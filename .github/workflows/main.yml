@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm install
-      - run: npm run check-lint
-      - run: npm run check-format
-      - run: npm run test
-      - run: npm run build-ci
+      - run: pnpm install
+      - run: pnpm run check-lint
+      - run: pnpm run check-format
+      - run: pnpm run test
+      - run: pnpm run build-ci
