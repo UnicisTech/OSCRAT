@@ -41,7 +41,7 @@ Please follow these simple steps to get a local copy up and running.
 
 - Node.js (Version: >=18.x)
 - PostgreSQL
-- NPM
+- PNPM
 - Docker compose
 
 ### Development
@@ -52,19 +52,19 @@ Please follow these simple steps to get a local copy up and running.
 - Clone the repository by using this command:
 
 ```bash
-git clone https://github.com/<your_github_username>/unicis-platform-ce.git
+git clone https://github.com/RaduCatalinAndrei/OSCRAT.git
 ```
 
 #### 2. Go to the project folder
 
 ```bash
-cd unicis-platform-ce
+cd oscrat
 ```
 
 #### 3. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 #### 4. Set up your .env file
@@ -94,7 +94,7 @@ npx prisma db push
 In a development environment:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 #### 8. Start the Prisma Studio
@@ -114,13 +114,13 @@ Update `playwright.config.ts` to change the playwright configuration.
 ##### Install Playwright dependencies
 
 ```bash
-npm run playwright:update
+pnpm run playwright:update
 ```
 
 ##### Run E2E tests
 
 ```bash
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 _Note: HTML test report is generated inside the `report` folder. Currently supported browsers for test execution `chromium` and `firefox`_
