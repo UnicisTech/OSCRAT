@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import colors from 'tailwindcss/colors';
 import type { AppPropsWithLayout } from 'types';
 import mixpanel from 'mixpanel-browser';
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from 'next-themes';
 
 import { init } from '@socialgouv/matomo-next';
 

@@ -1,38 +1,43 @@
-import { ComputerDesktopIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import {
+  ComputerDesktopIcon,
+  MoonIcon,
+  SunIcon,
+} from '@heroicons/react/24/outline';
 import { useTranslation } from 'next-i18next';
 
 export const useThemeIcon = () => {
-    const { t } = useTranslation('common');
+  const { t } = useTranslation('common');
 
-    const themes = [
-        {
-            id: 'system',
-            name: t('system'),
-            icon: ComputerDesktopIcon,
-        },
-        {
-            id: 'dark',
-            name: t('dark'),
-            icon: MoonIcon,
-        },
-        {
-            id: 'light',
-            name: t('light'),
-            icon: SunIcon,
-        },
-    ];
+  const themes = [
+    {
+      id: 'system',
+      name: t('system'),
+      icon: ComputerDesktopIcon,
+    },
+    {
+      id: 'dark',
+      name: t('dark'),
+      icon: MoonIcon,
+    },
+    {
+      id: 'light',
+      name: t('light'),
+      icon: SunIcon,
+    },
+  ];
 
-    const getThemeComponent = (themeId: string): JSX.Element => {
-        const selectedTheme = themes.find(theme => theme.id === themeId) || themes[0];
-        const IconComponent = selectedTheme.icon;
+  const getThemeComponent = (themeId: string): JSX.Element => {
+    const selectedTheme =
+      themes.find((theme) => theme.id === themeId) || themes[0];
+    const IconComponent = selectedTheme.icon;
 
-        return (
-            <>
-                <IconComponent className="w-5 h-5" />
-                {selectedTheme.name}
-                </>
-        );
-    };
+    return (
+      <>
+        <IconComponent className="w-5 h-5" />
+        {selectedTheme.name}
+      </>
+    );
+  };
 
-    return { themes, getThemeComponent };
+  return { themes, getThemeComponent };
 };

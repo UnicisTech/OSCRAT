@@ -257,7 +257,7 @@ const getOptionStyle = (label: string) => {
     'Not Applicable': 'bg-gray-500 text-white font-bold',
     'Not Performed': 'bg-red-600 text-white font-bold',
     'Performed Informally': 'bg-pink-700 text-white font-bold',
-    'Planned': 'bg-gray-700 text-white font-bold',
+    Planned: 'bg-gray-700 text-white font-bold',
     'Well Defined': 'bg-yellow-500 text-white font-bold',
     'Quantitatively Controlled': 'bg-green-500 text-white font-bold',
     'Continuously Improving': 'bg-green-700 text-white font-bold',

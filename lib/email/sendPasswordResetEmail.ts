@@ -3,7 +3,7 @@ import { render } from '@react-email/render';
 import { ResetPasswordEmail } from '@/components/emailTemplates';
 
 export const sendPasswordResetEmail = async (email: string, url: string) => {
-  const html = render(ResetPasswordEmail({ url }));
+  const html = await render(ResetPasswordEmail({ url }));
   await sendEmail({
     to: email,
     subject: 'Reset Your BoxyHQ Password',
