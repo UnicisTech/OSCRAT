@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSession } from 'next-auth/react';
+import { useToggleTheme } from '@/hooks/useToggleTheme';
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
@@ -8,7 +9,6 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import useTheme from 'hooks/useTheme';
 import env from '@/lib/env';
 import { signOut } from 'next-auth/react';
 import { ThemeModes } from '@atlaskit/theme/types';
@@ -18,14 +18,10 @@ interface HeaderProps {
   themeCallback: React.Dispatch<React.SetStateAction<ThemeModes>>;
 }
 
-const Header = ({ setSidebarOpen, themeCallback }: HeaderProps) => {
-  const { toggleTheme, theme } = useTheme();
+const Header = ({ setSidebarOpen }: HeaderProps) => {
+  const { toggleTheme } = useToggleTheme();
 
   const { status, data } = useSession();
-
-  useEffect(() => {
-    themeCallback(theme as ThemeModes);
-  }, [theme]);
 
   if (status === 'loading' || !data) {
     return null;

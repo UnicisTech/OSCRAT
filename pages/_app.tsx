@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import colors from 'tailwindcss/colors';
 import type { AppPropsWithLayout } from 'types';
 import mixpanel from 'mixpanel-browser';
+import { ThemeProvider } from "next-themes";
 
 import { init } from '@socialgouv/matomo-next';
 
@@ -13,7 +14,6 @@ import '@boxyhq/react-ui/dist/style.css';
 import '../styles/globals.css';
 import { useEffect } from 'react';
 import env from '@/lib/env';
-import { Theme, applyTheme } from '@/lib/theme';
 import { Themer } from '@boxyhq/react-ui/shared';
 import { AccountLayout } from '@/components/layouts';
 
@@ -21,7 +21,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const { session, ...props } = pageProps;
 
   useEffect(() => {
-    // Add mixpanel
     if (env.mixpanel.token) {
       mixpanel.init(env.mixpanel.token, {
         debug: true,
@@ -34,20 +33,15 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     if (env.matomo.url && env.matomo.siteId) {
       init({ url: env.matomo.url, siteId: env.matomo.siteId });
     }
-
-    if (env.darkModeEnabled) {
-      applyTheme(localStorage.getItem('theme') as Theme);
-    }
   }, []);
 
   const getLayout =
     Component.getLayout || ((page) => <AccountLayout>{page}</AccountLayout>);
 
   return (
-    <>
+    <ThemeProvider attribute="class" defaultTheme="light">
       <Head>
         <title>{app.name}</title>
-        {/* <link rel="icon" href='https://www.unicis.tech/img/logo-unicis.png' /> */}
         <link rel="icon" href="https://www.unicis.tech/favicon.ico" />
       </Head>
       <SessionProvider session={session}>
@@ -71,7 +65,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           {getLayout(<Component {...props} />)}
         </Themer>
       </SessionProvider>
-    </>
+    </ThemeProvider>
   );
 }
 

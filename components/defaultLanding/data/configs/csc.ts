@@ -252,73 +252,21 @@ const taskStatusOptions: { label: string; value: number }[] = [
   },
 ];
 
-const colourStyles = {
-  control: (styles: any) => ({ ...styles }),
-  option: (styles: any, { data }: any) => {
-    if (data.label === 'Not Applicable') {
-      return {
-        ...styles,
-        color: 'white',
-        fontWeight: 'bold',
-        backgroundColor: 'rgba(178,178,178,255)',
-      };
-    }
-    if (data.label === 'Not Performed') {
-      return {
-        ...styles,
-        color: 'white',
-        fontWeight: 'bold',
-        backgroundColor: 'rgba(255,0,0,255)',
-      };
-    }
-    if (data.label === 'Performed Informally') {
-      return {
-        ...styles,
-        color: 'white',
-        fontWeight: 'bold',
-        backgroundColor: 'rgba(202,0,63,255)',
-      };
-    }
-    if (data.label === 'Planned') {
-      return {
-        ...styles,
-        color: 'white',
-        fontWeight: 'bold',
-        backgroundColor: 'rgba(102,102,102,255)',
-      };
-    }
-    if (data.label === 'Well Defined') {
-      return {
-        ...styles,
-        color: 'white',
-        fontWeight: 'bold',
-        backgroundColor: 'rgba(255,190,0,255)',
-      };
-    }
-    if (data.label === 'Quantitatively Controlled') {
-      return {
-        ...styles,
-        color: 'white',
-        fontWeight: 'bold',
-        backgroundColor: 'rgba(106,217,0,255)',
-      };
-    }
-    if (data.label === 'Continuously Improving') {
-      return {
-        ...styles,
-        color: 'white',
-        fontWeight: 'bold',
-        backgroundColor: 'rgba(47,143,0,255)',
-      };
-    }
-    return {
-      ...styles,
-    };
-  },
+const getOptionStyle = (label: string) => {
+  const styles: Record<string, string> = {
+    'Not Applicable': 'bg-gray-500 text-white font-bold',
+    'Not Performed': 'bg-red-600 text-white font-bold',
+    'Performed Informally': 'bg-pink-700 text-white font-bold',
+    'Planned': 'bg-gray-700 text-white font-bold',
+    'Well Defined': 'bg-yellow-500 text-white font-bold',
+    'Quantitatively Controlled': 'bg-green-500 text-white font-bold',
+    'Continuously Improving': 'bg-green-700 text-white font-bold',
+  };
+  return styles[label] || 'bg-white text-black';
 };
 
 export {
-  colourStyles,
+  getOptionStyle,
   mergePoints,
   getRadarChartLabels,
   getControlOptions,
