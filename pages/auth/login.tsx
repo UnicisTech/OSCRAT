@@ -59,6 +59,12 @@ const Login: NextPageWithLayout<
   };
 
   useEffect(() => {
+    if (status === 'authenticated') {
+      router.push(env.redirectIfAuthenticated);
+    }
+  }, [status]);
+
+  useEffect(() => {
     if (error) {
       setMessage({ text: error, status: 'error' });
     }
@@ -116,9 +122,9 @@ const Login: NextPageWithLayout<
     return <Loading />;
   }
 
-  if (status === 'authenticated') {
-    router.push(redirectUrl);
-  }
+  // if (status === 'authenticated') {
+  //   router.replace(redirectUrl);
+  // }
 
   const params = token ? `?token=${token}` : '';
 
