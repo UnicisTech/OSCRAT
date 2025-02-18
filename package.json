@@ -103,6 +103,7 @@
     "react-quill": "^2.0.0",
     "react-youtube": "^10.1.0",
     "remark-gfm": "^4.0.0",
+    "sharp": "^0.33.5",
     "styled-components": "^6.1.11",
     "superjson": "2.2.1",
     "svix": "1.24.0",
@@ -159,7 +160,11 @@
       "esbuild",
       "prisma",
       "protobufjs",
+      "sharp",
       "sqlite3"
+    ],
+    "ignoredBuiltDependencies": [
+      "sharp"
     ]
   }
 }
