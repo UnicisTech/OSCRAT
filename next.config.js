@@ -2,7 +2,6 @@
 const { i18n } = require('./next-i18next.config');
 
 // Redirect root url to login page
-
 const redirects = [
   {
     source: '/',
