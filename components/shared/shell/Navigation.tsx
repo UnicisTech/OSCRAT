@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import TeamNavigation from './TeamNavigation';
-import UserNavigation from './UserNavigation';
-import CopyrightItem from './CopyrightItem';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import TeamNavigation from "./TeamNavigation";
+import UserNavigation from "./UserNavigation";
+import CopyrightItem from "./CopyrightItem";
 
 const Navigation = () => {
   const { asPath, isReady, query } = useRouter();

@@ -33,7 +33,7 @@ const StatusesTable = ({
   taskSelectorHandler: (
     action: string,
     dataToRemove: any,
-    control: string
+    control: string,
   ) => Promise<void>;
 }) => {
   const router = useRouter();
@@ -78,7 +78,7 @@ const StatusesTable = ({
       filteredControls = filteredControls.filter((control) =>
         statusFilter
           .map((option) => option.label)
-          .includes(statuses[control.value.control])
+          .includes(statuses[control.value.control]),
       );
     }
 
@@ -91,8 +91,8 @@ const StatusesTable = ({
         <div className="overflow-x- mt-2">
           {/* <table className="w-full table-fixed text-left text-sm text-gray-500 dark:text-gray-400">
             <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400"> */}
-          <table className="text-sm table w-full border-b dark:border-base-200">
-            <thead className="bg-base-200 dark:bg-gray-700 dark:text-gray-400">
+          <table className="table w-full border-b text-sm dark:border-base-200">
+            <thead className="bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="px-6 py-3">
                   Code
@@ -126,12 +126,12 @@ const StatusesTable = ({
                     {option.value.controlLabel || option.value.control}
                   </td>
                   <td className="px-6 py-3">
-                    <span style={{ whiteSpace: 'pre-line' }}>
+                    <span style={{ whiteSpace: "pre-line" }}>
                       {option.value.requirements}
                     </span>
                   </td>
                   <td className="px-6 py-3">
-                    {canAccess('task', ['update']) ? (
+                    {canAccess("task", ["update"]) ? (
                       <div className="w-40">
                         <StatusSelector
                           statusValue={statuses[option.value.control]}
@@ -140,20 +140,20 @@ const StatusesTable = ({
                           isDisabled={
                             !tasks.filter((task: any) =>
                               task.properties?.[cscControlsProp]?.find(
-                                (item: string) => item === option.value.control
-                              )
+                                (item: string) => item === option.value.control,
+                              ),
                             ).length
                           }
                         />
                       </div>
                     ) : (
-                      <span style={{ whiteSpace: 'pre-line' }}>
+                      <span style={{ whiteSpace: "pre-line" }}>
                         {statuses[option.value.control]}
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-3 w-40">
-                    {canAccess('task', ['update']) ? (
+                  <td className="w-40 px-6 py-3">
+                    {canAccess("task", ["update"]) ? (
                       <TaskSelector
                         tasks={tasks}
                         control={option.value.control}
@@ -170,19 +170,19 @@ const StatusesTable = ({
           </table>
         </div>
         {pageData.length ? (
-          <div className="w-full mt-3">
-            <div className="flex justify-center w-30">
+          <div className="mt-3 w-full">
+            <div className="w-30 flex justify-center">
               <div className="btn-group join grid grid-cols-10">
                 <button
-                  className="join-item btn btn-outline col-span-4"
+                  className="btn btn-outline join-item col-span-4"
                   onClick={goToPreviousPage}
                   disabled={prevButtonDisabled}
                 >
                   Previous page
                 </button>
-                <button className="join-item btn btn-outline col-span-2">{`${currentPage}/${totalPages}`}</button>
+                <button className="btn btn-outline join-item col-span-2">{`${currentPage}/${totalPages}`}</button>
                 <button
-                  className="join-item btn btn-outline col-span-4"
+                  className="btn btn-outline join-item col-span-4"
                   onClick={goToNextPage}
                   disabled={nextButtonDisabled}
                 >

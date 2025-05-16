@@ -1,19 +1,19 @@
-import { InputWithLabel } from '@/components/shared';
-import type { FormikConfig } from 'formik';
-import { useFormik } from 'formik';
-import { useTranslation } from 'next-i18next';
-import React from 'react';
-import { Button } from 'react-daisyui';
-import type { WebookFormSchema } from 'types';
-import * as Yup from 'yup';
-import Modal from '../shared/Modal';
-import EventTypes from './EventTypes';
+import { InputWithLabel } from "@/components/shared";
+import type { FormikConfig } from "formik";
+import { useFormik } from "formik";
+import { useTranslation } from "next-i18next";
+import React from "react";
+import { Button } from "react-daisyui";
+import type { WebookFormSchema } from "types";
+import * as Yup from "yup";
+import Modal from "../shared/Modal";
+import EventTypes from "./EventTypes";
 
 interface FormProps {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   initialValues: WebookFormSchema;
-  onSubmit: FormikConfig<WebookFormSchema>['onSubmit'];
+  onSubmit: FormikConfig<WebookFormSchema>["onSubmit"];
   title: string;
 }
 
@@ -28,7 +28,7 @@ const Form = ({
     validationSchema: Yup.object().shape({
       name: Yup.string().required(),
       url: Yup.string().required().url(),
-      eventTypes: Yup.array().min(1, 'Please choose at least one event type'),
+      eventTypes: Yup.array().min(1, "Please choose at least one event type"),
     }),
     initialValues,
     enableReinitialize: true,
@@ -36,7 +36,7 @@ const Form = ({
     validateOnBlur: false,
   });
 
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
 
   const toggleVisible = () => {
     setVisible(!visible);
@@ -47,7 +47,7 @@ const Form = ({
     <Modal open={visible} close={toggleVisible}>
       <form onSubmit={formik.handleSubmit} method="POST">
         <Modal.Header>{title}</Modal.Header>
-        <Modal.Description>{t('webhook-create-desc')}</Modal.Description>
+        <Modal.Description>{t("webhook-create-desc")}</Modal.Description>
         <Modal.Body>
           <div className="flex flex-col space-y-3">
             <InputWithLabel
@@ -70,15 +70,15 @@ const Form = ({
             <div className="divider"></div>
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">{t('events-to-send')}</span>
+                <span className="label-text">{t("events-to-send")}</span>
               </label>
-              <p className="ml-1 mb-3 text-sm font-normal text-gray-500">
-                {t('events-description')}
+              <p className="mb-3 ml-1 text-sm font-normal text-gray-500">
+                {t("events-description")}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <EventTypes
                   onChange={formik.handleChange}
-                  values={initialValues['eventTypes']}
+                  values={initialValues["eventTypes"]}
                   error={formik.errors.eventTypes}
                 />
               </div>
@@ -94,7 +94,7 @@ const Form = ({
             }}
             size="md"
           >
-            {t('close')}
+            {t("close")}
           </Button>
           <Button
             type="submit"
@@ -103,7 +103,7 @@ const Form = ({
             active={formik.dirty}
             size="md"
           >
-            {t('create-webhook')}
+            {t("create-webhook")}
           </Button>
         </Modal.Footer>
       </form>

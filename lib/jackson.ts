@@ -5,11 +5,11 @@ import jackson, {
   JacksonOption,
   ISPSSOConfig,
   OIDCAuthzResponsePayload,
-} from '@boxyhq/saml-jackson';
+} from "@boxyhq/saml-jackson";
 
 export type { OIDCAuthzResponsePayload };
 
-import env from './env';
+import env from "./env";
 
 const opts = {
   externalUrl: env.appUrl,
@@ -17,11 +17,11 @@ const opts = {
   oidcPath: env.jackson.sso.oidcPath,
   samlAudience: env.jackson.sso.issuer,
   db: {
-    engine: 'sql',
-    type: 'postgres',
+    engine: "sql",
+    type: "postgres",
     url: env.databaseUrl,
   },
-  idpDiscoveryPath: '/auth/sso/idp-select',
+  idpDiscoveryPath: "/auth/sso/idp-select",
   idpEnabled: true,
   openid: {},
 } as JacksonOption;

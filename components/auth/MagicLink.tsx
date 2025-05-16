@@ -18,10 +18,10 @@ interface MagicLinkProps {
 const MagicLink = ({ csrfToken }: MagicLinkProps) => {
   const router = useRouter();
   const { status } = useSession();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const { invitation } = useInvitation();
 
-  const params = invitation ? `?token=${invitation.token}` : '';
+  const params = invitation ? `?token=${invitation.token}` : "";
 
   const callbackUrl = invitation
     ? `/invitations/${invitation.token}`
@@ -29,13 +29,13 @@ const MagicLink = ({ csrfToken }: MagicLinkProps) => {
 
   const formik = useFormik({
     initialValues: {
-      email: '',
+      email: "",
     },
     validationSchema: Yup.object().shape({
       email: Yup.string().required().email(),
     }),
     onSubmit: async (values) => {
-      const response = await signIn('email', {
+      const response = await signIn("email", {
         email: values.email,
         csrfToken,
         redirect: false,
@@ -45,31 +45,31 @@ const MagicLink = ({ csrfToken }: MagicLinkProps) => {
       formik.resetForm();
 
       if (response?.error) {
-        toast.error(t('email-login-error'));
+        toast.error(t("email-login-error"));
         return;
       }
 
       if (response?.status === 200 && response?.ok) {
-        toast.success(t('email-login-success'));
+        toast.success(t("email-login-success"));
         return;
       }
     },
   });
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return <Loading />;
   }
 
-  if (status === 'authenticated') {
+  if (status === "authenticated") {
     router.push(env.redirectIfAuthenticated);
   }
 
   return (
     <>
       <Head>
-        <title>{t('magic-link-title')}</title>
+        <title>{t("magic-link-title")}</title>
       </Head>
-      <div className="rounded p-6 border">
+      <div className="rounded border p-6">
         <form onSubmit={formik.handleSubmit}>
           <div className="space-y-2">
             <InputWithLabel
@@ -90,7 +90,7 @@ const MagicLink = ({ csrfToken }: MagicLinkProps) => {
               fullWidth
               size="md"
             >
-              {t('send-magic-link')}
+              {t("send-magic-link")}
             </Button>
           </div>
         </form>
@@ -98,22 +98,22 @@ const MagicLink = ({ csrfToken }: MagicLinkProps) => {
         <div className="space-y-3">
           <Link
             href={`/auth/login/${params}`}
-            className="btn-outline btn w-full"
+            className="btn btn-outline w-full"
           >
-            &nbsp;{t('sign-in-with-password')}
+            &nbsp;{t("sign-in-with-password")}
           </Link>
-          <Link href="/auth/sso" className="btn-outline btn w-full">
-            &nbsp;{t('continue-with-saml-sso')}
+          <Link href="/auth/sso" className="btn btn-outline w-full">
+            &nbsp;{t("continue-with-saml-sso")}
           </Link>
         </div>
       </div>
-      <p className="text-center text-sm text-gray-600 mt-3">
-        {t('dont-have-an-account')}
+      <p className="mt-3 text-center text-sm text-gray-600">
+        {t("dont-have-an-account")}
         <Link
           href={`/auth/join${params}`}
           className="font-medium text-indigo-600 hover:text-indigo-500"
         >
-          &nbsp;{t('create-a-free-account')}
+          &nbsp;{t("create-a-free-account")}
         </Link>
       </p>
     </>

@@ -1,13 +1,10 @@
 module.exports = {
-  mode: 'jit',
-  darkMode: 'class',
+  mode: "jit",
+  darkMode: "class",
   content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
-    'node_modules/daisyui/dist/**/*.js',
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+    "node_modules/daisyui/dist/**/*.js",
   ],
-  daisyui: {
-    themes: false,
-  },
-  plugins: [require('@tailwindcss/typography'), require('daisyui')],
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
 };

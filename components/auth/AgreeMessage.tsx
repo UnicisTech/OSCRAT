@@ -1,8 +1,8 @@
-import { useTranslation } from 'next-i18next';
-import Link from 'next/link';
+import { useTranslation } from "next-i18next";
+import Link from "next/link";
 
 const AgreeMessage = ({ text }) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
 
   return (
     <p className="text-sm text-center">
@@ -10,17 +10,16 @@ const AgreeMessage = ({ text }) => {
       <Link
         rel="noopener noreferrer"
         target="_blank"
-        href={'https://www.unicis.tech/terms'}
-        className="font-medium text-primary hover:text-primary-focus"
+        href={"https://www.unicis.tech/terms"}
+        className="hover:text-primary-focus font-medium text-primary"
       >
-        {t('terms')}
+        {t("terms")}
       </Link>
-      {','}
       <Link
         rel="noopener noreferrer"
         target="_blank"
-        href={'https://www.unicis.tech/privacy'}
-        className="font-medium text-primary hover:text-primary-focus"
+        href={"https://www.unicis.tech/privacy"}
+        className="hover:text-primary-focus font-medium text-primary"
       >
         {t('privacy')}
       </Link>
@@ -28,10 +27,10 @@ const AgreeMessage = ({ text }) => {
       <Link
         rel="noopener noreferrer"
         target="_blank"
-        href={'https://www.unicis.tech/security'}
-        className="font-medium text-primary hover:text-primary-focus"
+        href={"https://www.unicis.tech/security"}
+        className="hover:text-primary-focus font-medium text-primary"
       >
-        {t('security')}
+        {t("security")}
       </Link>
     </p>
   );

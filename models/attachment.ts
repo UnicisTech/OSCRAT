@@ -1,11 +1,11 @@
-import json from '@/components/defaultLanding/data/availableExtensions.json';
-import { PrismaClient } from '@prisma/client';
-import formidable from 'formidable';
-import fs from 'fs';
-import { NextApiRequest } from 'next';
-import { v4 as uuidv4 } from 'uuid';
+import json from "@/components/defaultLanding/data/availableExtensions.json";
+import { PrismaClient } from "@prisma/client";
+import formidable from "formidable";
+import fs from "fs";
+import { NextApiRequest } from "next";
+import { v4 as uuidv4 } from "uuid";
 
-const availableExtensions = json['availableExtensions'] as any;
+const availableExtensions = json["availableExtensions"] as any;
 
 const prisma = new PrismaClient();
 
@@ -14,7 +14,7 @@ export const createAttachment = async (
   filename: string,
   fileData: Buffer,
   url: string,
-  attachmentId: string
+  attachmentId: string,
 ) => {
   return prisma.attachment.create({
     data: {
@@ -35,7 +35,7 @@ export const findAttachmentById = async (id: string) => {
 };
 
 export const readFile = (
-  req: NextApiRequest
+  req: NextApiRequest,
 ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   const options: formidable.Options = {};
   options.maxFileSize = 10 * 1024 * 1024;
@@ -65,7 +65,7 @@ export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
     filename as string,
     fileData,
     url,
-    attachmentId
+    attachmentId,
   );
 
   await fs.promises.unlink(tempPath);
@@ -82,7 +82,7 @@ export const deleteAttachment = async (id: string) => {
 };
 
 const getFileExtensionFromFileName = (fileName: string) => {
-  const lastDotIndex = fileName.lastIndexOf('.');
+  const lastDotIndex = fileName.lastIndexOf(".");
   if (lastDotIndex !== -1 && lastDotIndex < fileName.length - 1) {
     return fileName.substr(lastDotIndex + 1).toLowerCase();
   }

@@ -25,16 +25,16 @@ const TaskById = ({
 }: {
   csc_statuses: { [key: string]: string };
 }) => {
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState("Overview");
   const [statuses, setStatuses] = useState(csc_statuses);
-  const [activeCommentTab, setActiveCommentTab] = useState('Comments');
+  const [activeCommentTab, setActiveCommentTab] = useState("Comments");
   const router = useRouter();
   const { taskNumber, slug } = router.query;
   const { teamContext } = useTeamContext();
   const team = teamContext.team!;
   const { task, isLoading, isError, error } = useTask(
     slug as string,
-    taskNumber as string
+    taskNumber as string,
   );
   const { iso } = useISO(slug as string);
 
@@ -56,7 +56,7 @@ const TaskById = ({
       />
       <h3 className="text-2xl font-bold">{task.title}</h3>
       <TaskTab activeTab={activeTab} setActiveTab={setActiveTab} />
-      {activeTab === 'Overview' && (
+      {activeTab === "Overview" && (
         <>
           <Card heading="Details">
             <Card.Body>
@@ -70,7 +70,7 @@ const TaskById = ({
           </Card>
         </>
       )}
-      {activeTab === 'Cybersecurity Controls' && (
+      {activeTab === "Cybersecurity Controls" && (
         <Card heading="CSC panel">
           <Card.Body>
             <CscPanel
@@ -86,14 +86,14 @@ const TaskById = ({
         activeTab={activeCommentTab}
         setActiveTab={setActiveCommentTab}
       />
-      {activeCommentTab === 'Comments' && (
+      {activeCommentTab === "Comments" && (
         <Card heading="Comments">
           <Card.Body>
             <Comments task={task} />
           </Card.Body>
         </Card>
       )}
-      {activeCommentTab === 'Audit logs' && (
+      {activeCommentTab === "Audit logs" && (
         <>
           <Card heading="CSC Audit logs">
             <Card.Body>
@@ -122,7 +122,7 @@ export async function getServerSideProps({
 
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
+      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
       csc_statuses: await getCscStatusesBySlug(slug),
     },
   };

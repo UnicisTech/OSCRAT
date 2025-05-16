@@ -22,7 +22,7 @@ const CreateTeam = ({ visible, setVisible }: CreateTeamProps) => {
 
   const formik = useFormik({
     initialValues: {
-      name: '',
+      name: "",
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().required(),
@@ -46,15 +46,15 @@ const CreateTeam = ({ visible, setVisible }: CreateTeamProps) => {
   return (
     <Modal open={visible} close={() => setVisible(false)}>
       <form onSubmit={formik.handleSubmit} method="POST">
-        <Modal.Header>{t('create-team')}</Modal.Header>
-        <Modal.Description>{t('members-of-a-team')}</Modal.Description>
+        <Modal.Header>{t("create-team")}</Modal.Header>
+        <Modal.Description>{t("members-of-a-team")}</Modal.Description>
         <Modal.Body>
           <InputWithLabel
-            label={t('name')}
+            label={t("name")}
             name="name"
             onChange={formik.handleChange}
             value={formik.values.name}
-            placeholder={t('team-name')}
+            placeholder={t("team-name")}
             required
           />
         </Modal.Body>
@@ -67,7 +67,7 @@ const CreateTeam = ({ visible, setVisible }: CreateTeamProps) => {
             }}
             size="md"
           >
-            {t('close')}
+            {t("close")}
           </Button>
           <Button
             type="submit"
@@ -76,7 +76,7 @@ const CreateTeam = ({ visible, setVisible }: CreateTeamProps) => {
             size="md"
             disabled={!formik.dirty || !formik.isValid}
           >
-            {t('create-team')}
+            {t("create-team")}
           </Button>
         </Modal.Footer>
       </form>

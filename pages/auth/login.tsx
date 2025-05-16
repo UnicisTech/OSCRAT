@@ -1,32 +1,32 @@
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
-} from 'next';
+} from "next";
 
-import * as Yup from 'yup';
-import Link from 'next/link';
-import { useFormik } from 'formik';
-import toast from 'react-hot-toast';
-import { Button } from 'react-daisyui';
-import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
-import React, { type ReactElement, useEffect, useState, useRef } from 'react';
-import type { ComponentStatus } from 'react-daisyui/dist/types';
-import { getCsrfToken, signIn, useSession } from 'next-auth/react';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import * as Yup from "yup";
+import Link from "next/link";
+import { useFormik } from "formik";
+import toast from "react-hot-toast";
+import { Button } from "react-daisyui";
+import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
+import React, { type ReactElement, useEffect, useState, useRef } from "react";
+import type { ComponentStatus } from "react-daisyui/dist/types";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
-import env from '@/lib/env';
-import type { NextPageWithLayout } from 'types';
-import { AuthLayout } from '@/components/layouts';
+import env from "@/lib/env";
+import type { NextPageWithLayout } from "types";
+import { AuthLayout } from "@/components/layouts";
 // import GithubButton from '@/components/auth/GithubButton';
 // import GoogleButton from '@/components/auth/GoogleButton';
-import { Alert, InputWithLabel, Loading } from '@/components/shared';
-import { authProviderEnabled } from '@/lib/auth';
-import Head from 'next/head';
-import TogglePasswordVisibility from '@/components/shared/TogglePasswordVisibility';
-import AgreeMessage from '@/components/auth/AgreeMessage';
-import GoogleReCAPTCHA from '@/components/shared/GoogleReCAPTCHA';
-import ReCAPTCHA from 'react-google-recaptcha';
+import { Alert, InputWithLabel, Loading } from "@/components/shared";
+import { authProviderEnabled } from "@/lib/auth";
+import Head from "next/head";
+import TogglePasswordVisibility from "@/components/shared/TogglePasswordVisibility";
+import AgreeMessage from "@/components/auth/AgreeMessage";
+import GoogleReCAPTCHA from "@/components/shared/GoogleReCAPTCHA";
+import ReCAPTCHA from "react-google-recaptcha";
 
 interface Message {
   text: string | null;
@@ -42,8 +42,8 @@ const Login: NextPageWithLayout<
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { status } = useSession();
-  const { t } = useTranslation('common');
-  const [recaptchaToken, setRecaptchaToken] = useState<string>('');
+  const { t } = useTranslation("common");
+  const [recaptchaToken, setRecaptchaToken] = useState<string>("");
   const [message, setMessage] = useState<Message>({ text: null, status: null });
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
@@ -59,18 +59,18 @@ const Login: NextPageWithLayout<
   };
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (status === "authenticated") {
       router.push(env.redirectIfAuthenticated);
     }
   }, [status]);
 
   useEffect(() => {
     if (error) {
-      setMessage({ text: error, status: 'error' });
+      setMessage({ text: error, status: "error" });
     }
 
     if (success) {
-      setMessage({ text: success, status: 'success' });
+      setMessage({ text: success, status: "success" });
     }
   }, [error, success]);
 
@@ -89,8 +89,8 @@ const Login: NextPageWithLayout<
 
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
     validationSchema: Yup.object().shape({
       email: Yup.string().required().email(),
@@ -99,7 +99,7 @@ const Login: NextPageWithLayout<
     onSubmit: async (values) => {
       const { email, password } = values;
 
-      const response = await signIn('credentials', {
+      const response = await signIn("credentials", {
         email,
         password,
         csrfToken,
@@ -118,7 +118,7 @@ const Login: NextPageWithLayout<
     },
   });
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return <Loading />;
   }
 
@@ -126,17 +126,17 @@ const Login: NextPageWithLayout<
   //   router.replace(redirectUrl);
   // }
 
-  const params = token ? `?token=${token}` : '';
+  const params = token ? `?token=${token}` : "";
 
   return (
     <>
       <Head>
-        <title>{t('login-title')}</title>
+        <title>{t("login-title")}</title>
       </Head>
       {message.text && message.status && (
         <Alert status={message.status}>{t(message.text)}</Alert>
       )}
-      <div className="rounded p-6 border">
+      <div className="rounded border p-6">
         {/* <div className="flex gap-2 flex-wrap">
           {authProviders.github && <GithubButton />}
           {authProviders.google && <GoogleButton />}
@@ -159,7 +159,7 @@ const Login: NextPageWithLayout<
               />
               <div className="relative flex">
                 <InputWithLabel
-                  type={isPasswordVisible ? 'text' : 'password'}
+                  type={isPasswordVisible ? "text" : "password"}
                   name="password"
                   placeholder="Password"
                   value={formik.values.password}
@@ -169,9 +169,9 @@ const Login: NextPageWithLayout<
                       <span className="label-text-alt">
                         <Link
                           href="/auth/forgot-password"
-                          className="text-sm text-primary hover:text-primary-focus"
+                          className="hover:text-primary-focus text-sm text-primary"
                         >
-                          {t('forgot-password')}
+                          {t("forgot-password")}
                         </Link>
                       </span>
                     </label>
@@ -201,7 +201,7 @@ const Login: NextPageWithLayout<
                 fullWidth
                 size="md"
               >
-                {t('sign-in')}
+                {t("sign-in")}
               </Button>
               <AgreeMessage text="sign-in" />
             </div>
@@ -216,26 +216,26 @@ const Login: NextPageWithLayout<
           {authProviders.email && (
             <Link
               href={`/auth/magic-link${params}`}
-              className="btn-outline btn w-full"
+              className="btn btn-outline w-full"
             >
-              &nbsp;{t('sign-in-with-email')}
+              &nbsp;{t("sign-in-with-email")}
             </Link>
           )}
 
           {authProviders.saml && (
-            <Link href="/auth/sso" className="btn-outline btn w-full">
-              &nbsp;{t('continue-with-saml-sso')}
+            <Link href="/auth/sso" className="btn btn-outline w-full">
+              &nbsp;{t("continue-with-saml-sso")}
             </Link>
           )}
         </div>
       </div>
-      <p className="text-center text-sm text-gray-600 mt-3">
-        {t('dont-have-an-account')}
+      <p className="mt-3 text-center text-sm text-gray-600">
+        {t("dont-have-an-account")}
         <Link
           href={`/auth/join${params}`}
-          className="font-medium text-primary hover:text-primary-focus"
+          className="hover:text-primary-focus font-medium text-primary"
         >
-          &nbsp;{t('create-a-free-account')}
+          &nbsp;{t("create-a-free-account")}
         </Link>
       </p>
     </>
@@ -251,13 +251,13 @@ Login.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   const { locale } = context;
 
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
+      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
       csrfToken: await getCsrfToken(context),
       authProviders: authProviderEnabled(),
       recaptchaSiteKey: env.recaptcha.siteKey,

@@ -1,9 +1,9 @@
-import type { User } from '@prisma/client';
-import UploadAvatar from './UploadAvatar';
-import UpdateName from './UpdateName';
-import UpdateEmail from './UpdateEmail';
-import UpdateTheme from './UpdateTheme';
-import env from '@/lib/env';
+import type { User } from "@prisma/client";
+import UploadAvatar from "./UploadAvatar";
+import UpdateName from "./UpdateName";
+import UpdateEmail from "./UpdateEmail";
+import UpdateTheme from "./UpdateTheme";
+import env from "@/lib/env";
 
 interface UpdateAccountProps {
   user: Partial<User>;
@@ -12,7 +12,7 @@ interface UpdateAccountProps {
 
 const UpdateAccount = ({ user, allowEmailChange }: UpdateAccountProps) => {
   return (
-    <div className="flex gap-6 flex-col">
+    <div className="flex flex-col gap-6">
       <UpdateName user={user} />
       <UpdateEmail user={user} allowEmailChange={allowEmailChange} />
       <UploadAvatar user={user} />

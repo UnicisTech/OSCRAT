@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import useCanAccess from '@/hooks/useCanAccess';
 
+
 const TeamDropdown = () => {
   const router = useRouter();
   const { slug } = router.query as { slug: string };
@@ -38,32 +39,32 @@ const TeamDropdown = () => {
     },
     {
       id: 1,
-      name: t('profile'),
+      name: t("profile"),
       items: [
         {
           id: data?.user.id,
           name: data?.user?.name,
-          href: '/settings/account',
+          href: "/settings/account",
           icon: UserCircleIcon,
         },
       ],
     },
     {
       id: 3,
-      name: '',
+      name: "",
       items: [
         {
-          id: 'all-teams',
-          name: t('all-teams'),
-          href: '/teams',
+          id: "all-teams",
+          name: t("all-teams"),
+          href: "/teams",
           icon: RectangleStackIcon,
         },
-        ...(canAccess('team', ['create'])
+        ...(canAccess("team", ["create"])
           ? [
               {
-                id: 'new-team',
-                name: t('new-team'),
-                href: '/teams?newTeam=true',
+                id: "new-team",
+                name: t("new-team"),
+                href: "/teams?newTeam=true",
                 icon: FolderPlusIcon,
               },
             ]
@@ -76,21 +77,21 @@ const TeamDropdown = () => {
     <div className="dropdown w-full">
       <div
         tabIndex={0}
-        className="border border-gray-300 dark:border-gray-600 flex h-10 items-center px-4 justify-between cursor-pointer rounded text-sm font-bold"
+        className="flex h-10 cursor-pointer items-center justify-between rounded border border-gray-300 px-4 text-sm font-bold dark:border-gray-600"
       >
         {currentTeam?.name || data?.user?.name}
         <ChevronUpDownIcon className="w-5 h-5" />
       </div>
       <ul
         tabIndex={0}
-        className="dropdown-content dark:border-gray-600 p-2 shadow-md bg-base-100 w-full rounded border px-2"
+        className="dropdown-content w-full rounded border bg-white p-2 px-2 shadow-md dark:border-gray-600 dark:bg-base-100"
       >
         {menus.map(({ id, name, items }) => {
           return (
             <React.Fragment key={id}>
               {name && (
                 <li
-                  className="text-xs text-gray-500 py-1 px-2"
+                  className="px-2 py-1 text-xs text-gray-500"
                   key={`${id}-name`}
                 >
                   {name}
@@ -106,8 +107,8 @@ const TeamDropdown = () => {
                   }}
                 >
                   <Link href={item.href}>
-                    <div className="flex hover:bg-gray-100 hover:dark:text-black focus:bg-gray-100 focus:outline-none py-2 px-2 rounded text-sm font-medium gap-2 items-center">
-                      <item.icon className="w-5 h-5" /> {item.name}
+                    <div className="flex items-center gap-2 rounded px-2 py-2 text-sm font-medium hover:bg-gray-100 focus:bg-gray-100 focus:outline-none hover:dark:text-black">
+                      <item.icon className="h-5 w-5" /> {item.name}
                     </div>
                   </Link>
                 </li>

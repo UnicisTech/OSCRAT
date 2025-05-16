@@ -30,7 +30,7 @@ AllTasks.getLayout = function getLayout(page: React.ReactNode) {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   const { locale }: GetServerSidePropsContext = context;
 

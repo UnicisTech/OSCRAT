@@ -14,9 +14,9 @@ import { useCreateTeamTask } from '@/lib/api/hooks';
 import { getCurrentStringDate } from '@/components/services/taskService';
 import type { CreateTaskData } from '@/lib/api/endpoints/tasks';
 
-import 'react-quill/dist/quill.snow.css';
-import dynamic from 'next/dynamic';
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import "react-quill/dist/quill.snow.css";
+import dynamic from "next/dynamic";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 interface Status {
   label: string;
@@ -38,7 +38,7 @@ interface Option {
 }
 
 const statuses: Status[] = statusesData;
-const DEFAULT_STATUS_VALUE = 'todo';
+const DEFAULT_STATUS_VALUE = "todo";
 
 const CreateTask = ({
   visible,
@@ -90,15 +90,15 @@ const CreateTask = ({
             {...formProps}
             ref={formRef}
             className="flex flex-col justify-between"
-            style={{ height: '92%' }}
+            style={{ height: "92%" }}
           >
             <Modal.Body>
               <div
                 style={{
-                  display: 'flex',
-                  width: '100%',
-                  margin: '0 auto',
-                  flexDirection: 'column',
+                  display: "flex",
+                  width: "100%",
+                  margin: "0 auto",
+                  flexDirection: "column",
                 }}
               >
                 <Field
@@ -117,7 +117,7 @@ const CreateTask = ({
                   name="status"
                   label="Status"
                   defaultValue={statuses.find(
-                    ({ value }) => value === DEFAULT_STATUS_VALUE
+                    ({ value }) => value === DEFAULT_STATUS_VALUE,
                   )}
                   aria-required={true}
                   isRequired
@@ -127,8 +127,8 @@ const CreateTask = ({
                     }
 
                     return new Promise((resolve) =>
-                      setTimeout(resolve, 300)
-                    ).then(() => 'Please select a status');
+                      setTimeout(resolve, 300),
+                    ).then(() => "Please select a status");
                   }}
                 >
                   {({ fieldProps: { id, ...rest }, error }) => (
@@ -139,9 +139,9 @@ const CreateTask = ({
                           {...rest}
                           options={statuses}
                           defaultValue={statuses.find(
-                            ({ value }) => value === DEFAULT_STATUS_VALUE
+                            ({ value }) => value === DEFAULT_STATUS_VALUE,
                           )}
-                          validationState={error ? 'error' : 'default'}
+                          validationState={error ? "error" : "default"}
                         />
                         {error && <ErrorMessage>{error}</ErrorMessage>}
                       </WithoutRing>
@@ -160,8 +160,8 @@ const CreateTask = ({
                     }
 
                     return new Promise((resolve) =>
-                      setTimeout(resolve, 300)
-                    ).then(() => 'Please select a due date');
+                      setTimeout(resolve, 300),
+                    ).then(() => "Please select a due date");
                   }}
                 >
                   {({ fieldProps: { id, ...rest }, error }) => (
@@ -194,7 +194,7 @@ const CreateTask = ({
                   setVisible(!visible);
                 }}
               >
-                {t('close')}
+                {t("close")}
               </Button>
               <LoadingButton
                 type="submit"
@@ -202,7 +202,7 @@ const CreateTask = ({
                 ref={submitButtonRef}
                 isLoading={submitting}
               >
-                {t('create')}
+                {t("create")}
               </LoadingButton>
             </Modal.Actions>
           </form>

@@ -23,7 +23,7 @@ const Settings = ({ teamFeatures }) => {
       <div className="space-y-6">
         <TeamSettings team={team} />
         <CSCSettings team={team} />
-        <AccessControl resource="team" actions={['delete']}>
+        <AccessControl resource="team" actions={["delete"]}>
           <RemoveTeam team={team} />
         </AccessControl>
       </div>
@@ -44,7 +44,7 @@ export async function getServerSideProps({
 }: GetServerSidePropsContext) {
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
+      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
       teamFeatures: env.teamFeatures,
     },
   };

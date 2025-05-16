@@ -1,40 +1,40 @@
-import env from '@/lib/env';
-import jackson from '@/lib/jackson';
-import { sendAudit } from '@/lib/retraced';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiError } from '@/lib/errors';
+import env from "@/lib/env";
+import jackson from "@/lib/jackson";
+import { sendAudit } from "@/lib/retraced";
+import { throwIfNoTeamAccess } from "models/team";
+import { throwIfNotAllowed } from "models/user";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { ApiError } from "@/lib/errors";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { method } = req;
 
   try {
     if (!env.teamFeatures.dsync) {
-      throw new ApiError(404, 'Not Found');
+      throw new ApiError(404, "Not Found");
     }
 
     switch (method) {
-      case 'GET':
+      case "GET":
         await handleGET(req, res);
         break;
-      case 'POST':
+      case "POST":
         await handlePOST(req, res);
         break;
-      case 'DELETE':
+      case "DELETE":
         await handleDELETE(req, res);
         break;
       default:
-        res.setHeader('Allow', 'GET, POST');
+        res.setHeader("Allow", "GET, POST");
         res.status(405).json({
           error: { message: `Method ${method} Not Allowed` },
         });
     }
   } catch (error: any) {
-    const message = error.message || 'Something went wrong';
+    const message = error.message || "Something went wrong";
     const status = error.status || 500;
 
     res.status(status).json({ error: { message } });
@@ -43,13 +43,13 @@ export default async function handler(
 
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_dsync', 'read');
+  throwIfNotAllowed(teamMember, "team_dsync", "read");
 
   const { directorySync } = await jackson();
 
   const { data, error } = await directorySync.directories.getByTenantAndProduct(
     teamMember.teamId,
-    env.product
+    env.product,
   );
 
   if (error) {
@@ -61,7 +61,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_dsync', 'create');
+  throwIfNotAllowed(teamMember, "team_dsync", "create");
 
   const { name, provider } = req.body;
 
@@ -79,8 +79,8 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   sendAudit({
-    action: 'dsync.connection.create',
-    crud: 'c',
+    action: "dsync.connection.create",
+    crud: "c",
     user: teamMember.user,
     team: teamMember.team,
   });
@@ -90,7 +90,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_dsync', 'delete');
+  throwIfNotAllowed(teamMember, "team_dsync", "delete");
 
   const { dsyncId } = req.query as { dsyncId: string };
 
@@ -99,8 +99,8 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   await directorySync.directories.delete(dsyncId);
 
   sendAudit({
-    action: 'dsync.connection.delete',
-    crud: 'd',
+    action: "dsync.connection.delete",
+    crud: "d",
     user: teamMember.user,
     team: teamMember.team,
   });

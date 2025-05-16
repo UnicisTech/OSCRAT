@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import { useTeam } from '@/hooks/useTeam';
 import { extractErrorMessage } from '@/lib/utils';
 
-import { AccessControl } from '../shared/AccessControl';
+import { AccessControl } from "../shared/AccessControl";
 
 const TeamSettings = ({ team }: { team: Team }) => {
   const router = useRouter();
@@ -25,10 +25,10 @@ const TeamSettings = ({ team }: { team: Team }) => {
       domain: team.domain,
     },
     validationSchema: Yup.object().shape({
-      name: Yup.string().required('Name is required'),
-      slug: Yup.string().required('Slug is required'),
+      name: Yup.string().required("Name is required"),
+      slug: Yup.string().required("Slug is required"),
       domain: Yup.string().nullable().matches(domainRegex, {
-        message: 'Invalid domain: ${value}',
+        message: "Invalid domain: ${value}",
       }),
     }),
     enableReinitialize: true,
@@ -53,34 +53,34 @@ const TeamSettings = ({ team }: { team: Team }) => {
         <Card>
           <Card.Body>
             <Card.Header>
-              <Card.Title>{t('team-settings')}</Card.Title>
-              <Card.Description>{t('team-settings-config')}</Card.Description>
+              <Card.Title>{t("team-settings")}</Card.Title>
+              <Card.Description>{t("team-settings-config")}</Card.Description>
             </Card.Header>
             <div className="flex flex-col gap-4">
               <InputWithLabel
                 name="name"
-                label={t('team-name')}
+                label={t("team-name")}
                 value={formik.values.name}
                 onChange={formik.handleChange}
                 error={formik.errors.name}
               />
               <InputWithLabel
                 name="slug"
-                label={t('team-slug')}
+                label={t("team-slug")}
                 value={formik.values.slug}
                 onChange={formik.handleChange}
                 error={formik.errors.slug}
               />
               <InputWithLabel
                 name="domain"
-                label={t('team-domain')}
-                value={formik.values.domain ? formik.values.domain : ''}
+                label={t("team-domain")}
+                value={formik.values.domain ? formik.values.domain : ""}
                 onChange={formik.handleChange}
                 error={formik.errors.domain}
               />
             </div>
           </Card.Body>
-          <AccessControl resource="team" actions={['update']}>
+          <AccessControl resource="team" actions={["update"]}>
             <Card.Footer>
               <div className="flex justify-end">
                 <Button
@@ -90,7 +90,7 @@ const TeamSettings = ({ team }: { team: Team }) => {
                   disabled={!formik.isValid || !formik.dirty}
                   size="md"
                 >
-                  {t('save-changes')}
+                  {t("save-changes")}
                 </Button>
               </div>
             </Card.Footer>

@@ -238,5 +238,19 @@
   "wise-payment-details": "Payment link will be added as soon as your request is processed.",
   "pay-now": "Pay Now",
   "auth-limited": "Too many login attempts. Please try again in 1 minute.",
-  "support": "Support"
+  "support": "Support",
+  "loading-project-details": "Loading project details...",
+  "project-not-found": "Project not found",
+  "back-to-projects": "Back to Projects",
+  "cra-applicability": "CRA APPLICABILITY",
+  "check-cra-applicability": "Check CRA applicability",
+  "cra-assessment": "CRA ASSESSMENT",
+  "do-cra-assessment": "Do CRA Assessment",
+  "sbom-state": "SBOM STATE",
+  "upload-sbom": "Upload SBOM",
+  "vulnerability-state": "VULNERABILITY STATE",
+  "check-vulnerabilities": "Check vulnerabilities",
+  "add-new-project": "Add New Project",
+  "no-projects-found": "No projects found. Create a new one!",
+  "projects": "Projects"
 }

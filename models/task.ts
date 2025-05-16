@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma';
-import { getTeam, incrementTaskIndex } from './team';
+import { prisma } from "@/lib/prisma";
+import { getTeam, incrementTaskIndex } from "./team";
 
 export const createTask = async (param: {
   authorId: string;
@@ -34,7 +34,7 @@ export const createTask = async (param: {
 export const updateTask = async (
   taskNumber: number,
   slug: string,
-  data: any
+  data: any,
 ) => {
   const taskToEdit = await prisma.task.findFirst({
     where: {
@@ -96,7 +96,7 @@ export const getTasks = async (userId: string) => {
 
 export const getTaskBySlugAndNumber = async (
   taskNumber: number,
-  slug: string
+  slug: string,
 ) => {
   const task = await prisma.task.findFirst({
     where: {

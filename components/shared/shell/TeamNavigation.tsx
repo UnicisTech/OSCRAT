@@ -1,85 +1,93 @@
-import { QueueListIcon, ChartBarIcon } from '@heroicons/react/24/solid';
+import { QueueListIcon, ChartBarIcon } from "@heroicons/react/24/solid";
 import {
   Cog6ToothIcon,
   CodeBracketIcon,
   ChatBubbleBottomCenterTextIcon,
   QuestionMarkCircleIcon,
-} from '@heroicons/react/24/outline';
-import { useTranslation } from 'next-i18next';
-import NavigationItems from './NavigationItems';
-import { NavigationProps, MenuItem } from './NavigationItems';
-import Icon from '../Icon';
+} from "@heroicons/react/24/outline";
+import { useTranslation } from "next-i18next";
+import NavigationItems from "./NavigationItems";
+import { NavigationProps, MenuItem } from "./NavigationItems";
+import Icon from "../Icon";
 
 interface NavigationItemsProps extends NavigationProps {
   slug: string;
 }
 
 const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
 
   const menus: MenuItem[] = [
     {
-      name: t('Dashboard'),
+      name: t("Dashboard"),
       href: `/teams/${slug}/dashboard`,
       icon: ChartBarIcon,
-      className: 'fill-blue-600 stroke-blue-600',
+      className: "fill-blue-600 stroke-blue-600",
       active:
         activePathname?.startsWith(`/teams/${slug}`) &&
-        activePathname.includes('dashboard'),
+        activePathname.includes("dashboard"),
     },
     {
-      name: t('all-tasks'),
+      name: t("All Tasks"),
       href: `/teams/${slug}/tasks`,
       icon: QueueListIcon,
-      className: 'fill-blue-600 stroke-blue-600',
+      className: "fill-blue-600 stroke-blue-600",
       active:
         activePathname?.startsWith(`/teams/${slug}`) &&
-        activePathname.includes('tasks'),
+        activePathname.includes("tasks"),
     },
     {
-      name: t('csc'),
+      name: t("Cybersecurity Management System"),
       href: `/teams/${slug}/csc`,
       icon: () => <Icon src="/unicis-csc-logo.png" />,
       active:
         activePathname?.startsWith(`/teams/${slug}`) &&
-        activePathname.includes('csc'),
+        activePathname.includes("csc"),
     },
     {
-      name: 'line-break',
-      href: '',
+      name: t("Oscrat"),
+      href: `/teams/${slug}/projects`,
+      icon: () => <Icon src="/unicis-csc-logo.png" />,
+      active:
+        activePathname?.startsWith(`/teams/${slug}`) &&
+        activePathname.includes("projects"),
     },
     {
-      name: t('documentation'),
-      href: 'https://www.unicis.tech/docs',
+      name: "line-break",
+      href: "",
+    },
+    {
+      name: t("Documentation"),
+      href: "https://www.unicis.tech/docs",
       icon: CodeBracketIcon,
-      className: 'stroke-blue-600',
+      className: "stroke-blue-600",
       active:
         activePathname?.startsWith(`/teams/${slug}`) &&
-        activePathname.includes('documentation'),
+        activePathname.includes("documentation"),
     },
     {
-      name: t('feedback'),
-      href: 'https://feedback.unicis.tech',
+      name: t("Feedback"),
+      href: "https://feedback.unicis.tech",
       icon: ChatBubbleBottomCenterTextIcon,
-      className: 'stroke-blue-600',
+      className: "stroke-blue-600",
       active:
         activePathname?.startsWith(`/teams/${slug}`) &&
-        activePathname.includes('feedback'),
+        activePathname.includes("feedback"),
     },
     {
-      name: t('support'),
-      href: 'https://discord.com/invite/8TwyeD97HD',
+      name: t("Support"),
+      href: "https://discord.com/invite/8TwyeD97HD",
       icon: QuestionMarkCircleIcon,
     },
     {
-      name: t('settings'),
+      name: t("Settings"),
       href: `/teams/${slug}/settings`,
       icon: Cog6ToothIcon,
-      className: 'stroke-blue-600',
+      className: "stroke-blue-600",
       active:
         activePathname?.startsWith(`/teams/${slug}`) &&
         /(settings|members|saml|directory-sync|audit-logs|webhooks|api-keys)/.test(
-          activePathname
+          activePathname,
         ),
     },
   ];

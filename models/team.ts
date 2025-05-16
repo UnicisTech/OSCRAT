@@ -1,11 +1,11 @@
-import { prisma } from '@/lib/prisma';
-import { getCscStatusesProp } from '@/lib/csc';
-import { getSession } from '@/lib/session';
-import { findOrCreateApp } from '@/lib/svix';
-import { Role } from '@prisma/client';
-import { controls } from '@/components/defaultLanding/data/configs/csc';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import type { TeamProperties } from 'types';
+import { prisma } from "@/lib/prisma";
+import { getCscStatusesProp } from "@/lib/csc";
+import { getSession } from "@/lib/session";
+import { findOrCreateApp } from "@/lib/svix";
+import { Role } from "@prisma/client";
+import { controls } from "@/components/defaultLanding/data/configs/csc";
+import type { NextApiRequest, NextApiResponse } from "next";
+import type { TeamProperties } from "types";
 
 export const createTeam = async (param: {
   userId: string;
@@ -43,7 +43,7 @@ export const deleteTeam = async (key: { id: string } | { slug: string }) => {
 export const addTeamMember = async (
   teamId: string,
   userId: string,
-  role: Role
+  role: Role,
 ) => {
   return await prisma.teamMember.upsert({
     create: {
@@ -185,21 +185,21 @@ export const isTeamExists = async (condition: any) => {
 // Should be used in API routes to check if the user has access to the team
 export const throwIfNoTeamAccess = async (
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) => {
   const session = await getSession(req, res);
 
   if (!session) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
 
   const teamMember = await getTeamMember(
     session.user.id,
-    req.query.slug as string
+    req.query.slug as string,
   );
 
   if (!teamMember) {
-    throw new Error('You do not have access to this team');
+    throw new Error("You do not have access to this team");
   }
 
   return {
@@ -219,7 +219,7 @@ export const getTeamMember = async (userId: string, slug: string) => {
         slug,
       },
       role: {
-        in: ['ADMIN', 'MEMBER', 'OWNER', 'AUDITOR'],
+        in: ["ADMIN", "MEMBER", "OWNER", "AUDITOR"],
       },
     },
     include: {
@@ -265,7 +265,7 @@ export const getCscStatusesBySlug = async (slug: string) => {
   });
 
   const teamProperties = team ? (team.properties as TeamProperties) : {};
-  const iso = teamProperties.csc_iso || 'default';
+  const iso = teamProperties.csc_iso || "default";
   const cscStatusesProp = getCscStatusesProp(iso);
 
   if (teamProperties[cscStatusesProp]) {
@@ -273,7 +273,7 @@ export const getCscStatusesBySlug = async (slug: string) => {
   }
 
   const initial = {};
-  controls[iso].forEach((control) => (initial[control.Control] = 'Unknown'));
+  controls[iso].forEach((control) => (initial[control.Control] = "Unknown"));
 
   await prisma.team.update({
     where: { slug: slug },
@@ -308,7 +308,7 @@ export const setCscStatus = async ({
 
   const teamProperties = team ? (team.properties as TeamProperties) : {};
 
-  const iso = teamProperties.csc_iso || 'default';
+  const iso = teamProperties.csc_iso || "default";
 
   const cscStatusesProp = getCscStatusesProp(iso);
 
@@ -348,7 +348,7 @@ export const getCscIso = async ({
     return teamProperties?.csc_iso;
   }
 
-  const initial = 'default';
+  const initial = "default";
 
   const updatedProperties = {
     ...teamProperties,

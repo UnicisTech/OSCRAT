@@ -6,6 +6,11 @@
   color-scheme: dark light;
 }
 
+:root,
+[data-theme] {
+  background-color: transparent;
+}
+
 html,
 body {
   padding: 0;

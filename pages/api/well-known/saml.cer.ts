@@ -1,12 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import jackson from '@/lib/jackson';
+import type { NextApiRequest, NextApiResponse } from "next";
+import jackson from "@/lib/jackson";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  if (req.method !== 'GET') {
-    throw { message: 'Method not allowed', statusCode: 405 };
+  if (req.method !== "GET") {
+    throw { message: "Method not allowed", statusCode: 405 };
   }
 
   const { spConfig } = await jackson();
@@ -14,6 +14,6 @@ export default async function handler(
 
   res
     .status(200)
-    .setHeader('Content-Type', 'application/x-x509-ca-cert')
+    .setHeader("Content-Type", "application/x-x509-ca-cert")
     .send(config.publicKey);
 }

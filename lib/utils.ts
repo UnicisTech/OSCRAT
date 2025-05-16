@@ -2,14 +2,14 @@ import type { NextApiRequest } from 'next';
 import { ApiError } from '@/types';
 
 export const getIpAddress = (req: NextApiRequest): string => {
-  return (req.headers['x-forwarded-for'] ||
+  return (req.headers["x-forwarded-for"] ||
     req.socket.remoteAddress ||
     req.connection?.remoteAddress ||
-    'unknown') as string;
+    "unknown") as string;
 };
 
 export const capitalizeCountryName = (name: string) => {
-  if (name === 'usa') return 'USA'; // Special case for USA
+  if (name === "usa") return "USA"; // Special case for USA
   return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 };
 

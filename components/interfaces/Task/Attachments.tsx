@@ -47,7 +47,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
     if (isAvailable) {
       setSelectedFile(file);
     } else {
-      toast.error('Not supported type of file');
+      toast.error("Not supported type of file");
     }
   };
 
@@ -61,7 +61,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
         if (isAvailable) {
           setSelectedFile(file);
         } else {
-          toast.error('Not supported type of file');
+          toast.error("Not supported type of file");
         }
       };
       reader.readAsDataURL(file);
@@ -76,7 +76,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
 
   useEffect(() => {
     const uploadFile = async () => {
-      if (selectedFile && typeof slug === 'string') {
+      if (selectedFile && typeof slug === "string") {
         try {
           await uploadAttachment({
             file: selectedFile,
@@ -96,17 +96,17 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
   }, [selectedFile]);
 
   //TODO: refactoring
-  if (!canAccess('task', ['update'])) {
+  if (!canAccess("task", ["update"])) {
     return (
       <>
         {task.attachments.length ? (
-          <div className="flex items-center justify-center w-full">
+          <div className="flex w-full items-center justify-center">
             <div
               className={`flex flex-wrap ${
-                task.attachments.length ? 'justify-start' : 'justify-center'
-              } h-full w-full px-4 py-2 transition bg-white dark:bg-[color:hsla(var(--b1))] border-2 ${
-                isDragOver ? 'border-blue-400' : 'border-gray-300'
-              } border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none`}
+                task.attachments.length ? "justify-start" : "justify-center"
+              } h-full w-full border-2 bg-white px-4 py-2 transition dark:bg-[color:hsla(var(--b1))] ${
+                isDragOver ? "border-blue-400" : "border-gray-300"
+              } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
             >
               {task.attachments.map((attachment, index) => (
                 <AttachmentsCard
@@ -119,20 +119,20 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
             </div>
           </div>
         ) : (
-          <EmptyState title={t('no-attachments')} />
+          <EmptyState title={t("no-attachments")} />
         )}
       </>
     );
   }
 
   return (
-    <div className="flex items-center justify-center w-full">
+    <div className="flex w-full items-center justify-center">
       <div
         className={`flex flex-wrap ${
-          task.attachments.length ? 'justify-start' : 'justify-center'
-        } h-full w-full px-4 py-2 transition bg-white dark:bg-[color:hsla(var(--b1))] border-2 ${
-          isDragOver ? 'border-blue-400' : 'border-gray-300'
-        } border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none`}
+          task.attachments.length ? "justify-start" : "justify-center"
+        } h-full w-full border-2 bg-white px-4 py-2 transition dark:bg-[color:hsla(var(--b1))] ${
+          isDragOver ? "border-blue-400" : "border-gray-300"
+        } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -153,7 +153,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
             <span className="flex items-center space-x-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6 text-gray-600 dark:text-gray-400"
+                className="h-6 w-6 text-gray-600 dark:text-gray-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -167,8 +167,8 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
               </svg>
               <span className="font-medium text-gray-600 dark:text-gray-400">
                 {isDragOver
-                  ? 'Release to attach files'
-                  : 'Drop files to attach, or '}
+                  ? "Release to attach files"
+                  : "Drop files to attach, or "}
                 <span className="text-blue-600 underline">browse</span>
               </span>
             </span>

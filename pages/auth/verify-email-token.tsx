@@ -1,6 +1,6 @@
-import { prisma } from '@/lib/prisma';
-import type { GetServerSidePropsContext } from 'next';
-import type { ReactElement } from 'react';
+import { prisma } from "@/lib/prisma";
+import type { GetServerSidePropsContext } from "next";
+import type { ReactElement } from "react";
 
 const VerifyEmailToken = () => {
   return <></>;
@@ -30,7 +30,7 @@ export const getServerSideProps = async ({
   if (!verificationToken) {
     return {
       redirect: {
-        destination: '/auth/login?error=token-not-found',
+        destination: "/auth/login?error=token-not-found",
         permanent: false,
       },
     };
@@ -39,7 +39,7 @@ export const getServerSideProps = async ({
   if (new Date() > verificationToken.expires) {
     return {
       redirect: {
-        destination: '/auth/resend-email-token?error=verify-account-expired',
+        destination: "/auth/resend-email-token?error=verify-account-expired",
         permanent: false,
       },
     };
@@ -64,7 +64,7 @@ export const getServerSideProps = async ({
 
   return {
     redirect: {
-      destination: '/auth/login?success=email-verified',
+      destination: "/auth/login?success=email-verified",
       permanent: false,
     },
   };

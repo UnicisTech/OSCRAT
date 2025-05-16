@@ -10,6 +10,7 @@ type DirectoryData = {
   name: string;
   provider: string;
   settings: Record<string, string>;
+
 };
 
 type UpdateDirectoryData = {

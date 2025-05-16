@@ -1,4 +1,4 @@
-import { Button, Modal as DModal } from 'react-daisyui';
+import { Button, Modal as DModal } from "react-daisyui";
 
 interface ModalProps {
   open: boolean;
@@ -18,7 +18,7 @@ const Modal = ({ open, close, children }: ModalProps) => {
         type="button"
         size="sm"
         shape="circle"
-        className="absolute right-2 top-2 btn-ghost rounded-full"
+        className="btn-ghost absolute right-2 top-2 rounded-full"
         onClick={close}
         aria-label="close"
       >
@@ -30,11 +30,11 @@ const Modal = ({ open, close, children }: ModalProps) => {
 };
 
 const Header = ({ children }: { children: React.ReactNode }) => {
-  return <h3 className="font-bold text-lg">{children}</h3>;
+  return <h3 className="text-lg font-bold">{children}</h3>;
 };
 
 const Description = ({ children }: { children: React.ReactNode }) => {
-  return <p className="text-sm text-gray-700 pt-1">{children}</p>;
+  return <p className="pt-1 text-sm text-gray-700">{children}</p>;
 };
 
 const Body = ({ children, className }: BodyProps) => {

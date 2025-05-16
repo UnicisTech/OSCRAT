@@ -1,6 +1,6 @@
-import { Input, InputProps } from 'react-daisyui';
+import React, { InputHTMLAttributes } from "react";
 
-interface InputWithLabelProps extends InputProps {
+interface InputWithLabelProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string | React.ReactNode;
   error?: string;
   descriptionText?: string;
@@ -8,26 +8,27 @@ interface InputWithLabelProps extends InputProps {
 
 const InputWithLabel = (props: InputWithLabelProps) => {
   const { label, error, descriptionText, ...rest } = props;
+  console.log("rest", rest);
 
   const classes = Array<string>();
 
   if (error) {
-    classes.push('input-error');
+    classes.push("input-error");
   }
 
   return (
     <div className="form-control w-full">
-      {typeof label === 'string' ? (
+      {typeof label === "string" ? (
         <label className="label">
-          <span className="label-text">{label}</span>
+          <span className="label-text text-black dark:text-white">{label}</span>
         </label>
       ) : (
         label
       )}
-      <Input className={classes.join(' ')} {...rest} />
+      <input className={`${classes.join(" ")} border-2 p-3`} {...rest} />
       {(error || descriptionText) && (
         <label className="label">
-          <span className={`label-text-alt ${error ? 'text-red-500' : ''}`}>
+          <span className={`label-text-alt ${error ? "text-red-500" : ""}`}>
             {error || descriptionText}
           </span>
         </label>

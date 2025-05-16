@@ -17,7 +17,7 @@ import { extractErrorMessage } from '@/lib/utils';
 const AcceptTeamInvitation: NextPageWithLayout = () => {
   const { status, data } = useSession();
   const router = useRouter();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const { isLoading, error, invitation } = useInvitation();
   const { mutateAsync: acceptInvitationMutation, isPending } =
     useAcceptInvitation();
@@ -45,18 +45,18 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>{`${t('invitation-title')} ${invitation.team.name}`}</title>
+        <title>{`${t("invitation-title")} ${invitation.team.name}`}</title>
       </Head>
-      <div className="rounded p-6 border">
+      <div className="rounded border p-6">
         <div className="flex flex-col items-center space-y-6">
           <h2 className="font-bold">
-            {`${invitation.team.name} ${t('team-invite')}`}
+            {`${invitation.team.name} ${t("team-invite")}`}
           </h2>
 
           {/* User not authenticated */}
-          {status === 'unauthenticated' && (
+          {status === "unauthenticated" && (
             <>
-              <h3 className="text-center">{t('invite-create-account')}</h3>
+              <h3 className="text-center">{t("invite-create-account")}</h3>
               <Button
                 variant="outline"
                 fullWidth
@@ -65,7 +65,7 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
                 }}
                 size="md"
               >
-                {t('create-a-new-account')}
+                {t("create-a-new-account")}
               </Button>
               <Button
                 variant="outline"
@@ -75,15 +75,15 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
                 }}
                 size="md"
               >
-                {t('login')}
+                {t("login")}
               </Button>
             </>
           )}
 
           {/* User authenticated and email matches */}
-          {status === 'authenticated' && emailMatch && (
+          {status === "authenticated" && emailMatch && (
             <>
-              <h3 className="text-center">{t('accept-invite')}</h3>
+              <h3 className="text-center">{t("accept-invite")}</h3>
               <Button
                 onClick={acceptInvitation}
                 fullWidth
@@ -92,13 +92,13 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
                 loading={isPending}
                 disabled={isPending}
               >
-                {t('accept-invitation')}
+                {t("accept-invitation")}
               </Button>
             </>
           )}
 
           {/* User authenticated and email does not match */}
-          {status === 'authenticated' && !emailMatch && (
+          {status === "authenticated" && !emailMatch && (
             <>
               <p className="text-sm text-center">{`${t('email-mismatch-1')} ${data?.user?.email} ${t('email-mismatch-2')}`}</p>
               <p className="text-sm text-center">
@@ -128,13 +128,13 @@ AcceptTeamInvitation.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   const { locale } = context;
 
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
+      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
     },
   };
 };

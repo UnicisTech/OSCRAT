@@ -1,22 +1,22 @@
-import { sendEvent } from '@/lib/svix';
-import { createTask, getTeamTasks } from 'models/task';
-import { throwIfNoTeamAccess } from 'models/team';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { throwIfNotAllowed } from 'models/user';
+import { sendEvent } from "@/lib/svix";
+import { createTask, getTeamTasks } from "models/task";
+import { throwIfNoTeamAccess } from "models/team";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { throwIfNotAllowed } from "models/user";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { method } = req;
 
   switch (method) {
-    case 'POST':
+    case "POST":
       return handlePOST(req, res);
-    case 'GET':
+    case "GET":
       return handleGET(req, res);
     default:
-      res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
+      res.setHeader("Allow", ["GET", "DELETE", "PUT"]);
       res.status(405).json({
         data: null,
         error: { message: `Method ${method} Not Allowed` },
@@ -27,7 +27,7 @@ export default async function handler(
 // Get team tasks
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'read');
+  throwIfNotAllowed(teamMember, "task", "read");
 
   const tasks = await getTeamTasks(teamMember.team.slug as string);
 
@@ -37,7 +37,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 // Create a task
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'create');
+  throwIfNotAllowed(teamMember, "task", "create");
 
   const { title, status, duedate, description } = req.body;
   const {
@@ -54,7 +54,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     description,
   });
 
-  await sendEvent(teamMember.teamId, 'task.created', task);
+  await sendEvent(teamMember.teamId, "task.created", task);
 
   return res.status(200).json({ data: {}, error: null });
 };

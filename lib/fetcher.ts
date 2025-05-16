@@ -4,7 +4,7 @@ const fetcher = async (url: string) => {
 
   if (!response.ok) {
     throw new Error(
-      json.error.message || 'An error occurred while fetching the data'
+      json.error.message || "An error occurred while fetching the data",
     );
   }
 

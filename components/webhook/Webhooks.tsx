@@ -14,7 +14,7 @@ import ConfirmationDialog from '../shared/ConfirmationDialog';
 import { extractErrorMessage } from '@/lib/utils';
 
 const Webhooks = ({ team }: { team: Team }) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const [createWebhookVisible, setCreateWebhookVisible] = useState(false);
   const [updateWebhookVisible, setUpdateWebhookVisible] = useState(false);
   const [endpoint, setEndpoint] = useState<EndpointOut | null>(null);
@@ -23,7 +23,7 @@ const Webhooks = ({ team }: { team: Team }) => {
     React.useState(false);
 
   const [selectedWebhook, setSelectedWebhook] = useState<EndpointOut | null>(
-    null
+    null,
   );
 
   const { isLoading, isError, webhooks, deleteWebhook } = useWebhooks(
@@ -45,7 +45,7 @@ const Webhooks = ({ team }: { team: Team }) => {
   return (
     <WithLoadingAndError isLoading={isLoading} error={isError}>
       <div className="space-y-3">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div className="space-y-3">
             <h2 className="text-xl font-medium leading-none tracking-tight">
               Webhooks
@@ -60,20 +60,20 @@ const Webhooks = ({ team }: { team: Team }) => {
             size="md"
             onClick={() => setCreateWebhookVisible(!createWebhookVisible)}
           >
-            {t('add-webhook')}
+            {t("add-webhook")}
           </Button>
         </div>
         {webhooks?.length === 0 ? (
-          <EmptyState title={t('no-webhook-title')} />
+          <EmptyState title={t("no-webhook-title")} />
         ) : (
           <div className="overflow-x-auto">
-            <table className="text-sm table w-full border-b dark:border-base-200">
+            <table className="table w-full border-b text-sm dark:border-base-200">
               <thead className="bg-base-200">
                 <tr>
-                  <th>{t('name')}</th>
-                  <th>{t('url')}</th>
-                  <th>{t('created-at')}</th>
-                  <th>{t('action')}</th>
+                  <th>{t("name")}</th>
+                  <th>{t("url")}</th>
+                  <th>{t("created-at")}</th>
+                  <th>{t("action")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -93,7 +93,7 @@ const Webhooks = ({ team }: { team: Team }) => {
                               setUpdateWebhookVisible(!updateWebhookVisible);
                             }}
                           >
-                            {t('edit')}
+                            {t("edit")}
                           </Button>
                           <Button
                             size="xs"
@@ -104,7 +104,7 @@ const Webhooks = ({ team }: { team: Team }) => {
                               setConfirmationDialogVisible(true);
                             }}
                           >
-                            {t('remove')}
+                            {t("remove")}
                           </Button>
                         </div>
                       </td>
@@ -130,7 +130,7 @@ const Webhooks = ({ team }: { team: Team }) => {
         onConfirm={() => handleDeleteWebhook(selectedWebhook)}
         title={t('confirm-delete-webhook')}
       >
-        {t('delete-webhook-warning')}
+        {t("delete-webhook-warning")}
       </ConfirmationDialog>
       <CreateWebhook
         visible={createWebhookVisible}

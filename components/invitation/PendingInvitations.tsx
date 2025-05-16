@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
-
 const PendingInvitations = ({ team }: { team: Team }) => {
   const [selectedInvitation, setSelectedInvitation] =
     useState<Invitation | null>(null);
@@ -18,7 +17,7 @@ const PendingInvitations = ({ team }: { team: Team }) => {
     team.slug
   );
 
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
 
   if (isLoading) {
     return <Loading />;
@@ -48,19 +47,19 @@ const PendingInvitations = ({ team }: { team: Team }) => {
     <div className="space-y-3">
       <div className="space-y-3">
         <h2 className="text-xl font-medium leading-none tracking-tight">
-          {t('pending-invitations')}
+          {t("pending-invitations")}
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          {t('description-invitations')}
+          {t("description-invitations")}
         </p>
       </div>
-      <table className="text-sm table w-full border-b dark:border-base-200">
+      <table className="table w-full border-b text-sm dark:border-base-200">
         <thead className="bg-base-200">
           <tr>
-            <th>{t('email')}</th>
-            <th>{t('role')}</th>
-            <th>{t('expires-at')}</th>
-            <th>{t('action')}</th>
+            <th>{t("email")}</th>
+            <th>{t("role")}</th>
+            <th>{t("expires-at")}</th>
+            <th>{t("action")}</th>
           </tr>
         </thead>
         <tbody>
@@ -85,7 +84,7 @@ const PendingInvitations = ({ team }: { team: Team }) => {
                       setConfirmationDialogVisible(true);
                     }}
                   >
-                    {t('remove')}
+                    {t("remove")}
                   </Button>
                 </td>
               </tr>
@@ -99,7 +98,7 @@ const PendingInvitations = ({ team }: { team: Team }) => {
         onConfirm={() => handleDeleteInvitation(selectedInvitation)}
         title={t('confirm-delete-member-invitation')}
       >
-        {t('delete-member-invitation-warning')}
+        {t("delete-member-invitation-warning")}
       </ConfirmationDialog>
     </div>
   );

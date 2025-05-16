@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState } from 'react';
+import { RefObject, useEffect, useState } from "react";
 
 const useCollapse = (elemRef: RefObject<HTMLElement>, parent: string) => {
   const [collapse, setCollapse] = useState(false);
@@ -11,12 +11,12 @@ const useCollapse = (elemRef: RefObject<HTMLElement>, parent: string) => {
       }
     };
 
-    document.getElementById(parent)?.addEventListener('mousedown', handler);
+    document.getElementById(parent)?.addEventListener("mousedown", handler);
 
     return () => {
       document
         .getElementById(parent)
-        ?.removeEventListener('mousedown', handler);
+        ?.removeEventListener("mousedown", handler);
     };
   }, [elemRef, parent]);
 

@@ -74,6 +74,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
         <div className="bg-white p-8 rounded-lg shadow-md">
           <h2 className="text-xl mb-4">Enter Password to Continue</h2>
+
           <input
             type="password"
             value={password}

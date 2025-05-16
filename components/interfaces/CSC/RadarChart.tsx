@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -7,8 +7,8 @@ import {
   Filler,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Radar } from 'react-chartjs-2';
+} from "chart.js";
+import { Radar } from "react-chartjs-2";
 import {
   controls,
   statusOptions,
@@ -24,7 +24,7 @@ ChartJS.register(
   LineElement,
   Filler,
   Tooltip,
-  Legend
+  Legend,
 );
 
 const getMaturityLevels = (
@@ -42,7 +42,7 @@ const getMaturityLevels = (
         (accumulator, control) =>
           (statusOptions.find(({ label }) => label === statuses[control])
             ?.value || 0) + accumulator,
-        0
+        0,
       );
       return totalControlsValue / totalControls.length;
     });

@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from '@/components/shared/shadcn/Select';
-import { useTheme } from 'next-themes';
+} from "@/components/shared/shadcn/Select";
+import { useTheme } from "next-themes";
 import {
   statusOptions,
   getOptionStyle,
-} from '@/components/defaultLanding/data/configs/csc';
+} from "@/components/defaultLanding/data/configs/csc";
 
 const StatusSelector = ({
   isDisabled,
@@ -39,9 +39,9 @@ const StatusSelector = ({
       disabled={isDisabled}
     >
       <SelectTrigger
-        className={` ${theme === 'light' ? 'text-black' : theme === 'dark' ? 'text-white' : ''}`}
+        className={` ${theme === "light" ? "text-black" : theme === "dark" ? "text-white" : ""}`}
       >
-        {value || 'Status'}
+        {value || "Status"}
       </SelectTrigger>
       <SelectContent>
         {statusOptions.map((option) => (

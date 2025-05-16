@@ -1,29 +1,29 @@
-import Link from 'next/link';
-import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
-import { useTranslation } from 'next-i18next';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import { type ReactElement, useEffect } from 'react';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Link from "next/link";
+import toast from "react-hot-toast";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { type ReactElement, useEffect } from "react";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
-import Join from '@/components/auth/Join';
-import type { NextPageWithLayout } from 'types';
-import { authProviderEnabled } from '@/lib/auth';
-import { AuthLayout } from '@/components/layouts';
+import Join from "@/components/auth/Join";
+import type { NextPageWithLayout } from "types";
+import { authProviderEnabled } from "@/lib/auth";
+import { AuthLayout } from "@/components/layouts";
 // import GithubButton from '@/components/auth/GithubButton';
 // import GoogleButton from '@/components/auth/GoogleButton';
-import JoinWithInvitation from '@/components/auth/JoinWithInvitation';
-import Head from 'next/head';
-import { Loading } from '@/components/shared';
-import env from '@/lib/env';
+import JoinWithInvitation from "@/components/auth/JoinWithInvitation";
+import Head from "next/head";
+import { Loading } from "@/components/shared";
+import env from "@/lib/env";
 
 const Signup: NextPageWithLayout<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ authProviders, recaptchaSiteKey }) => {
   const router = useRouter();
   const { status } = useSession();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
 
   const { error, token } = router.query as {
     error: string;
@@ -36,22 +36,22 @@ const Signup: NextPageWithLayout<
     }
   }, [error, t]);
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return <Loading />;
   }
 
-  if (status === 'authenticated') {
+  if (status === "authenticated") {
     router.push(env.redirectIfAuthenticated);
   }
 
-  const params = token ? `?token=${token}` : '';
+  const params = token ? `?token=${token}` : "";
 
   return (
     <>
       <Head>
-        <title>{t('sign-up-title')}</title>
+        <title>{t("sign-up-title")}</title>
       </Head>
-      <div className="rounded p-6 border">
+      <div className="rounded border p-6">
         {/* <div className="flex gap-2 flex-wrap">
           {authProviders.github && <GithubButton />}
           {authProviders.google && <GoogleButton />}
@@ -73,13 +73,13 @@ const Signup: NextPageWithLayout<
           </>
         )}
       </div>
-      <p className="text-center text-sm text-gray-600 mt-3">
-        {t('already-have-an-account')}
+      <p className="mt-3 text-center text-sm text-gray-600">
+        {t("already-have-an-account")}
         <Link
           href={`/auth/login/${params}`}
-          className="font-medium text-primary hover:text-primary-focus"
+          className="hover:text-primary-focus font-medium text-primary"
         >
-          &nbsp;{t('sign-in')}
+          &nbsp;{t("sign-in")}
         </Link>
       </p>
     </>
@@ -95,13 +95,13 @@ Signup.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   const { locale } = context;
 
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
+      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
       authProviders: authProviderEnabled(),
       recaptchaSiteKey: env.recaptcha.siteKey,
     },

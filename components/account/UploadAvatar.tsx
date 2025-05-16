@@ -7,7 +7,7 @@ import { User } from '@prisma/client';
 
 import { Card } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
-import { extractErrorMessage } from '@/lib/utils';
+import { extractErrorMessage } from '@/lib/utils'
 
 const UploadAvatar = ({ user }: { user: Partial<User> }) => {
   const { t } = useTranslation('common');
@@ -18,7 +18,7 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
   useEffect(() => {
     setImage(
       user.image ||
-        `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`
+        `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`,
     );
   }, [user]);
 
@@ -42,17 +42,17 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
         onAvatarUpload(file);
       }
     },
-    [setImage]
+    [setImage],
   );
 
   const onAvatarUpload = (file: File) => {
     if (file.size / 1024 / 1024 > 2) {
-      toast.error('File size too big (max 2MB)');
+      toast.error("File size too big (max 2MB)");
       return;
     }
 
-    if (file.type !== 'image/png' && file.type !== 'image/jpeg') {
-      toast.error('File type not supported (.png or .jpg only)');
+    if (file.type !== "image/png" && file.type !== "image/jpeg") {
+      toast.error("File type not supported (.png or .jpg only)");
       return;
     }
 
@@ -86,10 +86,10 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
       <Card>
         <Card.Body>
           <Card.Header>
-            <Card.Title>{t('avatar')}</Card.Title>
+            <Card.Title>{t("avatar")}</Card.Title>
             <Card.Description>
-              {t('custom-avatar')} <br />
-              {t('avatar-type')}
+              {t("custom-avatar")} <br />
+              {t("avatar-type")}
             </Card.Description>
           </Card.Header>
           <div>
@@ -119,17 +119,17 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
               <div
                 className={`${
                   dragActive
-                    ? 'cursor-copy border-2 border-black bg-gray-50 opacity-100'
-                    : ''
+                    ? "cursor-copy border-2 border-black bg-gray-50 opacity-100"
+                    : ""
                 } absolute z-[3] flex h-full w-full flex-col items-center justify-center rounded-full bg-white transition-all ${
                   image
-                    ? 'opacity-0 group-hover:opacity-100'
-                    : 'group-hover:bg-gray-50'
+                    ? "opacity-0 group-hover:opacity-100"
+                    : "group-hover:bg-gray-50"
                 }`}
               >
                 <ArrowUpCircleIcon
                   className={`${
-                    dragActive ? 'scale-110' : 'scale-100'
+                    dragActive ? "scale-110" : "scale-100"
                   } h-50 w-50 text-gray-500 transition-all duration-75 group-hover:scale-110 group-active:scale-95`}
                 />
               </div>
@@ -161,7 +161,7 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
             disabled={!image || image === user.image}
             loading={isUpdateAvatarLoading}
           >
-            {t('save-changes')}
+            {t("save-changes")}
           </Button>
         </Card.Footer>
       </Card>

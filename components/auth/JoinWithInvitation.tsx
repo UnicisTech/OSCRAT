@@ -31,7 +31,7 @@ const JoinWithInvitation = ({
   recaptchaSiteKey,
 }: JoinWithInvitationProps) => {
   const router = useRouter();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const { isLoading, error, invitation } = useInvitation(inviteToken);
   const [recaptchaToken, setRecaptchaToken] = useState<string>('');
@@ -43,9 +43,9 @@ const JoinWithInvitation = ({
 
   const formik = useFormik({
     initialValues: {
-      firstName: '',
-      lastName: '',
-      password: '',
+      firstName: "",
+      lastName: "",
+      password: "",
     },
     validationSchema: Yup.object().shape({
       firstName: Yup.string().required(),
@@ -97,34 +97,34 @@ const JoinWithInvitation = ({
       <form className="space-y-3" onSubmit={formik.handleSubmit}>
         <InputWithLabel
           type="text"
-          label={t('first-name')}
+          label={t("first-name")}
           name="firstName"
-          placeholder={t('your-first-name')}
+          placeholder={t("your-first-name")}
           value={formik.values.firstName}
           error={formik.touched.firstName ? formik.errors.firstName : undefined}
           onChange={formik.handleChange}
         />
         <InputWithLabel
           type="text"
-          label={t('last-name')}
+          label={t("last-name")}
           name="lastName"
-          placeholder={t('your-last-name')}
+          placeholder={t("your-last-name")}
           value={formik.values.lastName}
           error={formik.touched.lastName ? formik.errors.lastName : undefined}
           onChange={formik.handleChange}
         />
         <InputWithLabel
           type="email"
-          label={t('email')}
+          label={t("email")}
           value={invitation.email}
           disabled
         />
         <div className="relative flex">
           <InputWithLabel
-            type={isPasswordVisible ? 'text' : 'password'}
-            label={t('password')}
+            type={isPasswordVisible ? "text" : "password"}
+            label={t("password")}
             name="password"
-            placeholder={t('password')}
+            placeholder={t("password")}
             value={formik.values.password}
             error={formik.touched.password ? formik.errors.password : undefined}
             onChange={formik.handleChange}
@@ -148,7 +148,7 @@ const JoinWithInvitation = ({
             fullWidth
             size="md"
           >
-            {t('create-account')}
+            {t("create-account")}
           </Button>
           <AgreeMessage text="create-account" />
         </div>

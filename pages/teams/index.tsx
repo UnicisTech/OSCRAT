@@ -16,7 +16,7 @@ AllTeams.getLayout = function getLayout(page: React.ReactNode) {
 export async function getStaticProps({ locale }: GetStaticPropsContext) {
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
+      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
     },
   };
 }

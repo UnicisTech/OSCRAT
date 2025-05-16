@@ -1,5 +1,5 @@
-import app from '@/lib/app';
-import env from '@/lib/env';
+import app from "@/lib/app";
+import env from "@/lib/env";
 import {
   Button,
   Container,
@@ -7,8 +7,8 @@ import {
   Html,
   Preview,
   Text,
-} from '@react-email/components';
-import EmailLayout from './EmailLayout';
+} from "@react-email/components";
+import EmailLayout from "./EmailLayout";
 
 interface ResetPasswordEmailProps {
   url: string;
@@ -29,8 +29,8 @@ const ResetPasswordEmail = ({ url }: ResetPasswordEmailProps) => {
         <Container className="text-center">
           <Button
             href={`${env.appUrl}/auth/reset-password/${url}`}
-            style={{ padding: '16px 20px' }}
-            className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center"
+            style={{ padding: "16px 20px" }}
+            className="rounded bg-[#000000] text-center text-[12px] font-semibold text-white no-underline"
           >
             Reset password
           </Button>

@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
-import CommentEdit from './CommentEdit';
-import CommentView from './CommentView';
-import CommentHeader from './CommentHeader';
-import type { Comment } from '@prisma/client';
-import type { ExtendedComment } from 'types';
-import CommentAvatar from './CommentAvatar';
+import React, { useCallback } from "react";
+import CommentEdit from "./CommentEdit";
+import CommentView from "./CommentView";
+import CommentHeader from "./CommentHeader";
+import type { Comment } from "@prisma/client";
+import type { ExtendedComment } from "types";
+import CommentAvatar from "./CommentAvatar";
 
 interface CommentProps {
   comment: ExtendedComment;
@@ -35,7 +35,7 @@ const Comment = ({
         image={comment.createdBy.image}
         username={comment.createdBy.name}
       />
-      <div className="flex flex-col gap-1 mt-2.5">
+      <div className="mt-2.5 flex flex-col gap-1">
         <CommentHeader
           createdByName={comment.createdBy.name}
           createdAt={comment.createdAt}

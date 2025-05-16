@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma';
-import { createHash, randomBytes } from 'crypto';
+import { prisma } from "@/lib/prisma";
+import { createHash, randomBytes } from "crypto";
 
 interface CreateApiKeyParams {
   name: string;
@@ -7,11 +7,11 @@ interface CreateApiKeyParams {
 }
 
 export const hashApiKey = (apiKey: string) => {
-  return createHash('sha256').update(apiKey).digest('hex');
+  return createHash("sha256").update(apiKey).digest("hex");
 };
 
 export const generateUniqueApiKey = () => {
-  const apiKey = randomBytes(16).toString('hex');
+  const apiKey = randomBytes(16).toString("hex");
 
   return [hashApiKey(apiKey), apiKey];
 };

@@ -5,21 +5,21 @@ import type { ApiResponse } from '@/types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   try {
     switch (req.method) {
-      case 'GET':
+      case "GET":
         await handleGET(req, res);
         break;
       default:
-        res.setHeader('Allow', 'GET');
+        res.setHeader("Allow", "GET");
         res.status(405).json({
           error: { message: `Method ${req.method} Not Allowed` },
         });
     }
   } catch (error: any) {
-    const message = error.message || 'Something went wrong';
+    const message = error.message || "Something went wrong";
     const status = error.status || 500;
 
     res.status(status).json({ error: { message } });

@@ -21,12 +21,12 @@ const NewAPIKey = ({
 
   const toggleVisible = () => {
     setCreateModalVisible(!createModalVisible);
-    setApiKey('');
+    setApiKey("");
   };
 
   return (
     <Modal open={createModalVisible} close={toggleVisible}>
-      {apiKey === '' ? (
+      {apiKey === "" ? (
         <CreateAPIKeyForm
           team={team}
           onNewAPIKey={onNewAPIKey}
@@ -44,8 +44,8 @@ const CreateAPIKeyForm = ({
   onNewAPIKey,
   closeModal,
 }: CreateAPIKeyFormProps) => {
-  const [name, setName] = useState('');
-  const { t } = useTranslation('common');
+  const [name, setName] = useState("");
+  const { t } = useTranslation("common");
   const [submitting, setSubmitting] = useState(false);
   const { createApiKey } = useApiKeys(team.slug);
 
@@ -71,11 +71,11 @@ const CreateAPIKeyForm = ({
 
   return (
     <form onSubmit={handleSubmit} method="POST">
-      <Modal.Header>{t('new-api-key')}</Modal.Header>
-      <Modal.Description>{t('new-api-key-description')}</Modal.Description>
+      <Modal.Header>{t("new-api-key")}</Modal.Header>
+      <Modal.Description>{t("new-api-key-description")}</Modal.Description>
       <Modal.Body>
         <InputWithLabel
-          label={t('name')}
+          label={t("name")}
           name="name"
           required
           value={name}
@@ -86,7 +86,7 @@ const CreateAPIKeyForm = ({
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" variant="outline" onClick={closeModal} size="md">
-          {t('close')}
+          {t("close")}
         </Button>
         <Button
           color="primary"
@@ -95,7 +95,7 @@ const CreateAPIKeyForm = ({
           disabled={!name}
           size="md"
         >
-          {t('create-api-key')}
+          {t("create-api-key")}
         </Button>
       </Modal.Footer>
     </form>
@@ -103,22 +103,22 @@ const CreateAPIKeyForm = ({
 };
 
 const DisplayAPIKey = ({ apiKey, closeModal }: DisplayAPIKeyProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
 
   return (
     <>
-      <Modal.Header>{t('new-api-key')}</Modal.Header>
-      <Modal.Description>{t('new-api-warning')}</Modal.Description>
+      <Modal.Header>{t("new-api-key")}</Modal.Header>
+      <Modal.Description>{t("new-api-warning")}</Modal.Description>
       <Modal.Body>
         <InputWithCopyButton
-          label={t('api-key')}
+          label={t("api-key")}
           value={apiKey}
           className="text-sm"
         />
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" variant="outline" onClick={closeModal} size="md">
-          {t('close')}
+          {t("close")}
         </Button>
       </Modal.Footer>
     </>

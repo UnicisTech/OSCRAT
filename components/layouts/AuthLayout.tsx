@@ -1,6 +1,6 @@
-import app from '@/lib/app';
-import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
+import app from "@/lib/app";
+import { useTranslation } from "next-i18next";
+import Image from "next/image";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export default function AuthLayout({
   heading,
   description,
 }: AuthLayoutProps) {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   //TODO: Image logo fix
   return (
     <>

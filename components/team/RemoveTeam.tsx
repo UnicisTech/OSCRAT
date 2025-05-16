@@ -31,8 +31,8 @@ const RemoveTeam = ({ team }: { team: Team }) => {
       <Card>
         <Card.Body>
           <Card.Header>
-            <Card.Title>{t('remove-team')}</Card.Title>
-            <Card.Description>{t('remove-team-warning')}</Card.Description>
+            <Card.Title>{t("remove-team")}</Card.Title>
+            <Card.Description>{t("remove-team-warning")}</Card.Description>
           </Card.Header>
         </Card.Body>
         <Card.Footer>
@@ -43,17 +43,17 @@ const RemoveTeam = ({ team }: { team: Team }) => {
             variant="outline"
             size="md"
           >
-            {t('remove-team')}
+            {t("remove-team")}
           </Button>
         </Card.Footer>
       </Card>
       <ConfirmationDialog
         visible={askConfirmation}
-        title={t('remove-team')}
+        title={t("remove-team")}
         onCancel={() => setAskConfirmation(false)}
         onConfirm={removeTeam}
       >
-        {t('remove-team-confirmation')}
+        {t("remove-team-confirmation")}
       </ConfirmationDialog>
     </>
   );

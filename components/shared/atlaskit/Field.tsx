@@ -6,7 +6,7 @@ const Field = ({
   value?: string | number | JSX.Element;
 }) => {
   return (
-    <div style={{ marginTop: '12px' }}>
+    <div style={{ marginTop: "12px" }}>
       <p>
         <b>{label}</b>: {value}
       </p>

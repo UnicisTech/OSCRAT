@@ -1,24 +1,24 @@
-import { sendEvent } from '@/lib/svix';
-import { getTaskBySlugAndNumber, updateTask, deleteTask } from 'models/task';
-import { throwIfNoTeamAccess } from 'models/team';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { throwIfNotAllowed } from 'models/user';
+import { sendEvent } from "@/lib/svix";
+import { getTaskBySlugAndNumber, updateTask, deleteTask } from "models/task";
+import { throwIfNoTeamAccess } from "models/team";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { throwIfNotAllowed } from "models/user";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { method } = req;
 
   switch (method) {
-    case 'GET':
+    case "GET":
       return handleGET(req, res);
-    case 'PUT':
+    case "PUT":
       return handlePUT(req, res);
-    case 'DELETE':
+    case "DELETE":
       return handleDELETE(req, res);
     default:
-      res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
+      res.setHeader("Allow", ["GET", "DELETE", "PUT"]);
       res.status(405).json({
         data: null,
         error: { message: `Method ${method} Not Allowed` },
@@ -29,7 +29,7 @@ export default async function handler(
 // Get task by slug and taskNumber
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'read');
+  throwIfNotAllowed(teamMember, "task", "read");
 
   const { slug, taskNumber } = req.query;
   const taskNumberAsNumber = Number(taskNumber);
@@ -37,7 +37,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   if (isNaN(taskNumberAsNumber)) {
     return res.status(400).json({
       error: {
-        message: 'Invalid task number',
+        message: "Invalid task number",
       },
     });
   }
@@ -47,7 +47,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!task) {
     return res.status(404).json({
       error: {
-        message: 'Task not found',
+        message: "Task not found",
       },
     });
   }
@@ -58,7 +58,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 // Edit a task
 const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+  throwIfNotAllowed(teamMember, "task", "update");
 
   const { slug, taskNumber } = req.query;
   const taskNumberAsNumber = Number(taskNumber);
@@ -66,7 +66,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   if (isNaN(taskNumberAsNumber)) {
     return res.status(400).json({
       error: {
-        message: 'Invalid task number',
+        message: "Invalid task number",
       },
     });
   }
@@ -77,12 +77,12 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!task) {
     return res.status(404).json({
       error: {
-        message: 'Task not found',
+        message: "Task not found",
       },
     });
   }
 
-  await sendEvent(teamMember.teamId, 'task.updated', task);
+  await sendEvent(teamMember.teamId, "task.updated", task);
 
   return res.status(200).json({ data: task, error: null });
 };
@@ -90,7 +90,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 // Delete the task
 const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'delete');
+  throwIfNotAllowed(teamMember, "task", "delete");
 
   const { slug, taskNumber } = req.query;
 
@@ -99,7 +99,7 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   if (isNaN(taskNumberAsNumber)) {
     return res.status(400).json({
       error: {
-        message: 'Invalid task number',
+        message: "Invalid task number",
       },
     });
   }
@@ -109,12 +109,12 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!task) {
     return res.status(404).json({
       error: {
-        message: 'Task not found',
+        message: "Task not found",
       },
     });
   }
 
-  await sendEvent(teamMember.teamId, 'task.deleted', task);
+  await sendEvent(teamMember.teamId, "task.deleted", task);
 
   return res.status(200).json({ data: {}, error: null });
 };

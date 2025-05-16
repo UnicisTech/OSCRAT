@@ -22,7 +22,7 @@ const Teams = () => {
   const leaveTeam = async (team: Team) => {
 
     const response = await axios.put<ApiResponse>(
-      `/api/teams/${team.slug}/members`
+      `/api/teams/${team.slug}/members`,
     );
 
     const { error } = response.data;
@@ -32,7 +32,7 @@ const Teams = () => {
       return;
     }
 
-    toast.success(t('leave-team-success'));
+    toast.success(t("leave-team-success"));
 
     // mutateTeams();
   };
@@ -44,16 +44,16 @@ const Teams = () => {
           <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
-                {t('name')}
+                {t("name")}
               </th>
               <th scope="col" className="px-6 py-3">
-                {t('members')}
+                {t("members")}
               </th>
               <th scope="col" className="px-6 py-3">
-                {t('created-at')}
+                {t("created-at")}
               </th>
               <th scope="col" className="px-6 py-3">
-                {t('actions')}
+                {t("actions")}
               </th>
             </tr>
           </thead>
@@ -85,7 +85,7 @@ const Teams = () => {
                           leaveTeam(team);
                         }}
                       >
-                        {t('leave-team')}
+                        {t("leave-team")}
                       </Button>
                     </td>
                   </tr>

@@ -1,5 +1,5 @@
-import InformationCircleIcon from '@heroicons/react/24/outline/InformationCircleIcon';
-import React from 'react';
+import InformationCircleIcon from "@heroicons/react/24/outline/InformationCircleIcon";
+import React from "react";
 
 interface EmptyStateProps {
   title: string;
@@ -8,13 +8,13 @@ interface EmptyStateProps {
 
 const EmptyState = ({ title, description }: EmptyStateProps) => {
   return (
-    <div className="flex w-full flex-col items-center justify-center rounded lg:p-20 border gap-2 bg-white dark:bg-black h-80 border-slate-300 dark:border-white">
-      <InformationCircleIcon className="w-10 h-10" />
+    <div className="flex h-80 w-full flex-col items-center justify-center gap-2 rounded border border-slate-300 bg-white dark:border-white dark:bg-black lg:p-20">
+      <InformationCircleIcon className="h-10 w-10" />
       <h3 className="text-semibold text-emphasis text-center text-lg">
         {title}
       </h3>
       {description && (
-        <p className="text-default text-center font-light leading-6 text-sm">
+        <p className="text-default text-center text-sm font-light leading-6">
           {description}
         </p>
       )}

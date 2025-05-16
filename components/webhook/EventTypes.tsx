@@ -1,15 +1,15 @@
-import React, { ReactElement } from 'react';
-import type { WebookFormSchema } from 'types';
+import React, { ReactElement } from "react";
+import type { WebookFormSchema } from "types";
 
 export const eventTypes = [
-  'member.created',
-  'member.removed',
-  'invitation.created',
-  'invitation.removed',
-  'task.created',
-  'task.updated',
-  'task.commented',
-  'task.deleted',
+  "member.created",
+  "member.removed",
+  "invitation.created",
+  "invitation.removed",
+  "task.created",
+  "task.updated",
+  "task.commented",
+  "task.deleted",
 ];
 
 const EventTypes = ({
@@ -18,7 +18,7 @@ const EventTypes = ({
   error,
 }: {
   onChange: React.ChangeEventHandler<HTMLInputElement>;
-  values: WebookFormSchema['eventTypes'];
+  values: WebookFormSchema["eventTypes"];
   error: string | string[] | undefined;
 }) => {
   const events: ReactElement[] = [];
@@ -35,14 +35,14 @@ const EventTypes = ({
           defaultChecked={values ? values.includes(eventType) : false}
         />
         <label className="ml-2 text-sm text-gray-900">{eventType}</label>
-      </div>
+      </div>,
     );
   });
 
   return (
     <>
       {events}
-      {error && typeof error === 'string' && (
+      {error && typeof error === "string" && (
         <div className="label-text-alt text-red-500">{error}</div>
       )}
     </>

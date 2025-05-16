@@ -1,7 +1,7 @@
-import { EndpointIn, Svix } from 'svix';
+import { EndpointIn, Svix } from "svix";
 
-import env from './env';
-import type { AppEvent } from 'types';
+import env from "./env";
+import type { AppEvent } from "types";
 
 const svix = new Svix(env.svix.apiKey);
 
@@ -24,7 +24,7 @@ export const createWebhook = async (appId: string, data: EndpointIn) => {
 export const updateWebhook = async (
   appId: string,
   endpointId: string,
-  data: EndpointIn
+  data: EndpointIn,
 ) => {
   if (!env.svix.apiKey) {
     return;
@@ -60,7 +60,7 @@ export const deleteWebhook = async (appId: string, endpointId: string) => {
 export const sendEvent = async (
   appId: string,
   eventType: AppEvent,
-  payload: Record<string, unknown>
+  payload: Record<string, unknown>,
 ) => {
   if (!env.svix.apiKey) {
     return;

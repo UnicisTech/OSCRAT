@@ -6,7 +6,6 @@ import React from 'react';
 import toast from 'react-hot-toast';
 import type { WebookFormSchema } from 'types';
 import { extractErrorMessage } from '@/lib/utils';
-
 import ModalForm from './Form';
 
 const CreateWebhook = ({
@@ -23,7 +22,7 @@ const CreateWebhook = ({
 
   const onSubmit = async (
     values: WebookFormSchema,
-    formikHelpers: FormikHelpers<WebookFormSchema>
+    formikHelpers: FormikHelpers<WebookFormSchema>,
   ) => {
     try {
       await createWebhook(values);
@@ -40,12 +39,12 @@ const CreateWebhook = ({
       visible={visible}
       setVisible={setVisible}
       initialValues={{
-        name: '',
-        url: '',
+        name: "",
+        url: "",
         eventTypes: [],
       }}
       onSubmit={onSubmit}
-      title={t('create-webhook')}
+      title={t("create-webhook")}
     />
   );
 };

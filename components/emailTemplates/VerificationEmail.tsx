@@ -6,9 +6,9 @@ import {
   Html,
   Preview,
   Text,
-} from '@react-email/components';
-import EmailLayout from './EmailLayout';
-import app from '@/lib/app';
+} from "@react-email/components";
+import EmailLayout from "./EmailLayout";
+import app from "@/lib/app";
 
 interface VerificationEmailProps {
   subject: string;
@@ -35,8 +35,8 @@ const VerificationEmail = ({
         <Container className="text-center">
           <Button
             href={verificationLink}
-            style={{ padding: '16px 20px' }}
-            className="bg-[#0052cc] rounded text-white text-[12px] font-semibold no-underline text-center"
+            style={{ padding: "16px 20px" }}
+            className="rounded bg-[#0052cc] text-center text-[12px] font-semibold text-white no-underline"
           >
             Confirm account
           </Button>

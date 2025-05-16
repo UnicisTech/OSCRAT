@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import Select from '@atlaskit/select';
-import { WithoutRing } from 'sharedStyles';
-import { getCscControlsProp } from '@/lib/csc';
-import type { Task } from '@prisma/client';
-import type { CscOption, ISO } from 'types';
+import React, { useState, useEffect } from "react";
+import Select from "@atlaskit/select";
+import { WithoutRing } from "sharedStyles";
+import { getCscControlsProp } from "@/lib/csc";
+import type { Task } from "@prisma/client";
+import type { CscOption, ISO } from "types";
 
 const TaskSelector = ({
   tasks,
@@ -16,7 +16,7 @@ const TaskSelector = ({
   handler: (
     action: string,
     dataToRemove: any,
-    control: string
+    control: string,
   ) => Promise<void>;
   ISO: ISO;
 }) => {
@@ -32,8 +32,8 @@ const TaskSelector = ({
     const selectedOptions = tasks
       .filter((task: any) =>
         task.properties?.[cscStatusesProp]?.find(
-          (item: string) => item === control
-        )
+          (item: string) => item === control,
+        ),
       )
       ?.map((issue) => ({ label: issue.title, value: issue.taskNumber }));
     setOptions(options);

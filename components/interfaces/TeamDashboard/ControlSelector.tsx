@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import Select from '@atlaskit/select';
-import { sections } from '@/components/defaultLanding/data/configs/csc';
-import { WithoutRing } from 'sharedStyles';
+import React, { useEffect, useState } from "react";
+import Select from "@atlaskit/select";
+import { sections } from "@/components/defaultLanding/data/configs/csc";
+import { WithoutRing } from "sharedStyles";
 
 const ControlSelector = ({
   controlValue,

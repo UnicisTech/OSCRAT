@@ -11,7 +11,7 @@ import { sendEvent } from '@/lib/svix';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { method } = req;
 
@@ -20,9 +20,9 @@ export default async function handler(
       return handleGET(req, res);
     case 'POST':
       return handlePOST(req, res);
-    case 'PUT':
+    case "PUT":
       return handlePUT(req, res);
-    case 'DELETE':
+    case "DELETE":
       return handleDELETE(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST', 'DELETE', 'PUT']);
@@ -60,7 +60,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 // Create a comment
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+  throwIfNotAllowed(teamMember, "task", "update");
 
   const { slug, taskNumber } = req.query;
   const taskNumberAsNumber = Number(taskNumber);
@@ -68,7 +68,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   if (isNaN(taskNumberAsNumber)) {
     return res.status(400).json({
       error: {
-        message: 'Invalid task number',
+        message: "Invalid task number",
       },
     });
   }
@@ -86,12 +86,12 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!comment) {
     return res.status(400).json({
       error: {
-        message: 'Comment not created',
+        message: "Comment not created",
       },
     });
   }
 
-  await sendEvent(teamMember.teamId, 'task.commented', comment);
+  await sendEvent(teamMember.teamId, "task.commented", comment);
 
   return res.status(200).json({ data: comment, error: null });
 };
@@ -99,7 +99,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 // Edit a comment
 const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+  throwIfNotAllowed(teamMember, "task", "update");
 
   const { text, id } = req.body;
 
@@ -108,7 +108,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!comment) {
     return res.status(503).json({
       error: {
-        message: 'Comment is not updated.',
+        message: "Comment is not updated.",
       },
     });
   }
@@ -119,7 +119,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 // Delete a comment
 const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+  throwIfNotAllowed(teamMember, "task", "update");
 
   const { id } = req.body;
 
@@ -128,7 +128,7 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!comment) {
     return res.status(400).json({
       error: {
-        message: 'Comment not deleted',
+        message: "Comment not deleted",
       },
     });
   }

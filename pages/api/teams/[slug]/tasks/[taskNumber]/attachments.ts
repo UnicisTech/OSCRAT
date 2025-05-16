@@ -1,17 +1,17 @@
-import formidable from 'formidable';
-import fs from 'fs';
+import formidable from "formidable";
+import fs from "fs";
 import {
   deleteAttachment,
   findAttachmentById,
   readFile,
   saveFileAsAttachment,
-} from 'models/attachment';
-import { checkExtensionAndMIMEType } from 'models/attachment';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import path from 'path';
-import { promisify } from 'util';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
+} from "models/attachment";
+import { checkExtensionAndMIMEType } from "models/attachment";
+import type { NextApiRequest, NextApiResponse } from "next";
+import path from "path";
+import { promisify } from "util";
+import { throwIfNoTeamAccess } from "models/team";
+import { throwIfNotAllowed } from "models/user";
 
 export const config = {
   api: {
@@ -21,19 +21,19 @@ export const config = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { method } = req;
 
   switch (method) {
-    case 'GET':
+    case "GET":
       return handleGET(req, res);
-    case 'POST':
+    case "POST":
       return handlePOST(req, res);
-    case 'DELETE':
+    case "DELETE":
       return handleDELETE(req, res);
     default:
-      res.setHeader('Allow', ['GET', 'DELETE', 'POST']);
+      res.setHeader("Allow", ["GET", "DELETE", "POST"]);
       res.status(405).json({
         data: null,
         error: { message: `Method ${method} Not Allowed` },
@@ -44,7 +44,7 @@ export default async function handler(
 // Download an attachment
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'read');
+  throwIfNotAllowed(teamMember, "task", "read");
 
   const { id } = req.query;
 
@@ -54,21 +54,21 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!attachment) {
       return res.status(200).json({
         data: null,
-        error: { message: 'Attachment not found.' },
+        error: { message: "Attachment not found." },
       });
     }
 
     const fileData = attachment.fileData;
     const filename = attachment.filename;
 
-    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader("Content-Type", "application/octet-stream");
     res.setHeader(
-      'Content-Disposition',
-      `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`
+      "Content-Disposition",
+      `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
     );
 
     const writeFileAsync = promisify(fs.writeFile);
-    const tempFilePath = path.join('/tmp', filename);
+    const tempFilePath = path.join("/tmp", filename);
 
     await writeFileAsync(tempFilePath, fileData);
 
@@ -76,14 +76,14 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 
     fileStream.pipe(res);
 
-    fileStream.on('close', async () => {
+    fileStream.on("close", async () => {
       await fs.promises.unlink(tempFilePath);
     });
   } catch (error) {
     console.error(error);
     res.status(500).send({
       data: null,
-      error: { message: 'Internal server error.' },
+      error: { message: "Internal server error." },
     });
   }
 };
@@ -91,7 +91,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 // Upload an attachment
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+  throwIfNotAllowed(teamMember, "task", "update");
 
   try {
     const { fields, files } = await readFile(req);
@@ -111,19 +111,19 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
         const url = await saveFileAsAttachment(uploadParams);
         res.status(200).json({ url });
       } catch (error) {
-        console.error('Failed to save file as attachment:', error);
+        console.error("Failed to save file as attachment:", error);
         res
           .status(500)
-          .json({ error: { message: 'Failed to save file as attachment.' } });
+          .json({ error: { message: "Failed to save file as attachment." } });
       }
     } else {
       res
         .status(200)
-        .json({ error: { message: 'Not supported type of file.' } });
+        .json({ error: { message: "Not supported type of file." } });
     }
   } catch (e) {
     res.status(200).json({
-      error: { message: 'File is too large. Maximum size of file is 10mb.' },
+      error: { message: "File is too large. Maximum size of file is 10mb." },
     });
   }
 };
@@ -132,7 +132,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+  throwIfNotAllowed(teamMember, "task", "update");
 
   const { id } = req.query;
 

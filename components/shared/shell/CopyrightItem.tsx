@@ -1,6 +1,6 @@
 const CopyrightItem = () => {
   return (
-    <ul role="list" className="flex flex-1 flex-col justify-end gap-1 mb-1.5">
+    <ul role="list" className="mb-1.5 flex flex-1 flex-col justify-end gap-1">
       <li>
         <p className="text-xs text-center font-semibold">
           Copyright © {new Date().getFullYear()}

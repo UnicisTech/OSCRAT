@@ -1,8 +1,8 @@
-import { initializeMetrics, incrementCounter } from '@boxyhq/metrics';
+import { initializeMetrics, incrementCounter } from "@boxyhq/metrics";
 
-import type { AppEvent } from 'types';
-import packageInfo from '../package.json';
-import env from './env';
+import type { AppEvent } from "types";
+import packageInfo from "../package.json";
+import env from "./env";
 
 if (
   process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT &&

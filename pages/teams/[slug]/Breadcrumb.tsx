@@ -15,14 +15,14 @@ const Breadcrumb = ({
   taskNumber: string;
   backTo?: string;
 }) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
 
   return (
-    <div className="text-sm breadcrumbs">
+    <div className="breadcrumbs text-sm">
       <ul>
-        <li>{teamName || t('Home')}</li>
+        <li>{teamName || t("Home")}</li>
         <li>
-          <Link href={backTo || '/'}>{t('Tasks')}</Link>
+          <Link href={backTo || "/"}>{t("Tasks")}</Link>
         </li>
         <li>{`${taskNumber} - ${taskTitle}`}</li>
       </ul>

@@ -44,18 +44,18 @@ const Tasks = ({ team }: { team: Team }) => {
 
   return (
     <WithLoadingAndError isLoading={isLoading} error={isError}>
-      <div className="space-y-3">
-        <div className="flex justify-between items-center">
+      <div className="space-y-3 bg-white text-black dark:bg-black dark:text-white">
+        <div className="flex items-center justify-between">
           <div className="space-y-3">
             <h2 className="text-xl font-medium leading-none tracking-tight">
-              {t('all-tasks')}
+              {t("all-tasks")}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t('task-listed')}
+              {t("task-listed")}
             </p>
           </div>
 
-          {canAccess('task', ['create']) && (
+          {canAccess("task", ["create"]) && (
             <Button
               size="sm"
               color="primary"
@@ -64,24 +64,24 @@ const Tasks = ({ team }: { team: Team }) => {
                 setVisible(!visible);
               }}
             >
-              {t('create')}
+              {t("create")}
             </Button>
           )}
         </div>
-        <table className="text-sm table w-full border-b dark:border-base-200">
-          <thead className="bg-base-200 dark:bg-gray-700 dark:text-gray-400">
+        <table className="table w-full border-b text-sm dark:border-base-200">
+          <thead className="bg-white dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
-                {t('task-id')}
+                {t("task-id")}
               </th>
               <th scope="col" className="px-6 py-3">
-                {t('title')}
+                {t("title")}
               </th>
               <th scope="col" className="px-6 py-3">
-                {t('status')}
+                {t("status")}
               </th>
               <th scope="col" className="px-6 py-3">
-                {t('actions')}
+                {t("actions")}
               </th>
             </tr>
           </thead>
@@ -114,8 +114,8 @@ const Tasks = ({ team }: { team: Team }) => {
                       />
                     </td>
                     <td className="px-6 py-3">
-                      <div className=" btn-group">
-                        {canAccess('task', ['update']) && (
+                      <div className="btn-group">
+                        {canAccess("task", ["update"]) && (
                           <Button
                             className="dark:text-gray-100"
                             size="sm"
@@ -124,10 +124,10 @@ const Tasks = ({ team }: { team: Team }) => {
                               openEditModal(task);
                             }}
                           >
-                            {t('edit-task')}
+                            {t("edit-task")}
                           </Button>
                         )}
-                        {canAccess('task', ['delete']) && (
+                        {canAccess("task", ["delete"]) && (
                           <Button
                             className="dark:text-gray-100"
                             size="sm"
@@ -136,7 +136,7 @@ const Tasks = ({ team }: { team: Team }) => {
                               openDeleteModal(task.taskNumber);
                             }}
                           >
-                            {t('delete')}
+                            {t("delete")}
                           </Button>
                         )}
                       </div>

@@ -24,8 +24,8 @@ const CreateDirectory = ({
 
   const formik = useFormik({
     initialValues: {
-      name: '',
-      provider: 'generic-scim-v2',
+      name: "",
+      provider: "generic-scim-v2",
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().required(),
@@ -59,35 +59,35 @@ const CreateDirectory = ({
         type="button"
         size="sm"
         shape="circle"
-        className="absolute right-2 top-2 btn-outline rounded-full"
+        className="btn-outline absolute right-2 top-2 rounded-full"
         onClick={toggleVisible}
-        aria-label={t('close')}
+        aria-label={t("close")}
       >
         ✕
       </Button>
       <form onSubmit={formik.handleSubmit} method="POST">
         <Modal.Header className="font-bold">
-          {t('create-directory-connection')}
+          {t("create-directory-connection")}
         </Modal.Header>
         <Modal.Body>
           <div className="mt-2 flex flex-col space-y-2">
-            <p>{t('create-directory-message')}</p>
+            <p>{t("create-directory-message")}</p>
             <InputWithLabel
               name="name"
               onChange={formik.handleChange}
               value={formik.values.name}
-              placeholder={t('directory-name-placeholder')}
-              label={t('directory-name')}
+              placeholder={t("directory-name-placeholder")}
+              label={t("directory-name")}
             />
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">
-                  {t('directory-sync-provider')}
+                  {t("directory-sync-provider")}
                 </span>
                 <span className="label-text-alt"></span>
               </label>
               <select
-                className="select-bordered select flex-grow"
+                className="select select-bordered flex-grow"
                 name="provider"
                 onChange={formik.handleChange}
                 value={formik.values.provider}
@@ -110,7 +110,7 @@ const CreateDirectory = ({
             active={formik.dirty}
             size="md"
           >
-            {t('create-directory')}
+            {t("create-directory")}
           </Button>
         </Modal.Actions>
       </form>

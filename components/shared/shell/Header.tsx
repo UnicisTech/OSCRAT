@@ -1,21 +1,19 @@
-import Link from 'next/link';
-import React from 'react';
-import { useSession } from 'next-auth/react';
-import { useToggleTheme } from '@/hooks/useToggleTheme';
+import Link from "next/link";
+import React from "react";
+import { useSession } from "next-auth/react";
+import { useToggleTheme } from "@/hooks/useToggleTheme";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   SunIcon,
   UserCircleIcon,
-} from '@heroicons/react/24/outline';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import env from '@/lib/env';
-import { signOut } from 'next-auth/react';
-import { ThemeModes } from '@atlaskit/theme/types';
+} from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import env from "@/lib/env";
+import { signOut } from "next-auth/react";
 
 interface HeaderProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  themeCallback: React.Dispatch<React.SetStateAction<ThemeModes>>;
 }
 
 const Header = ({ setSidebarOpen }: HeaderProps) => {
@@ -23,14 +21,14 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
 
   const { status, data } = useSession();
 
-  if (status === 'loading' || !data) {
+  if (status === "loading" || !data) {
     return null;
   }
 
   const user = data.user;
 
   return (
-    <div className="dark:bg-[color:hsla(var(--b1))] bg-white sticky top-0 z-40 flex h-14 shrink-0 items-center border-b px-4 sm:gap-x-6 sm:px-6 lg:px-8 dark:border-gray-600">
+    <div className="sticky top-0 z-40 flex h-14 shrink-0 items-center border-b bg-white px-4 dark:border-gray-600 dark:bg-[color:hsla(var(--b1))] sm:gap-x-6 sm:px-6 lg:px-8">
       <button
         type="button"
         className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
@@ -43,7 +41,7 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
         <div className="relative flex flex-1"></div>
         <div className="flex items-center gap-x-4 lg:gap-x-6">
           <div className="dropdown dropdown-end">
-            <div className="flex items-center cursor-pointer" tabIndex={0}>
+            <div className="flex cursor-pointer items-center" tabIndex={0}>
               <span className="hidden lg:flex lg:items-center">
                 <button
                   className="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-gray-400"
@@ -59,7 +57,7 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
             </div>
             <ul
               tabIndex={0}
-              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 border rounded w-40 space-y-1"
+              className="menu dropdown-content z-[1] w-40 space-y-1 rounded border bg-white p-2 shadow dark:bg-base-100"
             >
               <li
                 onClick={() => {
@@ -70,10 +68,10 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
               >
                 <Link
                   href="/settings/account"
-                  className="block px-2 py-1 text-sm leading-6 text-gray-900 cursor-pointer dark:text-gray-400"
+                  className="block cursor-pointer px-2 py-1 text-sm leading-6 text-gray-900 dark:text-gray-400"
                 >
                   <div className="flex items-center">
-                    <UserCircleIcon className="w-5 h-5 mr-1" /> Account
+                    <UserCircleIcon className="mr-1 h-5 w-5" /> Account
                   </div>
                 </Link>
               </li>
@@ -81,12 +79,12 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
               {env.darkModeEnabled && (
                 <li>
                   <button
-                    className="block px-2 py-1 text-sm leading-6 text-gray-900 cursor-pointer dark:text-gray-400"
+                    className="block cursor-pointer px-2 py-1 text-sm leading-6 text-gray-900 dark:text-gray-400"
                     type="button"
                     onClick={toggleTheme}
                   >
                     <div className="flex items-center">
-                      <SunIcon className="w-5 h-5 mr-1" /> Change Theme
+                      <SunIcon className="mr-1 h-5 w-5" /> Change Theme
                     </div>
                   </button>
                 </li>
@@ -94,12 +92,12 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
 
               <li>
                 <button
-                  className="block px-2 py-1 text-sm leading-6 text-gray-900 cursor-pointer dark:text-gray-400"
+                  className="block cursor-pointer px-2 py-1 text-sm leading-6 text-gray-900 dark:text-gray-400"
                   type="button"
                   onClick={() => signOut()}
                 >
                   <div className="flex items-center">
-                    <ArrowRightOnRectangleIcon className="w-5 h-5 mr-1" />
+                    <ArrowRightOnRectangleIcon className="mr-1 h-5 w-5" />
                     Logout
                   </div>
                 </button>

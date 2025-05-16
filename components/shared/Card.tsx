@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface CardProps {
   heading?: string;
@@ -10,9 +10,9 @@ const Card = (props: CardProps) => {
   const { heading, children, button } = props;
 
   return (
-    <div className="card w-full border border-rounded dark:border-gray-600 mb-5">
-      <div className="border-b border-gray-300 bg-gray-100 dark:border-gray-600 px-3 py-3 text-sm font-medium text-gray-900 flex justify-between items-center dark:bg-gray-700 dark:text-gray-400">
-        <div>{heading || ''}</div>
+    <div className="border-rounded card mb-5 w-full border dark:border-gray-600">
+      <div className="flex items-center justify-between border-b border-gray-300 bg-gray-100 px-3 py-3 text-sm font-medium text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400">
+        <div>{heading || ""}</div>
         <div>{button ? button : null}</div>
       </div>
       <div>{children}</div>
@@ -29,11 +29,11 @@ const Title = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Description = ({ children }: { children: React.ReactNode }) => {
-  return <p className="text-gray-600 dark:text-gray-400 text-sm">{children}</p>;
+  return <p className="text-sm text-gray-600 dark:text-gray-400">{children}</p>;
 };
 
 const Header = ({ children }: { children: React.ReactNode }) => {
-  return <div className="flex gap-3 flex-col">{children}</div>;
+  return <div className="flex flex-col gap-3">{children}</div>;
 };
 
 //TODO: card fix className
@@ -47,7 +47,7 @@ const Body = ({
   return (
     <div
       className={`card-body gap-6 p-6 dark:bg-[color:hsla(var(--b1))] ${
-        className || ''
+        className || ""
       }`}
     >
       {children}
@@ -57,7 +57,7 @@ const Body = ({
 
 const Footer = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="card-actions justify-end dark:border-gray-600 p-3 border-t bg-gray-50 dark:bg-inherit">
+    <div className="card-actions justify-end border-t bg-gray-50 p-3 dark:border-gray-600 dark:bg-inherit">
       {children}
     </div>
   );

@@ -1,45 +1,45 @@
-import { ApiError } from '@/lib/errors';
-import { prisma } from '@/lib/prisma';
-import { sendAudit } from '@/lib/retraced';
-import { sendEvent } from '@/lib/svix';
-import { Role } from '@prisma/client';
+import { ApiError } from "@/lib/errors";
+import { prisma } from "@/lib/prisma";
+import { sendAudit } from "@/lib/retraced";
+import { sendEvent } from "@/lib/svix";
+import { Role } from "@prisma/client";
 import {
   getTeamMembers,
   removeTeamMember,
   throwIfNoTeamAccess,
-} from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { recordMetric } from '@/lib/metrics';
+} from "models/team";
+import { throwIfNotAllowed } from "models/user";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { recordMetric } from "@/lib/metrics";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { method } = req;
 
   try {
     switch (method) {
-      case 'GET':
+      case "GET":
         await handleGET(req, res);
         break;
-      case 'DELETE':
+      case "DELETE":
         await handleDELETE(req, res);
         break;
-      case 'PUT':
+      case "PUT":
         await handlePUT(req, res);
         break;
-      case 'PATCH':
+      case "PATCH":
         await handlePATCH(req, res);
         break;
       default:
-        res.setHeader('Allow', 'GET, DELETE, PUT, PATCH');
+        res.setHeader("Allow", "GET, DELETE, PUT, PATCH");
         res.status(405).json({
           error: { message: `Method ${method} Not Allowed` },
         });
     }
   } catch (error: any) {
-    const message = error.message || 'Something went wrong';
+    const message = error.message || "Something went wrong";
     const status = error.status || 500;
 
     res.status(status).json({ error: { message } });
@@ -49,11 +49,11 @@ export default async function handler(
 // Get members of a team
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_member', 'read');
+  throwIfNotAllowed(teamMember, "team_member", "read");
 
   const members = await getTeamMembers(teamMember.team.slug);
 
-  recordMetric('member.fetched');
+  recordMetric("member.fetched");
 
   res.status(200).json({ data: members });
 };
@@ -61,7 +61,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 // Delete the member from the team
 const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_member', 'delete');
+  throwIfNotAllowed(teamMember, "team_member", "delete");
 
   const { userId } = req.query as { userId: string };
 
@@ -94,16 +94,16 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
     throw new ApiError(404, 'Team member not found.');
   }
 
-  await sendEvent(teamMember.teamId, 'member.removed', teamMemberRemoved);
+  await sendEvent(teamMember.teamId, "member.removed", teamMemberRemoved);
 
   sendAudit({
-    action: 'member.remove',
-    crud: 'd',
+    action: "member.remove",
+    crud: "d",
     user: teamMember.user,
     team: teamMember.team,
   });
 
-  recordMetric('member.removed');
+  recordMetric("member.removed");
 
   res.status(200).json({ data: {} });
 };
@@ -111,7 +111,7 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
 // Leave a team
 const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'leave');
+  throwIfNotAllowed(teamMember, "team", "leave");
 
   const totalTeamOwners = await prisma.teamMember.count({
     where: {
@@ -121,12 +121,12 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (totalTeamOwners <= 1) {
-    throw new ApiError(400, 'A team should have at least one owner.');
+    throw new ApiError(400, "A team should have at least one owner.");
   }
 
   await removeTeamMember(teamMember.teamId, teamMember.user.id);
 
-  recordMetric('member.left');
+  recordMetric("member.left");
 
   res.status(200).json({ data: {} });
 };
@@ -134,7 +134,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 // Update the role of a member
 const handlePATCH = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_member', 'update');
+  throwIfNotAllowed(teamMember, "team_member", "update");
 
   const { memberId, role } = req.body as { memberId: string; role: Role };
 
@@ -151,13 +151,13 @@ const handlePATCH = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   sendAudit({
-    action: 'member.update',
-    crud: 'u',
+    action: "member.update",
+    crud: "u",
     user: teamMember.user,
     team: teamMember.team,
   });
 
-  recordMetric('member.role.updated');
+  recordMetric("member.role.updated");
 
   res.status(200).json({ data: memberUpdated });
 };
