@@ -1,7 +1,7 @@
 import { InputWithLabel, Loading } from '@/components/shared';
 import env from '@/lib/env';
 import { useFormik } from 'formik';
-import useInvitation from 'hooks/useInvitation';
+import { useInvitation } from 'hooks/useInvitation';
 import { signIn, useSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';

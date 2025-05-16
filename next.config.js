@@ -1,5 +1,8 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 const { i18n } = require('./next-i18next.config');
+const { withGlobalCss } = require('next-global-css')
+
+const withConfig = withGlobalCss()
 
 // Redirect root url to login page
 const redirects = [
@@ -11,7 +14,7 @@ const redirects = [
 ];
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = withConfig({
   reactStrictMode: false,
   images: {
     domains: ['platform.unicis.tech'],
@@ -49,6 +52,4 @@ const nextConfig = {
       },
     ];
   },
-};
-
-module.exports = nextConfig;
+});

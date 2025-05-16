@@ -1,19 +1,19 @@
-import toast from 'react-hot-toast';
 import { Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowUpCircleIcon } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
+import { User } from '@prisma/client';
 
-import type { ApiResponse, UserReturned } from 'types';
-import type { User } from '@prisma/client';
 import { Card } from '@/components/shared';
-import { defaultHeaders } from '@/lib/common';
+import { useAccount } from '@/hooks/useAccount';
+import { extractErrorMessage } from '@/lib/utils';
 
 const UploadAvatar = ({ user }: { user: Partial<User> }) => {
   const { t } = useTranslation('common');
+  const { updateAvatar, isUpdateAvatarLoading } = useAccount();
   const [dragActive, setDragActive] = useState(false);
   const [image, setImage] = useState<string | null>();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setImage(
@@ -67,23 +67,18 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
-    const response = await fetch('/api/users', {
-      method: 'PUT',
-      headers: defaultHeaders,
-      body: JSON.stringify({ image }),
-    });
+    if (!image) return;
 
-    const json = (await response.json()) as ApiResponse<UserReturned>;
-    setLoading(false);
+    const result = await updateAvatar(image);
 
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+    if (result.success) {
+      toast.success(t('successfully-updated'));
+    } else {
+      toast.error(
+        extractErrorMessage(result.error, t('error.avatar-update-failed'))
+      );
     }
-
-    toast.success(t('successfully-updated'));
   };
 
   return (
@@ -164,7 +159,7 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
             color="primary"
             size="md"
             disabled={!image || image === user.image}
-            loading={loading}
+            loading={isUpdateAvatarLoading}
           >
             {t('save-changes')}
           </Button>

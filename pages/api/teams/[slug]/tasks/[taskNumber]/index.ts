@@ -71,7 +71,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   }
 
-  const { data } = req.body;
+  const data = req.body;
   const task = await updateTask(taskNumberAsNumber, slug as string, data);
 
   if (!task) {

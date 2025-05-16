@@ -1,7 +1,8 @@
 import { useTranslation } from 'next-i18next';
 import PieChart from '../CSC/PieChart';
 import { TaskStatusesDetail } from '@/components/interfaces/CSC';
-import useTeamTasks from 'hooks/useTeamTasks';
+import { useTeamContext } from '@/context/TeamContext';
+import { useTeamTasks } from 'hooks/useTeamTasks';
 
 const labels = ['To Do', 'In Progress', 'In Review', 'Feedback', 'Done'];
 
@@ -13,14 +14,10 @@ const barColors = [
   'rgb(0, 169, 110)', // done
 ];
 
-const TasksAnalysis = ({
-  slug,
-}: {
-  csc_statuses: { [key: string]: string };
-  slug: string;
-}) => {
+const TasksAnalysis = () => {
   const { t } = useTranslation('translation');
-  const { tasks } = useTeamTasks(slug as string);
+  const { slug } = useTeamContext();
+  const { tasks } = useTeamTasks(slug);
 
   const statuses: { [key: string]: string } =
     tasks?.reduce((acc: { [key: string]: string }, task) => {

@@ -1,6 +1,7 @@
-import { permissions } from '@/lib/permissions';
+import { permissions, Permission } from '@/lib/permissions';
 import { throwIfNoTeamAccess } from 'models/team';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import type { ApiResponse } from '@/types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,8 +27,11 @@ export default async function handler(
 }
 
 // Get permissions for a team for the current user
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: NextApiRequest,
+  res: NextApiResponse<ApiResponse<Permission[]>>
+) => {
   const teamRole = await throwIfNoTeamAccess(req, res);
 
-  res.json({ data: permissions[teamRole.role] });
+  res.json({ data: permissions[teamRole.role] } as ApiResponse<Permission[]>);
 };

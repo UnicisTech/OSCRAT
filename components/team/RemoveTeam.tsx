@@ -5,36 +5,25 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
+import { useTeam } from '@/hooks/useTeam';
+import { extractErrorMessage } from '@/lib/utils';
 
 import ConfirmationDialog from '../shared/ConfirmationDialog';
-import { defaultHeaders } from '@/lib/common';
-import type { ApiResponse } from 'types';
 
 const RemoveTeam = ({ team }: { team: Team }) => {
   const router = useRouter();
   const { t } = useTranslation('common');
-  const [loading, setLoading] = useState(false);
   const [askConfirmation, setAskConfirmation] = useState(false);
+  const { deleteTeam, isLoading } = useTeam(team.slug);
 
   const removeTeam = async () => {
-    setLoading(true);
-
-    const response = await fetch(`/api/teams/${team.slug}`, {
-      method: 'DELETE',
-      headers: defaultHeaders,
-    });
-
-    const json = (await response.json()) as ApiResponse;
-
-    setLoading(false);
-
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+    try {
+      await deleteTeam();
+      toast.success(t('team-removed-successfully'));
+      router.push('/teams');
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('an-error-occurred')));
     }
-
-    toast.success(t('team-removed-successfully'));
-    router.push('/teams');
   };
 
   return (
@@ -50,7 +39,7 @@ const RemoveTeam = ({ team }: { team: Team }) => {
           <Button
             color="error"
             onClick={() => setAskConfirmation(true)}
-            loading={loading}
+            loading={isLoading}
             variant="outline"
             size="md"
           >

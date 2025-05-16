@@ -1,16 +1,13 @@
 import { InputWithLabel, Loading } from '@/components/shared';
-import { defaultHeaders } from '@/lib/common';
-import fetcher from '@/lib/fetcher';
-import type { Directory } from '@boxyhq/saml-jackson';
 import { Team } from '@prisma/client';
 import { useFormik } from 'formik';
-import useDirectory from 'hooks/useDirectory';
+import { useDirectory } from 'hooks/useDirectory';
+import { useIdp } from 'hooks/useIdp';
 import { useTranslation } from 'next-i18next';
 import { Button, Modal } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import useSWR from 'swr';
-import type { ApiResponse } from 'types';
 import * as Yup from 'yup';
+import { extractErrorMessage } from '@/lib/utils';
 
 const CreateDirectory = ({
   visible,
@@ -22,8 +19,8 @@ const CreateDirectory = ({
   team: Team;
 }) => {
   const { t } = useTranslation('common');
-  const { data } = useSWR('/api/idp', fetcher);
-  const { mutateDirectory } = useDirectory(team.slug as string);
+  const { providers, isLoading: isIdpLoading } = useIdp();
+  const { createDirectory } = useDirectory(team.slug);
 
   const formik = useFormik({
     initialValues: {
@@ -35,22 +32,16 @@ const CreateDirectory = ({
       provider: Yup.string().required(),
     }),
     onSubmit: async (values) => {
-      const response = await fetch(`/api/teams/${team.slug}/directory-sync`, {
-        method: 'POST',
-        headers: defaultHeaders,
-        body: JSON.stringify(values),
-      });
-
-      const json = (await response.json()) as ApiResponse<Directory>;
-
-      if (!response.ok) {
-        toast.error(json.error.message);
-        return;
+      try {
+        await createDirectory({
+          ...values,
+          settings: {},
+        });
+        toast.success(t('directory-connection-created'));
+        setVisible(false);
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('error-creating-directory')));
       }
-
-      toast.success(t('directory-connection-created'));
-      mutateDirectory();
-      setVisible(false);
     },
   });
 
@@ -58,11 +49,9 @@ const CreateDirectory = ({
     setVisible(!visible);
   };
 
-  if (!data) {
+  if (isIdpLoading || !providers) {
     return <Loading />;
   }
-
-  const providers = data.data;
 
   return (
     <Modal open={visible}>

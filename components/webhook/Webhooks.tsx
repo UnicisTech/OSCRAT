@@ -1,7 +1,7 @@
 import { WithLoadingAndError } from '@/components/shared';
 import { EmptyState } from '@/components/shared';
 import { Team } from '@prisma/client';
-import useWebhooks from 'hooks/useWebhooks';
+import { useWebhooks } from 'hooks/useWebhooks';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 import { Button } from 'react-daisyui';
@@ -10,9 +10,8 @@ import type { EndpointOut } from 'svix';
 
 import CreateWebhook from './CreateWebhook';
 import EditWebhook from './EditWebhook';
-import { defaultHeaders } from '@/lib/common';
-import type { ApiResponse } from 'types';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
+import { extractErrorMessage } from '@/lib/utils';
 
 const Webhooks = ({ team }: { team: Team }) => {
   const { t } = useTranslation('common');
@@ -27,32 +26,20 @@ const Webhooks = ({ team }: { team: Team }) => {
     null
   );
 
-  const { isLoading, isError, webhooks, mutateWebhooks } = useWebhooks(
+  const { isLoading, isError, webhooks, deleteWebhook } = useWebhooks(
     team.slug
   );
 
-  const deleteWebhook = async (webhook: EndpointOut | null) => {
+  const handleDeleteWebhook = async (webhook: EndpointOut | null) => {
     if (!webhook) return;
 
-    const sp = new URLSearchParams({ webhookId: webhook.id });
-
-    const response = await fetch(
-      `/api/teams/${team.slug}/webhooks?${sp.toString()}`,
-      {
-        method: 'DELETE',
-        headers: defaultHeaders,
-      }
-    );
-
-    const json = (await response.json()) as ApiResponse;
-
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+    try {
+      await deleteWebhook(webhook.id);
+      toast.success(t('webhook-deleted'));
+      setConfirmationDialogVisible(false);
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('webhook-deletion-failed')));
     }
-
-    mutateWebhooks();
-    toast.success(t('webhook-deleted'));
   };
 
   return (
@@ -140,7 +127,7 @@ const Webhooks = ({ team }: { team: Team }) => {
       <ConfirmationDialog
         visible={confirmationDialogVisible}
         onCancel={() => setConfirmationDialogVisible(false)}
-        onConfirm={() => deleteWebhook(selectedWebhook)}
+        onConfirm={() => handleDeleteWebhook(selectedWebhook)}
         title={t('confirm-delete-webhook')}
       >
         {t('delete-webhook-warning')}

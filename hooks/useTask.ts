@@ -1,24 +1,39 @@
-import fetcher from '@/lib/fetcher';
-import useSWR, { mutate } from 'swr';
-import type { ApiResponse } from 'types';
-import type { TaskExtended } from 'types';
+import { useGetTask, useUpdateTask, useDeleteTask } from '@/lib/api/hooks';
+import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 
-const useTask = (slug: string, taskNumber: string) => {
-  const url = `/api/teams/${slug}/tasks/${taskNumber}`;
-  const resp = useSWR<ApiResponse<TaskExtended>>(url, fetcher);
+/**
+ * Hook to fetch and manage a single task
+ * @param slug Team slug
+ * @param taskNumber Task number
+ */
+export function useTask(slug: string, taskNumber: string) {
+  const {
+    data: task,
+    isLoading: isFetching,
+    isError,
+    error,
+  } = useGetTask(slug, taskNumber);
 
-  const { data, error } = resp;
+  const updateMutation = useUpdateTask(slug, taskNumber);
+  const deleteMutation = useDeleteTask(slug, taskNumber);
 
-  const mutateTask = async () => {
-    mutate(url);
+  const updateTask = async (data: UpdateTaskData) => {
+    return updateMutation.mutateAsync(data);
   };
+
+  const deleteTask = async () => {
+    return deleteMutation.mutateAsync();
+  };
+
+  const isLoading =
+    isFetching || updateMutation.isPending || deleteMutation.isPending;
 
   return {
-    isLoading: !error && !data,
-    isError: error,
-    task: data?.data,
-    mutateTask,
+    task,
+    isLoading,
+    isError,
+    error,
+    updateTask,
+    deleteTask,
   };
-};
-
-export default useTask;
+}

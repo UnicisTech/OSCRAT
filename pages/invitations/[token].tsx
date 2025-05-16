@@ -1,9 +1,9 @@
 import { AuthLayout } from '@/components/layouts';
 import { Error, Loading } from '@/components/shared';
-import { defaultHeaders } from '@/lib/common';
-import useInvitation from 'hooks/useInvitation';
+import { useInvitation } from 'hooks/useInvitation';
+import { useAcceptInvitation } from '@/lib/api/hooks/invitations';
 import type { GetServerSidePropsContext } from 'next';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
@@ -11,41 +11,33 @@ import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import type { ApiResponse, NextPageWithLayout } from 'types';
-import { signOut } from 'next-auth/react';
+import type { NextPageWithLayout } from 'types';
+import { extractErrorMessage } from '@/lib/utils';
 
 const AcceptTeamInvitation: NextPageWithLayout = () => {
   const { status, data } = useSession();
   const router = useRouter();
   const { t } = useTranslation('common');
   const { isLoading, error, invitation } = useInvitation();
+  const { mutateAsync: acceptInvitationMutation, isPending } =
+    useAcceptInvitation();
 
   if (isLoading) {
     return <Loading />;
   }
 
   if (error || !invitation) {
-    return <Error message={error.message} />;
+    return <Error message={error?.message || t('invitation-not-found')} />;
   }
 
   const acceptInvitation = async () => {
-    const response = await fetch(
-      `/api/teams/${invitation.team.slug}/invitations`,
-      {
-        method: 'PUT',
-        headers: defaultHeaders,
-        body: JSON.stringify({ inviteToken: invitation.token }),
-      }
-    );
-
-    const json = (await response.json()) as ApiResponse;
-
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+    try {
+      await acceptInvitationMutation({ token: invitation.token });
+      toast.success(t('invitation-accepted'));
+      router.push(`/teams`);
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('failed-to-accept-invitation')));
     }
-
-    router.push(`/teams`);
   };
 
   const emailMatch = data?.user?.email === invitation.email;
@@ -97,6 +89,8 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
                 fullWidth
                 color="primary"
                 size="md"
+                loading={isPending}
+                disabled={isPending}
               >
                 {t('accept-invitation')}
               </Button>
@@ -106,11 +100,9 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
           {/* User authenticated and email does not match */}
           {status === 'authenticated' && !emailMatch && (
             <>
-              <p className="text-sm text-center">{`Your email address ${data?.user?.email} does not match the email address this invitation was sent to.`}</p>
+              <p className="text-sm text-center">{`${t('email-mismatch-1')} ${data?.user?.email} ${t('email-mismatch-2')}`}</p>
               <p className="text-sm text-center">
-                To accept this invitation, you will need to sign out and then
-                sign in or create a new account using the same email address
-                used in the invitation.
+                {t('email-mismatch-instructions')}
               </p>
               <Button
                 fullWidth
@@ -121,7 +113,7 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
                   signOut();
                 }}
               >
-                Sign out
+                {t('sign-out')}
               </Button>
             </>
           )}

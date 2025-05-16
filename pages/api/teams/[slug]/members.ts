@@ -63,9 +63,36 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
   throwIfNotAllowed(teamMember, 'team_member', 'delete');
 
-  const { memberId } = req.query as { memberId: string };
+  const { userId } = req.query as { userId: string };
 
-  const teamMemberRemoved = await removeTeamMember(teamMember.teamId, memberId);
+  if (!userId) {
+    throw new ApiError(400, 'User ID is required.');
+  }
+
+  const existingMember = await prisma.teamMember.findUnique({
+    where: {
+      teamId_userId: {
+        teamId: teamMember.teamId,
+        userId,
+      },
+    },
+  });
+
+  if (!existingMember) {
+    throw new ApiError(404, 'Team member not found.');
+  }
+
+  let teamMemberRemoved;
+  try {
+    teamMemberRemoved = await removeTeamMember(teamMember.teamId, userId);
+  } catch (error) {
+    console.error('Error removing team member:', error);
+    throw new ApiError(500, 'Failed to remove team member.');
+  }
+
+  if (!teamMemberRemoved) {
+    throw new ApiError(404, 'Team member not found.');
+  }
 
   await sendEvent(teamMember.teamId, 'member.removed', teamMemberRemoved);
 

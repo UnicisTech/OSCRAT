@@ -2,8 +2,7 @@ import { useTranslation } from 'next-i18next';
 import PieChart from '../CSC/PieChart';
 import RadarChart from '../CSC/RadarChart';
 import { useEffect, useState } from 'react';
-import useISO from 'hooks/useISO';
-import useTeam from 'hooks/useTeam';
+import { useTeamContext } from '@/context/TeamContext';
 import { Loading, Error } from '@/components/shared';
 
 const labels = [
@@ -30,21 +29,19 @@ const barColors = [
 
 const ProcessingActivitiesAnalysis = ({
   csc_statuses,
-  slug,
 }: {
   csc_statuses: { [key: string]: string };
-  slug: string;
 }) => {
   const { t } = useTranslation('translation');
   const [statuses] = useState(csc_statuses);
-  const { isLoading, isError, team } = useTeam(slug as string);
-  const { ISO } = useISO(team);
+  const { teamContext } = useTeamContext();
+  const { isLoading, isError, cscIso } = teamContext;
 
   useEffect(() => {
-    console.log('CSC ISO', ISO);
-  }, [ISO]);
+    console.log('CSC ISO', cscIso);
+  }, [cscIso]);
 
-  if (isLoading || !team || !ISO) {
+  if (isLoading || !cscIso) {
     return <Loading />;
   }
 
@@ -91,7 +88,7 @@ const ProcessingActivitiesAnalysis = ({
             />
           </div>
           <div style={{ width: '49%' }} className="stats p-4 stat-value shadow">
-            <RadarChart ISO={ISO} statuses={statuses} />
+            <RadarChart iso={cscIso.iso} statuses={statuses} />
           </div>
         </div>
       </div>

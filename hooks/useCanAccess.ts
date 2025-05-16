@@ -1,17 +1,19 @@
-import type { Action, Resource } from '@/lib/permissions';
+import type { Resource, Action } from '@/lib/permissions';
+import { usePermissions } from './usePermissions';
 
-import usePermissions from './usePermissions';
-
-const useCanAccess = () => {
-  const { permissions, isError, isLoading } = usePermissions();
+const useCanAccess = (teamSlug: string) => {
+  const { permissions, error: isError, isLoading } = usePermissions(teamSlug);
 
   const canAccess = (resource: Resource, actions: Action[]) => {
-    return (permissions || []).some(
-      (permission) =>
-        permission.resource === resource &&
-        (permission.actions === '*' ||
-          permission.actions.some((action) => actions.includes(action)))
-    );
+    if (!permissions) return false;
+
+    const permission = permissions.find((p) => p.resource === resource);
+
+    if (!permission) return false;
+
+    if (permission.actions === '*') return true;
+
+    return actions.every((action) => permission.actions.includes(action));
   };
 
   return {

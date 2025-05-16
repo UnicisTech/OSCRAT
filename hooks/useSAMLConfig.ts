@@ -1,26 +1,63 @@
-import fetcher from '@/lib/fetcher';
-import type { SAMLSSORecord } from '@boxyhq/saml-jackson';
-import useSWR, { mutate } from 'swr';
-import type { ApiResponse } from 'types';
+import {
+  useGetSAMLConfig,
+  useCreateSAMLConfig,
+  useUpdateSAMLConfig,
+  useDeleteSAMLConfig,
+} from '@/lib/api/hooks/saml';
+import type {
+  CreateSamlConnectionData,
+  UpdateSamlConnectionData,
+} from '@/lib/api/endpoints/teams/saml';
 
-const useSAMLConfig = (slug: string | undefined) => {
-  const url = `/api/teams/${slug}/saml`;
+/**
+ * Hook to fetch and manage team SAML configuration
+ * @param slug Team slug
+ */
+export function useSAMLConfig(slug: string) {
+  const {
+    data: samlConfig,
+    isLoading: isFetching,
+    isError,
+    error,
+  } = useGetSAMLConfig(slug);
 
-  const { data, error, isLoading } = useSWR<ApiResponse<SAMLSSORecord[]>>(
-    slug ? url : null,
-    fetcher
-  );
+  const createMutation = useCreateSAMLConfig(slug);
+  const updateMutation = useUpdateSAMLConfig(slug);
+  const deleteMutation = useDeleteSAMLConfig(slug);
 
-  const mutateSamlConfig = async () => {
-    mutate(url);
+  const createSAMLConfig = async (data: CreateSamlConnectionData) => {
+    return createMutation.mutateAsync(data);
   };
+
+  const updateSAMLConfig = async (
+    clientID: string,
+    clientSecret: string,
+    data: Partial<UpdateSamlConnectionData>
+  ) => {
+    return updateMutation.mutateAsync({
+      ...data,
+      clientID,
+      clientSecret,
+    });
+  };
+
+  const deleteSAMLConfig = async (clientID: string, clientSecret: string) => {
+    return deleteMutation.mutateAsync({ clientID, clientSecret });
+  };
+
+  const isLoading =
+    isFetching ||
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
   return {
+    samlConfig,
     isLoading,
-    isError: error,
-    samlConfig: data?.data,
-    mutateSamlConfig,
+    isError,
+    error,
+    createSAMLConfig,
+    updateSAMLConfig,
+    deleteSAMLConfig,
   };
-};
-
-export default useSAMLConfig;
+}

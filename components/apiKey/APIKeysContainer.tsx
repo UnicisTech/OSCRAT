@@ -1,26 +1,14 @@
-import { Error, Loading } from '@/components/shared';
 import { TeamTab } from '@/components/team';
-import useTeam from 'hooks/useTeam';
-import { useTranslation } from 'next-i18next';
+import { useTeamContext } from '@/context/TeamContext';
 import APIKeys from './APIKeys';
 import { TeamFeature } from 'types';
 
 const APIKeysContainer = ({ teamFeatures }: { teamFeatures: TeamFeature }) => {
-  const { t } = useTranslation('common');
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
 
-  const { isLoading, isError, team } = useTeam();
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError) {
-    return <Error message={isError.message} />;
-  }
-
-  if (!team) {
-    return <Error message={t('team-not-found')} />;
-  }
+  // TeamContext already handles loading and errors,
+  // so we can be confident that team exists when this component renders
 
   return (
     <>

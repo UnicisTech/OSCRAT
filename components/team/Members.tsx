@@ -1,29 +1,27 @@
 import { Error, LetterAvatar, Loading } from '@/components/shared';
 import { Team, TeamMember } from '@prisma/client';
-import useCanAccess from 'hooks/useCanAccess';
-import useTeamMembers from 'hooks/useTeamMembers';
+import useCanAccess from '@/hooks/useCanAccess';
+import { useTeamMembers } from 'hooks/useTeamMembers';
 import { useSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-
 import { InviteMember } from '@/components/invitation';
 import UpdateMemberRole from './UpdateMemberRole';
-import { defaultHeaders } from '@/lib/common';
-import type { ApiResponse } from 'types';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
 import { useState } from 'react';
+import { extractErrorMessage } from '@/lib/utils';
 
 const Members = ({ team }: { team: Team }) => {
   const { data: session } = useSession();
   const { t } = useTranslation('common');
-  const { canAccess } = useCanAccess();
+  const { canAccess } = useCanAccess(team.slug);
   const [visible, setVisible] = useState(false);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [confirmationDialogVisible, setConfirmationDialogVisible] =
     useState(false);
 
-  const { isLoading, isError, members, mutateTeamMembers } = useTeamMembers(
+  const { members, isLoading, isError, error, deleteMember } = useTeamMembers(
     team.slug
   );
 
@@ -32,7 +30,7 @@ const Members = ({ team }: { team: Team }) => {
   }
 
   if (isError) {
-    return <Error message={isError.message} />;
+    return <Error message={error?.message} />;
   }
 
   if (!members) {
@@ -42,25 +40,15 @@ const Members = ({ team }: { team: Team }) => {
   const removeTeamMember = async (member: TeamMember | null) => {
     if (!member) return;
 
-    const sp = new URLSearchParams({ memberId: member.userId });
-
-    const response = await fetch(
-      `/api/teams/${team.slug}/members?${sp.toString()}`,
-      {
-        method: 'DELETE',
-        headers: defaultHeaders,
-      }
-    );
-
-    const json = (await response.json()) as ApiResponse;
-
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+    try {
+      await deleteMember(member.userId);
+      toast.success(t('member-deleted'));
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('error-deleting-member')));
+    } finally {
+      setConfirmationDialogVisible(false);
+      setSelectedMember(null);
     }
-
-    mutateTeamMembers();
-    toast.success(t('member-deleted'));
   };
 
   const canUpdateRole = (member: TeamMember) => {
@@ -146,7 +134,10 @@ const Members = ({ team }: { team: Team }) => {
       </table>
       <ConfirmationDialog
         visible={confirmationDialogVisible}
-        onCancel={() => setConfirmationDialogVisible(false)}
+        onCancel={() => {
+          setConfirmationDialogVisible(false);
+          setSelectedMember(null);
+        }}
         onConfirm={() => removeTeamMember(selectedMember)}
         title={t('confirm-delete-member')}
       >

@@ -1,19 +1,23 @@
 import { Card } from '@/components/shared';
-import { Error, Loading } from '@/components/shared';
+import { Error } from '@/components/shared';
 import { TeamTab } from '@/components/team';
 import env from '@/lib/env';
 import { inferSSRProps } from '@/lib/inferSSRProps';
 import { getViewerToken } from '@/lib/retraced';
 import { getSession } from '@/lib/session';
 import useCanAccess from 'hooks/useCanAccess';
-import useTeam from 'hooks/useTeam';
+import { useTeamContext } from '@/context/TeamContext';
 import { getTeamMember } from 'models/team';
 import { throwIfNotAllowed } from 'models/user';
 import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import type { NextPageWithLayout } from 'types';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import AccountLayout from '@/components/layouts/AccountLayout';
+import React from 'react';
 
 interface RetracedEventsBrowserProps {
   host: string;
@@ -35,19 +39,14 @@ const Events: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
   teamFeatures,
 }) => {
   const { t } = useTranslation('common');
-  const { canAccess } = useCanAccess();
-  const { isLoading, isError, team } = useTeam();
+  const router = useRouter();
+  const { slug } = router.query;
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
+  const { canAccess } = useCanAccess(slug as string);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError || error) {
-    return <Error message={isError?.message || error?.message} />;
-  }
-
-  if (!team) {
-    return <Error message={t('team-not-found')} />;
+  if (error) {
+    return <Error message={error.message} />;
   }
 
   return (
@@ -65,6 +64,14 @@ const Events: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
         </Card.Body>
       </Card>
     </>
+  );
+};
+
+Events.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 

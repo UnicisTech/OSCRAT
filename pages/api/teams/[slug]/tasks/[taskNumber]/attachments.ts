@@ -103,7 +103,12 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (isAllowed) {
       try {
-        const url = await saveFileAsAttachment(Number(taskId), file[0]);
+        const uploadParams = {
+          taskId: Number(taskId),
+          file: file[0],
+        };
+
+        const url = await saveFileAsAttachment(uploadParams);
         res.status(200).json({ url });
       } catch (error) {
         console.error('Failed to save file as attachment:', error);

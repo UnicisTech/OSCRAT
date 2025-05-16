@@ -1,14 +1,13 @@
 import { EmptyState, WithLoadingAndError } from '@/components/shared';
 import Badge from '@/components/shared/Badge';
 import ConfirmationDialog from '@/components/shared/ConfirmationDialog';
-import fetcher from '@/lib/fetcher';
+import { useApiKeys } from '@/hooks/useApiKeys';
+import { extractErrorMessage } from '@/lib/utils';
 import type { ApiKey, Team } from '@prisma/client';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
-import useSWR from 'swr';
-import type { ApiResponse } from 'types';
 import NewAPIKey from './NewAPIKey';
 
 interface APIKeysProps {
@@ -22,37 +21,24 @@ const APIKeys = ({ team }: APIKeysProps) => {
   const [confirmationDialogVisible, setConfirmationDialogVisible] =
     useState(false);
 
-  // Fetch API Keys
-  const { data, isLoading, error, mutate } = useSWR<{ data: ApiKey[] }>(
-    `/api/teams/${team.slug}/api-keys`,
-    fetcher
+  // Use the custom hook
+  const { apiKeys, isLoading, error, deleteApiKey } = useApiKeys(
+    team.slug
   );
 
   // Delete API Key
-  const deleteApiKey = async (apiKey: ApiKey | null) => {
+  const handleDeleteApiKey = async (apiKey: ApiKey | null) => {
     if (!apiKey) return;
 
-    const res = await fetch(`/api/teams/${team.slug}/api-keys/${apiKey.id}`, {
-      method: 'DELETE',
-    });
-
-    const { data, error } = (await res.json()) as ApiResponse<null>;
-
-    setSelectedApiKey(null);
-    setConfirmationDialogVisible(false);
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
-    if (data) {
-      mutate();
+    try {
+      await deleteApiKey(apiKey.id);
+      setSelectedApiKey(null);
+      setConfirmationDialogVisible(false);
       toast.success(t('api-key-deleted'));
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('error-deleting-api-key')));
     }
   };
-
-  const apiKeys = data?.data ?? [];
 
   return (
     <WithLoadingAndError isLoading={isLoading} error={error}>
@@ -121,7 +107,7 @@ const APIKeys = ({ team }: APIKeysProps) => {
             <ConfirmationDialog
               title={t('revoke-api-key')}
               visible={confirmationDialogVisible}
-              onConfirm={() => deleteApiKey(selectedApiKey)}
+              onConfirm={() => handleDeleteApiKey(selectedApiKey)}
               onCancel={() => setConfirmationDialogVisible(false)}
               cancelText={t('cancel')}
               confirmText={t('revoke-api-key')}

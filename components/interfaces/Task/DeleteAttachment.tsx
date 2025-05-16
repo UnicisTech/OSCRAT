@@ -1,9 +1,10 @@
 import React, { useCallback, MouseEvent, useState } from 'react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { Modal, Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import type { Attachment } from 'types';
+import { useAttachments } from '@/hooks/useAttachments';
+import { extractErrorMessage } from '@/lib/utils';
 
 const DeleteAttachment = ({
   visible,
@@ -11,17 +12,16 @@ const DeleteAttachment = ({
   taskNumber,
   teamSlug,
   attachment,
-  mutateTask,
 }: {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   taskNumber: string;
   teamSlug: string;
   attachment: Attachment;
-  mutateTask: () => Promise<void>;
 }) => {
   const { t } = useTranslation('common');
   const [isLoading, setIsLoading] = useState(false);
+  const { deleteAttachment } = useAttachments(teamSlug, taskNumber);
 
   const deleteHandler = useCallback(
     async (event: MouseEvent<HTMLButtonElement>) => {
@@ -30,23 +30,17 @@ const DeleteAttachment = ({
 
       setIsLoading(true);
 
-      const response = await axios.delete(
-        `/api/teams/${teamSlug}/tasks/${taskNumber}/attachments?id=${attachment.id}`
-      );
-      const { error } = response.data;
-
-      if (error) {
-        toast.error(error.message);
+      try {
+        await deleteAttachment(attachment.id);
+        toast.success(t('attachment-deleted'));
         setIsLoading(false);
-        return;
+        setVisible(false);
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('attachment-delete-error')));
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
-      setVisible(false);
-      toast.success('Attachment deleted');
-      mutateTask();
     },
-    []
+    [deleteAttachment, attachment.id, setVisible, t]
   );
 
   return (

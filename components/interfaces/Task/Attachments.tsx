@@ -1,28 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import { TaskExtended } from 'types';
 import AttachmentsCard from './AttachmentCard';
 import { checkExtensionAndMIMEType } from '@/components/services/taskService';
-import useCanAccess from 'hooks/useCanAccess';
+import useCanAccess from '@/hooks/useCanAccess';
 import { useTranslation } from 'next-i18next';
 import { EmptyState } from '@/components/shared';
+import { useAttachments } from '@/hooks/useAttachments';
+import { extractErrorMessage } from '@/lib/utils';
 
-const Attachments = ({
-  task,
-  mutateTask,
-}: {
-  task: TaskExtended;
-  mutateTask: () => Promise<void>;
-}) => {
+const Attachments = ({ task }: { task: TaskExtended }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { t } = useTranslation('common');
-  const { canAccess } = useCanAccess();
   const { slug, taskNumber } = router.query;
+  const { canAccess } = useCanAccess(slug as string);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const { uploadAttachment } = useAttachments(
+    slug as string,
+    taskNumber as string
+  );
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -78,31 +78,15 @@ const Attachments = ({
     const uploadFile = async () => {
       if (selectedFile && typeof slug === 'string') {
         try {
-          const formData = new FormData();
-          formData.append('file', selectedFile);
-          formData.append('slug', slug);
-          formData.append('taskId', String(task.id));
-          const response = await axios.post(
-            `/api/teams/${slug}/tasks/${taskNumber}/attachments`,
-            formData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            }
-          );
-
-          const { error } = response.data;
-
-          if (error) {
-            toast.error(error.message);
-            return;
-          }
-
+          await uploadAttachment({
+            file: selectedFile,
+            taskId: task.id,
+          });
           toast.success('Attachment uploaded');
-          mutateTask();
-        } catch (error: any) {
-          toast.error(error?.message);
+        } catch (error: unknown) {
+          toast.error(
+            extractErrorMessage(error, 'Failed to upload attachment')
+          );
           console.error(error);
         }
       }
@@ -130,7 +114,6 @@ const Attachments = ({
                   attachment={attachment}
                   taskNumber={taskNumber as string}
                   teamSlug={slug as string}
-                  mutateTask={mutateTask}
                 />
               ))}
             </div>
@@ -163,7 +146,6 @@ const Attachments = ({
               attachment={attachment}
               taskNumber={taskNumber as string}
               teamSlug={slug as string}
-              mutateTask={mutateTask}
             />
           ))
         ) : (

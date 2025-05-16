@@ -1,48 +1,37 @@
 import React from 'react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { Modal, Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
-import type { ApiResponse } from 'types';
-import useTasks from 'hooks/useTasks';
-import { useRouter } from 'next/router';
 import { useFormik } from 'formik';
+import { useTask } from 'hooks/useTask';
 
 const DeleteTask = ({
   taskNumber,
   visible,
   setVisible,
+  teamSlug,
 }: {
   taskNumber: null | number;
   visible: boolean;
   setVisible: (visible: boolean) => void;
+  teamSlug: string;
 }) => {
-  const router = useRouter();
-  const { slug } = router.query;
-  const { mutateTasks } = useTasks(slug as string);
   const { t } = useTranslation('common');
+  const { deleteTask } = useTask(teamSlug, taskNumber?.toString() || '');
 
   const formik = useFormik({
     initialValues: {
       name: '',
     },
     onSubmit: async () => {
-      const response = await axios.delete<ApiResponse<unknown>>(
-        `/api/teams/${slug}/tasks/${taskNumber}`
-      );
-
-      const { error } = response.data;
-
-      if (error) {
-        toast.error(error.message);
-        return;
+      try {
+        await deleteTask();
+        toast.success(t('task-deleted'));
+        formik.resetForm();
+        setVisible(false);
+      } catch (err: any) {
+        toast.error(err.message || t('error-deleting-task'));
       }
-
-      toast.success(t('task-deleted'));
-
-      mutateTasks();
-      formik.resetForm();
-      setVisible(false);
     },
   });
 

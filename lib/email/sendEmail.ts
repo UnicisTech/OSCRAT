@@ -5,11 +5,7 @@ import env from '../env';
 const transporter = nodemailer.createTransport({
   host: env.smtp.host,
   port: env.smtp.port,
-  secure: false,
-  auth: {
-    user: env.smtp.user,
-    pass: env.smtp.password,
-  },
+  secure: false
 });
 
 interface EmailData {

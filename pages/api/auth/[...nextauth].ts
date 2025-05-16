@@ -137,7 +137,8 @@ if (isAuthProviderEnabled('email')) {
 }
 
 const cookiesOptions: Partial<Pick<NextAuthOptions, 'cookies'>> =
-  process.env.NODE_ENV === 'production' && process?.env?.APP_URL?.startsWith('https')
+  process.env.NODE_ENV === 'production' &&
+  process?.env?.APP_URL?.startsWith('https')
     ? {
         cookies: {
           sessionToken: {

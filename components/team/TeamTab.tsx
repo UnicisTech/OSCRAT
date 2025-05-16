@@ -8,9 +8,9 @@ import {
 } from '@heroicons/react/24/outline';
 import type { Team } from '@prisma/client';
 import classNames from 'classnames';
-import useCanAccess from 'hooks/useCanAccess';
 import Link from 'next/link';
 import { TeamFeature } from 'types';
+import useCanAccess from '@/hooks/useCanAccess';
 
 interface TeamTabProps {
   activeTab: string;
@@ -20,12 +20,14 @@ interface TeamTabProps {
 }
 
 const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
-  const { canAccess } = useCanAccess();
+  const { canAccess } = useCanAccess(team.slug);
+
+  const teamSlug = team.slug;
 
   const navigations = [
     {
       name: 'Settings',
-      href: `/teams/${team.slug}/settings`,
+      href: `/teams/${teamSlug}/settings`,
       active: activeTab === 'settings',
       icon: Cog6ToothIcon,
     },
@@ -34,7 +36,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   if (canAccess('team_member', ['create', 'update', 'read', 'delete'])) {
     navigations.push({
       name: 'Members',
-      href: `/teams/${team.slug}/members`,
+      href: `/teams/${teamSlug}/members`,
       active: activeTab === 'members',
       icon: UserPlusIcon,
     });
@@ -46,7 +48,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   ) {
     navigations.push({
       name: 'Single Sign-On',
-      href: `/teams/${team.slug}/saml`,
+      href: `/teams/${teamSlug}/saml`,
       active: activeTab === 'saml',
       icon: ShieldExclamationIcon,
     });
@@ -58,7 +60,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   ) {
     navigations.push({
       name: 'Directory Sync',
-      href: `/teams/${team.slug}/directory-sync`,
+      href: `/teams/${teamSlug}/directory-sync`,
       active: activeTab === 'directory-sync',
       icon: UserPlusIcon,
     });
@@ -70,7 +72,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   ) {
     navigations.push({
       name: 'Audit Logs',
-      href: `/teams/${team.slug}/audit-logs`,
+      href: `/teams/${teamSlug}/audit-logs`,
       active: activeTab === 'audit-logs',
       icon: DocumentMagnifyingGlassIcon,
     });
@@ -82,7 +84,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   ) {
     navigations.push({
       name: 'Webhooks',
-      href: `/teams/${team.slug}/webhooks`,
+      href: `/teams/${teamSlug}/webhooks`,
       active: activeTab === 'webhooks',
       icon: PaperAirplaneIcon,
     });
@@ -94,7 +96,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   ) {
     navigations.push({
       name: 'API Keys',
-      href: `/teams/${team.slug}/api-keys`,
+      href: `/teams/${teamSlug}/api-keys`,
       active: activeTab === 'api-keys',
       icon: KeyIcon,
     });

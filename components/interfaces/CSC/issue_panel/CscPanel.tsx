@@ -6,24 +6,24 @@ import React, {
   SetStateAction,
 } from 'react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import ControlBlock from './ControlBlock';
 import type { Task } from '@prisma/client';
 import { IssuePanelContainer } from 'sharedStyles';
-import useCanAccess from 'hooks/useCanAccess';
+import useCanAccess from '@/hooks/useCanAccess';
 import ControlBlockViewOnly from './ControlBlockViewOnly';
 import { getCscControlsProp } from '@/lib/csc';
 import type { ISO } from 'types';
+import { useTeam } from '@/hooks/useTeam';
+import { extractErrorMessage } from '@/lib/utils';
 
 const CscPanel = ({
   task,
   statuses,
   ISO,
   setStatuses,
-  mutateTask,
 }: {
   task: Task;
   statuses: { [key: string]: string };
@@ -33,13 +33,13 @@ const CscPanel = ({
       [key: string]: string;
     }>
   >;
-  mutateTask: () => Promise<void>;
 }) => {
   const { t } = useTranslation('common');
-  const { canAccess } = useCanAccess();
 
   const router = useRouter();
-  const { slug } = router.query;
+  const { slug } = router.query as { slug: string };
+  const { updateTaskCsc } = useTeam(slug);
+  const { canAccess } = useCanAccess(slug);
 
   const properties = task?.properties as any;
   const issueControls = (properties?.[getCscControlsProp(ISO)] as string[]) || [
@@ -62,94 +62,61 @@ const CscPanel = ({
 
   const deleteControls = useCallback(async () => {
     setIsDeleting(true);
-
-    const response = await axios.put(
-      `/api/teams/${slug}/tasks/${task.taskNumber}/csc`,
-      {
+    try {
+      await updateTaskCsc(task.taskNumber, {
         controls: [...controls],
         operation: 'remove',
-        ISO,
-      }
-    );
-
-    const { error } = response.data;
-
-    if (error) {
-      toast.error(error.message);
+        iso: ISO,
+      });
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('error.delete-controls')));
+    } finally {
       setIsDeleting(false);
-      return;
     }
-
-    mutateTask();
-    setIsDeleting(false);
-  }, [task, mutateTask, setIsDeleting]);
+  }, [task, controls, updateTaskCsc, ISO, t]);
 
   const controlHanlder = useCallback(
     async (oldControl: string, newControl: string) => {
       setIsSaving(true);
-
-      let response;
-
-      if (oldControl === '') {
-        response = await axios.put(
-          `/api/teams/${slug}/tasks/${task.taskNumber}/csc`,
-          {
+      try {
+        if (oldControl === '') {
+          await updateTaskCsc(task.taskNumber, {
             controls: [newControl],
             operation: 'add',
-            ISO,
-          }
-        );
-      } else {
-        response = await axios.put(
-          `/api/teams/${slug}/tasks/${task.taskNumber}/csc`,
-          {
+            iso: ISO,
+          });
+        } else {
+          await updateTaskCsc(task.taskNumber, {
             controls: [oldControl, newControl],
             operation: 'change',
-            ISO,
-          }
-        );
-      }
-
-      const { error } = response.data;
-
-      if (error) {
-        toast.error(error.message);
+            iso: ISO,
+          });
+        }
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('error.update-control')));
+      } finally {
         setIsSaving(false);
-        return;
       }
-
-      mutateTask();
-      setIsSaving(false);
     },
-    [task, mutateTask, setIsSaving]
+    [task, updateTaskCsc, ISO, t]
   );
 
   const deleteControlHandler = useCallback(
     async (control: string) => {
       setIsDeleting(true);
-
-      const response = await axios.put(
-        `/api/teams/${slug}/tasks/${task.taskNumber}/csc`,
-        {
+      try {
+        await updateTaskCsc(task.taskNumber, {
           controls: [control],
           operation: 'remove',
-          ISO,
-        }
-      );
-
-      const { error } = response.data;
-
-      if (error) {
-        toast.error(error.message);
+          iso: ISO,
+        });
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('error.delete-control')));
+      } finally {
         setIsDeleting(false);
-        return;
       }
-
-      mutateTask();
-
-      setIsDeleting(false);
     },
-    [task, mutateTask, setIsDeleting]
+    [task, updateTaskCsc, ISO, t]
   );
 
   return (

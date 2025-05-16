@@ -1,21 +1,21 @@
 import { Error, Loading } from '@/components/shared';
 import { Team } from '@prisma/client';
-import useDirectory from 'hooks/useDirectory';
+import { useDirectory } from 'hooks/useDirectory';
 import { useTranslation } from 'next-i18next';
 
 const Directory = ({ team }: { team: Team }) => {
   const { t } = useTranslation('common');
-  const { isLoading, isError, directories } = useDirectory(team.slug);
+  const { isLoading, error, directories } = useDirectory(team.slug);
 
   if (isLoading) {
     return <Loading />;
   }
 
-  if (isError) {
-    return <Error message={isError.message} />;
+  if (error) {
+    return <Error message={error.message} />;
   }
 
-  if (directories && directories.length === 0) {
+  if (!directories || directories.length === 0) {
     return null;
   }
 

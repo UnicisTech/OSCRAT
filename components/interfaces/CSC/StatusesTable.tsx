@@ -7,13 +7,14 @@ import StatusSelector from './StatusSelector';
 import type { CscOption } from 'types';
 import type { Task } from '@prisma/client';
 import usePagination from 'hooks/usePagination';
-import useCanAccess from 'hooks/useCanAccess';
+import useCanAccess from '@/hooks/useCanAccess';
 import { ControlOption, ISO } from 'types';
 import { TailwindTableWrapper } from 'sharedStyles';
 import TasksList from './TasksList';
+import { useRouter } from 'next/router';
 
 const StatusesTable = ({
-  ISO,
+  iso,
   tasks,
   statuses,
   sectionFilter,
@@ -22,7 +23,7 @@ const StatusesTable = ({
   statusHandler,
   taskSelectorHandler,
 }: {
-  ISO: ISO;
+  iso: ISO;
   tasks: Array<Task>;
   statuses: any;
   sectionFilter: null | Array<{ label: string; value: string }>;
@@ -35,11 +36,12 @@ const StatusesTable = ({
     control: string
   ) => Promise<void>;
 }) => {
-  const { canAccess } = useCanAccess();
-  //TODO: maybe [] instead of getControlOptions
+  const router = useRouter();
+  const { slug } = router.query as { slug: string };
+  const { canAccess } = useCanAccess(slug);
   const [filteredControls, setFilteredControls] = useState<
     Array<ControlOption>
-  >(getControlOptions(ISO));
+  >(getControlOptions(iso));
   const {
     currentPage,
     totalPages,
@@ -50,10 +52,10 @@ const StatusesTable = ({
     nextButtonDisabled,
   } = usePagination<ControlOption>(filteredControls, perPage);
 
-  const cscControlsProp = getCscControlsProp(ISO);
+  const cscControlsProp = getCscControlsProp(iso);
 
   useEffect(() => {
-    let filteredControls = [...getControlOptions(ISO)];
+    let filteredControls = [...getControlOptions(iso)];
     if (
       (sectionFilter === null || sectionFilter?.length === 0) &&
       (statusFilter === null || statusFilter?.length === 0)
@@ -65,7 +67,7 @@ const StatusesTable = ({
       filteredControls = filteredControls.filter((item) => {
         const sections = sectionFilter.map((option) => option.value);
         const content = item.value.section;
-        if (ISO === '2013') {
+        if (iso === '2013') {
           return sections.some((section) => content.includes(section));
         } else {
           return sections.includes(content);
@@ -81,7 +83,7 @@ const StatusesTable = ({
     }
 
     setFilteredControls(filteredControls);
-  }, [sectionFilter, statusFilter]);
+  }, [sectionFilter, statusFilter, iso, statuses]);
 
   return (
     <>
@@ -156,7 +158,7 @@ const StatusesTable = ({
                         tasks={tasks}
                         control={option.value.control}
                         handler={taskSelectorHandler}
-                        ISO={ISO}
+                        ISO={iso}
                       />
                     ) : (
                       <TasksList tasks={tasks} control={option.value.control} />

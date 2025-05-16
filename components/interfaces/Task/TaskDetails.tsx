@@ -1,19 +1,17 @@
 import React, { Fragment, useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { DatePicker } from '@atlaskit/datetime-picker';
 import TextField from '@atlaskit/textfield';
 import Select, { ValueType } from '@atlaskit/select';
 import { Button } from 'react-daisyui';
-import type { ApiResponse } from 'types';
 import type { Task, Team } from '@prisma/client';
 import statuses from '@/components/defaultLanding/data/statuses.json';
 import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
 import { WithoutRing, IssuePanelContainer } from 'sharedStyles';
-import useTask from 'hooks/useTask';
-import useCanAccess from 'hooks/useCanAccess';
+import { useTask } from 'hooks/useTask';
+import useCanAccess from '@/hooks/useCanAccess';
+import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
@@ -24,6 +22,7 @@ interface FormData {
   status: ValueType<Option>;
   team: ValueType<Option>;
   duedate: string;
+  description: string;
   [key: string]: string | ValueType<Option>;
 }
 
@@ -33,51 +32,41 @@ interface Option {
 }
 
 const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
-  const router = useRouter();
-  const { slug, taskNumber } = router.query;
   const { t } = useTranslation('common');
-  const { canAccess } = useCanAccess();
-  const { mutateTask } = useTask(slug as string, taskNumber as string);
+  const { canAccess } = useCanAccess(team.slug);
+  const { updateTask } = useTask(team.slug, task.taskNumber.toString());
   const [isFormChanged, setIsFormChanged] = useState(false);
 
   const checkFormChanges = useCallback(() => {
     setIsFormChanged(true);
   }, []);
 
+  const handleSubmit = async (data: FormData) => {
+    if (!isFormChanged) {
+      return;
+    }
+    const { title, status, duedate, description } = data;
+
+    try {
+      const updateData: UpdateTaskData = {
+        title,
+        status: status?.value,
+        description: description || '',
+        duedate: duedate ? new Date(duedate) : undefined,
+      };
+
+      await updateTask(updateData);
+
+      toast.success(t('task-updated'));
+      setIsFormChanged(false);
+    } catch (err: any) {
+      toast.error(err.message || t('error-updating-task'));
+    }
+  };
+
   return (
     <IssuePanelContainer>
-      <Form<FormData>
-        onSubmit={async (data) => {
-          if (!isFormChanged) {
-            return;
-          }
-          const { title, status, duedate, description } = data;
-          const response = await axios.put<ApiResponse<Task>>(
-            `/api/teams/${team.slug}/tasks/${task.taskNumber}`,
-            {
-              data: {
-                title,
-                status: status?.value,
-                teamId: team.id,
-                duedate,
-                description: description || '',
-              },
-            }
-          );
-
-          const { error } = response.data;
-
-          if (error) {
-            toast.error(error.message);
-            return;
-          } else {
-            toast.success(t('task-updated'));
-            setIsFormChanged(false);
-          }
-
-          mutateTask();
-        }}
-      >
+      <Form<FormData> onSubmit={handleSubmit}>
         {({ formProps, submitting }) => (
           <form {...formProps}>
             <div

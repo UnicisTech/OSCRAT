@@ -1,12 +1,10 @@
 import { Error, LetterAvatar, Loading } from '@/components/shared';
-import { defaultHeaders } from '@/lib/common';
 import { Invitation, Team } from '@prisma/client';
-import useInvitations from 'hooks/useInvitations';
+import { useInvitations } from 'hooks/useInvitations';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import type { ApiResponse } from 'types';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
 
 const PendingInvitations = ({ team }: { team: Team }) => {
@@ -16,7 +14,7 @@ const PendingInvitations = ({ team }: { team: Team }) => {
   const [confirmationDialogVisible, setConfirmationDialogVisible] =
     useState(false);
 
-  const { isLoading, isError, invitations, mutateInvitation } = useInvitations(
+  const { isLoading, isError, invitations, deleteInvitation } = useInvitations(
     team.slug
   );
 
@@ -27,31 +25,19 @@ const PendingInvitations = ({ team }: { team: Team }) => {
   }
 
   if (isError) {
-    return <Error message={isError.message} />;
+    return <Error message={t('error-loading-invitations')} />;
   }
 
-  const deleteInvitation = async (invitation: Invitation | null) => {
+  const handleDeleteInvitation = async (invitation: Invitation | null) => {
     if (!invitation) return;
-
-    const sp = new URLSearchParams({ id: invitation.id });
-
-    const response = await fetch(
-      `/api/teams/${team.slug}/invitations?${sp.toString()}`,
-      {
-        method: 'DELETE',
-        headers: defaultHeaders,
-      }
-    );
-
-    const json = (await response.json()) as ApiResponse<unknown>;
-
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+    try {
+      await deleteInvitation(invitation.id);
+      toast.success(t('invitation-deleted'));
+      setConfirmationDialogVisible(false);
+    } catch (error) {
+      console.error(error);
+      toast.error(t('error-deleting-invitation'));
     }
-
-    mutateInvitation();
-    toast.success(t('invitation-deleted'));
   };
 
   if (!invitations || !invitations.length) {
@@ -110,7 +96,7 @@ const PendingInvitations = ({ team }: { team: Team }) => {
       <ConfirmationDialog
         visible={confirmationDialogVisible}
         onCancel={() => setConfirmationDialogVisible(false)}
-        onConfirm={() => deleteInvitation(selectedInvitation)}
+        onConfirm={() => handleDeleteInvitation(selectedInvitation)}
         title={t('confirm-delete-member-invitation')}
       >
         {t('delete-member-invitation-warning')}

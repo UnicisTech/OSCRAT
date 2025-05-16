@@ -3,12 +3,11 @@ import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { Button } from 'react-daisyui';
-
-import type { ApiResponse, UserReturned } from 'types';
-import { Card, InputWithLabel } from '@/components/shared';
-import { defaultHeaders } from '@/lib/common';
 import { User } from '@prisma/client';
-import { useSession } from 'next-auth/react';
+
+import { Card, InputWithLabel } from '@/components/shared';
+import { useAccount } from '@/hooks/useAccount';
+import { extractErrorMessage } from '@/lib/utils';
 
 const schema = Yup.object().shape({
   firstName: Yup.string().required(),
@@ -17,7 +16,7 @@ const schema = Yup.object().shape({
 
 const UpdateName = ({ user }: { user: Partial<User> }) => {
   const { t } = useTranslation('common');
-  const { data: session, update } = useSession();
+  const { updateUser, isUpdateUserLoading } = useAccount();
 
   const formik = useFormik({
     initialValues: {
@@ -27,30 +26,16 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
     enableReinitialize: true,
     validationSchema: schema,
     onSubmit: async (values) => {
-      const response = await fetch('/api/users', {
-        method: 'PUT',
-        headers: defaultHeaders,
-        body: JSON.stringify(values),
-      });
+      const result = await updateUser(values);
 
-      const json = (await response.json()) as ApiResponse<UserReturned>;
-
-      if (!response.ok) {
-        toast.error(json.error.message);
-        return;
+      if (result.success) {
+        toast.success(t('successfully-updated'));
+        formik.resetForm({ values });
+      } else {
+        toast.error(
+          extractErrorMessage(result.error, t('error.update-failed'))
+        );
       }
-
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          name: json.data.name,
-          firstName: json.data.firstName,
-          lastName: json.data.lastName,
-        },
-      });
-
-      toast.success(t('successfully-updated'));
     },
   });
 
@@ -89,7 +74,7 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
           <Button
             type="submit"
             color="primary"
-            loading={formik.isSubmitting}
+            loading={isUpdateUserLoading}
             disabled={!formik.dirty || !formik.isValid}
             size="md"
           >

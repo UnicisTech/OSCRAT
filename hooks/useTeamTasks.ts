@@ -1,23 +1,31 @@
-import fetcher from '@/lib/fetcher';
-import { Task } from '@prisma/client';
-import useSWR, { mutate } from 'swr';
-import type { ApiResponse } from 'types';
+import { useGetTeamTasks, useCreateTeamTask } from '@/lib/api/hooks';
+import type { CreateTaskData } from '@/lib/api/endpoints/tasks';
 
-const useTeamTasks = (slug: string) => {
-  const url = `/api/teams/${slug}/tasks`;
+/**
+ * Hook to fetch and manage team tasks
+ * @param slug Team slug
+ */
+export function useTeamTasks(slug: string) {
+  const {
+    data: tasks,
+    isLoading: isFetching,
+    isError,
+    error,
+  } = useGetTeamTasks(slug);
 
-  const { data, error } = useSWR<ApiResponse<Task[]>>(url, fetcher);
+  const createMutation = useCreateTeamTask(slug);
 
-  const mutateTasks = async () => {
-    mutate(url);
+  const createTask = async (data: CreateTaskData) => {
+    return createMutation.mutateAsync(data);
   };
+
+  const isLoading = isFetching || createMutation.isPending;
 
   return {
-    isLoading: !error && !data,
-    isError: error,
-    tasks: data?.data,
-    mutateTasks,
+    tasks,
+    isLoading,
+    isError,
+    error,
+    createTask,
   };
-};
-
-export default useTeamTasks;
+}

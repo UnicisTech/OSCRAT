@@ -1,9 +1,9 @@
-import { Error, Loading } from '@/components/shared';
+import React from 'react';
+import { Error } from '@/components/shared';
 import { TeamTab } from '@/components/team';
 import { ConnectionsWrapper } from '@boxyhq/react-ui/sso';
-import useTeam from 'hooks/useTeam';
+import { useTeamContext } from '@/context/TeamContext';
 import { GetServerSidePropsContext } from 'next';
-import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import env from '@/lib/env';
@@ -13,26 +13,19 @@ import { getTeamMember } from 'models/team';
 import { throwIfNotAllowed } from 'models/user';
 import { NextPageWithLayout } from 'types';
 import { inferSSRProps } from '@/lib/inferSSRProps';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import AccountLayout from '@/components/layouts/AccountLayout';
 
 const TeamSSO: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
   teamFeatures,
   SPConfigURL,
   error,
 }) => {
-  const { t } = useTranslation('common');
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
 
-  const { isLoading, isError, team } = useTeam();
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError || error) {
-    return <Error message={isError?.message || error?.message} />;
-  }
-
-  if (!team) {
-    return <Error message={t('team-not-found')} />;
+  if (error) {
+    return <Error message={error.message} />;
   }
 
   return (
@@ -77,6 +70,14 @@ const TeamSSO: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
         }}
       />
     </>
+  );
+};
+
+TeamSSO.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 

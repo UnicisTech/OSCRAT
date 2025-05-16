@@ -4,7 +4,13 @@ import type { AppEvent } from 'types';
 import packageInfo from '../package.json';
 import env from './env';
 
-initializeMetrics({ name: packageInfo.name, version: packageInfo.version });
+if (
+  process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT &&
+  process.env.OTEL_EXPORTER_OTLP_METRICS_HEADERS &&
+  process.env.OTEL_EXPORTER_OTLP_METRICS_PROTOCOL
+) {
+  initializeMetrics({ name: packageInfo.name, version: packageInfo.version });
+}
 
 const prefix = env.otel.prefix;
 const meter = packageInfo.name;

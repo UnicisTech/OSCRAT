@@ -5,22 +5,23 @@ import {
   RectangleStackIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
-import useTeams from 'hooks/useTeams';
+import { useTeams } from 'hooks/useTeams';
 import { useSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import useCanAccess from 'hooks/useCanAccess';
+import useCanAccess from '@/hooks/useCanAccess';
 
 const TeamDropdown = () => {
   const router = useRouter();
+  const { slug } = router.query as { slug: string };
   const { teams } = useTeams();
   const { data } = useSession();
   const { t } = useTranslation('common');
-  const { canAccess } = useCanAccess();
+  const { canAccess } = useCanAccess(slug);
 
-  const currentTeam = (teams || []).find(
+  const currentTeam = (Array.isArray(teams) ? teams : []).find(
     (team) => team.slug === router.query.slug
   );
 
@@ -28,7 +29,7 @@ const TeamDropdown = () => {
     {
       id: 2,
       name: t('teams'),
-      items: (teams || []).map((team) => ({
+      items: (Array.isArray(teams) ? teams : []).map((team) => ({
         id: team.id,
         name: team.name,
         href: `/teams/${team.slug}/dashboard`,
@@ -77,7 +78,7 @@ const TeamDropdown = () => {
         tabIndex={0}
         className="border border-gray-300 dark:border-gray-600 flex h-10 items-center px-4 justify-between cursor-pointer rounded text-sm font-bold"
       >
-        {currentTeam?.name || data?.user?.name}{' '}
+        {currentTeam?.name || data?.user?.name}
         <ChevronUpDownIcon className="w-5 h-5" />
       </div>
       <ul

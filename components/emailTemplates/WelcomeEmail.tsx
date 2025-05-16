@@ -24,7 +24,7 @@ const WelcomeEmail = ({ name, subject, team }: WelcomeEmailProps) => {
       <EmailLayout>
         <Text>Hi {name},</Text>
         <Text>
-          You have been successfully signed up to {app.name} on team{' '}
+          You have been successfully signed up to {app.name} on team
           <b>{team}</b>.
         </Text>
         <Text>Click the below link to login now:</Text>

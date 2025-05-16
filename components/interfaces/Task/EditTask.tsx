@@ -1,19 +1,17 @@
 import React, { Fragment } from 'react';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { Modal } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { DatePicker } from '@atlaskit/datetime-picker';
 import TextField from '@atlaskit/textfield';
 import Select, { ValueType } from '@atlaskit/select';
-import type { ApiResponse } from 'types';
 import type { Task, Team } from '@prisma/client';
 import Button, { LoadingButton } from '@atlaskit/button';
 import statuses from '@/components/defaultLanding/data/statuses.json';
 import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
 import { WithoutRing } from 'sharedStyles';
-import useTasks from 'hooks/useTasks';
+import { useTask } from 'hooks/useTask';
+import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
@@ -24,6 +22,7 @@ interface FormData {
   status: ValueType<Option>;
   team: ValueType<Option>;
   duedate: string;
+  description: string;
   [key: string]: string | ValueType<Option>;
 }
 
@@ -43,39 +42,29 @@ const EditTask = ({
   task: Task;
   team: Team;
 }) => {
-  const router = useRouter();
-  const { slug } = router.query;
-  const { mutateTasks } = useTasks(slug as string);
   const { t } = useTranslation('common');
+  const { updateTask } = useTask(team.slug, task.taskNumber.toString());
 
   return (
     <Modal open={visible}>
       <Form<FormData>
         onSubmit={async (data) => {
           const { title, status, duedate, description } = data;
-          const response = await axios.put<ApiResponse<Task>>(
-            `/api/teams/${team.slug}/tasks/${task.taskNumber}`,
-            {
-              data: {
-                title,
-                status: status?.value,
-                teamId: team.id,
-                duedate,
-                description: description || '',
-              },
-            }
-          );
 
-          const { error } = response.data;
+          try {
+            const updateData: UpdateTaskData = {
+              title,
+              status: status?.value,
+              description: description || '',
+              duedate: duedate ? new Date(duedate) : undefined,
+            };
 
-          if (error) {
-            toast.error(error.message);
-            return;
+            await updateTask(updateData);
+            toast.success(t('task-updated'));
+            setVisible(false);
+          } catch (err: any) {
+            toast.error(err.message || t('error-updating-task'));
           }
-
-          mutateTasks();
-          toast.success(t('task-updated'));
-          setVisible(false);
         }}
       >
         {({ formProps, submitting }) => (

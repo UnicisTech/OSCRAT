@@ -1,4 +1,3 @@
-import { Error, Loading } from '@/components/shared';
 import { AccessControl } from '@/components/shared/AccessControl';
 import env from '@/lib/env';
 import {
@@ -7,26 +6,16 @@ import {
   TeamTab,
   CSCSettings,
 } from '@/components/team';
-import useTeam from 'hooks/useTeam';
+import { useTeamContext } from '@/context/TeamContext';
 import type { GetServerSidePropsContext } from 'next';
-import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import AccountLayout from '@/components/layouts/AccountLayout';
+import React from 'react';
 
 const Settings = ({ teamFeatures }) => {
-  const { t } = useTranslation('common');
-  const { isLoading, isError, team } = useTeam();
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError) {
-    return <Error message={isError.message} />;
-  }
-
-  if (!team) {
-    return <Error message={t('team-not-found')} />;
-  }
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
 
   return (
     <>
@@ -39,6 +28,14 @@ const Settings = ({ teamFeatures }) => {
         </AccessControl>
       </div>
     </>
+  );
+};
+
+Settings.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 

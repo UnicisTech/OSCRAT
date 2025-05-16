@@ -5,7 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { Error, Loading, StatusBadge } from '@/components/shared';
 import useTasks from 'hooks/useTasks';
-import useCanAccess from 'hooks/useCanAccess';
+import useCanAccess from '@/hooks/useCanAccess';
 import statuses from '@/components/defaultLanding/data/statuses.json';
 import { WithLoadingAndError } from '@/components/shared';
 import type { Task, Team } from '@prisma/client';
@@ -22,7 +22,7 @@ const Tasks = ({ team }: { team: Team }) => {
   const [taskToDelete, setTaskToDelete] = useState<null | number>(null);
 
   const { t } = useTranslation('common');
-  const { canAccess } = useCanAccess();
+  const { canAccess } = useCanAccess(slug);
 
   if (isLoading) {
     return <Loading />;
@@ -159,6 +159,7 @@ const Tasks = ({ team }: { team: Team }) => {
           visible={deleteVisible}
           setVisible={setDeleteVisible}
           taskNumber={taskToDelete}
+          teamSlug={team.slug}
         />
       </div>
     </WithLoadingAndError>

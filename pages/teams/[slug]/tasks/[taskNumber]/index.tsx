@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Loading, Error, Card } from '@/components/shared';
 import { GetServerSidePropsContext } from 'next';
-import useTask from 'hooks/useTask';
+import { useTask } from 'hooks/useTask';
 import {
   Attachments,
   Comments,
@@ -12,11 +12,13 @@ import {
   TaskTab,
 } from '@/components/interfaces/Task';
 import { CscAuditLogs, CscPanel } from '@/components/interfaces/CSC';
-import useTeam from 'hooks/useTeam';
+import { useTeamContext } from '@/context/TeamContext';
 import useISO from 'hooks/useISO';
 import { Team } from '@prisma/client';
 import { getCscStatusesBySlug } from 'models/team';
 import Breadcrumb from '../../Breadcrumb';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import AccountLayout from '@/components/layouts/AccountLayout';
 
 const TaskById = ({
   csc_statuses,
@@ -28,23 +30,20 @@ const TaskById = ({
   const [activeCommentTab, setActiveCommentTab] = useState('Comments');
   const router = useRouter();
   const { taskNumber, slug } = router.query;
-  const {
-    team,
-    isLoading: isTeamLoading,
-    isError: isTeamError,
-  } = useTeam(slug as string);
-  const { task, isLoading, isError, mutateTask } = useTask(
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
+  const { task, isLoading, isError, error } = useTask(
     slug as string,
     taskNumber as string
   );
-  const { ISO } = useISO(team);
+  const { iso } = useISO(slug as string);
 
-  if (isLoading || isTeamLoading || !ISO) {
+  if (isLoading || !iso) {
     return <Loading />;
   }
 
-  if (!task || isError || isTeamError) {
-    return <Error message={isError.message} />;
+  if (!task || isError) {
+    return <Error message={error?.message || 'Error loading task'} />;
   }
 
   return (
@@ -66,7 +65,7 @@ const TaskById = ({
           </Card>
           <Card heading="Attachments">
             <Card.Body>
-              <Attachments task={task} mutateTask={mutateTask} />
+              <Attachments task={task} />
             </Card.Body>
           </Card>
         </>
@@ -76,10 +75,9 @@ const TaskById = ({
           <Card.Body>
             <CscPanel
               task={task}
-              mutateTask={mutateTask}
               statuses={statuses}
               setStatuses={setStatuses}
-              ISO={ISO}
+              ISO={iso}
             />
           </Card.Body>
         </Card>
@@ -91,7 +89,7 @@ const TaskById = ({
       {activeCommentTab === 'Comments' && (
         <Card heading="Comments">
           <Card.Body>
-            <Comments task={task} mutateTask={mutateTask} />
+            <Comments task={task} />
           </Card.Body>
         </Card>
       )}
@@ -105,6 +103,14 @@ const TaskById = ({
         </>
       )}
     </>
+  );
+};
+
+TaskById.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 

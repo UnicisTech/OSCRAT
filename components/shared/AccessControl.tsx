@@ -1,5 +1,5 @@
 import type { Action, Resource } from '@/lib/permissions';
-import useCanAccess from 'hooks/useCanAccess';
+import { useTeamContext } from '@/context/TeamContext';
 
 interface AccessControlProps {
   children: React.ReactNode;
@@ -12,7 +12,8 @@ export const AccessControl = ({
   resource,
   actions,
 }: AccessControlProps) => {
-  const { canAccess } = useCanAccess();
+  const { accessContext } = useTeamContext();
+  const { canAccess } = accessContext;
 
   if (!canAccess(resource, actions)) {
     return null;

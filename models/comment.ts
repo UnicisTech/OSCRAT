@@ -1,5 +1,46 @@
 import { prisma } from '@/lib/prisma';
 
+export const getComments = async (params: {
+  taskNumber: number;
+  slug: string;
+}) => {
+  const { taskNumber, slug } = params;
+
+  const task = await prisma.task.findFirst({
+    where: {
+      taskNumber,
+      team: {
+        slug,
+      },
+    },
+  });
+
+  if (!task) {
+    return [];
+  }
+
+  const comments = await prisma.comment.findMany({
+    where: {
+      taskId: task.id,
+    },
+    include: {
+      createdBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+
+  return comments;
+};
+
 export const createComment = async (params: {
   text: string;
   userId: string;

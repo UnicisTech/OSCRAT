@@ -1,21 +1,18 @@
 import React, { Fragment, useRef } from 'react';
 import { Team } from '@prisma/client';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { Modal } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { DatePicker } from '@atlaskit/datetime-picker';
 import TextField from '@atlaskit/textfield';
 import Select, { ValueType } from '@atlaskit/select';
-import type { ApiResponse } from 'types';
-import type { Task } from '@prisma/client';
 import Button, { LoadingButton } from '@atlaskit/button';
 import statusesData from '@/components/defaultLanding/data/statuses.json';
 import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
 import { WithoutRing } from 'sharedStyles';
-import useTasks from 'hooks/useTasks';
+import { useCreateTeamTask } from '@/lib/api/hooks';
 import { getCurrentStringDate } from '@/components/services/taskService';
+import type { CreateTaskData } from '@/lib/api/endpoints/tasks';
 
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
@@ -31,6 +28,7 @@ interface FormData {
   status: ValueType<Option>;
   team: ValueType<Option>;
   duedate: string;
+  description: string;
   [key: string]: string | ValueType<Option>;
 }
 
@@ -53,10 +51,8 @@ const CreateTask = ({
 }) => {
   const formRef = useRef<HTMLFormElement | null>(null);
   const submitButtonRef = useRef<HTMLButtonElement | null>(null);
-  const router = useRouter();
-  const { slug } = router.query;
-  const { mutateTasks } = useTasks(slug as string);
   const { t } = useTranslation('common');
+  const createTaskMutation = useCreateTeamTask(team.slug);
 
   return (
     <Modal open={visible}>
@@ -64,33 +60,29 @@ const CreateTask = ({
       <Form<FormData>
         onSubmit={async (data, { reset }) => {
           const { title, status, duedate, description } = data;
-          const response = await axios.post<ApiResponse<Task>>(
-            `/api/teams/${team.slug}/tasks`,
-            {
+
+          try {
+            const createData: CreateTaskData = {
               title,
               status: status?.value,
-              duedate,
+              duedate: duedate ? new Date(duedate) : undefined,
               description: description || '',
-            }
-          );
+            };
 
-          const { error } = response.data;
+            await createTaskMutation.mutateAsync(createData);
 
-          if (error) {
-            toast.error(error.message);
-            return;
+            reset({
+              title: '',
+              status: null,
+              team: null,
+              duedate: '',
+              description: '',
+            });
+            toast.success(t('task-created'));
+            setVisible(false);
+          } catch (err: any) {
+            toast.error(err.message || t('error-creating-task'));
           }
-
-          mutateTasks();
-          reset({
-            title: '',
-            status: null,
-            team: null,
-            duedate: '',
-            description: '',
-          });
-          toast.success(t('task-created'));
-          setVisible(false);
         }}
       >
         {({ formProps, submitting }) => (

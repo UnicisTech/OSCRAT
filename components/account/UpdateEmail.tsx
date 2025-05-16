@@ -4,9 +4,9 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { Button, Input } from 'react-daisyui';
 
-import type { ApiResponse, UserReturned } from 'types';
 import { Card } from '@/components/shared';
-import { defaultHeaders } from '@/lib/common';
+import { useAccount } from '@/hooks/useAccount';
+import { extractErrorMessage } from '@/lib/utils';
 import type { User } from '@prisma/client';
 
 const schema = Yup.object().shape({
@@ -20,6 +20,7 @@ interface UpdateEmailProps {
 
 const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
   const { t } = useTranslation('common');
+  const { updateUser, isUpdateUserLoading } = useAccount();
 
   const formik = useFormik({
     initialValues: {
@@ -27,20 +28,16 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
     },
     validationSchema: schema,
     onSubmit: async (values) => {
-      const response = await fetch('/api/users', {
-        method: 'PUT',
-        headers: defaultHeaders,
-        body: JSON.stringify(values),
-      });
+      const result = await updateUser(values);
 
-      const json = (await response.json()) as ApiResponse<UserReturned>;
-
-      if (!response.ok) {
-        toast.error(json.error.message);
-        return;
+      if (result.success) {
+        toast.success(t('successfully-updated'));
+        formik.resetForm({ values });
+      } else {
+        toast.error(
+          extractErrorMessage(result.error, t('error.update-failed'))
+        );
       }
-
-      toast.success(t('successfully-updated'));
     },
   });
 
@@ -69,7 +66,7 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
           <Button
             type="submit"
             color="primary"
-            loading={formik.isSubmitting}
+            loading={isUpdateUserLoading}
             disabled={!formik.dirty || !formik.isValid}
             size="md"
           >

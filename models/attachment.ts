@@ -20,7 +20,7 @@ export const createAttachment = async (
     data: {
       taskId,
       filename,
-      fileData,
+      fileData: new Uint8Array(fileData),
       url,
       id: attachmentId,
     },
@@ -48,22 +48,20 @@ export const readFile = (
   });
 };
 
-export const saveFileAsAttachment = async (
-  taskId: number,
-  file: formidable.File
-) => {
-  const {
-    filepath: tempPath,
-    originalFilename: filename,
-    //mimetype: mimeType,
-  } = file;
+export interface UploadAttachmentParams {
+  taskId: number;
+  file: formidable.File;
+}
+
+export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
+  const { filepath: tempPath, originalFilename: filename } = params.file;
 
   const fileData = await fs.promises.readFile(tempPath);
   const attachmentId = uuidv4();
   const url = `/attachments/${attachmentId}`;
 
   await createAttachment(
-    taskId,
+    params.taskId,
     filename as string,
     fileData,
     url,

@@ -1,24 +1,25 @@
 import { CreateDirectory, Directory } from '@/components/directorySync';
 import { Card } from '@/components/shared';
-import { Error, Loading } from '@/components/shared';
+import { Error } from '@/components/shared';
 import ConfirmationDialog from '@/components/shared/ConfirmationDialog';
 import { TeamTab } from '@/components/team';
-import { defaultHeaders } from '@/lib/common';
-import useDirectory from 'hooks/useDirectory';
-import useTeam from 'hooks/useTeam';
+import { useDirectory } from 'hooks/useDirectory';
+import { useTeamContext } from '@/context/TeamContext';
 import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
-import type { ApiResponse, NextPageWithLayout } from 'types';
+import type { NextPageWithLayout } from 'types';
 import env from '@/lib/env';
 import { getSession } from '@/lib/session';
 import { getTeamMember } from 'models/team';
 import { throwIfNotAllowed } from 'models/user';
 import { inferSSRProps } from '@/lib/inferSSRProps';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import AccountLayout from '@/components/layouts/AccountLayout';
 
 const DirectorySync: NextPageWithLayout<
   inferSSRProps<typeof getServerSideProps>
@@ -29,20 +30,13 @@ const DirectorySync: NextPageWithLayout<
   const [visible, setVisible] = useState(false);
   const [confirmationDialogVisible, setConfirmationDialogVisible] =
     useState(false);
-  const { isLoading, isError, team } = useTeam();
-  const { directories, mutateDirectory } = useDirectory(slug);
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
+  const { directories, deleteDirectory } = useDirectory(slug);
   const { t } = useTranslation('common');
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError || error) {
-    return <Error message={isError?.message || error?.message} />;
-  }
-
-  if (!team) {
-    return <Error message={t('team-not-found')} />;
+  if (error) {
+    return <Error message={error.message} />;
   }
 
   const directory =
@@ -51,25 +45,12 @@ const DirectorySync: NextPageWithLayout<
   const removeDirectory = async () => {
     if (!directory) return;
 
-    const sp = new URLSearchParams({ dsyncId: directory.id });
-
-    const response = await fetch(
-      `/api/teams/${team.slug}/directory-sync?${sp.toString()}`,
-      {
-        method: 'DELETE',
-        headers: defaultHeaders,
-      }
-    );
-
-    const json = (await response.json()) as ApiResponse;
-
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+    try {
+      await deleteDirectory(directory.id);
+      toast.success(t('directory-sync-deleted'));
+    } catch (err: any) {
+      toast.error(err.message || t('error-deleting-directory'));
     }
-
-    mutateDirectory();
-    toast.success(t('directory-sync-deleted'));
   };
 
   return (
@@ -116,6 +97,14 @@ const DirectorySync: NextPageWithLayout<
         {t('delete-directory-sync-warning')}
       </ConfirmationDialog>
     </>
+  );
+};
+
+DirectorySync.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 

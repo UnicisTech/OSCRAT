@@ -1,29 +1,21 @@
 import React, { useState, useCallback } from 'react';
-import { getAxiosError } from '@/lib/common';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import type { Task } from '@prisma/client';
 import toast from 'react-hot-toast';
-import axios from 'axios';
-import type { ApiResponse } from 'types';
 import type { TaskExtended } from 'types';
 import { IssuePanelContainer } from 'sharedStyles';
 import Comment from './comments/Comment';
 import CreateCommentForm from './comments/CreateCommentForm';
 import { AccessControl } from '@/components/shared/AccessControl';
 import ConfirmationDialog from '@/components/shared/ConfirmationDialog';
+import { useComments } from '@/hooks/useComments';
+import { extractErrorMessage } from '@/lib/utils';
 
 interface FormData {
   text: string;
 }
 
-export default function Comments({
-  task,
-  mutateTask,
-}: {
-  task: TaskExtended;
-  mutateTask: () => Promise<void>;
-}) {
+export default function Comments({ task }: { task: TaskExtended }) {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { slug, taskNumber } = router.query;
@@ -31,6 +23,11 @@ export default function Comments({
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
   const [confirmationDialogVisible, setConfirmationDialogVisible] =
     useState(false);
+
+  const { createComment, updateComment, deleteComment } = useComments(
+    slug as string,
+    taskNumber as string
+  );
 
   const onDeleteClick = useCallback((id: number) => {
     setCommentToDelete(id);
@@ -43,78 +40,46 @@ export default function Comments({
       reset: (initialValues?: Partial<FormData> | undefined) => void
     ) => {
       try {
-        const response = await axios.post<ApiResponse<Task>>(
-          `/api/teams/${slug}/tasks/${taskNumber}/comments`,
-          {
-            text,
-          }
+        await createComment({ text });
+        reset({ text: '' });
+      } catch (error: unknown) {
+        toast.error(
+          extractErrorMessage(error, t('error.comment-create-failed'))
         );
-
-        const { error } = response.data;
-
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-        reset({
-          text: '',
-        });
-        mutateTask();
-      } catch (error: any) {
-        toast.error(getAxiosError(error));
       }
     },
-    []
+    [createComment, t]
   );
 
-  const handleUpdateComment = useCallback(async (text: string, id: number) => {
-    try {
-      const response = await axios.put<ApiResponse<unknown>>(
-        `/api/teams/${slug}/tasks/${taskNumber}/comments`,
-        {
-          id,
-          text,
-        }
-      );
-
-      const { error } = response.data;
-
-      if (error) {
-        toast.error(error.message);
-        return;
+  const handleUpdateComment = useCallback(
+    async (text: string, id: number) => {
+      try {
+        await updateComment({ id: id.toString(), text });
+        setCommentToEdit(null);
+      } catch (error: unknown) {
+        toast.error(
+          extractErrorMessage(error, t('error.comment-update-failed'))
+        );
       }
+    },
+    [updateComment, t]
+  );
 
-      mutateTask();
-      setCommentToEdit(null);
-    } catch (error: any) {
-      toast.error(getAxiosError(error));
-    }
-  }, []);
+  const handleDeleteComment = useCallback(
+    async (id: number | null) => {
+      if (!id) return;
 
-  const handleDeleteComment = useCallback(async (id: number | null) => {
-    if (!id) return;
-
-    try {
-      const response = await axios.delete<ApiResponse<unknown>>(
-        `/api/teams/${slug}/tasks/${taskNumber}/comments`,
-        {
-          data: {
-            id,
-          },
-        }
-      );
-      const { error } = response.data;
-
-      if (error) {
-        toast.error(error.message);
-        return;
+      try {
+        await deleteComment(id.toString());
+        setConfirmationDialogVisible(false);
+      } catch (error: unknown) {
+        toast.error(
+          extractErrorMessage(error, t('error.comment-delete-failed'))
+        );
       }
-
-      mutateTask();
-    } catch (error: any) {
-      toast.error(getAxiosError(error));
-    }
-  }, []);
+    },
+    [deleteComment, t]
+  );
 
   return (
     <IssuePanelContainer>

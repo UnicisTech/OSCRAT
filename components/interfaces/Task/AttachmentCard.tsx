@@ -1,105 +1,85 @@
-import React, { useCallback, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
+import { useTranslation } from 'next-i18next';
+import { Attachment } from 'types';
 import toast from 'react-hot-toast';
-import type { Attachment } from 'types';
-import { MouseEvent } from 'react';
-import DeleteAttachment from './DeleteAttachment';
-import useCanAccess from 'hooks/useCanAccess';
+import { AccessControl } from '@/components/shared/AccessControl';
+import { useAttachments } from '@/hooks/useAttachments';
+import { extractErrorMessage } from '@/lib/utils';
 
-const AttachmentsCard = ({
-  attachment,
-  taskNumber,
-  teamSlug,
-  mutateTask,
-}: {
+type Props = {
   attachment: Attachment;
   taskNumber: string;
   teamSlug: string;
-  mutateTask: () => Promise<void>;
-}) => {
-  const [isDeleteVisible, setIsDeleteVisible] = useState(false);
-  const { canAccess } = useCanAccess();
-
-  const downloadHanlder = useCallback(
-    async (event: MouseEvent<HTMLButtonElement>) => {
-      try {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const response = await axios.get(
-          `/api/teams/${teamSlug}/tasks/${taskNumber}/attachments?id=${attachment.id}`,
-          {
-            responseType: 'blob',
-          }
-        );
-
-        const { error } = response.data;
-
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-
-        const blob = new Blob([response.data], {
-          type: response.headers['content-type'],
-        });
-        const url = window.URL.createObjectURL(blob);
-
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = attachment.filename;
-        link.click();
-
-        window.URL.revokeObjectURL(url);
-      } catch (error) {
-        // Handle error here
-      }
-    },
-    []
-  );
-
-  const openDeleteModal = useCallback(
-    async (event: MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setIsDeleteVisible(true);
-    },
-    []
-  );
-
-  return (
-    <>
-      <div className="card card-compact w-36 bg-base-100 shadow-xl p-0.5 m-1 dark:bg-gray-500 dark:text-white">
-        <div className="flex">
-          <button
-            className="btn btn-info btn-xs m-0.5"
-            onClick={downloadHanlder}
-          >
-            Download
-          </button>
-          {canAccess('task', ['update']) && (
-            <button
-              className="btn btn-error btn-xs m-0.5"
-              onClick={openDeleteModal}
-            >
-              Delete
-            </button>
-          )}
-        </div>
-        <div className="card-body">
-          <p className="text-sm truncate">{attachment.filename}</p>
-        </div>
-      </div>
-      <DeleteAttachment
-        visible={isDeleteVisible}
-        setVisible={setIsDeleteVisible}
-        taskNumber={taskNumber}
-        teamSlug={teamSlug}
-        attachment={attachment}
-        mutateTask={mutateTask}
-      />
-    </>
-  );
 };
 
-export default AttachmentsCard;
+export default function AttachmentsCard({
+  attachment,
+  taskNumber,
+  teamSlug,
+}: Props) {
+  const { t } = useTranslation('common');
+  const { deleteAttachment } = useAttachments(teamSlug, taskNumber);
+
+  const handleDelete = async () => {
+    try {
+      await deleteAttachment(attachment.id);
+      toast.success(t('attachment-deleted'));
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('attachment-delete-error')));
+    }
+  };
+
+  return (
+    <div className="flex flex-row items-center justify-between p-2 text-center rounded-md w-full">
+      <a
+        href={`/api/teams/${teamSlug}/tasks/${taskNumber}/attachments?id=${attachment.id}`}
+        target="_blank"
+        rel="noreferrer"
+      >
+        <div className="flex items-center gap-2 text-sm">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={`text-blue-700`}
+          >
+            <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" />
+            <path d="M11 10a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0v-4z" />
+            <path d="M11 16a1 1 0 0 1 2 0v.01a1 1 0 0 1-2 0V16z" />
+          </svg>
+          <p className="hover:underline">{attachment.filename}</p>
+        </div>
+      </a>
+      <AccessControl resource="task" actions={['update']}>
+        <button
+          className="flex items-center p-1 text-red-500 rounded hover:bg-gray-100"
+          onClick={handleDelete}
+          title={t('delete')}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
+        </button>
+      </AccessControl>
+    </div>
+  );
+}

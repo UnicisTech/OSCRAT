@@ -5,7 +5,9 @@ import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 
 import { Card, InputWithLabel } from '@/components/shared';
-import { defaultHeaders, passwordPolicies } from '@/lib/common';
+import { passwordPolicies } from '@/lib/common';
+import { useAccount } from '@/hooks/useAccount';
+import { extractErrorMessage } from '@/lib/utils';
 
 const schema = Yup.object().shape({
   currentPassword: Yup.string().required(),
@@ -14,6 +16,7 @@ const schema = Yup.object().shape({
 
 const UpdatePassword = () => {
   const { t } = useTranslation('common');
+  const { updatePassword, isUpdatePasswordLoading } = useAccount();
 
   const formik = useFormik({
     initialValues: {
@@ -22,21 +25,16 @@ const UpdatePassword = () => {
     },
     validationSchema: schema,
     onSubmit: async (values) => {
-      const response = await fetch('/api/password', {
-        method: 'PUT',
-        headers: defaultHeaders,
-        body: JSON.stringify(values),
-      });
+      const result = await updatePassword(values);
 
-      const json = await response.json();
-
-      if (!response.ok) {
-        toast.error(json.error.message);
-        return;
+      if (result.success) {
+        toast.success(t('successfully-updated'));
+        formik.resetForm();
+      } else {
+        toast.error(
+          extractErrorMessage(result.error, t('error.password-update-failed'))
+        );
       }
-
-      toast.success(t('successfully-updated'));
-      formik.resetForm();
     },
   });
 
@@ -83,7 +81,7 @@ const UpdatePassword = () => {
               <Button
                 type="submit"
                 color="primary"
-                loading={formik.isSubmitting}
+                loading={isUpdatePasswordLoading}
                 disabled={!formik.dirty || !formik.isValid}
                 size="md"
               >

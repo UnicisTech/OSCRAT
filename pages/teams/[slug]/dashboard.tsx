@@ -1,50 +1,44 @@
-import {
-  TeamCscAnalysis,
-  TeamTaskAnalysis,
-} from '@/components/interfaces/TeamDashboard';
-import { Error, Loading } from '@/components/shared';
+import { TeamCscAnalysis } from '@/components/interfaces/TeamDashboard';
+import TasksAnalysis from '@/components/interfaces/TeamDashboard/TeamTasksAnalysis';
 import env from '@/lib/env';
-import useTeam from 'hooks/useTeam';
+import { useTeamContext } from '@/context/TeamContext';
 import { getCscStatusesBySlug } from 'models/team';
 import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import React from 'react';
+import AccountLayout from '@/components/layouts/AccountLayout';
 
 const TeamDashboard = ({
   csc_statuses,
-  slug,
 }: {
   teamFeatures: any;
   csc_statuses: { [key: string]: string };
-  slug: string;
 }) => {
   const { t } = useTranslation('common');
-  const { isLoading: teamLoading, isError: teamError, team } = useTeam();
-
-  if (teamLoading) {
-    return <Loading />;
-  }
-
-  if (teamError) {
-    return <Error message={teamError.message} />;
-  }
-
-  if (!team) {
-    return <Error message={t('team-not-found')} />;
-  }
+  const { teamContext } = useTeamContext();
 
   return (
     <>
       <div className="flex flex-col pb-6">
         <h2 className="text-xl font-semibold mb-2">
-          {t('Team dashboard')} ({team?.name})
+          {t('Team dashboard')} ({teamContext.team?.name})
         </h2>
       </div>
       <div className="space-y-6">
-        <TeamTaskAnalysis slug={slug} csc_statuses={csc_statuses} />
-        <TeamCscAnalysis slug={slug} csc_statuses={csc_statuses} />
+        <TasksAnalysis />
+        <TeamCscAnalysis csc_statuses={csc_statuses} />
       </div>
     </>
+  );
+};
+
+TeamDashboard.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 
@@ -57,7 +51,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
       teamFeatures: env.teamFeatures,
       csc_statuses: await getCscStatusesBySlug(slug),
-      slug: slug,
     },
   };
 }

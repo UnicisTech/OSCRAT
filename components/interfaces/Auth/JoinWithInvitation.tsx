@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 import type { User } from '@prisma/client';
 import type { ApiResponse } from 'types';
 import { InputWithLabel, Loading, Error } from '@/components/shared';
-import useInvitation from 'hooks/useInvitation';
+import { useInvitation } from 'hooks/useInvitation';
 
 const JoinWithInvitation = ({
   inviteToken,

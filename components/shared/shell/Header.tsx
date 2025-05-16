@@ -99,7 +99,7 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
                   onClick={() => signOut()}
                 >
                   <div className="flex items-center">
-                    <ArrowRightOnRectangleIcon className="w-5 h-5 mr-1" />{' '}
+                    <ArrowRightOnRectangleIcon className="w-5 h-5 mr-1" />
                     Logout
                   </div>
                 </button>

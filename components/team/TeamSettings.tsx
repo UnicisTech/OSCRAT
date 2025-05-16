@@ -1,5 +1,5 @@
 import { Card, InputWithLabel } from '@/components/shared';
-import { defaultHeaders, domainRegex } from '@/lib/common';
+import { domainRegex } from '@/lib/common';
 import { Team } from '@prisma/client';
 import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
@@ -7,14 +7,16 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import type { ApiResponse } from 'types';
 import * as Yup from 'yup';
+import { useTeam } from '@/hooks/useTeam';
+import { extractErrorMessage } from '@/lib/utils';
 
 import { AccessControl } from '../shared/AccessControl';
 
 const TeamSettings = ({ team }: { team: Team }) => {
   const router = useRouter();
   const { t } = useTranslation('common');
+  const { updateTeam, isLoading } = useTeam(team.slug);
 
   const formik = useFormik({
     initialValues: {
@@ -31,21 +33,17 @@ const TeamSettings = ({ team }: { team: Team }) => {
     }),
     enableReinitialize: true,
     onSubmit: async (values) => {
-      const response = await fetch(`/api/teams/${team.slug}`, {
-        method: 'PUT',
-        headers: defaultHeaders,
-        body: JSON.stringify(values),
-      });
+      try {
+        const response = await updateTeam({
+          ...values,
+          domain: values.domain || undefined,
+        });
 
-      const json = (await response.json()) as ApiResponse<Team>;
-
-      if (!response.ok) {
-        toast.error(json.error.message);
-        return;
+        toast.success(t('successfully-updated'));
+        router.push(`/teams/${response.slug}/settings`);
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('an-error-occurred')));
       }
-
-      toast.success(t('successfully-updated'));
-      router.push(`/teams/${json.data.slug}/settings`);
     },
   });
 
@@ -88,7 +86,7 @@ const TeamSettings = ({ team }: { team: Team }) => {
                 <Button
                   type="submit"
                   color="primary"
-                  loading={formik.isSubmitting}
+                  loading={formik.isSubmitting || isLoading}
                   disabled={!formik.isValid || !formik.dirty}
                   size="md"
                 >

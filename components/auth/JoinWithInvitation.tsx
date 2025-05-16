@@ -7,7 +7,7 @@ import {
 import { defaultHeaders, passwordPolicies } from '@/lib/common';
 import type { User } from '@prisma/client';
 import { useFormik } from 'formik';
-import useInvitation from 'hooks/useInvitation';
+import { useInvitation } from 'hooks/useInvitation';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { Button } from 'react-daisyui';
@@ -19,6 +19,7 @@ import { useRef, useState } from 'react';
 import AgreeMessage from './AgreeMessage';
 import GoogleReCAPTCHA from '../shared/GoogleReCAPTCHA';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { extractErrorMessage } from '@/lib/utils';
 
 interface JoinWithInvitationProps {
   inviteToken: string;
@@ -32,7 +33,7 @@ const JoinWithInvitation = ({
   const router = useRouter();
   const { t } = useTranslation('common');
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const { isLoading, error, invitation } = useInvitation();
+  const { isLoading, error, invitation } = useInvitation(inviteToken);
   const [recaptchaToken, setRecaptchaToken] = useState<string>('');
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
@@ -53,28 +54,33 @@ const JoinWithInvitation = ({
     }),
     enableReinitialize: true,
     onSubmit: async (values) => {
-      const response = await fetch('/api/auth/join', {
-        method: 'POST',
-        headers: defaultHeaders,
-        body: JSON.stringify({
-          ...values,
-          recaptchaToken,
-          inviteToken,
-        }),
-      });
+      try {
+        const response = await fetch('/api/auth/join', {
+          method: 'POST',
+          headers: defaultHeaders,
+          body: JSON.stringify({
+            ...values,
+            recaptchaToken,
+            inviteToken,
+          }),
+        });
 
-      const json = (await response.json()) as ApiResponse<User>;
+        const json = (await response.json()) as ApiResponse<User>;
 
-      recaptchaRef.current?.reset();
+        recaptchaRef.current?.reset();
 
-      if (!response.ok) {
-        toast.error(json.error.message);
-        return;
+        if (!response.ok) {
+          toast.error(json.error.message);
+          return;
+        }
+
+        formik.resetForm();
+        toast.success(t('successfully-joined'));
+        router.push(`/auth/login?token=${inviteToken}`);
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('error-joining')));
+        recaptchaRef.current?.reset();
       }
-
-      formik.resetForm();
-      toast.success(t('successfully-joined'));
-      router.push(`/auth/login?token=${inviteToken}`);
     },
   });
 
@@ -83,7 +89,7 @@ const JoinWithInvitation = ({
   }
 
   if (error || !invitation) {
-    return <Error message={error.message} />;
+    return <Error message={error?.message || t('invitation-not-found')} />;
   }
 
   return (

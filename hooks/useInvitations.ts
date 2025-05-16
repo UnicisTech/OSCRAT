@@ -1,26 +1,41 @@
-import fetcher from '@/lib/fetcher';
-import { Invitation } from '@prisma/client';
-import useSWR, { mutate } from 'swr';
-import type { ApiResponse } from 'types';
+import {
+  useGetTeamInvitations,
+  useCreateTeamInvitation,
+  useDeleteTeamInvitation,
+} from '@/lib/api/hooks/invitations';
 
-const useInvitations = (slug: string) => {
-  const url = `/api/teams/${slug}/invitations`;
+/**
+ * Hook to fetch and manage team invitations
+ * @param slug Team slug
+ */
+export function useInvitations(slug: string) {
+  const {
+    data: invitations,
+    isLoading: isFetching,
+    isError,
+    error,
+  } = useGetTeamInvitations(slug);
 
-  const { data, error, isLoading } = useSWR<ApiResponse<Invitation[]>>(
-    url,
-    fetcher
-  );
+  const createMutation = useCreateTeamInvitation(slug);
+  const deleteMutation = useDeleteTeamInvitation(slug);
 
-  const mutateInvitation = async () => {
-    mutate(url);
+  const createInvitation = async (email: string, role: string) => {
+    return createMutation.mutateAsync({ email, role });
   };
+
+  const deleteInvitation = async (id: string) => {
+    return deleteMutation.mutateAsync(id);
+  };
+
+  const isLoading =
+    isFetching || createMutation.isPending || deleteMutation.isPending;
 
   return {
+    invitations,
     isLoading,
-    isError: error,
-    invitations: data?.data,
-    mutateInvitation,
+    isError,
+    error,
+    createInvitation,
+    deleteInvitation,
   };
-};
-
-export default useInvitations;
+}

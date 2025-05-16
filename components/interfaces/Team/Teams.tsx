@@ -4,12 +4,12 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { Card, Error, LetterAvatar, Loading } from '@/components/shared';
-import useTeams from 'hooks/useTeams';
+import {useTeams} from 'hooks/useTeams';
 import { Team } from '@prisma/client';
 import { ApiResponse } from 'types';
 
 const Teams = () => {
-  const { isLoading, isError, teams, mutateTeams } = useTeams();
+  const { isLoading, isError, teams } = useTeams();
   const { t } = useTranslation('common');
   if (isLoading) {
     return <Loading />;
@@ -20,6 +20,7 @@ const Teams = () => {
   }
 
   const leaveTeam = async (team: Team) => {
+
     const response = await axios.put<ApiResponse>(
       `/api/teams/${team.slug}/members`
     );
@@ -33,7 +34,7 @@ const Teams = () => {
 
     toast.success(t('leave-team-success'));
 
-    mutateTeams();
+    // mutateTeams();
   };
 
   return (

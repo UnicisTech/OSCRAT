@@ -1,33 +1,29 @@
-import { Error, Loading } from '@/components/shared';
 import { TeamTab } from '@/components/team';
 import { Webhooks } from '@/components/webhook';
-import useTeam from 'hooks/useTeam';
+import { useTeamContext } from '@/context/TeamContext';
 import { GetServerSidePropsContext } from 'next';
-import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import env from '@/lib/env';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import AccountLayout from '@/components/layouts/AccountLayout';
 
 const WebhookList = ({ teamFeatures }) => {
-  const { t } = useTranslation('common');
-  const { isLoading, isError, team } = useTeam();
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError) {
-    return <Error message={isError.message} />;
-  }
-
-  if (!team) {
-    return <Error message={t('team-not-found')} />;
-  }
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
 
   return (
     <>
       <TeamTab activeTab="webhooks" team={team} teamFeatures={teamFeatures} />
       <Webhooks team={team} />
     </>
+  );
+};
+
+WebhookList.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 

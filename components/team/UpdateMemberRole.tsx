@@ -1,9 +1,9 @@
-import { defaultHeaders } from '@/lib/common';
 import { availableRoles } from '@/lib/permissions';
 import { Team, TeamMember } from '@prisma/client';
 import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
-import type { ApiResponse } from 'types';
+import { useTeamMembers } from '@/hooks/useTeamMembers';
+import { extractErrorMessage } from '@/lib/utils';
 
 interface UpdateMemberRoleProps {
   team: Team;
@@ -12,34 +12,26 @@ interface UpdateMemberRoleProps {
 
 const UpdateMemberRole = ({ team, member }: UpdateMemberRoleProps) => {
   const { t } = useTranslation('common');
+  const { updateMember, isLoading } = useTeamMembers(team.slug);
 
-  const updateRole = async (member: TeamMember, role: string) => {
-    const response = await fetch(`/api/teams/${team.slug}/members`, {
-      method: 'PATCH',
-      headers: defaultHeaders,
-      body: JSON.stringify({
-        memberId: member.userId,
-        role,
-      }),
-    });
-
-    const json = (await response.json()) as ApiResponse;
-
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+  const handleRoleUpdate = async (role: string) => {
+    try {
+      await updateMember(member.userId, role);
+      toast.success(t('member-role-updated'));
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('an-error-occurred')));
     }
-
-    toast.success(t('member-role-updated'));
   };
 
   return (
     <select
       className="select select-bordered select-sm rounded"
-      onChange={(e) => updateRole(member, e.target.value)}
+      onChange={(e) => handleRoleUpdate(e.target.value)}
+      value={member.role}
+      disabled={isLoading}
     >
       {availableRoles.map((role) => (
-        <option value={role.id} key={role.id} selected={role.id == member.role}>
+        <option value={role.id} key={role.id}>
           {role.id}
         </option>
       ))}

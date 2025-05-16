@@ -1,4 +1,9 @@
-import { createComment, updateComment, deleteComment } from 'models/comment';
+import {
+  createComment,
+  updateComment,
+  deleteComment,
+  getComments,
+} from 'models/comment';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { throwIfNoTeamAccess } from 'models/team';
 import { throwIfNotAllowed } from 'models/user';
@@ -11,6 +16,8 @@ export default async function handler(
   const { method } = req;
 
   switch (method) {
+    case 'GET':
+      return handleGET(req, res);
     case 'POST':
       return handlePOST(req, res);
     case 'PUT':
@@ -18,13 +25,37 @@ export default async function handler(
     case 'DELETE':
       return handleDELETE(req, res);
     default:
-      res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
+      res.setHeader('Allow', ['GET', 'POST', 'DELETE', 'PUT']);
       res.status(405).json({
         data: null,
         error: { message: `Method ${method} Not Allowed` },
       });
   }
 }
+
+// Get comments for a task
+const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
+  const teamMember = await throwIfNoTeamAccess(req, res);
+  throwIfNotAllowed(teamMember, 'task', 'read');
+
+  const { slug, taskNumber } = req.query;
+  const taskNumberAsNumber = Number(taskNumber);
+
+  if (isNaN(taskNumberAsNumber)) {
+    return res.status(400).json({
+      error: {
+        message: 'Invalid task number',
+      },
+    });
+  }
+
+  const comments = await getComments({
+    taskNumber: taskNumberAsNumber,
+    slug: slug as string,
+  });
+
+  return res.status(200).json({ data: comments, error: null });
+};
 
 // Create a comment
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {

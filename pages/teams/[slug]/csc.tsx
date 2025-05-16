@@ -1,10 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Loading, Error } from '@/components/shared';
-import useTeam from 'hooks/useTeam';
+import { Loading } from '@/components/shared';
+import { useTeamContext } from '@/context/TeamContext';
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import {
   StatusesTable,
@@ -18,10 +17,15 @@ import {
   perPageOptions,
   isoOptions,
 } from '@/components/defaultLanding/data/configs/csc';
-import useTeamTasks from 'hooks/useTeamTasks';
+import { useTeamTasks } from 'hooks/useTeamTasks';
 import { getCscStatusesBySlug } from 'models/team';
 import type { Option } from 'types';
 import useISO from 'hooks/useISO';
+import { useTeam } from 'hooks/useTeam';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import AccountLayout from '@/components/layouts/AccountLayout';
+import { extractErrorMessage } from '@/lib/utils';
+import { useTranslation } from 'next-i18next';
 
 const labels = [
   'Unknown',
@@ -50,6 +54,7 @@ const CscDashboard = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { slug } = router.query;
+  const { t } = useTranslation('common');
 
   const [statuses, setStatuses] = useState(csc_statuses || {});
   const [sectionFilter, setSectionFilter] = useState<
@@ -58,66 +63,51 @@ const CscDashboard = ({
   const [statusFilter, setStatusFilter] = useState<null | Option[]>(null);
   const [perPage, setPerPage] = useState<number>(10);
 
-  const { isLoading, isError, team } = useTeam(slug as string);
-  const { tasks, mutateTasks } = useTeamTasks(slug as string);
-  const { ISO } = useISO(team);
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
+  const { tasks } = useTeamTasks(slug as string);
+  const { iso } = useISO(slug as string);
+  const { updateCscStatus, updateTaskCsc } = useTeam(slug as string);
 
   const statusHandler = useCallback(
     async (control: string, value: string) => {
-      const response = await axios.put(`/api/teams/${slug}/csc`, {
-        control,
-        value,
-      });
-
-      const { data, error } = response.data;
-
-      if (error) {
-        toast.error(error.message);
-        return;
+      try {
+        const response = await updateCscStatus({ control, value });
+        setStatuses(response.statuses);
+        return Promise.resolve();
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('failed-to-update-status')));
+        return Promise.reject(error);
       }
-
-      setStatuses(data.statuses);
     },
-    [slug]
+    [updateCscStatus, t]
   );
 
   const taskSelectorHandler = useCallback(
     async (action: string, dataToRemove: any, control: string) => {
       const operation = action === 'select-option' ? 'add' : 'remove';
+
       for (const option of dataToRemove) {
         const taskNumber = option.value;
-        const response = await axios.put(
-          `/api/teams/${slug}/tasks/${taskNumber}/csc`,
-          {
+
+        try {
+          await updateTaskCsc(taskNumber, {
             controls: [control],
             operation,
-            ISO,
-          }
-        );
-
-        const { error } = response.data;
-
-        if (error) {
-          toast.error(error.message);
-          return;
+            iso,
+          });
+        } catch (error: unknown) {
+          toast.error(
+            extractErrorMessage(error, t('failed-to-update-task-csc'))
+          );
         }
-
-        mutateTasks();
       }
     },
-    [ISO, slug, mutateTasks]
+    [iso, updateTaskCsc, t]
   );
 
-  useEffect(() => {
-    console.log('CSC ISO', ISO);
-  }, [ISO]);
-
-  if (isLoading || !team || !tasks || !ISO) {
+  if (!tasks || !iso) {
     return <Loading />;
-  }
-
-  if (isError) {
-    return <Error />;
   }
 
   return (
@@ -148,18 +138,18 @@ const CscDashboard = ({
           />
         </div>
         <div style={{ width: '49%' }} className="stats stat-value shadow">
-          <RadarChart statuses={statuses} ISO={ISO} />
+          <RadarChart statuses={statuses} iso={iso} />
         </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div className="flex items-center">
           <p>
-            Framework:{' '}
-            <b>{isoOptions.find(({ value }) => value === ISO)?.label}</b>
+            Framework:
+            <b>{isoOptions.find(({ value }) => value === iso)?.label}</b>
           </p>
         </div>
         <div className="flex flex-row justify-end">
-          <SectionFilter ISO={ISO} setSectionFilter={setSectionFilter} />
+          <SectionFilter iso={iso} setSectionFilter={setSectionFilter} />
           <StatusCscFilter setStatusFilter={setStatusFilter} />
           <PerPageSelector
             setPerPage={setPerPage}
@@ -173,7 +163,7 @@ const CscDashboard = ({
         </div>
       </div>
       <StatusesTable
-        ISO={ISO}
+        iso={iso}
         tasks={tasks}
         statuses={statuses}
         sectionFilter={sectionFilter}
@@ -183,6 +173,14 @@ const CscDashboard = ({
         taskSelectorHandler={taskSelectorHandler}
       />
     </>
+  );
+};
+
+CscDashboard.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 

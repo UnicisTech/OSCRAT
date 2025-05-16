@@ -1,11 +1,11 @@
 import { InputWithCopyButton, InputWithLabel } from '@/components/shared';
+import { useApiKeys } from '@/hooks/useApiKeys';
+import { extractErrorMessage } from '@/lib/utils';
 import type { Team } from '@prisma/client';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
-import { useSWRConfig } from 'swr';
-import type { ApiResponse } from 'types';
 import Modal from '../shared/Modal';
 
 const NewAPIKey = ({
@@ -13,12 +13,10 @@ const NewAPIKey = ({
   createModalVisible,
   setCreateModalVisible,
 }: NewAPIKeyProps) => {
-  const { mutate } = useSWRConfig();
   const [apiKey, setApiKey] = useState('');
 
   const onNewAPIKey = (apiKey: string) => {
     setApiKey(apiKey);
-    mutate(`/api/teams/${team.slug}/api-keys`);
   };
 
   const toggleVisible = () => {
@@ -49,6 +47,7 @@ const CreateAPIKeyForm = ({
   const [name, setName] = useState('');
   const { t } = useTranslation('common');
   const [submitting, setSubmitting] = useState(false);
+  const { createApiKey } = useApiKeys(team.slug);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -56,25 +55,17 @@ const CreateAPIKeyForm = ({
 
     setSubmitting(true);
 
-    const res = await fetch(`/api/teams/${team.slug}/api-keys`, {
-      method: 'POST',
-      body: JSON.stringify({ name }),
-    });
+    try {
+      const response = await createApiKey(name);
+      setSubmitting(false);
 
-    const { data, error } = (await res.json()) as ApiResponse<{
-      apiKey: string;
-    }>;
-
-    setSubmitting(false);
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
-    if (data.apiKey) {
-      onNewAPIKey(data.apiKey);
-      toast.success(t('api-key-created'));
+      if (response.apiKey) {
+        onNewAPIKey(response.apiKey);
+        toast.success(t('api-key-created'));
+      }
+    } catch (error: unknown) {
+      setSubmitting(false);
+      toast.error(extractErrorMessage(error, t('error-creating-api-key')));
     }
   };
 

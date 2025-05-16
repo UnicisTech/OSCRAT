@@ -1,24 +1,25 @@
 import { Card } from '@/components/shared';
-import { getAxiosError } from '@/lib/common';
 import { Team } from '@prisma/client';
 import { isoOptions } from '../defaultLanding/data/configs/csc';
-import axios from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import type { ApiResponse, TeamProperties } from 'types';
+import type { TeamProperties } from 'types';
 import * as Yup from 'yup';
+import { useSetCscIso } from '@/lib/api/hooks/csc';
+import { extractErrorMessage } from '@/lib/utils';
 
 const CSCSettings = ({ team }: { team: Team }) => {
   const { t } = useTranslation('common');
+  const { mutateAsync: setIso, isPending: isLoading } = useSetCscIso(team.slug);
 
   const teamProperties = team.properties as TeamProperties;
 
   const formik = useFormik({
     initialValues: {
-      iso: teamProperties.csc_iso || 'default',
+      iso: teamProperties?.csc_iso || 'default',
     },
     validationSchema: Yup.object().shape({
       iso: Yup.string().required('Choose ISO set'),
@@ -26,19 +27,10 @@ const CSCSettings = ({ team }: { team: Team }) => {
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {
-        const response = await axios.put<ApiResponse<Team>>(
-          `/api/teams/${team.slug}/csc/iso`,
-          {
-            ...values,
-          }
-        );
-
-        const { data: iso } = response.data;
-        if (iso) {
-          toast.success(t('successfully-updated'));
-        }
-      } catch (error) {
-        toast.error(getAxiosError(error));
+        await setIso(values.iso);
+        toast.success(t('successfully-updated'));
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('an-error-occurred')));
       }
     },
   });
@@ -69,7 +61,7 @@ const CSCSettings = ({ team }: { team: Team }) => {
                 <Button
                   type="submit"
                   color="primary"
-                  loading={formik.isSubmitting}
+                  loading={formik.isSubmitting || isLoading}
                   disabled={!formik.isValid || !formik.dirty}
                   size="md"
                 >

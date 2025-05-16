@@ -1,17 +1,16 @@
 import { Error, Loading } from '@/components/shared';
 import type { Team } from '@prisma/client';
 import type { FormikHelpers } from 'formik';
-import useWebhook from 'hooks/useWebhook';
-import useWebhooks from 'hooks/useWebhooks';
+import { useWebhook } from 'hooks/useWebhook';
+import { useWebhooks } from 'hooks/useWebhooks';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import toast from 'react-hot-toast';
 import type { EndpointOut } from 'svix';
 import type { WebookFormSchema } from 'types';
-import type { ApiResponse } from 'types';
+import { extractErrorMessage } from '@/lib/utils';
 
 import ModalForm from './Form';
-import { defaultHeaders } from '@/lib/common';
 
 const EditWebhook = ({
   visible,
@@ -24,42 +23,33 @@ const EditWebhook = ({
   team: Team;
   endpoint: EndpointOut;
 }) => {
-  const { isLoading, isError, webhook } = useWebhook(team.slug, endpoint.id);
+  const { isLoading, isError, webhook, error } = useWebhook(
+    team.slug,
+    endpoint.id
+  );
   const { t } = useTranslation('common');
-  const { mutateWebhooks } = useWebhooks(team.slug);
+  const { updateWebhook } = useWebhooks(team.slug);
 
   if (isLoading || !webhook) {
     return <Loading />;
   }
 
   if (isError) {
-    return <Error message={isError.message} />;
+    return <Error message={error?.message || 'An error occurred'} />;
   }
 
   const onSubmit = async (
     values: WebookFormSchema,
     formikHelpers: FormikHelpers<WebookFormSchema>
   ) => {
-    const response = await fetch(
-      `/api/teams/${team.slug}/webhooks/${endpoint.id}`,
-      {
-        method: 'PUT',
-        headers: defaultHeaders,
-        body: JSON.stringify(values),
-      }
-    );
-
-    const json = (await response.json()) as ApiResponse;
-
-    if (!response.ok) {
-      toast.error(json.error.message);
-      return;
+    try {
+      await updateWebhook(endpoint.id, values);
+      toast.success(t('webhook-updated'));
+      setVisible(false);
+      formikHelpers.resetForm();
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('webhook-update-failed')));
     }
-
-    toast.success(t('webhook-updated'));
-    mutateWebhooks();
-    setVisible(false);
-    formikHelpers.resetForm();
   };
 
   return (

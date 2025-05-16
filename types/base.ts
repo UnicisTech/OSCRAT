@@ -89,6 +89,11 @@ export type AUTH_PROVIDER =
   | 'email'
   | 'credentials';
 
+export type Permission = {
+  resource: string;
+  actions: string;
+};
+
 export interface TeamFeature {
   sso: boolean;
   dsync: boolean;

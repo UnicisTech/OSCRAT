@@ -1,5 +1,8 @@
 import { Link } from 'react-daisyui';
 import { useTranslation } from 'react-i18next';
+import TeamLayout from '@/components/layouts/TeamLayout';
+import AccountLayout from '@/components/layouts/AccountLayout';
+import React from 'react';
 
 const Breadcrumb = ({
   teamName,
@@ -24,6 +27,14 @@ const Breadcrumb = ({
         <li>{`${taskNumber} - ${taskTitle}`}</li>
       </ul>
     </div>
+  );
+};
+
+Breadcrumb.getLayout = function getLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
+    </AccountLayout>
   );
 };
 

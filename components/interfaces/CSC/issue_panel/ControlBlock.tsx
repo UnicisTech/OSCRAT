@@ -5,7 +5,6 @@ import React, {
   SetStateAction,
   useMemo,
 } from 'react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import Select from '@atlaskit/select';
@@ -16,6 +15,9 @@ import Textfield from '@atlaskit/textfield';
 import { WithoutRing } from 'sharedStyles';
 import { getControlOptions } from '@/components/defaultLanding/data/configs/csc';
 import StatusSelector from '../StatusSelector';
+import { useTeam } from '@/hooks/useTeam';
+import { useTranslation } from 'next-i18next';
+import { extractErrorMessage } from '@/lib/utils';
 
 const ControlBlock = ({
   ISO,
@@ -44,8 +46,9 @@ const ControlBlock = ({
 }) => {
   console.log('status control block', status);
   const router = useRouter();
-
-  const { slug } = router.query;
+  const { t } = useTranslation('common');
+  const { slug } = router.query as { slug: string };
+  const { updateCscStatus } = useTeam(slug);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const controlOptions = useMemo(() => getControlOptions(ISO), [ISO]);
@@ -53,22 +56,22 @@ const ControlBlock = ({
     ({ value }) => value.control === control
   )?.value;
 
-  const statusHandler = useCallback(async (control: string, value: string) => {
-    const response = await axios.put(`/api/teams/${slug}/csc`, {
-      control,
-      value,
-    });
+  const statusHandler = useCallback(
+    async (control: string, value: string) => {
+      try {
+        const response = await updateCscStatus({
+          control,
+          value,
+        });
 
-    const { data, error } = response.data;
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    } else {
-      toast.success('Status changed!');
-    }
-    setStatuses(data.statuses);
-  }, []);
+        toast.success('Status changed!');
+        setStatuses(response.statuses);
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('error.update-status')));
+      }
+    },
+    [updateCscStatus, setStatuses, t]
+  );
 
   return (
     <>

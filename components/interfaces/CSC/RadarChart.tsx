@@ -16,6 +16,7 @@ import {
   mergePoints,
   getSections,
 } from '@/components/defaultLanding/data/configs/csc';
+import type { ISO } from '@/types';
 
 ChartJS.register(
   RadialLinearScale,
@@ -28,15 +29,15 @@ ChartJS.register(
 
 const getMaturityLevels = (
   statuses: { [key: string]: string },
-  ISO: string
+  iso: string
 ) => {
-  const sections = getSections(ISO);
+  const sections = getSections(iso);
   const data = sections
     .map(({ label }) => label)
     .map((label) => {
-      const totalControls = controls[ISO].filter(
-        ({ Section }) => Section === label
-      ).map(({ Control }) => Control);
+      const totalControls = controls[iso]
+        .filter(({ Section }) => Section === label)
+        .map(({ Control }) => Control);
       const totalControlsValue = totalControls.reduce(
         (accumulator, control) =>
           (statusOptions.find(({ label }) => label === statuses[control])
@@ -47,7 +48,7 @@ const getMaturityLevels = (
     });
   const roundedData = data.map((value) => Math.round(value));
 
-  if (ISO != '2013') {
+  if (iso != '2013') {
     return roundedData;
   } else {
     const mergedPoints = mergePoints(roundedData);
@@ -57,10 +58,10 @@ const getMaturityLevels = (
 
 const RadarChart = ({
   statuses,
-  ISO,
+  iso,
 }: {
   statuses: { [key: string]: string };
-  ISO;
+  iso: ISO;
 }) => {
   const options = {
     plugins: {
@@ -78,11 +79,11 @@ const RadarChart = ({
     responsive: true,
   };
   const data = {
-    labels: getRadarChartLabels(ISO),
+    labels: getRadarChartLabels(iso),
     datasets: [
       {
         label: 'Maturity level from 0 to 6',
-        data: getMaturityLevels(statuses, ISO),
+        data: getMaturityLevels(statuses, iso),
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
         borderColor: 'rgba(255, 99, 132, 1)',
         borderWidth: 1,
