@@ -13,9 +13,9 @@ import { useTask } from 'hooks/useTask';
 import useCanAccess from '@/hooks/useCanAccess';
 import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 
-import "react-quill/dist/quill.snow.css";
-import dynamic from "next/dynamic";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
+import dynamic from 'next/dynamic';
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface FormData {
   title: string;
@@ -32,7 +32,6 @@ interface Option {
 }
 
 const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
-
   const { t } = useTranslation('common');
   const { canAccess } = useCanAccess(team.slug);
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
@@ -72,10 +71,10 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
           <form {...formProps}>
             <div
               style={{
-                display: "flex",
-                width: "100%",
-                margin: "0 auto",
-                flexDirection: "column",
+                display: 'flex',
+                width: '100%',
+                margin: '0 auto',
+                flexDirection: 'column',
               }}
             >
               <Field
@@ -101,7 +100,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                 aria-required={true}
                 isRequired
                 defaultValue={statuses.find(
-                  ({ value }) => value === task.status,
+                  ({ value }) => value === task.status
                 )}
                 validate={async (value) => {
                   if (value) {
@@ -109,8 +108,8 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                   }
 
                   return new Promise((resolve) =>
-                    setTimeout(resolve, 300),
-                  ).then(() => "Please select a status");
+                    setTimeout(resolve, 300)
+                  ).then(() => 'Please select a status');
                 }}
               >
                 {({ fieldProps: { id, ...rest }, error }) => (
@@ -120,7 +119,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                         inputId={id}
                         {...rest}
                         options={statuses}
-                        validationState={error ? "error" : "default"}
+                        validationState={error ? 'error' : 'default'}
                         onInputChange={checkFormChanges}
                       />
                       {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -140,8 +139,8 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                   }
 
                   return new Promise((resolve) =>
-                    setTimeout(resolve, 300),
-                  ).then(() => "Please select a due date");
+                    setTimeout(resolve, 300)
+                  ).then(() => 'Please select a due date');
                 }}
               >
                 {({ fieldProps: { id, ...rest }, error }) => (
@@ -160,7 +159,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
               <Field
                 label="Description"
                 name="description"
-                defaultValue={task.description || ""}
+                defaultValue={task.description || ''}
               >
                 {({ fieldProps }: any) => (
                   <Fragment>
@@ -176,7 +175,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                 )}
               </Field>
               <FormFooter>
-                {canAccess("task", ["update"]) && (
+                {canAccess('task', ['update']) && (
                   <Button
                     color="primary"
                     variant="outline"
@@ -185,7 +184,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                     active={!isFormChanged}
                     loading={submitting}
                   >
-                    {t("save-changes")}
+                    {t('save-changes')}
                   </Button>
                 )}
               </FormFooter>

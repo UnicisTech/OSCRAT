@@ -22,7 +22,7 @@ const CSCSettings = ({ team }: { team: Team }) => {
       iso: teamProperties?.csc_iso || 'default',
     },
     validationSchema: Yup.object().shape({
-      iso: Yup.string().required("Choose ISO set"),
+      iso: Yup.string().required('Choose ISO set'),
     }),
     enableReinitialize: true,
     onSubmit: async (values) => {
@@ -38,10 +38,10 @@ const CSCSettings = ({ team }: { team: Team }) => {
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
-        <Card heading={t("csc-settings")}>
+        <Card heading={t('csc-settings')}>
           <Card.Body className="px-3 py-3">
             <div className="mt-2 flex flex-col space-y-4">
-              <p>{t("csc-choose-iso")}</p>
+              <p>{t('csc-choose-iso')}</p>
               <div className="flex w-1/2 items-center justify-between space-x-3">
                 <select
                   className="select select-bordered flex-grow bg-white dark:bg-base-100"
@@ -65,7 +65,7 @@ const CSCSettings = ({ team }: { team: Team }) => {
                   disabled={!formik.isValid || !formik.dirty}
                   size="md"
                 >
-                  {t("choose")}
+                  {t('choose')}
                 </Button>
               </div>
             </div>

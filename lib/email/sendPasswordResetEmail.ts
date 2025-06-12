@@ -1,12 +1,12 @@
-import { sendEmail } from "./sendEmail";
-import { render } from "@react-email/render";
-import { ResetPasswordEmail } from "@/components/emailTemplates";
+import { sendEmail } from './sendEmail';
+import { render } from '@react-email/render';
+import { ResetPasswordEmail } from '@/components/emailTemplates';
 
 export const sendPasswordResetEmail = async (email: string, url: string) => {
   const html = await render(ResetPasswordEmail({ url }));
   await sendEmail({
     to: email,
-    subject: "Reset Your BoxyHQ Password",
+    subject: 'Reset Your BoxyHQ Password',
     html,
   });
 };

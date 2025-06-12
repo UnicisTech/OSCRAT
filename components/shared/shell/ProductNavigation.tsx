@@ -1,5 +1,5 @@
-import NavigationItems from "./NavigationItems";
-import { NavigationProps, MenuItem } from "./NavigationItems";
+import NavigationItems from './NavigationItems';
+import { NavigationProps, MenuItem } from './NavigationItems';
 
 const ProductNavigation = ({ activePathname }: NavigationProps) => {
   if (!activePathname) {

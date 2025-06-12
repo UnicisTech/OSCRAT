@@ -71,20 +71,20 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   if (!isPasswordCorrect) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-xl mb-4">Enter Password to Continue</h2>
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="rounded-lg bg-white p-8 shadow-md">
+          <h2 className="mb-4 text-xl">Enter Password to Continue</h2>
 
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border p-2 mb-4 w-full"
+            className="mb-4 w-full border p-2"
             placeholder="Password"
           />
           <button
             onClick={handlePasswordSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="rounded bg-blue-500 px-4 py-2 text-white"
           >
             Submit
           </button>

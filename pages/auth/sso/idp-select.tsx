@@ -1,10 +1,10 @@
-import { AuthLayout } from "@/components/layouts";
-import { LetterAvatar } from "@/components/shared";
-import jackson from "@/lib/jackson";
-import { SAMLSSORecord } from "@boxyhq/saml-jackson";
-import type { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/router";
-import type { ReactElement } from "react";
+import { AuthLayout } from '@/components/layouts';
+import { LetterAvatar } from '@/components/shared';
+import jackson from '@/lib/jackson';
+import { SAMLSSORecord } from '@boxyhq/saml-jackson';
+import type { GetServerSidePropsContext } from 'next';
+import { useRouter } from 'next/router';
+import type { ReactElement } from 'react';
 
 interface IdPSelectionProps {
   connections: SAMLSSORecord[];
@@ -63,7 +63,7 @@ export const getServerSideProps = async ({
   const paramsToRelay = { ...query } as { [key: string]: string };
 
   const { authFlow, tenant, product, idp_hint } = query as {
-    authFlow: "oauth";
+    authFlow: 'oauth';
     tenant?: string;
     product?: string;
     idp_hint?: string;
@@ -73,7 +73,7 @@ export const getServerSideProps = async ({
   if (!tenant || !product) {
     return {
       redirect: {
-        destination: "/auth/sso",
+        destination: '/auth/sso',
         permanent: false,
       },
     };
@@ -105,9 +105,9 @@ export const getServerSideProps = async ({
   // Send only the clientID and name to the frontend
   const connectionsFormatted = connections.map((connection) => {
     const idpMetadata =
-      "idpMetadata" in connection ? connection.idpMetadata : undefined;
+      'idpMetadata' in connection ? connection.idpMetadata : undefined;
     const oidcProvider =
-      "oidcProvider" in connection ? connection.oidcProvider : undefined;
+      'oidcProvider' in connection ? connection.oidcProvider : undefined;
 
     const name =
       connection.name ||

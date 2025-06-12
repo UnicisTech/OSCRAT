@@ -1,25 +1,25 @@
-import React, { useRef, Dispatch, SetStateAction } from "react";
-import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import React, { useRef, Dispatch, SetStateAction } from 'react';
+import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
 
 const perPageOptions: { label: string; value: number }[] = [
   {
-    label: "5",
+    label: '5',
     value: 5,
   },
   {
-    label: "10",
+    label: '10',
     value: 10,
   },
   {
-    label: "25",
+    label: '25',
     value: 25,
   },
   {
-    label: "50",
+    label: '50',
     value: 50,
   },
   {
-    label: "100",
+    label: '100',
     value: 100,
   },
 ];
@@ -37,7 +37,7 @@ const PerPageSelector = ({ perPage, setPerPage }: PerPageSelectorProps) => {
         <div
           onClick={() => {
             if (tabRef.current) {
-              tabRef.current.style.display = "block";
+              tabRef.current.style.display = 'block';
             }
           }}
           tabIndex={0}
@@ -56,7 +56,7 @@ const PerPageSelector = ({ perPage, setPerPage }: PerPageSelectorProps) => {
               key={index}
               onClick={() => {
                 if (tabRef.current) {
-                  tabRef.current.style.display = "none";
+                  tabRef.current.style.display = 'none';
                 }
                 setPerPage(item.value);
               }}

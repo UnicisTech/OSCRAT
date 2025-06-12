@@ -1,21 +1,21 @@
-import { setCscIso, getCscIso } from "models/team";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { throwIfNoTeamAccess } from "models/team";
-import { throwIfNotAllowed } from "models/user";
+import { setCscIso, getCscIso } from 'models/team';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { throwIfNoTeamAccess } from 'models/team';
+import { throwIfNotAllowed } from 'models/user';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
-    case "GET":
+    case 'GET':
       return handleGET(req, res);
-    case "PUT":
+    case 'PUT':
       return handlePUT(req, res);
     default:
-      res.setHeader("Allow", ["GET", "DELETE", "PUT"]);
+      res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
       res.status(405).json({
         data: null,
         error: { message: `Method ${method} Not Allowed` },
@@ -25,7 +25,7 @@ export default async function handler(
 
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team", "read");
+  throwIfNotAllowed(teamMember, 'team', 'read');
 
   const { slug } = req.query;
 
@@ -33,26 +33,26 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
     slug: slug as string,
   });
 
-  console.log("hande get iso responce", responce);
+  console.log('hande get iso responce', responce);
 
   return res.status(200).json({ data: { iso: responce }, error: null });
 };
 
 const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team", "read");
+  throwIfNotAllowed(teamMember, 'team', 'read');
 
   const { slug } = req.query;
   const { iso } = req.body;
 
-  console.log("hande put iso slug ", { slug, iso });
+  console.log('hande put iso slug ', { slug, iso });
 
   const responce = await setCscIso({
     slug: slug as string,
     iso,
   });
 
-  console.log("hande put isoresponce ", responce);
+  console.log('hande put isoresponce ', responce);
 
   return res.status(200).json({ data: { iso: responce }, error: null });
 };

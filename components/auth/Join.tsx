@@ -1,18 +1,18 @@
-import { useState, useRef } from "react";
-import { InputWithLabel } from "@/components/shared";
-import { defaultHeaders, passwordPolicies } from "@/lib/common";
-import type { User } from "@prisma/client";
-import { useFormik } from "formik";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
-import { Button } from "react-daisyui";
-import toast from "react-hot-toast";
-import type { ApiResponse } from "types";
-import * as Yup from "yup";
-import TogglePasswordVisibility from "../shared/TogglePasswordVisibility";
-import AgreeMessage from "./AgreeMessage";
-import GoogleReCAPTCHA from "../shared/GoogleReCAPTCHA";
-import ReCAPTCHA from "react-google-recaptcha";
+import { useState, useRef } from 'react';
+import { InputWithLabel } from '@/components/shared';
+import { defaultHeaders, passwordPolicies } from '@/lib/common';
+import type { User } from '@prisma/client';
+import { useFormik } from 'formik';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import { Button } from 'react-daisyui';
+import toast from 'react-hot-toast';
+import type { ApiResponse } from 'types';
+import * as Yup from 'yup';
+import TogglePasswordVisibility from '../shared/TogglePasswordVisibility';
+import AgreeMessage from './AgreeMessage';
+import GoogleReCAPTCHA from '../shared/GoogleReCAPTCHA';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface JoinProps {
   recaptchaSiteKey: string | null;
@@ -20,9 +20,9 @@ interface JoinProps {
 
 const Join = ({ recaptchaSiteKey }: JoinProps) => {
   const router = useRouter();
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [recaptchaToken, setRecaptchaToken] = useState<string>("");
+  const [recaptchaToken, setRecaptchaToken] = useState<string>('');
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const handlePasswordVisibility = () => {
@@ -31,11 +31,11 @@ const Join = ({ recaptchaSiteKey }: JoinProps) => {
 
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      team: "",
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      team: '',
     },
     validationSchema: Yup.object().shape({
       firstName: Yup.string().required(),
@@ -45,8 +45,8 @@ const Join = ({ recaptchaSiteKey }: JoinProps) => {
       team: Yup.string().required().min(3),
     }),
     onSubmit: async (values) => {
-      const response = await fetch("/api/auth/join", {
-        method: "POST",
+      const response = await fetch('/api/auth/join', {
+        method: 'POST',
         headers: defaultHeaders,
         body: JSON.stringify({
           ...values,
@@ -68,10 +68,10 @@ const Join = ({ recaptchaSiteKey }: JoinProps) => {
       formik.resetForm();
 
       if (json.data.confirmEmail) {
-        router.push("/auth/verify-email");
+        router.push('/auth/verify-email');
       } else {
-        toast.success(t("successfully-joined"));
-        router.push("/auth/login");
+        toast.success(t('successfully-joined'));
+        router.push('/auth/login');
       }
     },
   });
@@ -81,34 +81,34 @@ const Join = ({ recaptchaSiteKey }: JoinProps) => {
       <div className="space-y-1">
         <InputWithLabel
           type="text"
-          label={t("first-name")}
+          label={t('first-name')}
           name="firstName"
-          placeholder={t("your-first-name")}
+          placeholder={t('your-first-name')}
           value={formik.values.firstName}
           error={formik.touched.firstName ? formik.errors.firstName : undefined}
           onChange={formik.handleChange}
         />
         <InputWithLabel
           type="text"
-          label={t("last-name")}
+          label={t('last-name')}
           name="lastName"
-          placeholder={t("your-last-name")}
+          placeholder={t('your-last-name')}
           value={formik.values.lastName}
           error={formik.touched.lastName ? formik.errors.lastName : undefined}
           onChange={formik.handleChange}
         />
         <InputWithLabel
           type="text"
-          label={t("team")}
+          label={t('team')}
           name="team"
-          placeholder={t("team-name")}
+          placeholder={t('team-name')}
           value={formik.values.team}
           error={formik.touched.team ? formik.errors.team : undefined}
           onChange={formik.handleChange}
         />
         <InputWithLabel
           type="email"
-          label={t("email")}
+          label={t('email')}
           name="email"
           placeholder="first.last@name.com"
           value={formik.values.email}
@@ -117,10 +117,10 @@ const Join = ({ recaptchaSiteKey }: JoinProps) => {
         />
         <div className="relative flex">
           <InputWithLabel
-            type={isPasswordVisible ? "text" : "password"}
-            label={t("password")}
+            type={isPasswordVisible ? 'text' : 'password'}
+            label={t('password')}
             name="password"
-            placeholder={t("password")}
+            placeholder={t('password')}
             value={formik.values.password}
             error={formik.touched.password ? formik.errors.password : undefined}
             onChange={formik.handleChange}
@@ -145,7 +145,7 @@ const Join = ({ recaptchaSiteKey }: JoinProps) => {
           fullWidth
           size="md"
         >
-          {t("create-account")}
+          {t('create-account')}
         </Button>
         <AgreeMessage text="create-account" />
       </div>

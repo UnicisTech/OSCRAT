@@ -1,20 +1,20 @@
-import { useTranslation } from "next-i18next";
+import { useTranslation } from 'next-i18next';
 
 export const useThemeData = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
 
   return [
     {
-      id: "system",
-      name: t("system"),
+      id: 'system',
+      name: t('system'),
     },
     {
-      id: "dark",
-      name: t("dark"),
+      id: 'dark',
+      name: t('dark'),
     },
     {
-      id: "light",
-      name: t("light"),
+      id: 'light',
+      name: t('light'),
     },
   ];
 };

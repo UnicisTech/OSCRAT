@@ -1,16 +1,16 @@
-import Link from "next/link";
-import React from "react";
-import { useSession } from "next-auth/react";
-import { useToggleTheme } from "@/hooks/useToggleTheme";
+import Link from 'next/link';
+import React from 'react';
+import { useSession } from 'next-auth/react';
+import { useToggleTheme } from '@/hooks/useToggleTheme';
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   SunIcon,
   UserCircleIcon,
-} from "@heroicons/react/24/outline";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import env from "@/lib/env";
-import { signOut } from "next-auth/react";
+} from '@heroicons/react/24/outline';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import env from '@/lib/env';
+import { signOut } from 'next-auth/react';
 
 interface HeaderProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,7 +21,7 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
 
   const { status, data } = useSession();
 
-  if (status === "loading" || !data) {
+  if (status === 'loading' || !data) {
     return null;
   }
 

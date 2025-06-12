@@ -1,8 +1,8 @@
-import { ApiError } from "@/lib/errors";
-import { Action, Resource, permissions } from "@/lib/permissions";
-import { prisma } from "@/lib/prisma";
-import { Role, TeamMember } from "@prisma/client";
-import type { Session } from "next-auth";
+import { ApiError } from '@/lib/errors';
+import { Action, Resource, permissions } from '@/lib/permissions';
+import { prisma } from '@/lib/prisma';
+import { Role, TeamMember } from '@prisma/client';
+import type { Session } from 'next-auth';
 
 export const createUser = async (param: {
   name: string;
@@ -20,14 +20,14 @@ export const createUser = async (param: {
       firstName,
       lastName,
       email,
-      password: password ? password : "",
+      password: password ? password : '',
       emailVerified: emailVerified ? emailVerified : null,
     },
   });
 };
 
 export const getUser = async (key: { id: string } | { email: string }) => {
-  console.log("getUser", key);
+  console.log('getUser', key);
   return await prisma.user.findUnique({
     where: key,
   });
@@ -62,7 +62,7 @@ export const isAllowed = (role: Role, resource: Resource, action: Action) => {
 
   for (const permission of rolePermissions) {
     if (permission.resource === resource) {
-      if (permission.actions === "*" || permission.actions.includes(action)) {
+      if (permission.actions === '*' || permission.actions.includes(action)) {
         return true;
       }
     }
@@ -74,7 +74,7 @@ export const isAllowed = (role: Role, resource: Resource, action: Action) => {
 export const throwIfNotAllowed = (
   teamMember: TeamMember,
   resource: Resource,
-  action: Action,
+  action: Action
 ) => {
   if (isAllowed(teamMember.role, resource, action)) {
     return true;
@@ -82,6 +82,6 @@ export const throwIfNotAllowed = (
 
   throw new ApiError(
     403,
-    `You are not allowed to perform ${action} on ${resource}`,
+    `You are not allowed to perform ${action} on ${resource}`
   );
 };

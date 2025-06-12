@@ -1,6 +1,6 @@
-import { useTranslation } from "next-i18next";
+import { useTranslation } from 'next-i18next';
 
-import Alert from "./Alert";
+import Alert from './Alert';
 
 interface ErrorProps {
   message?: string;
@@ -8,11 +8,11 @@ interface ErrorProps {
 
 const Error = (props: ErrorProps) => {
   const { message } = props;
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
 
   return (
     <Alert status="error" className="my-2">
-      <p>{message || t("unknown-error")}</p>
+      <p>{message || t('unknown-error')}</p>
     </Alert>
   );
 };

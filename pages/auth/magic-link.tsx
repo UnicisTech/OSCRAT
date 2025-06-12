@@ -1,13 +1,13 @@
-import MagicLink from "@/components/auth/MagicLink";
-import { AuthLayout } from "@/components/layouts";
+import MagicLink from '@/components/auth/MagicLink';
+import { AuthLayout } from '@/components/layouts';
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
-} from "next";
-import { getCsrfToken } from "next-auth/react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import type { ReactElement } from "react";
-import type { NextPageWithLayout } from "types";
+} from 'next';
+import { getCsrfToken } from 'next-auth/react';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { ReactElement } from 'react';
+import type { NextPageWithLayout } from 'types';
 
 type LoginProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -24,13 +24,13 @@ Login.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
+  context: GetServerSidePropsContext
 ) => {
   const { locale } = context;
 
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
       csrfToken: await getCsrfToken(context),
     },
   };

@@ -1,4 +1,4 @@
-import { Button, Modal as DModal } from "react-daisyui";
+import { Button, Modal as DModal } from 'react-daisyui';
 
 interface ModalProps {
   open: boolean;

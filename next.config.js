@@ -1,14 +1,14 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 const { i18n } = require('./next-i18next.config');
-const { withGlobalCss } = require('next-global-css')
+const { withGlobalCss } = require('next-global-css');
 
-const withConfig = withGlobalCss()
+const withConfig = withGlobalCss();
 
 // Redirect root url to login page
 const redirects = [
   {
-    source: "/",
-    destination: "/auth/login",
+    source: '/',
+    destination: '/auth/login',
     permanent: true,
   },
 ];
@@ -17,7 +17,7 @@ const redirects = [
 module.exports = withConfig({
   reactStrictMode: false,
   images: {
-    domains: ["platform.unicis.tech"],
+    domains: ['platform.unicis.tech'],
   },
   i18n,
   async redirects() {
@@ -26,15 +26,15 @@ module.exports = withConfig({
   async headers() {
     return [
       {
-        source: "/(.*)",
+        source: '/(.*)',
         headers: [
           {
-            key: "X-Frame-Options",
-            value: "DENY",
+            key: 'X-Frame-Options',
+            value: 'DENY',
           },
           {
-            key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
           },
         ],
       },
@@ -43,12 +43,12 @@ module.exports = withConfig({
   rewrites: async () => {
     return [
       {
-        source: "/.well-known/saml.cer",
-        destination: "/api/well-known/saml.cer",
+        source: '/.well-known/saml.cer',
+        destination: '/api/well-known/saml.cer',
       },
       {
-        source: "/.well-known/saml-configuration",
-        destination: "/well-known/saml-configuration",
+        source: '/.well-known/saml-configuration',
+        destination: '/well-known/saml-configuration',
       },
     ];
   },

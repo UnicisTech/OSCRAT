@@ -22,7 +22,7 @@ const TeamDashboard = ({
   return (
     <>
       <div className="flex flex-col pb-6">
-        <h2 className="text-xl font-semibold mb-2">
+        <h2 className="mb-2 text-xl font-semibold">
           {t('Team dashboard')} ({teamContext.team?.name})
         </h2>
       </div>
@@ -48,7 +48,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
       teamFeatures: env.teamFeatures,
       csc_statuses: await getCscStatusesBySlug(slug),
     },

@@ -1,13 +1,13 @@
-import defaultJson from "../MVPS-controls.json";
-import iso2013Json from "../ISO-CSC-controls-2013.json";
-import iso2022Json from "../ISO-CSC-controls-2022.json";
-import nistcsfv2 from "../CSF2_1.json";
-import { Section } from "types";
+import defaultJson from '../MVPS-controls.json';
+import iso2013Json from '../ISO-CSC-controls-2013.json';
+import iso2022Json from '../ISO-CSC-controls-2022.json';
+import nistcsfv2 from '../CSF2_1.json';
+import { Section } from 'types';
 
 const controls = {
-  "2013": iso2013Json,
-  "2022": iso2022Json,
-  default: defaultJson["MVPS-Controls"],
+  '2013': iso2013Json,
+  '2022': iso2022Json,
+  default: defaultJson['MVPS-Controls'],
   nistcsfv2: nistcsfv2.map((item) => ({
     ...item,
     Control: `${item.Code}: ${item.Control}`,
@@ -17,66 +17,66 @@ const controls = {
 
 const sections = [
   {
-    label: "Business controls",
-    value: "Business controls",
+    label: 'Business controls',
+    value: 'Business controls',
   },
   {
-    label: "Application design controls",
-    value: "Application design controls",
+    label: 'Application design controls',
+    value: 'Application design controls',
   },
   {
-    label: "Application implementation controls",
-    value: "Application implementation controls",
+    label: 'Application implementation controls',
+    value: 'Application implementation controls',
   },
   {
-    label: "Operational controls",
-    value: "Operational controls",
+    label: 'Operational controls',
+    value: 'Operational controls',
   },
 ];
 
 const isoOptions = [
-  { label: "ISO/IEC 27001:2013", value: "2013" },
-  { label: "ISO/IEC 27001:2022", value: "2022" },
-  { label: "MVSP v1.0-20211007", value: "default" },
-  { label: "NIST CSF v2", value: "nistcsfv2" },
+  { label: 'ISO/IEC 27001:2013', value: '2013' },
+  { label: 'ISO/IEC 27001:2022', value: '2022' },
+  { label: 'MVSP v1.0-20211007', value: 'default' },
+  { label: 'NIST CSF v2', value: 'nistcsfv2' },
 ];
 
 const perPageOptions: { label: string; value: number }[] = [
   {
-    label: "5",
+    label: '5',
     value: 5,
   },
   {
-    label: "10",
+    label: '10',
     value: 10,
   },
   {
-    label: "25",
+    label: '25',
     value: 25,
   },
   {
-    label: "50",
+    label: '50',
     value: 50,
   },
   {
-    label: "100",
+    label: '100',
     value: 100,
   },
 ];
 
 const trimToSecondDot = (inputString: string): string =>
-  inputString.split(".").slice(0, 2).join(".");
+  inputString.split('.').slice(0, 2).join('.');
 
 const getSectionsLabels = (iso: string) => {
   switch (iso) {
-    case "2022":
-    case "default":
-    case "nistcsfv2":
+    case '2022':
+    case 'default':
+    case 'nistcsfv2':
       return getSections(iso).map(({ label }) => label);
     // case 'nistcsfv2':
     //   return getFunctions().map(({ label }) => label)
     //For ISO 2013 we should merge the sections because of their big amount
-    case "2013":
+    case '2013':
     default: {
       const labelSet = new Set<string>();
       controls[iso].forEach((item) => {
@@ -86,10 +86,10 @@ const getSectionsLabels = (iso: string) => {
       const sections = Array.from(labelSet).map(
         (label) =>
           label +
-          " " +
+          ' ' +
           controls[iso]
             .find(({ Code }) => Code.includes(label))
-            ?.Section.split(" - ")[0],
+            ?.Section.split(' - ')[0]
       );
 
       return sections;
@@ -108,7 +108,7 @@ const getControlOptions = (iso: string) =>
         section: Section,
         controlLabel: ControlLabel,
       },
-    }),
+    })
   );
 
 const mergePoints = (d) => {
@@ -136,7 +136,7 @@ const mergePoints = (d) => {
 
 const getRadarChartLabels = (iso: string) => {
   const labels = getSectionsLabels(iso);
-  return labels.map((label) => label.split(" "));
+  return labels.map((label) => label.split(' '));
 };
 
 const getSections = (iso: string): Section[] => {
@@ -173,7 +173,7 @@ const getSections = (iso: string): Section[] => {
 // }
 
 const getSectionFilterOptions = (iso: string) => {
-  if (iso !== "2013") {
+  if (iso !== '2013') {
     return getSections(iso);
   }
 
@@ -187,82 +187,82 @@ const getSectionFilterOptions = (iso: string) => {
 };
 
 const removeBeforeFirstSpace = (string) => {
-  const parts = string.split(" ");
+  const parts = string.split(' ');
   if (parts.length > 1) {
-    return parts.slice(1).join(" ");
+    return parts.slice(1).join(' ');
   }
   return string;
 };
 
 const statusOptions: { label: string; value: number }[] = [
   {
-    label: "Unknown",
+    label: 'Unknown',
     value: 0,
   },
   {
-    label: "Not Applicable",
+    label: 'Not Applicable',
     value: 0,
   },
   {
-    label: "Not Performed",
+    label: 'Not Performed',
     value: 1,
   },
   {
-    label: "Performed Informally",
+    label: 'Performed Informally',
     value: 2,
   },
   {
-    label: "Planned",
+    label: 'Planned',
     value: 3,
   },
   {
-    label: "Well Defined",
+    label: 'Well Defined',
     value: 4,
   },
   {
-    label: "Quantitatively Controlled",
+    label: 'Quantitatively Controlled',
     value: 5,
   },
   {
-    label: "Continuously Improving",
+    label: 'Continuously Improving',
     value: 6,
   },
 ];
 
 const taskStatusOptions: { label: string; value: number }[] = [
   {
-    label: "To Do",
+    label: 'To Do',
     value: 0,
   },
   {
-    label: "In Progress",
+    label: 'In Progress',
     value: 1,
   },
   {
-    label: "In Review",
+    label: 'In Review',
     value: 2,
   },
   {
-    label: "Feedback",
+    label: 'Feedback',
     value: 3,
   },
   {
-    label: "Done",
+    label: 'Done',
     value: 4,
   },
 ];
 
 const getOptionStyle = (label: string) => {
   const styles: Record<string, string> = {
-    "Not Applicable": "bg-gray-500 text-white font-bold",
-    "Not Performed": "bg-red-600 text-white font-bold",
-    "Performed Informally": "bg-pink-700 text-white font-bold",
-    Planned: "bg-gray-700 text-white font-bold",
-    "Well Defined": "bg-yellow-500 text-white font-bold",
-    "Quantitatively Controlled": "bg-green-500 text-white font-bold",
-    "Continuously Improving": "bg-green-700 text-white font-bold",
+    'Not Applicable': 'bg-gray-500 text-white font-bold',
+    'Not Performed': 'bg-red-600 text-white font-bold',
+    'Performed Informally': 'bg-pink-700 text-white font-bold',
+    Planned: 'bg-gray-700 text-white font-bold',
+    'Well Defined': 'bg-yellow-500 text-white font-bold',
+    'Quantitatively Controlled': 'bg-green-500 text-white font-bold',
+    'Continuously Improving': 'bg-green-700 text-white font-bold',
   };
-  return styles[label] || "bg-white text-black";
+  return styles[label] || 'bg-white text-black';
 };
 
 export {

@@ -1,5 +1,5 @@
-import React from "react";
-import AppShell from "../shared/shell/AppShell";
+import React from 'react';
+import AppShell from '../shared/shell/AppShell';
 
 interface AccountLayoutProps {
   children: React.ReactNode;

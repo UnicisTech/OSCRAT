@@ -1,10 +1,10 @@
-import React, { useCallback } from "react";
-import CommentEdit from "./CommentEdit";
-import CommentView from "./CommentView";
-import CommentHeader from "./CommentHeader";
-import type { Comment } from "@prisma/client";
-import type { ExtendedComment } from "types";
-import CommentAvatar from "./CommentAvatar";
+import React, { useCallback } from 'react';
+import CommentEdit from './CommentEdit';
+import CommentView from './CommentView';
+import CommentHeader from './CommentHeader';
+import type { Comment } from '@prisma/client';
+import type { ExtendedComment } from 'types';
+import CommentAvatar from './CommentAvatar';
 
 interface CommentProps {
   comment: ExtendedComment;

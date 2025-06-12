@@ -47,7 +47,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
     if (isAvailable) {
       setSelectedFile(file);
     } else {
-      toast.error("Not supported type of file");
+      toast.error('Not supported type of file');
     }
   };
 
@@ -61,7 +61,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
         if (isAvailable) {
           setSelectedFile(file);
         } else {
-          toast.error("Not supported type of file");
+          toast.error('Not supported type of file');
         }
       };
       reader.readAsDataURL(file);
@@ -76,7 +76,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
 
   useEffect(() => {
     const uploadFile = async () => {
-      if (selectedFile && typeof slug === "string") {
+      if (selectedFile && typeof slug === 'string') {
         try {
           await uploadAttachment({
             file: selectedFile,
@@ -96,16 +96,16 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
   }, [selectedFile]);
 
   //TODO: refactoring
-  if (!canAccess("task", ["update"])) {
+  if (!canAccess('task', ['update'])) {
     return (
       <>
         {task.attachments.length ? (
           <div className="flex w-full items-center justify-center">
             <div
               className={`flex flex-wrap ${
-                task.attachments.length ? "justify-start" : "justify-center"
+                task.attachments.length ? 'justify-start' : 'justify-center'
               } h-full w-full border-2 bg-white px-4 py-2 transition dark:bg-[color:hsla(var(--b1))] ${
-                isDragOver ? "border-blue-400" : "border-gray-300"
+                isDragOver ? 'border-blue-400' : 'border-gray-300'
               } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
             >
               {task.attachments.map((attachment, index) => (
@@ -119,7 +119,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
             </div>
           </div>
         ) : (
-          <EmptyState title={t("no-attachments")} />
+          <EmptyState title={t('no-attachments')} />
         )}
       </>
     );
@@ -129,9 +129,9 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
     <div className="flex w-full items-center justify-center">
       <div
         className={`flex flex-wrap ${
-          task.attachments.length ? "justify-start" : "justify-center"
+          task.attachments.length ? 'justify-start' : 'justify-center'
         } h-full w-full border-2 bg-white px-4 py-2 transition dark:bg-[color:hsla(var(--b1))] ${
-          isDragOver ? "border-blue-400" : "border-gray-300"
+          isDragOver ? 'border-blue-400' : 'border-gray-300'
         } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -167,8 +167,8 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
               </svg>
               <span className="font-medium text-gray-600 dark:text-gray-400">
                 {isDragOver
-                  ? "Release to attach files"
-                  : "Drop files to attach, or "}
+                  ? 'Release to attach files'
+                  : 'Drop files to attach, or '}
                 <span className="text-blue-600 underline">browse</span>
               </span>
             </span>

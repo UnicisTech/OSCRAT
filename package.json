@@ -17,7 +17,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage --env=jsdom",
-    "vercel-build": "prisma generate && next build"
+    "vercel-build": "prisma generate && next build",
+    "seed:oscrat": "npx tsx prisma/seed-oscrat.ts"
   },
   "dependencies": {
     "@atlaskit/app-provider": "^1.6.1",

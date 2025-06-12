@@ -21,7 +21,7 @@ const DeleteTask = ({
 
   const formik = useFormik({
     initialValues: {
-      name: "",
+      name: '',
     },
     onSubmit: async () => {
       try {
@@ -41,7 +41,7 @@ const DeleteTask = ({
         <Modal.Header className="font-bold">{`Delete task`}</Modal.Header>
         <Modal.Body>
           <div className="mt-2 flex flex-col space-y-4">
-            <p>{t("delete-task-warning")}</p>
+            <p>{t('delete-task-warning')}</p>
           </div>
         </Modal.Body>
         <Modal.Actions>
@@ -51,7 +51,7 @@ const DeleteTask = ({
             loading={formik.isSubmitting}
             active={formik.dirty}
           >
-            {t("delete")}
+            {t('delete')}
           </Button>
           <Button
             type="button"
@@ -60,7 +60,7 @@ const DeleteTask = ({
               setVisible(!visible);
             }}
           >
-            {t("close")}
+            {t('close')}
           </Button>
         </Modal.Actions>
       </form>

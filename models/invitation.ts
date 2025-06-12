@@ -1,7 +1,7 @@
-import { ApiError } from "@/lib/errors";
-import { prisma } from "@/lib/prisma";
-import { Invitation, Role } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
+import { ApiError } from '@/lib/errors';
+import { prisma } from '@/lib/prisma';
+import { Invitation, Role } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 export const getInvitations = async (teamId: string) => {
   return await prisma.invitation.findMany({
@@ -12,7 +12,7 @@ export const getInvitations = async (teamId: string) => {
 };
 
 export const getInvitation = async (
-  key: { token: string } | { id: string },
+  key: { token: string } | { id: string }
 ) => {
   const invitation = await prisma.invitation.findUnique({
     where: key,
@@ -27,7 +27,7 @@ export const getInvitation = async (
   });
 
   if (!invitation) {
-    throw new ApiError(404, "Invitation not found.");
+    throw new ApiError(404, 'Invitation not found.');
   }
 
   return invitation;
@@ -55,7 +55,7 @@ export const createInvitation = async (param: {
 };
 
 export const deleteInvitation = async (
-  key: { token: string } | { id: string },
+  key: { token: string } | { id: string }
 ) => {
   return await prisma.invitation.delete({
     where: key,

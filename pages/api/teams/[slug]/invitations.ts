@@ -1,49 +1,49 @@
-import { sendTeamInviteEmail } from "@/lib/email/sendTeamInviteEmail";
-import { ApiError } from "@/lib/errors";
-import { prisma } from "@/lib/prisma";
-import { sendAudit } from "@/lib/retraced";
-import { getSession } from "@/lib/session";
-import { sendEvent } from "@/lib/svix";
+import { sendTeamInviteEmail } from '@/lib/email/sendTeamInviteEmail';
+import { ApiError } from '@/lib/errors';
+import { prisma } from '@/lib/prisma';
+import { sendAudit } from '@/lib/retraced';
+import { getSession } from '@/lib/session';
+import { sendEvent } from '@/lib/svix';
 import {
   createInvitation,
   deleteInvitation,
   getInvitation,
   getInvitations,
   isInvitationExpired,
-} from "models/invitation";
-import { addTeamMember, throwIfNoTeamAccess } from "models/team";
-import { throwIfNotAllowed } from "models/user";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { recordMetric } from "@/lib/metrics";
+} from 'models/invitation';
+import { addTeamMember, throwIfNoTeamAccess } from 'models/team';
+import { throwIfNotAllowed } from 'models/user';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { recordMetric } from '@/lib/metrics';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
   const { method } = req;
 
   try {
     switch (method) {
-      case "GET":
+      case 'GET':
         await handleGET(req, res);
         break;
-      case "POST":
+      case 'POST':
         await handlePOST(req, res);
         break;
-      case "PUT":
+      case 'PUT':
         await handlePUT(req, res);
         break;
-      case "DELETE":
+      case 'DELETE':
         await handleDELETE(req, res);
         break;
       default:
-        res.setHeader("Allow", "GET, POST, PUT, DELETE");
+        res.setHeader('Allow', 'GET, POST, PUT, DELETE');
         res.status(405).json({
           error: { message: `Method ${method} Not Allowed` },
         });
     }
   } catch (error: any) {
-    const message = error.message || "Something went wrong";
+    const message = error.message || 'Something went wrong';
     const status = error.status || 500;
 
     res.status(status).json({ error: { message } });
@@ -53,7 +53,7 @@ export default async function handler(
 // Invite a user to a team
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team_invitation", "create");
+  throwIfNotAllowed(teamMember, 'team_invitation', 'create');
 
   const { email, role } = req.body;
 
@@ -65,7 +65,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (invitationExists) {
-    throw new ApiError(400, "An invitation already exists for this email.");
+    throw new ApiError(400, 'An invitation already exists for this email.');
   }
 
   const userExist = await prisma.teamMember.findFirst({
@@ -82,7 +82,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (userExist) {
-    throw new ApiError(400, "This user already in your team.");
+    throw new ApiError(400, 'This user already in your team.');
   }
 
   const invitation = await createInvitation({
@@ -92,18 +92,18 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     role,
   });
 
-  await sendEvent(teamMember.teamId, "invitation.created", invitation);
+  await sendEvent(teamMember.teamId, 'invitation.created', invitation);
 
   await sendTeamInviteEmail(teamMember.team, invitation);
 
   sendAudit({
-    action: "member.invitation.create",
-    crud: "c",
+    action: 'member.invitation.create',
+    crud: 'c',
     user: teamMember.user,
     team: teamMember.team,
   });
 
-  recordMetric("invitation.created");
+  recordMetric('invitation.created');
 
   res.status(200).json({ data: invitation });
 };
@@ -111,11 +111,11 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 // Get all invitations for a team
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team_invitation", "read");
+  throwIfNotAllowed(teamMember, 'team_invitation', 'read');
 
   const invitations = await getInvitations(teamMember.teamId);
 
-  recordMetric("invitation.fetched");
+  recordMetric('invitation.fetched');
 
   res.status(200).json({ data: invitations });
 };
@@ -123,7 +123,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 // Delete an invitation
 const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team_invitation", "delete");
+  throwIfNotAllowed(teamMember, 'team_invitation', 'delete');
 
   const { id } = req.query as { id: string };
 
@@ -135,22 +135,22 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   ) {
     throw new ApiError(
       400,
-      `You don't have permission to delete this invitation.`,
+      `You don't have permission to delete this invitation.`
     );
   }
 
   await deleteInvitation({ id });
 
   sendAudit({
-    action: "member.invitation.delete",
-    crud: "d",
+    action: 'member.invitation.delete',
+    crud: 'd',
     user: teamMember.user,
     team: teamMember.team,
   });
 
-  await sendEvent(teamMember.teamId, "invitation.removed", invitation);
+  await sendEvent(teamMember.teamId, 'invitation.removed', invitation);
 
-  recordMetric("invitation.removed");
+  recordMetric('invitation.removed');
 
   res.status(200).json({ data: {} });
 };
@@ -162,7 +162,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   const invitation = await getInvitation({ token: inviteToken });
 
   if (await isInvitationExpired(invitation)) {
-    throw new ApiError(400, "Invitation expired. Please request a new one.");
+    throw new ApiError(400, 'Invitation expired. Please request a new one.');
   }
 
   const session = await getSession(req, res);
@@ -171,20 +171,20 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   if (session?.user.email != invitation.email) {
     throw new ApiError(
       400,
-      "You must be logged in with the email address you were invited with.",
+      'You must be logged in with the email address you were invited with.'
     );
   }
 
   const teamMember = await addTeamMember(
     invitation.team.id,
     userId,
-    invitation.role,
+    invitation.role
   );
 
-  await sendEvent(invitation.team.id, "member.created", teamMember);
+  await sendEvent(invitation.team.id, 'member.created', teamMember);
   await deleteInvitation({ token: inviteToken });
 
-  recordMetric("member.created");
+  recordMetric('member.created');
 
   res.status(200).json({ data: {} });
 };

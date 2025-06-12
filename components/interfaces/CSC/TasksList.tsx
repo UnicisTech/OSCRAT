@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import type { Task } from "@prisma/client";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import type { Task } from '@prisma/client';
 
 const TasksList = ({
   tasks,
@@ -12,8 +12,8 @@ const TasksList = ({
 }) => {
   const [selectedTasks] = useState<Array<Task>>(
     tasks.filter((task: any) =>
-      task.properties?.csc_controls?.find((item: string) => item === control),
-    ),
+      task.properties?.csc_controls?.find((item: string) => item === control)
+    )
   );
 
   const router = useRouter();

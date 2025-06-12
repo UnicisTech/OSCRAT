@@ -57,6 +57,31 @@ export const queryKeys = {
     apiKeys: (slug: string) =>
       [...queryKeys.teams.detail(slug), 'api-keys'] as const,
   },
+  oscrat: {
+    organization: {
+      summary: (teamId: string) =>
+        ['teams', teamId, 'oscrat', 'organization', 'summary'] as const,
+      detail: (teamId: string) =>
+        ['teams', teamId, 'oscrat', 'organization', 'detail'] as const,
+    },
+    projects: {
+      all: (teamId: string) => ['teams', teamId, 'oscrat', 'projects'] as const,
+      detail: (teamId: string, projectId: string) =>
+        [...queryKeys.oscrat.projects.all(teamId), projectId] as const,
+      assessments: {
+        all: (teamId: string, projectId: string) =>
+          [
+            ...queryKeys.oscrat.projects.detail(teamId, projectId),
+            'assessments',
+          ] as const,
+        detail: (teamId: string, projectId: string, assessmentId: string) =>
+          [
+            ...queryKeys.oscrat.projects.assessments.all(teamId, projectId),
+            assessmentId,
+          ] as const,
+      },
+    },
+  },
   wellKnown: {
     samlCert: ['well-known', 'saml.cer'] as const,
   },

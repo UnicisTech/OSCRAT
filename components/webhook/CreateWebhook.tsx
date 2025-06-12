@@ -22,7 +22,7 @@ const CreateWebhook = ({
 
   const onSubmit = async (
     values: WebookFormSchema,
-    formikHelpers: FormikHelpers<WebookFormSchema>,
+    formikHelpers: FormikHelpers<WebookFormSchema>
   ) => {
     try {
       await createWebhook(values);
@@ -39,12 +39,12 @@ const CreateWebhook = ({
       visible={visible}
       setVisible={setVisible}
       initialValues={{
-        name: "",
-        url: "",
+        name: '',
+        url: '',
         eventTypes: [],
       }}
       onSubmit={onSubmit}
-      title={t("create-webhook")}
+      title={t('create-webhook')}
     />
   );
 };

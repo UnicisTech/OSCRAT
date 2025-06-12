@@ -26,10 +26,10 @@ interface RetracedEventsBrowserProps {
 }
 
 const RetracedEventsBrowser = dynamic<RetracedEventsBrowserProps>(
-  () => import("@retracedhq/logs-viewer"),
+  () => import('@retracedhq/logs-viewer'),
   {
     ssr: false,
-  },
+  }
 );
 
 const Events: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
@@ -54,11 +54,11 @@ const Events: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
       <TeamTab activeTab="audit-logs" team={team} teamFeatures={teamFeatures} />
       <Card>
         <Card.Body>
-          {canAccess("team_audit_log", ["read"]) && auditLogToken && (
+          {canAccess('team_audit_log', ['read']) && auditLogToken && (
             <RetracedEventsBrowser
               host={`${retracedHost}/viewer/v1`}
               auditLogToken={auditLogToken}
-              header={t("audit-logs")}
+              header={t('audit-logs')}
             />
           )}
         </Card.Body>
@@ -87,23 +87,23 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(req, res);
   const teamMember = await getTeamMember(
     session?.user.id as string,
-    query.slug as string,
+    query.slug as string
   );
 
   try {
-    throwIfNotAllowed(teamMember, "team_audit_log", "read");
+    throwIfNotAllowed(teamMember, 'team_audit_log', 'read');
 
     const auditLogToken = await getViewerToken(
       teamMember.team.id,
-      session?.user.id as string,
+      session?.user.id as string
     );
 
     return {
       props: {
-        ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+        ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
         error: null,
-        auditLogToken: auditLogToken ?? "",
-        retracedHost: env.retraced.url ?? "",
+        auditLogToken: auditLogToken ?? '',
+        retracedHost: env.retraced.url ?? '',
         teamFeatures: env.teamFeatures,
       },
     };
@@ -111,7 +111,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     const { message } = error as { message: string };
     return {
       props: {
-        ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+        ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
         error: {
           message,
         },

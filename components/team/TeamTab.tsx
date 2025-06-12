@@ -32,7 +32,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
     },
   ];
 
-  if (canAccess("team_member", ["create", "update", "read", "delete"])) {
+  if (canAccess('team_member', ['create', 'update', 'read', 'delete'])) {
     navigations.push({
       name: 'Members',
       href: `/teams/${teamSlug}/members`,
@@ -43,7 +43,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
 
   if (
     teamFeatures.sso &&
-    canAccess("team_sso", ["create", "update", "read", "delete"])
+    canAccess('team_sso', ['create', 'update', 'read', 'delete'])
   ) {
     navigations.push({
       name: 'Single Sign-On',
@@ -55,7 +55,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
 
   if (
     teamFeatures.dsync &&
-    canAccess("team_dsync", ["create", "update", "read", "delete"])
+    canAccess('team_dsync', ['create', 'update', 'read', 'delete'])
   ) {
     navigations.push({
       name: 'Directory Sync',
@@ -67,7 +67,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
 
   if (
     teamFeatures.auditLog &&
-    canAccess("team_audit_log", ["create", "update", "read", "delete"])
+    canAccess('team_audit_log', ['create', 'update', 'read', 'delete'])
   ) {
     navigations.push({
       name: 'Audit Logs',
@@ -79,7 +79,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
 
   if (
     teamFeatures.webhook &&
-    canAccess("team_webhook", ["create", "update", "read", "delete"])
+    canAccess('team_webhook', ['create', 'update', 'read', 'delete'])
   ) {
     navigations.push({
       name: 'Webhooks',
@@ -91,7 +91,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
 
   if (
     teamFeatures.apiKey &&
-    canAccess("team_api_key", ["create", "update", "read", "delete"])
+    canAccess('team_api_key', ['create', 'update', 'read', 'delete'])
   ) {
     navigations.push({
       name: 'API Keys',
@@ -116,10 +116,10 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
               href={menu.href}
               key={menu.href}
               className={classNames(
-                "inline-flex items-center border-b-2 py-4 text-sm font-medium",
+                'inline-flex items-center border-b-2 py-4 text-sm font-medium',
                 menu.active
-                  ? "border-gray-900 text-gray-700 dark:text-gray-100"
-                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 hover:dark:text-gray-100",
+                  ? 'border-gray-900 text-gray-700 dark:text-gray-100'
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 hover:dark:text-gray-100'
               )}
             >
               {menu.name}

@@ -2,26 +2,26 @@ import {
   ComputerDesktopIcon,
   MoonIcon,
   SunIcon,
-} from "@heroicons/react/24/outline";
-import { useTranslation } from "next-i18next";
+} from '@heroicons/react/24/outline';
+import { useTranslation } from 'next-i18next';
 
 export const useThemeIcon = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
 
   const themes = [
     {
-      id: "system",
-      name: t("system"),
+      id: 'system',
+      name: t('system'),
       icon: ComputerDesktopIcon,
     },
     {
-      id: "dark",
-      name: t("dark"),
+      id: 'dark',
+      name: t('dark'),
       icon: MoonIcon,
     },
     {
-      id: "light",
-      name: t("light"),
+      id: 'light',
+      name: t('light'),
       icon: SunIcon,
     },
   ];

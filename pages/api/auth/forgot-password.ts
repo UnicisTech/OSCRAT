@@ -1,12 +1,12 @@
-import { generateToken, validateEmail } from "@/lib/common";
-import { sendPasswordResetEmail } from "@/lib/email/sendPasswordResetEmail";
-import { ApiError } from "@/lib/errors";
-import { prisma } from "@/lib/prisma";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { recordMetric } from "@/lib/metrics";
-import { validateRecaptcha } from "@/lib/recaptcha";
-import rateLimit from "@/lib/rate-limit";
-import { getIpAddress } from "@/lib/utils";
+import { generateToken, validateEmail } from '@/lib/common';
+import { sendPasswordResetEmail } from '@/lib/email/sendPasswordResetEmail';
+import { ApiError } from '@/lib/errors';
+import { prisma } from '@/lib/prisma';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { recordMetric } from '@/lib/metrics';
+import { validateRecaptcha } from '@/lib/recaptcha';
+import rateLimit from '@/lib/rate-limit';
+import { getIpAddress } from '@/lib/utils';
 
 const limiter = rateLimit({
   interval: 60 * 1000, // 60 seconds
@@ -15,28 +15,28 @@ const limiter = rateLimit({
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
   try {
     await limiter.check(5, getIpAddress(req), res); // 5 requests per minute for IP address
     try {
       switch (req.method) {
-        case "POST":
+        case 'POST':
           await handlePOST(req, res);
           break;
         default:
-          res.setHeader("Allow", "POST");
+          res.setHeader('Allow', 'POST');
           res.status(405).json({
             error: { message: `Method ${req.method} Not Allowed` },
           });
       }
     } catch (error: any) {
-      const message = error.message || "Something went wrong";
+      const message = error.message || 'Something went wrong';
       const status = error.status || 500;
       res.status(status).json({ error: { message } });
     }
   } catch (error: any) {
-    res.status(429).json({ error: { message: "Rate limit exceeded" } });
+    res.status(429).json({ error: { message: 'Rate limit exceeded' } });
   }
 }
 
@@ -46,7 +46,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   await validateRecaptcha(recaptchaToken);
 
   if (!email || !validateEmail(email)) {
-    throw new ApiError(422, "The e-mail address you entered is invalid");
+    throw new ApiError(422, 'The e-mail address you entered is invalid');
   }
 
   const user = await prisma.user.findUnique({
@@ -69,7 +69,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
   await sendPasswordResetEmail(email, encodeURIComponent(resetToken));
 
-  recordMetric("user.password.request");
+  recordMetric('user.password.request');
 
   res.json({});
 };

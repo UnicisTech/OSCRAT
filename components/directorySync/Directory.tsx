@@ -23,10 +23,10 @@ const Directory = ({ team }: { team: Team }) => {
 
   return (
     <div className="flex flex-col justify-between space-y-2 border-t text-sm">
-      <p className="mt-3 text-sm">{t("directory-sync-message")}</p>
+      <p className="mt-3 text-sm">{t('directory-sync-message')}</p>
       <div className="form-control w-full">
         <label className="label">
-          <span className="label-text">{t("scim-url")}</span>
+          <span className="label-text">{t('scim-url')}</span>
         </label>
         <input
           type="text"
@@ -36,7 +36,7 @@ const Directory = ({ team }: { team: Team }) => {
       </div>
       <div className="form-control w-full">
         <label className="label">
-          <span className="label-text">{t("auth-token")}</span>
+          <span className="label-text">{t('auth-token')}</span>
         </label>
         <input
           type="text"

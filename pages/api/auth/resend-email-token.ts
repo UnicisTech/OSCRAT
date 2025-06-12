@@ -1,26 +1,26 @@
-import { generateToken, validateEmail } from "@/lib/common";
-import { sendVerificationEmail } from "@/lib/email/sendVerificationEmail";
-import { ApiError } from "@/lib/errors";
-import { prisma } from "@/lib/prisma";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { generateToken, validateEmail } from '@/lib/common';
+import { sendVerificationEmail } from '@/lib/email/sendVerificationEmail';
+import { ApiError } from '@/lib/errors';
+import { prisma } from '@/lib/prisma';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
   try {
     switch (req.method) {
-      case "POST":
+      case 'POST':
         await handlePOST(req, res);
         break;
       default:
-        res.setHeader("Allow", "POST");
+        res.setHeader('Allow', 'POST');
         res.status(405).json({
           error: { message: `Method ${req.method} Not Allowed` },
         });
     }
   } catch (error: any) {
-    const message = error.message || "Something went wrong";
+    const message = error.message || 'Something went wrong';
     const status = error.status || 500;
 
     res.status(status).json({ error: { message } });
@@ -31,7 +31,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email } = req.body;
 
   if (!email || !validateEmail(email)) {
-    throw new ApiError(422, "The email address you entered is invalid");
+    throw new ApiError(422, 'The email address you entered is invalid');
   }
 
   const user = await prisma.user.findUnique({

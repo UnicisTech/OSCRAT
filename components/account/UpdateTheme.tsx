@@ -1,24 +1,24 @@
-import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
 
-import { Card } from "@/components/shared";
-import { useTranslation } from "next-i18next";
-import { useTheme } from "next-themes";
-import { useThemeIcon } from "@/hooks/useThemeIcon";
-import { useThemeData } from "@/utils/themeData";
+import { Card } from '@/components/shared';
+import { useTranslation } from 'next-i18next';
+import { useTheme } from 'next-themes';
+import { useThemeIcon } from '@/hooks/useThemeIcon';
+import { useThemeData } from '@/utils/themeData';
 
 const UpdateTheme = () => {
   const { theme, setTheme } = useTheme();
   const { getThemeComponent } = useThemeIcon();
   const themes = useThemeData();
 
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
 
   return (
     <Card>
       <Card.Body>
         <Card.Header>
-          <Card.Title>{t("theme")}</Card.Title>
-          <Card.Description>{t("change-theme")}</Card.Description>
+          <Card.Title>{t('theme')}</Card.Title>
+          <Card.Description>{t('change-theme')}</Card.Description>
         </Card.Header>
         <div className="dropdown w-60">
           <div

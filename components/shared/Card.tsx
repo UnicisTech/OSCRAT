@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface CardProps {
   heading?: string;
@@ -12,7 +12,7 @@ const Card = (props: CardProps) => {
   return (
     <div className="border-rounded card mb-5 w-full border dark:border-gray-600">
       <div className="flex items-center justify-between border-b border-gray-300 bg-gray-100 px-3 py-3 text-sm font-medium text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400">
-        <div>{heading || ""}</div>
+        <div>{heading || ''}</div>
         <div>{button ? button : null}</div>
       </div>
       <div>{children}</div>
@@ -47,7 +47,7 @@ const Body = ({
   return (
     <div
       className={`card-body gap-6 p-6 dark:bg-[color:hsla(var(--b1))] ${
-        className || ""
+        className || ''
       }`}
     >
       {children}

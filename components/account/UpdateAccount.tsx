@@ -1,9 +1,9 @@
-import type { User } from "@prisma/client";
-import UploadAvatar from "./UploadAvatar";
-import UpdateName from "./UpdateName";
-import UpdateEmail from "./UpdateEmail";
-import UpdateTheme from "./UpdateTheme";
-import env from "@/lib/env";
+import type { User } from '@prisma/client';
+import UploadAvatar from './UploadAvatar';
+import UpdateName from './UpdateName';
+import UpdateEmail from './UpdateEmail';
+import UpdateTheme from './UpdateTheme';
+import env from '@/lib/env';
 
 interface UpdateAccountProps {
   user: Partial<User>;

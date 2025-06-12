@@ -1,14 +1,14 @@
 const env = {
   databaseUrl: `${process.env.DATABASE_URL}`,
   appUrl: `${process.env.APP_URL}`,
-  product: "unicis-platform",
+  product: 'unicis-platform',
   // redirectAfterSignIn: '/teams',
-  redirectIfAuthenticated: "/teams",
+  redirectIfAuthenticated: '/teams',
 
   // SAML Jackson configuration
   saml: {
-    issuer: "https://saml.boxyhq.com",
-    path: "/api/oauth/saml",
+    issuer: 'https://saml.boxyhq.com',
+    path: '/api/oauth/saml',
     callback: `${process.env.APP_URL}`,
   },
 
@@ -17,14 +17,14 @@ const env = {
     url: process.env.JACKSON_URL,
     externalUrl: process.env.JACKSON_EXTERNAL_URL || process.env.JACKSON_URL,
     apiKey: process.env.JACKSON_API_KEY,
-    productId: process.env.JACKSON_PRODUCT_ID || "boxyhq",
+    productId: process.env.JACKSON_PRODUCT_ID || 'boxyhq',
     selfHosted: process.env.JACKSON_URL !== undefined,
     sso: {
       callback: `${process.env.APP_URL}`,
-      issuer: "https://saml.boxyhq.com",
-      path: "/api/oauth/saml",
-      oidcPath: "/api/oauth/oidc",
-      idpLoginPath: "/auth/idp-login",
+      issuer: 'https://saml.boxyhq.com',
+      path: '/api/oauth/saml',
+      oidcPath: '/api/oauth/oidc',
+      idpLoginPath: '/auth/idp-login',
     },
     dsync: {
       webhook_url: `${process.env.APP_URL}/api/webhooks/dsync`,
@@ -82,7 +82,7 @@ const env = {
   groupPrefix: process.env.GROUP_PREFIX,
 
   // Users will need to confirm their email before accessing the app feature
-  confirmEmail: process.env.CONFIRM_EMAIL === "true",
+  confirmEmail: process.env.CONFIRM_EMAIL === 'true',
 
   // Mixpanel configuration
   mixpanel: {
@@ -90,24 +90,24 @@ const env = {
   },
 
   disableNonBusinessEmailSignup:
-    process.env.DISABLE_NON_BUSINESS_EMAIL_SIGNUP === "true" ? true : false,
+    process.env.DISABLE_NON_BUSINESS_EMAIL_SIGNUP === 'true' ? true : false,
 
-  authProviders: process.env.AUTH_PROVIDERS || "github,credentials",
+  authProviders: process.env.AUTH_PROVIDERS || 'github,credentials',
 
   otel: {
-    prefix: process.env.OTEL_PREFIX || "boxyhq.saas",
+    prefix: process.env.OTEL_PREFIX || 'boxyhq.saas',
   },
 
-  hideLandingPage: process.env.HIDE_LANDING_PAGE === "true" ? true : false,
+  hideLandingPage: process.env.HIDE_LANDING_PAGE === 'true' ? true : false,
 
-  darkModeEnabled: process.env.NEXT_PUBLIC_DARK_MODE === "false" ? false : true,
+  darkModeEnabled: process.env.NEXT_PUBLIC_DARK_MODE === 'false' ? false : true,
 
   teamFeatures: {
-    sso: process.env.FEATURE_TEAM_SSO === "false" ? false : true,
-    dsync: process.env.FEATURE_TEAM_DSYNC === "false" ? false : true,
-    webhook: process.env.FEATURE_TEAM_WEBHOOK === "false" ? false : true,
-    apiKey: process.env.FEATURE_TEAM_API_KEY === "false" ? false : true,
-    auditLog: process.env.FEATURE_TEAM_AUDIT_LOG === "false" ? false : true,
+    sso: process.env.FEATURE_TEAM_SSO === 'false' ? false : true,
+    dsync: process.env.FEATURE_TEAM_DSYNC === 'false' ? false : true,
+    webhook: process.env.FEATURE_TEAM_WEBHOOK === 'false' ? false : true,
+    apiKey: process.env.FEATURE_TEAM_API_KEY === 'false' ? false : true,
+    auditLog: process.env.FEATURE_TEAM_AUDIT_LOG === 'false' ? false : true,
   },
 
   recaptcha: {

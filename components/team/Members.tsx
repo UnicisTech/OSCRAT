@@ -53,13 +53,13 @@ const Members = ({ team }: { team: Team }) => {
 
   const canUpdateRole = (member: TeamMember) => {
     return (
-      session?.user.id != member.userId && canAccess("team_member", ["update"])
+      session?.user.id != member.userId && canAccess('team_member', ['update'])
     );
   };
 
   const canRemoveMember = (member: TeamMember) => {
     return (
-      session?.user.id != member.userId && canAccess("team_member", ["delete"])
+      session?.user.id != member.userId && canAccess('team_member', ['delete'])
     );
   };
 
@@ -80,16 +80,16 @@ const Members = ({ team }: { team: Team }) => {
           size="md"
           onClick={() => setVisible(!visible)}
         >
-          {t("add-member")}
+          {t('add-member')}
         </Button>
       </div>
       <table className="table w-full border-b text-sm dark:border-base-200">
         <thead className="bg-gray-200 text-gray-600 dark:bg-base-200 dark:text-gray-400">
           <tr>
-            <th>{t("name")}</th>
-            <th>{t("email")}</th>
-            <th>{t("role")}</th>
-            {canAccess("team_member", ["delete"]) && <th>{t("action")}</th>}
+            <th>{t('name')}</th>
+            <th>{t('email')}</th>
+            <th>{t('role')}</th>
+            {canAccess('team_member', ['delete']) && <th>{t('action')}</th>}
           </tr>
         </thead>
         <tbody>
@@ -121,7 +121,7 @@ const Members = ({ team }: { team: Team }) => {
                         setConfirmationDialogVisible(true);
                       }}
                     >
-                      {t("remove")}
+                      {t('remove')}
                     </Button>
                   ) : (
                     <span>-</span>
@@ -139,9 +139,9 @@ const Members = ({ team }: { team: Team }) => {
           setSelectedMember(null);
         }}
         onConfirm={() => removeTeamMember(selectedMember)}
-        title={t("confirm-delete-member")}
+        title={t('confirm-delete-member')}
       >
-        {t("delete-member-warning")}
+        {t('delete-member-warning')}
       </ConfirmationDialog>
       <InviteMember visible={visible} setVisible={setVisible} team={team} />
     </div>

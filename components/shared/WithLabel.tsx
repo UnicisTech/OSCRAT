@@ -1,5 +1,5 @@
-import React from "react";
-import { InputProps } from "react-daisyui";
+import React from 'react';
+import { InputProps } from 'react-daisyui';
 
 interface InputWithLabelProps extends InputProps {
   children: React.ReactNode;
@@ -19,7 +19,7 @@ const InputWithLabel = (props: InputWithLabelProps) => {
 
   return (
     <div className="form-control w-full">
-      {typeof label === "string" ? (
+      {typeof label === 'string' ? (
         <label className="label">
           <span className="label-text">{label}</span>
         </label>
@@ -30,7 +30,7 @@ const InputWithLabel = (props: InputWithLabelProps) => {
       {React.cloneElement(children as React.ReactElement<any>, { ...rest })}
       {(error || descriptionText) && (
         <label className="label">
-          <span className={`label-text-alt ${error ? "text-red-500" : ""}`}>
+          <span className={`label-text-alt ${error ? 'text-red-500' : ''}`}>
             {error || descriptionText}
           </span>
         </label>

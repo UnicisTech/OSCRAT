@@ -15,16 +15,14 @@ interface APIKeysProps {
 }
 
 const APIKeys = ({ team }: APIKeysProps) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
   const [selectedApiKey, setSelectedApiKey] = useState<ApiKey | null>(null);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [confirmationDialogVisible, setConfirmationDialogVisible] =
     useState(false);
 
   // Use the custom hook
-  const { apiKeys, isLoading, error, deleteApiKey } = useApiKeys(
-    team.slug
-  );
+  const { apiKeys, isLoading, error, deleteApiKey } = useApiKeys(team.slug);
 
   // Delete API Key
   const handleDeleteApiKey = async (apiKey: ApiKey | null) => {
@@ -58,23 +56,23 @@ const APIKeys = ({ team }: APIKeysProps) => {
             size="md"
             onClick={() => setCreateModalVisible(true)}
           >
-            {t("create-api-key")}
+            {t('create-api-key')}
           </Button>
         </div>
         {apiKeys.length === 0 ? (
           <EmptyState
-            title={t("no-api-key-title")}
-            description={t("no-api-key-description")}
+            title={t('no-api-key-title')}
+            description={t('no-api-key-description')}
           />
         ) : (
           <>
             <table className="table w-full border-b text-sm dark:border-base-200">
               <thead className="bg-base-200">
                 <tr>
-                  <th>{t("name")}</th>
-                  <th>{t("status")}</th>
-                  <th>{t("created")}</th>
-                  <th>{t("actions")}</th>
+                  <th>{t('name')}</th>
+                  <th>{t('status')}</th>
+                  <th>{t('created')}</th>
+                  <th>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -83,7 +81,7 @@ const APIKeys = ({ team }: APIKeysProps) => {
                     <tr key={apiKey.id}>
                       <td>{apiKey.name}</td>
                       <td>
-                        <Badge color="success">{t("active")}</Badge>
+                        <Badge color="success">{t('active')}</Badge>
                       </td>
                       <td>{new Date(apiKey.createdAt).toLocaleDateString()}</td>
                       <td>
@@ -96,7 +94,7 @@ const APIKeys = ({ team }: APIKeysProps) => {
                             setConfirmationDialogVisible(true);
                           }}
                         >
-                          {t("revoke")}
+                          {t('revoke')}
                         </Button>
                       </td>
                     </tr>
@@ -105,14 +103,14 @@ const APIKeys = ({ team }: APIKeysProps) => {
               </tbody>
             </table>
             <ConfirmationDialog
-              title={t("revoke-api-key")}
+              title={t('revoke-api-key')}
               visible={confirmationDialogVisible}
               onConfirm={() => handleDeleteApiKey(selectedApiKey)}
               onCancel={() => setConfirmationDialogVisible(false)}
-              cancelText={t("cancel")}
-              confirmText={t("revoke-api-key")}
+              cancelText={t('cancel')}
+              confirmText={t('revoke-api-key')}
             >
-              {t("revoke-api-key-confirm")}
+              {t('revoke-api-key-confirm')}
             </ConfirmationDialog>
           </>
         )}

@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import SectionMessage, { Appearance } from "@atlaskit/section-message";
+import { ReactNode } from 'react';
+import SectionMessage, { Appearance } from '@atlaskit/section-message';
 
 const Message = ({
   title,
@@ -13,9 +13,9 @@ const Message = ({
   isBold?: boolean;
 }) => {
   return (
-    <div style={{ margin: "5px" }}>
+    <div style={{ margin: '5px' }}>
       <SectionMessage title={title} appearance={appearance}>
-        <p className={`${isBold ? "font-bold" : ""}`}>{text}</p>
+        <p className={`${isBold ? 'font-bold' : ''}`}>{text}</p>
       </SectionMessage>
     </div>
   );

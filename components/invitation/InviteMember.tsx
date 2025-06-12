@@ -23,13 +23,13 @@ const InviteMember = ({
 
   const formik = useFormik({
     initialValues: {
-      email: "",
+      email: '',
       role: availableRoles[0].id,
     },
     validationSchema: Yup.object().shape({
-      email: Yup.string().email().required(t("require-email")),
+      email: Yup.string().email().required(t('require-email')),
       role: Yup.string()
-        .required(t("required-role"))
+        .required(t('required-role'))
         .oneOf(availableRoles.map((r) => r.id)),
     }),
     onSubmit: async (values) => {
@@ -54,8 +54,8 @@ const InviteMember = ({
   return (
     <Modal open={visible} close={toggleVisible}>
       <form onSubmit={formik.handleSubmit} method="POST">
-        <Modal.Header>{t("invite-new-member")}</Modal.Header>
-        <Modal.Description>{t("invite-member-message")}</Modal.Description>
+        <Modal.Header>{t('invite-new-member')}</Modal.Header>
+        <Modal.Description>{t('invite-member-message')}</Modal.Description>
         <Modal.Body>
           <div className="flex flex-col gap-4">
             <Input
@@ -89,7 +89,7 @@ const InviteMember = ({
             }}
             size="md"
           >
-            {t("close")}
+            {t('close')}
           </Button>
           <Button
             type="submit"
@@ -98,7 +98,7 @@ const InviteMember = ({
             active={formik.dirty}
             size="md"
           >
-            {t("send-invite")}
+            {t('send-invite')}
           </Button>
         </Modal.Footer>
       </form>

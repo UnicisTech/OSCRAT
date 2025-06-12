@@ -11,8 +11,8 @@ import {
   RadarChart,
   SectionFilter,
   StatusCscFilter,
-} from "@/components/interfaces/CSC";
-import { PerPageSelector } from "@/components/shared/atlaskit";
+} from '@/components/interfaces/CSC';
+import { PerPageSelector } from '@/components/shared/atlaskit';
 import {
   perPageOptions,
   isoOptions,
@@ -28,25 +28,25 @@ import { extractErrorMessage } from '@/lib/utils';
 import { useTranslation } from 'next-i18next';
 
 const labels = [
-  "Unknown",
-  "Not Applicable",
-  "Not Performed",
-  "Performed Informally",
-  "Planned",
-  "Well Defined",
-  "Quantitatively Controlled",
-  "Continuously Improving",
+  'Unknown',
+  'Not Applicable',
+  'Not Performed',
+  'Performed Informally',
+  'Planned',
+  'Well Defined',
+  'Quantitatively Controlled',
+  'Continuously Improving',
 ];
 
 const barColors = [
-  "rgba(241, 241, 241, 1)",
-  "rgba(178, 178, 178, 1)",
-  "rgba(255, 0, 0, 1)",
-  "rgba(202, 0, 63, 1)",
-  "rgba(102, 102, 102, 1)",
-  "rgba(255, 190, 0, 1)",
-  "rgba(106, 217, 0, 1)",
-  "rgba(47, 143, 0, 1)",
+  'rgba(241, 241, 241, 1)',
+  'rgba(178, 178, 178, 1)',
+  'rgba(255, 0, 0, 1)',
+  'rgba(202, 0, 63, 1)',
+  'rgba(102, 102, 102, 1)',
+  'rgba(255, 190, 0, 1)',
+  'rgba(106, 217, 0, 1)',
+  'rgba(47, 143, 0, 1)',
 ];
 
 const CscDashboard = ({
@@ -113,21 +113,21 @@ const CscDashboard = ({
   return (
     <>
       <h2 className="text-xl font-medium leading-none tracking-tight">
-        {"Cybersecurity Controls Dashboard: "}
+        {'Cybersecurity Controls Dashboard: '}
         {team.name}
       </h2>
       {/* <h2 className="text-2xl font-bold">{"Cybersecurity Controls Dashboard: "}{team.name}</h2> */}
       <div
         style={{
-          height: "400px",
-          width: "100%",
-          display: "flex",
-          justifyContent: "space-around",
-          marginBottom: "10px",
+          height: '400px',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-around',
+          marginBottom: '10px',
         }}
       >
         <div
-          style={{ width: "49%" }}
+          style={{ width: '49%' }}
           className="stats stat-value bg-white py-4 pl-4 shadow dark:bg-base-100"
         >
           <PieChart
@@ -141,7 +141,7 @@ const CscDashboard = ({
           <RadarChart statuses={statuses} iso={iso} />
         </div>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div className="flex items-center">
           <p>
             Framework:
@@ -156,7 +156,7 @@ const CscDashboard = ({
             options={perPageOptions}
             placeholder="Controls per page"
             defaultValue={{
-              label: "10",
+              label: '10',
               value: 10,
             }}
           />
@@ -185,14 +185,14 @@ CscDashboard.getLayout = function getLayout(page: React.ReactNode) {
 };
 
 export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
+  context: GetServerSidePropsContext
 ) => {
   const { locale, query }: GetServerSidePropsContext = context;
   const slug = query.slug as string;
 
   return {
     props: {
-      ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+      ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
       csc_statuses: await getCscStatusesBySlug(slug),
     },
   };

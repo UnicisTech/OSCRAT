@@ -5,9 +5,9 @@ import {
   Html,
   Preview,
   Text,
-} from "@react-email/components";
-import EmailLayout from "./EmailLayout";
-import { Team } from "@prisma/client";
+} from '@react-email/components';
+import EmailLayout from './EmailLayout';
+import { Team } from '@prisma/client';
 
 interface TeamInviteEmailProps {
   team: Team;
@@ -29,7 +29,7 @@ const TeamInviteEmail = ({ team, invitationLink }: TeamInviteEmailProps) => {
         <Container className="text-center">
           <Button
             href={invitationLink}
-            style={{ padding: "16px 20px" }}
+            style={{ padding: '16px 20px' }}
             className="rounded bg-[#000000] text-center text-[12px] font-semibold text-white no-underline"
           >
             Join team

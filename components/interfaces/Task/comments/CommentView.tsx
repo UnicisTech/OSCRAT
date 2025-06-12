@@ -1,11 +1,11 @@
-import React from "react";
-import { Button } from "react-daisyui";
-import { AccessControl } from "@/components/shared/AccessControl";
-import type { Comment } from "@prisma/client";
-import "react-quill/dist/quill.snow.css";
-import dynamic from "next/dynamic";
+import React from 'react';
+import { Button } from 'react-daisyui';
+import { AccessControl } from '@/components/shared/AccessControl';
+import type { Comment } from '@prisma/client';
+import 'react-quill/dist/quill.snow.css';
+import dynamic from 'next/dynamic';
 
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface CommentViewProps {
   comment: Comment;
@@ -17,7 +17,7 @@ const CommentView = ({
   activateEditForComment,
   deleteComment,
 }: CommentViewProps) => {
-  console.log("CommentView text", comment.text);
+  console.log('CommentView text', comment.text);
   return (
     <>
       <div>
@@ -32,12 +32,12 @@ const CommentView = ({
         />
       </div>
       <div>
-        <AccessControl resource="task" actions={["update"]}>
+        <AccessControl resource="task" actions={['update']}>
           <Button
             size="sm"
             variant="link"
             color="ghost"
-            style={{ color: "grey", paddingLeft: "0px" }}
+            style={{ color: 'grey', paddingLeft: '0px' }}
             onClick={() => activateEditForComment(comment.id)}
           >
             Edit
@@ -46,7 +46,7 @@ const CommentView = ({
             size="sm"
             variant="link"
             color="ghost"
-            style={{ color: "grey" }}
+            style={{ color: 'grey' }}
             onClick={() => deleteComment(comment.id)}
           >
             Delete

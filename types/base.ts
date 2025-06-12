@@ -1,5 +1,5 @@
-import type { Prisma, TeamMember, User, Comment } from "@prisma/client";
-import type { TaskCscProperties, TeamCscProperties } from "./csc";
+import type { Prisma, TeamMember, User, Comment } from '@prisma/client';
+import type { TaskCscProperties, TeamCscProperties } from './csc';
 
 export type ApiError = {
   code?: string;
@@ -17,7 +17,7 @@ export type ApiResponse<T = unknown> =
       error: ApiError;
     };
 
-export type Role = "owner" | "member";
+export type Role = 'owner' | 'member';
 
 export type TeamWithMemberCount = Prisma.TeamGetPayload<{
   include: {
@@ -52,42 +52,42 @@ export type WebookFormSchema = {
 };
 
 export type AppEvent =
-  | "invitation.created"
-  | "invitation.removed"
-  | "invitation.fetched"
-  | "member.created"
-  | "member.removed"
-  | "member.left"
-  | "member.fetched"
-  | "member.role.updated"
-  | "user.password.updated"
-  | "user.password.request"
-  | "user.updated"
-  | "user.signup"
-  | "user.password.reset"
-  | "team.fetched"
-  | "team.created"
-  | "team.updated"
-  | "team.removed"
-  | "apikey.created"
-  | "apikey.removed"
-  | "apikey.fetched"
-  | "apikey.removed"
-  | "webhook.created"
-  | "webhook.removed"
-  | "webhook.fetched"
-  | "webhook.updated"
-  | "task.created"
-  | "task.updated"
-  | "task.commented"
-  | "task.deleted";
+  | 'invitation.created'
+  | 'invitation.removed'
+  | 'invitation.fetched'
+  | 'member.created'
+  | 'member.removed'
+  | 'member.left'
+  | 'member.fetched'
+  | 'member.role.updated'
+  | 'user.password.updated'
+  | 'user.password.request'
+  | 'user.updated'
+  | 'user.signup'
+  | 'user.password.reset'
+  | 'team.fetched'
+  | 'team.created'
+  | 'team.updated'
+  | 'team.removed'
+  | 'apikey.created'
+  | 'apikey.removed'
+  | 'apikey.fetched'
+  | 'apikey.removed'
+  | 'webhook.created'
+  | 'webhook.removed'
+  | 'webhook.fetched'
+  | 'webhook.updated'
+  | 'task.created'
+  | 'task.updated'
+  | 'task.commented'
+  | 'task.deleted';
 
 export type AUTH_PROVIDER =
-  | "github"
-  | "google"
-  | "saml"
-  | "email"
-  | "credentials";
+  | 'github'
+  | 'google'
+  | 'saml'
+  | 'email'
+  | 'credentials';
 
 export type Permission = {
   resource: string;
@@ -123,4 +123,4 @@ export type ExtendedComment = Comment & {
   createdBy: User;
 };
 
-export type UserReturned = Pick<User, "name" | "firstName" | "lastName">;
+export type UserReturned = Pick<User, 'name' | 'firstName' | 'lastName'>;

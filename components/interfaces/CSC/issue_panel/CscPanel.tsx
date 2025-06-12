@@ -43,21 +43,21 @@ const CscPanel = ({
 
   const properties = task?.properties as any;
   const issueControls = (properties?.[getCscControlsProp(ISO)] as string[]) || [
-    "",
+    '',
   ];
 
   const [controls, setControls] = useState(issueControls);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  console.log("statuses", statuses);
+  console.log('statuses', statuses);
 
   useEffect(() => {
     setControls(issueControls);
   }, [issueControls]);
 
   const addControl = useCallback(() => {
-    setControls((prev) => [...prev, ""]);
+    setControls((prev) => [...prev, '']);
   }, [setControls]);
 
   const deleteControls = useCallback(async () => {
@@ -122,7 +122,7 @@ const CscPanel = ({
   return (
     <IssuePanelContainer>
       <h2 className="text-1xl font-bold">Cybersecurity Controls</h2>
-      {canAccess("task", ["update"]) ? (
+      {canAccess('task', ['update']) ? (
         <>
           {controls.map((control, index) => (
             <ControlBlock
@@ -140,12 +140,12 @@ const CscPanel = ({
           ))}
           <div
             style={{
-              marginTop: "15px",
-              display: "flex",
-              justifyContent: "flex-end",
+              marginTop: '15px',
+              display: 'flex',
+              justifyContent: 'flex-end',
             }}
           >
-            <div style={{ margin: "0 5px" }}>
+            <div style={{ margin: '0 5px' }}>
               <Button
                 color="primary"
                 variant="outline"
@@ -156,9 +156,9 @@ const CscPanel = ({
                 + Add Control
               </Button>
             </div>
-            <div style={{ margin: "0 5px" }}>
+            <div style={{ margin: '0 5px' }}>
               <Button variant="outline" size="sm" onClick={deleteControls}>
-                {t("remove")}
+                {t('remove')}
               </Button>
             </div>
           </div>

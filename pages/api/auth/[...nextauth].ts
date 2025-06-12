@@ -1,23 +1,23 @@
-import { verifyPassword } from "@/lib/auth";
-import { isBusinessEmail } from "@/lib/email/utils";
-import env from "@/lib/env";
-import { prisma } from "@/lib/prisma";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { Role } from "@prisma/client";
-import { getAccount } from "models/account";
-import { addTeamMember, getTeam } from "models/team";
-import { createUser, getUser } from "models/user";
-import NextAuth, { Account, NextAuthOptions, Profile, User } from "next-auth";
-import BoxyHQSAMLProvider from "next-auth/providers/boxyhq-saml";
-import CredentialsProvider from "next-auth/providers/credentials";
-import EmailProvider from "next-auth/providers/email";
-import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
-import { isAuthProviderEnabled } from "@/lib/auth";
-import type { Provider } from "next-auth/providers";
-import { validateRecaptcha } from "@/lib/recaptcha";
-import rateLimit from "@/lib/rate-limit";
-import { getIpAddress } from "@/lib/utils";
+import { verifyPassword } from '@/lib/auth';
+import { isBusinessEmail } from '@/lib/email/utils';
+import env from '@/lib/env';
+import { prisma } from '@/lib/prisma';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { Role } from '@prisma/client';
+import { getAccount } from 'models/account';
+import { addTeamMember, getTeam } from 'models/team';
+import { createUser, getUser } from 'models/user';
+import NextAuth, { Account, NextAuthOptions, Profile, User } from 'next-auth';
+import BoxyHQSAMLProvider from 'next-auth/providers/boxyhq-saml';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import EmailProvider from 'next-auth/providers/email';
+import GitHubProvider from 'next-auth/providers/github';
+import GoogleProvider from 'next-auth/providers/google';
+import { isAuthProviderEnabled } from '@/lib/auth';
+import type { Provider } from 'next-auth/providers';
+import { validateRecaptcha } from '@/lib/recaptcha';
+import rateLimit from '@/lib/rate-limit';
+import { getIpAddress } from '@/lib/utils';
 
 const adapter = PrismaAdapter(prisma);
 
@@ -28,24 +28,24 @@ const limiter = rateLimit({
   uniqueTokenPerInterval: 500, // Max 500 requests per second
 });
 
-if (isAuthProviderEnabled("credentials")) {
+if (isAuthProviderEnabled('credentials')) {
   providers.push(
     CredentialsProvider({
-      id: "credentials",
+      id: 'credentials',
       credentials: {
-        email: { type: "email" },
-        password: { type: "password" },
-        recaptchaToken: { type: "text" },
+        email: { type: 'email' },
+        password: { type: 'password' },
+        recaptchaToken: { type: 'text' },
       },
       async authorize(credentials, req) {
         try {
           await limiter.check(5, getIpAddress(req as any)); // 5 requests per minute for IP address
         } catch (e) {
-          throw new Error("auth-limited");
+          throw new Error('auth-limited');
         }
 
         if (!credentials) {
-          throw new Error("no-credentials");
+          throw new Error('no-credentials');
         }
 
         const { email, password, recaptchaToken } = credentials;
@@ -59,20 +59,20 @@ if (isAuthProviderEnabled("credentials")) {
         const user = await getUser({ email });
 
         if (!user) {
-          throw new Error("invalid-credentials");
+          throw new Error('invalid-credentials');
         }
 
         if (env.confirmEmail && !user.emailVerified) {
-          throw new Error("confirm-your-email");
+          throw new Error('confirm-your-email');
         }
 
         const hasValidPassword = await verifyPassword(
           password,
-          user?.password as string,
+          user?.password as string
         );
 
         if (!hasValidPassword) {
-          throw new Error("invalid-credentials");
+          throw new Error('invalid-credentials');
         }
 
         return {
@@ -81,46 +81,46 @@ if (isAuthProviderEnabled("credentials")) {
           email: user.email,
         };
       },
-    }),
+    })
   );
 }
 
-if (isAuthProviderEnabled("github")) {
+if (isAuthProviderEnabled('github')) {
   providers.push(
     GitHubProvider({
       clientId: env.github.clientId,
       clientSecret: env.github.clientSecret,
       allowDangerousEmailAccountLinking: true,
-    }),
+    })
   );
 }
 
-if (isAuthProviderEnabled("google")) {
+if (isAuthProviderEnabled('google')) {
   providers.push(
     GoogleProvider({
       clientId: env.google.clientId,
       clientSecret: env.google.clientSecret,
       allowDangerousEmailAccountLinking: true,
-    }),
+    })
   );
 }
 
-if (isAuthProviderEnabled("saml")) {
+if (isAuthProviderEnabled('saml')) {
   providers.push(
     BoxyHQSAMLProvider({
-      authorization: { params: { scope: "" } },
+      authorization: { params: { scope: '' } },
       issuer: env.appUrl,
-      clientId: "dummy",
-      clientSecret: "dummy",
+      clientId: 'dummy',
+      clientSecret: 'dummy',
       allowDangerousEmailAccountLinking: true,
       httpOptions: {
         timeout: 30000,
       },
-    }),
+    })
   );
 }
 
-if (isAuthProviderEnabled("email")) {
+if (isAuthProviderEnabled('email')) {
   providers.push(
     EmailProvider({
       server: {
@@ -132,7 +132,7 @@ if (isAuthProviderEnabled("email")) {
         },
       },
       from: env.smtp.from,
-    }),
+    })
   );
 }
 
@@ -145,8 +145,8 @@ const cookiesOptions: Partial<Pick<NextAuthOptions, 'cookies'>> =
             name: `__Secure-next-auth.session-token`,
             options: {
               httpOnly: true,
-              sameSite: "lax",
-              path: "/",
+              sameSite: 'lax',
+              path: '/',
               secure: true,
             },
           },
@@ -154,8 +154,8 @@ const cookiesOptions: Partial<Pick<NextAuthOptions, 'cookies'>> =
             name: `__Host-next-auth.csrf-token`,
             options: {
               httpOnly: true,
-              sameSite: "lax",
-              path: "/",
+              sameSite: 'lax',
+              path: '/',
               secure: true,
             },
           },
@@ -167,11 +167,11 @@ export const authOptions: NextAuthOptions = {
   adapter,
   providers,
   pages: {
-    signIn: "/auth/login",
-    verifyRequest: "/auth/verify-request",
+    signIn: '/auth/login',
+    verifyRequest: '/auth/verify-request',
   },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   ...cookiesOptions,
   secret: env.nextAuth.secret,
@@ -182,24 +182,24 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (env.disableNonBusinessEmailSignup && !isBusinessEmail(user.email)) {
-        return "/auth/login?error=allow-only-work-email";
+        return '/auth/login?error=allow-only-work-email';
       }
 
       // Login via email and password
-      if (account?.provider === "credentials") {
+      if (account?.provider === 'credentials') {
         return true;
       }
 
       const existingUser = await getUser({ email: user.email });
 
       // Login via email (Magic Link)
-      if (account?.provider === "email") {
+      if (account?.provider === 'email') {
         return existingUser ? true : false;
       }
 
       // First time users
       if (!existingUser) {
-        const [firstName, lastName] = user.name?.split(" ") || ["", ""];
+        const [firstName, lastName] = user.name?.split(' ') || ['', ''];
 
         const newUser = await createUser({
           name: `${user.name}`,
@@ -210,7 +210,7 @@ export const authOptions: NextAuthOptions = {
 
         await linkAccount(newUser, account);
 
-        if (account.provider === "boxyhq-saml" && profile) {
+        if (account.provider === 'boxyhq-saml' && profile) {
           await linkToTeam(profile, newUser.id);
         }
 
@@ -236,7 +236,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ token, user, trigger, session }) {
-      if (trigger === "update" && session?.user.name) {
+      if (trigger === 'update' && session?.user.name) {
         const updateUsername = { ...user, name: session.user.name };
         return { ...token, ...updateUsername };
       }
@@ -258,7 +258,7 @@ const linkToTeam = async (profile: Profile, userId: string) => {
 
   for (let role of roles) {
     if (env.groupPrefix) {
-      role = role.replace(env.groupPrefix, "");
+      role = role.replace(env.groupPrefix, '');
     }
     // Owner > Admin > Member
     if (
@@ -283,7 +283,7 @@ const linkAccount = async (user: User, account: Account) => {
       providerAccountId: account.providerAccountId,
       userId: user.id,
       provider: account.provider,
-      type: "oauth",
+      type: 'oauth',
       scope: account.scope,
       token_type: account.token_type,
       access_token: account.access_token,

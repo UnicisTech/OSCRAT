@@ -60,10 +60,10 @@ const Teams = () => {
           <div className="flex items-center justify-between">
             <div className="space-y-3">
               <h2 className="text-xl font-medium leading-none tracking-tight">
-                {t("all-teams")}
+                {t('all-teams')}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("team-listed")}
+                {t('team-listed')}
               </p>
             </div>
             <Button
@@ -72,16 +72,16 @@ const Teams = () => {
               size="md"
               onClick={() => setCreateTeamVisible(!createTeamVisible)}
             >
-              {t("create-team")}
+              {t('create-team')}
             </Button>
           </div>
           <table className="table w-full border-b text-sm dark:border-base-200">
             <thead className="bg-gray-200 text-gray-600 dark:bg-base-200 dark:text-gray-400">
               <tr>
-                <th>{t("name")}</th>
-                <th>{t("members")}</th>
-                <th>{t("created-at")}</th>
-                <th>{t("actions")}</th>
+                <th>{t('name')}</th>
+                <th>{t('members')}</th>
+                <th>{t('created-at')}</th>
+                <th>{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -126,9 +126,9 @@ const Teams = () => {
                 handleLeaveTeam();
               }
             }}
-            confirmText={t("leave-team")}
+            confirmText={t('leave-team')}
           >
-            {t("leave-team-confirmation")}
+            {t('leave-team-confirmation')}
           </ConfirmationDialog>
           <CreateTeam
             visible={createTeamVisible}

@@ -16,7 +16,7 @@ const SectionFilter = ({
   const options = getSectionFilterOptions(iso);
 
   return (
-    <div style={{ margin: "0 5px" }}>
+    <div style={{ margin: '0 5px' }}>
       <WithoutRing>
         <Select
           inputId="multi-select-section-filter"

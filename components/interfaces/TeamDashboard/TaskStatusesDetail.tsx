@@ -1,5 +1,5 @@
-import React from "react";
-import type { Task } from "@prisma/client";
+import React from 'react';
+import type { Task } from '@prisma/client';
 
 const TaskStatusesDetail = ({
   tasks,

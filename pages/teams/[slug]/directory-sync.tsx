@@ -63,7 +63,7 @@ const DirectorySync: NextPageWithLayout<
       <Card>
         <Card.Body>
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm">{t("provision")}</p>
+            <p className="text-sm">{t('provision')}</p>
             {directory === null ? (
               <Button
                 onClick={() => setVisible(!visible)}
@@ -71,7 +71,7 @@ const DirectorySync: NextPageWithLayout<
                 color="primary"
                 size="md"
               >
-                {t("configure")}
+                {t('configure')}
               </Button>
             ) : (
               <Button
@@ -80,7 +80,7 @@ const DirectorySync: NextPageWithLayout<
                 color="error"
                 size="md"
               >
-                {t("remove")}
+                {t('remove')}
               </Button>
             )}
           </div>
@@ -92,9 +92,9 @@ const DirectorySync: NextPageWithLayout<
         visible={confirmationDialogVisible}
         onCancel={() => setConfirmationDialogVisible(false)}
         onConfirm={removeDirectory}
-        title={t("confirm-delete-directory-sync")}
+        title={t('confirm-delete-directory-sync')}
       >
-        {t("delete-directory-sync-warning")}
+        {t('delete-directory-sync-warning')}
       </ConfirmationDialog>
     </>
   );
@@ -120,15 +120,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(req, res);
   const teamMember = await getTeamMember(
     session?.user.id as string,
-    query.slug as string,
+    query.slug as string
   );
 
   try {
-    throwIfNotAllowed(teamMember, "team_dsync", "read");
+    throwIfNotAllowed(teamMember, 'team_dsync', 'read');
 
     return {
       props: {
-        ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+        ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
         error: null,
         teamFeatures: env.teamFeatures,
       },
@@ -138,7 +138,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
     return {
       props: {
-        ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+        ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
         error: {
           message,
         },

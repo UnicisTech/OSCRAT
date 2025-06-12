@@ -44,14 +44,14 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
       <Card>
         <Card.Body>
           <Card.Header>
-            <Card.Title>{t("name")}</Card.Title>
-            <Card.Description>{t("name-appearance")}</Card.Description>
+            <Card.Title>{t('name')}</Card.Title>
+            <Card.Description>{t('name-appearance')}</Card.Description>
           </Card.Header>
           <InputWithLabel
             type="text"
-            label={t("first-name")}
+            label={t('first-name')}
             name="firstName"
-            placeholder={t("your-first-name")}
+            placeholder={t('your-first-name')}
             value={formik.values.firstName}
             error={
               formik.touched.firstName ? formik.errors.firstName : undefined
@@ -61,9 +61,9 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
           />
           <InputWithLabel
             type="text"
-            label={t("last-name")}
+            label={t('last-name')}
             name="lastName"
-            placeholder={t("your-last-name")}
+            placeholder={t('your-last-name')}
             value={formik.values.lastName}
             error={formik.touched.lastName ? formik.errors.lastName : undefined}
             onChange={formik.handleChange}
@@ -78,7 +78,7 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
             disabled={!formik.dirty || !formik.isValid}
             size="md"
           >
-            {t("save-changes")}
+            {t('save-changes')}
           </Button>
         </Card.Footer>
       </Card>

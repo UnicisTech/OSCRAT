@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
-import TextArea from "@atlaskit/textarea";
-import Textfield from "@atlaskit/textfield";
-import { getControlOptions } from "@/components/defaultLanding/data/configs/csc";
+import React, { useMemo } from 'react';
+import TextArea from '@atlaskit/textarea';
+import Textfield from '@atlaskit/textfield';
+import { getControlOptions } from '@/components/defaultLanding/data/configs/csc';
 
 const ControlBlockViewOnly = ({
   status,
@@ -14,7 +14,7 @@ const ControlBlockViewOnly = ({
 }) => {
   const controlOptions = useMemo(() => getControlOptions(ISO), [ISO]);
   const controlData = controlOptions.find(
-    ({ value }) => value.control === control,
+    ({ value }) => value.control === control
   )?.value;
 
   return (
@@ -60,10 +60,10 @@ const ControlBlockViewOnly = ({
       )}
       <div
         style={{
-          height: "1px",
-          width: "100%",
-          backgroundColor: "rgb(223, 225, 231)",
-          margin: "24px 0px",
+          height: '1px',
+          width: '100%',
+          backgroundColor: 'rgb(223, 225, 231)',
+          margin: '24px 0px',
         }}
       ></div>
     </>

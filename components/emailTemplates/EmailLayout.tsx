@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode } from 'react';
 import {
   Body,
   Container,
@@ -7,15 +7,15 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
-import app from "@/lib/app";
+} from '@react-email/components';
+import app from '@/lib/app';
 
 interface EmailLayoutProps {
   children: ReactNode;
 }
 
 const EmailLayout = ({ children }: EmailLayoutProps) => {
-  console.log("EmailLayout", app.logoUrl);
+  console.log('EmailLayout', app.logoUrl);
   return (
     <Tailwind>
       <Body className="mx-auto my-auto bg-white font-sans">

@@ -19,7 +19,7 @@ const DeleteAttachment = ({
   teamSlug: string;
   attachment: Attachment;
 }) => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
   const [isLoading, setIsLoading] = useState(false);
   const { deleteAttachment } = useAttachments(teamSlug, taskNumber);
 
@@ -46,7 +46,7 @@ const DeleteAttachment = ({
   return (
     <Modal open={visible}>
       <Modal.Header className="font-bold">
-        {t("attachment-delete")}
+        {t('attachment-delete')}
       </Modal.Header>
       <Modal.Body>
         <div className="mt-2 flex flex-col space-y-4">
@@ -55,7 +55,7 @@ const DeleteAttachment = ({
       </Modal.Body>
       <Modal.Actions>
         <Button color="error" onClick={deleteHandler} loading={isLoading}>
-          {t("delete")}
+          {t('delete')}
         </Button>
         <Button
           type="button"
@@ -64,7 +64,7 @@ const DeleteAttachment = ({
             setVisible(!visible);
           }}
         >
-          {t("close")}
+          {t('close')}
         </Button>
       </Modal.Actions>
     </Modal>

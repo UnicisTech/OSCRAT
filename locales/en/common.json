@@ -252,5 +252,150 @@
   "check-vulnerabilities": "Check vulnerabilities",
   "add-new-project": "Add New Project",
   "no-projects-found": "No projects found. Create a new one!",
-  "projects": "Projects"
+  "no-reporting": "No Reporting",
+  "no-roles": "No Roles",
+  "projects": "Projects",
+  "search-by-title": "Search by title",
+  "filters": "Filters",
+  "close-filters": "Close filters",
+  "all": "All",
+  "filter": "filter",
+  "clear": "Clear",
+  "add-product": "Add Product",
+  "go-to-form": "Go to form",
+  "oscrat": {
+    "ui": {
+      "category": "Category",
+      "role": "Role",
+      "product-type": "Product Type",
+      "open-incidents": "Open Incidents",
+      "open-vulnerabilities": "Open Vulnerabilities",
+      "external-reporting": "External Reporting",
+      "show-more": "Show More",
+      "withdraw": "Withdraw",
+      "none": "None",
+      "n-a": "N/A",
+      "open": "open"
+    },
+    "organization": {
+      "roles": {
+        "manufacturer": "Manufacturer",
+        "distributor": "Distributor",
+        "importer": "Importer",
+        "data-steward": "Data Steward"
+      },
+      "types": {
+        "natural-person": "Natural Person",
+        "limited-liability-company": "Limited Liability Company",
+        "public-limited-company": "Public Limited Company",
+        "partnership": "Partnership",
+        "open-source-foundation": "Open Source Foundation",
+        "open-source-steward": "Open Source Steward",
+        "non-profit-organization": "Non-Profit Organization",
+        "academic-institution": "Academic Institution",
+        "public-body": "Public Body",
+        "other": "Other"
+      },
+      "sizes": {
+        "microenterprise": "Microenterprise",
+        "small-enterprise": "Small Enterprise",
+        "medium-enterprise": "Medium Enterprise",
+        "large-enterprise": "Large Enterprise",
+        "startup": "Startup"
+      }
+    },
+    "product": {
+      "categories": {
+        "default": "Default",
+        "important-class-i": "Important Class I",
+        "important-class-ii": "Important Class II",
+        "critical": "Critical"
+      },
+      "types": {
+        "connected-device": "Connected Device",
+        "iot-device": "IoT Device",
+        "smart-home-device": "Smart Home Device",
+        "wearable-device": "Wearable Device",
+        "industrial-device": "Industrial Device",
+        "security-hardware": "Security Hardware",
+        "application-software": "Application Software",
+        "system-software": "System Software",
+        "security-software": "Security Software",
+        "embedded-software": "Embedded Software",
+        "firmware": "Firmware",
+        "hardware-with-software": "Hardware with Software",
+        "remote-data-processing": "Remote Data Processing"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    },
+    "risk": {
+      "levels": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      }
+    },
+    "compliance": {
+      "status": {
+        "not-assessed": "Not Assessed",
+        "in-progress": "In Progress",
+        "compliant": "Compliant",
+        "non-compliant": "Non-Compliant",
+        "pending-certification": "Pending Certification",
+        "certified": "Certified"
+      }
+    },
+    "conformity": {
+      "procedures": {
+        "self-assessment": "Self Assessment",
+        "third-party-optional": "Third Party Optional",
+        "third-party-mandatory": "Third Party Mandatory",
+        "eucc-certification": "EUCC Certification"
+      }
+    },
+    "vulnerability": {
+      "severity": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "status": {
+        "open": "Open",
+        "actively-exploited": "Actively Exploited",
+        "patched": "Patched",
+        "mitigated": "Mitigated",
+        "closed": "Closed",
+        "accepted-risk": "Accepted Risk"
+      }
+    },
+    "incident": {
+      "types": {
+        "vulnerability-exploit": "Vulnerability Exploit",
+        "product-compromise": "Product Compromise",
+        "supply-chain-incident": "Supply Chain Incident",
+        "authentication-bypass": "Authentication Bypass",
+        "data-breach": "Data Breach",
+        "denial-of-service": "Denial of Service",
+        "firmware-tampering": "Firmware Tampering",
+        "configuration-exploit": "Configuration Exploit",
+        "update-mechanism-failure": "Update Mechanism Failure",
+        "cryptographic-failure": "Cryptographic Failure",
+        "network-intrusion": "Network Intrusion",
+        "other": "Other"
+      },
+      "status": {
+        "not-reported": "Not Reported",
+        "initial-alert-sent": "Initial Alert Sent",
+        "detailed-report-sent": "Detailed Report Sent",
+        "final-report-sent": "Final Report Sent",
+        "reporting-complete": "Reporting Complete"
+      }
+    }
+  }
 }
+

@@ -1,4 +1,4 @@
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 const TogglePasswordVisibility = ({
   isPasswordVisible,
@@ -11,9 +11,9 @@ const TogglePasswordVisibility = ({
       type="button"
     >
       {!isPasswordVisible ? (
-        <EyeIcon className="h-6 w-4 text-primary" />
+        <EyeIcon className="text-primary h-6 w-4" />
       ) : (
-        <EyeSlashIcon className="h-6 w-4 text-primary" />
+        <EyeSlashIcon className="text-primary h-6 w-4" />
       )}
     </button>
   );

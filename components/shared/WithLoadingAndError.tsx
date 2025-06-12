@@ -1,4 +1,4 @@
-import { Alert, Loading } from "@/components/shared";
+import { Alert, Loading } from '@/components/shared';
 
 interface WithLoadingAndErrorProps {
   isLoading: boolean;

@@ -12,7 +12,6 @@ import { extractErrorMessage } from '@/lib/utils';
 
 import ModalForm from './Form';
 
-
 const EditWebhook = ({
   visible,
   setVisible,
@@ -41,7 +40,7 @@ const EditWebhook = ({
 
   const onSubmit = async (
     values: WebookFormSchema,
-    formikHelpers: FormikHelpers<WebookFormSchema>,
+    formikHelpers: FormikHelpers<WebookFormSchema>
   ) => {
     try {
       await updateWebhook(endpoint.id, values);
@@ -51,7 +50,6 @@ const EditWebhook = ({
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, t('webhook-update-failed')));
     }
-
   };
 
   return (
@@ -64,7 +62,7 @@ const EditWebhook = ({
         eventTypes: webhook.filterTypes as string[],
       }}
       onSubmit={onSubmit}
-      title={t("edit-webhook-endpoint")}
+      title={t('edit-webhook-endpoint')}
     />
   );
 };

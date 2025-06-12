@@ -5,10 +5,10 @@ import {
   Html,
   Preview,
   Text,
-} from "@react-email/components";
-import EmailLayout from "./EmailLayout";
-import app from "@/lib/app";
-import env from "@/lib/env";
+} from '@react-email/components';
+import EmailLayout from './EmailLayout';
+import app from '@/lib/app';
+import env from '@/lib/env';
 
 interface WelcomeEmailProps {
   name: string;
@@ -31,7 +31,7 @@ const WelcomeEmail = ({ name, subject, team }: WelcomeEmailProps) => {
         <Container className="text-center">
           <Button
             href={`${env.appUrl}/auth/login`}
-            style={{ padding: "16px 20px" }}
+            style={{ padding: '16px 20px' }}
             className="rounded bg-[#000000] text-center text-[12px] font-semibold text-white no-underline"
           >
             Login to your account

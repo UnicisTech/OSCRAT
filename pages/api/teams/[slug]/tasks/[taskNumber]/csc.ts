@@ -2,23 +2,23 @@ import {
   addControlsToIssue,
   changeControlInIssue,
   removeControlsFromIssue,
-} from "@/lib/csc";
-import type { NextApiRequest, NextApiResponse } from "next";
-import type { ISO } from "types";
-import { throwIfNoTeamAccess } from "models/team";
-import { throwIfNotAllowed } from "models/user";
+} from '@/lib/csc';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { ISO } from 'types';
+import { throwIfNoTeamAccess } from 'models/team';
+import { throwIfNotAllowed } from 'models/user';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
-    case "PUT":
+    case 'PUT':
       return handlePUT(req, res);
     default:
-      res.setHeader("Allow", ["GET", "DELETE", "PUT"]);
+      res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
       res.status(405).json({
         data: null,
         error: { message: `Method ${method} Not Allowed` },
@@ -28,7 +28,7 @@ export default async function handler(
 
 const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "task", "update");
+  throwIfNotAllowed(teamMember, 'task', 'update');
 
   const { slug, taskNumber } = req.query;
 
@@ -37,14 +37,14 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   if (isNaN(taskNumberAsNumber)) {
     return res.status(400).json({
       error: {
-        message: "Invalid task number",
+        message: 'Invalid task number',
       },
     });
   }
 
   const { operation, controls, ISO } = req.body;
 
-  if (operation === "add") {
+  if (operation === 'add') {
     await addControlsToIssue({
       user: teamMember.user,
       taskNumber: taskNumberAsNumber,
@@ -54,7 +54,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   }
 
-  if (operation === "remove") {
+  if (operation === 'remove') {
     await removeControlsFromIssue({
       user: teamMember.user,
       taskNumber: taskNumberAsNumber,
@@ -64,7 +64,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   }
 
-  if (operation === "change") {
+  if (operation === 'change') {
     await changeControlInIssue({
       user: teamMember.user,
       taskNumber: taskNumberAsNumber,

@@ -17,13 +17,13 @@ const JoinWithInvitation = ({
   next: string;
 }) => {
   const router = useRouter();
-  const { t } = useTranslation("common");
+  const { t } = useTranslation('common');
 
   const { isLoading, error, invitation } = useInvitation(inviteToken);
 
   const formik = useFormik({
     initialValues: {
-      name: "",
+      name: '',
       email: invitation?.email,
     },
     validationSchema: Yup.object().shape({
@@ -32,8 +32,8 @@ const JoinWithInvitation = ({
     }),
     enableReinitialize: true,
     onSubmit: async (values) => {
-      const response = await fetch("/api/auth/join", {
-        method: "POST",
+      const response = await fetch('/api/auth/join', {
+        method: 'POST',
         body: JSON.stringify(values),
       });
 
@@ -45,9 +45,9 @@ const JoinWithInvitation = ({
       }
 
       formik.resetForm();
-      toast.success(t("successfully-joined"));
+      toast.success(t('successfully-joined'));
 
-      return next ? router.push(next) : router.push("/auth/login");
+      return next ? router.push(next) : router.push('/auth/login');
     },
   });
 
@@ -86,10 +86,10 @@ const JoinWithInvitation = ({
         active={formik.dirty}
         fullWidth
       >
-        {t("create-account")}
+        {t('create-account')}
       </Button>
       <div>
-        <p className="text-sm">{t("sign-up-message")}</p>
+        <p className="text-sm">{t('sign-up-message')}</p>
       </div>
     </form>
   );

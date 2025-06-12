@@ -30,7 +30,7 @@ export default function AttachmentsCard({
   };
 
   return (
-    <div className="flex flex-row items-center justify-between p-2 text-center rounded-md w-full">
+    <div className="flex w-full flex-row items-center justify-between rounded-md p-2 text-center">
       <a
         href={`/api/teams/${teamSlug}/tasks/${taskNumber}/attachments?id=${attachment.id}`}
         target="_blank"
@@ -58,13 +58,13 @@ export default function AttachmentsCard({
       </a>
       <AccessControl resource="task" actions={['update']}>
         <button
-          className="flex items-center p-1 text-red-500 rounded hover:bg-gray-100"
+          className="flex items-center rounded p-1 text-red-500 hover:bg-gray-100"
           onClick={handleDelete}
           title={t('delete')}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
+            className="h-5 w-5"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

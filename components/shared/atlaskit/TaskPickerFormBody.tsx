@@ -1,8 +1,8 @@
-import React, { Fragment } from "react";
-import Select, { ValueType } from "@atlaskit/select";
-import { ErrorMessage, Field, FormFooter } from "@atlaskit/form";
-import type { Task } from "@prisma/client";
-import { WithoutRing } from "sharedStyles";
+import React, { Fragment } from 'react';
+import Select, { ValueType } from '@atlaskit/select';
+import { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
+import type { Task } from '@prisma/client';
+import { WithoutRing } from 'sharedStyles';
 
 interface FormBodyProps {
   tasks: Task[];
@@ -18,10 +18,10 @@ const TaskPickerFormBody = ({ tasks }: FormBodyProps) => {
     <>
       <div
         style={{
-          display: "flex",
-          width: "100%",
-          margin: "0 auto",
-          flexDirection: "column",
+          display: 'flex',
+          width: '100%',
+          margin: '0 auto',
+          flexDirection: 'column',
         }}
       >
         <Field<ValueType<TaskOption>>
@@ -35,7 +35,7 @@ const TaskPickerFormBody = ({ tasks }: FormBodyProps) => {
             }
 
             return new Promise((resolve) => setTimeout(resolve, 300)).then(
-              () => "Please select a task",
+              () => 'Please select a task'
             );
           }}
         >
@@ -51,7 +51,7 @@ const TaskPickerFormBody = ({ tasks }: FormBodyProps) => {
                     value: task,
                     label: task.title,
                   }))}
-                  validationState={error ? "error" : "default"}
+                  validationState={error ? 'error' : 'default'}
                 />
                 {error && <ErrorMessage>{error}</ErrorMessage>}
               </WithoutRing>

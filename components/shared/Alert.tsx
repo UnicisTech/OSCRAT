@@ -1,5 +1,5 @@
-import React from "react";
-import { Alert as AlertCore, AlertProps } from "react-daisyui";
+import React from 'react';
+import { Alert as AlertCore, AlertProps } from 'react-daisyui';
 
 const Alert = (props: AlertProps) => {
   const { children, className, ...rest } = props;

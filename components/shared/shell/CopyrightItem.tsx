@@ -2,7 +2,7 @@ const CopyrightItem = () => {
   return (
     <ul role="list" className="mb-1.5 flex flex-1 flex-col justify-end gap-1">
       <li>
-        <p className="text-xs text-center font-semibold">
+        <p className="text-center text-xs font-semibold">
           Copyright © {new Date().getFullYear()}
           <a
             href="https://www.unicis.tech/?mtm_campaign=platform&mtm_source=platform_beta"

@@ -43,7 +43,7 @@ const ControlBlock = ({
     }>
   >;
 }) => {
-  console.log("status control block", status);
+  console.log('status control block', status);
   const router = useRouter();
   const { t } = useTranslation('common');
   const { slug } = router.query as { slug: string };
@@ -52,7 +52,7 @@ const ControlBlock = ({
 
   const controlOptions = useMemo(() => getControlOptions(ISO), [ISO]);
   const controlData = controlOptions.find(
-    ({ value }) => value.control === control,
+    ({ value }) => value.control === control
   )?.value;
 
   const statusHandler = useCallback(
@@ -78,9 +78,9 @@ const ControlBlock = ({
         <p className="csc_label">Select a control</p>
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "11fr 1fr",
-            alignItems: "center",
+            display: 'grid',
+            gridTemplateColumns: '11fr 1fr',
+            alignItems: 'center',
           }}
         >
           <WithoutRing>
@@ -90,13 +90,13 @@ const ControlBlock = ({
               classNamePrefix="react-select"
               options={controlOptions.filter(
                 (option) =>
-                  !controls.find((item) => item === option.value.control),
+                  !controls.find((item) => item === option.value.control)
               )}
               onChange={(option) => {
                 controlHanlder(control, option?.value?.control as string);
               }}
               value={controlOptions.find(
-                ({ value }) => value.control === control,
+                ({ value }) => value.control === control
               )}
               formatOptionLabel={({ value }) =>
                 `${value.code}: ${value.section}, ${value.controlLabel}, ${value.requirements}`
@@ -105,7 +105,7 @@ const ControlBlock = ({
               isDisabled={isSaving || isDeleting}
             />
           </WithoutRing>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <LoadingButton
               appearance="danger"
               iconBefore={<TrashIcon size="medium" label="Delete" />}
@@ -157,10 +157,10 @@ const ControlBlock = ({
       )}
       <div
         style={{
-          height: "1px",
-          width: "100%",
-          backgroundColor: "rgb(223, 225, 231)",
-          margin: "24px 0px",
+          height: '1px',
+          width: '100%',
+          backgroundColor: 'rgb(223, 225, 231)',
+          margin: '24px 0px',
         }}
       ></div>
     </>

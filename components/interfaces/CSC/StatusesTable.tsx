@@ -33,7 +33,7 @@ const StatusesTable = ({
   taskSelectorHandler: (
     action: string,
     dataToRemove: any,
-    control: string,
+    control: string
   ) => Promise<void>;
 }) => {
   const router = useRouter();
@@ -78,7 +78,7 @@ const StatusesTable = ({
       filteredControls = filteredControls.filter((control) =>
         statusFilter
           .map((option) => option.label)
-          .includes(statuses[control.value.control]),
+          .includes(statuses[control.value.control])
       );
     }
 
@@ -126,12 +126,12 @@ const StatusesTable = ({
                     {option.value.controlLabel || option.value.control}
                   </td>
                   <td className="px-6 py-3">
-                    <span style={{ whiteSpace: "pre-line" }}>
+                    <span style={{ whiteSpace: 'pre-line' }}>
                       {option.value.requirements}
                     </span>
                   </td>
                   <td className="px-6 py-3">
-                    {canAccess("task", ["update"]) ? (
+                    {canAccess('task', ['update']) ? (
                       <div className="w-40">
                         <StatusSelector
                           statusValue={statuses[option.value.control]}
@@ -140,20 +140,20 @@ const StatusesTable = ({
                           isDisabled={
                             !tasks.filter((task: any) =>
                               task.properties?.[cscControlsProp]?.find(
-                                (item: string) => item === option.value.control,
-                              ),
+                                (item: string) => item === option.value.control
+                              )
                             ).length
                           }
                         />
                       </div>
                     ) : (
-                      <span style={{ whiteSpace: "pre-line" }}>
+                      <span style={{ whiteSpace: 'pre-line' }}>
                         {statuses[option.value.control]}
                       </span>
                     )}
                   </td>
                   <td className="w-40 px-6 py-3">
-                    {canAccess("task", ["update"]) ? (
+                    {canAccess('task', ['update']) ? (
                       <TaskSelector
                         tasks={tasks}
                         control={option.value.control}

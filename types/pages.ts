@@ -1,1 +1,1 @@
-export type UnicisPages = "csc" | "task" | "dashboard";
+export type UnicisPages = 'csc' | 'task' | 'dashboard';

@@ -1,26 +1,26 @@
-import type { Team } from "@prisma/client";
-import { Client } from "@retracedhq/retraced";
-import type { CRUD, Event } from "@retracedhq/retraced";
-import type { User } from "next-auth";
+import type { Team } from '@prisma/client';
+import { Client } from '@retracedhq/retraced';
+import type { CRUD, Event } from '@retracedhq/retraced';
+import type { User } from 'next-auth';
 
-import env from "./env";
+import env from './env';
 
 export type EventType =
-  | "member.invitation.create"
-  | "member.invitation.delete"
-  | "member.remove"
-  | "member.update"
-  | "sso.connection.create"
-  | "sso.connection.patch"
-  | "sso.connection.delete"
-  | "dsync.connection.create"
-  | "dsync.connection.delete"
-  | "webhook.create"
-  | "webhook.delete"
-  | "webhook.update"
-  | "team.create"
-  | "team.update"
-  | "team.delete";
+  | 'member.invitation.create'
+  | 'member.invitation.delete'
+  | 'member.remove'
+  | 'member.update'
+  | 'sso.connection.create'
+  | 'sso.connection.patch'
+  | 'sso.connection.delete'
+  | 'dsync.connection.create'
+  | 'dsync.connection.delete'
+  | 'webhook.create'
+  | 'webhook.delete'
+  | 'webhook.update'
+  | 'team.create'
+  | 'team.update'
+  | 'team.delete';
 
 type Request = {
   action: EventType;
@@ -85,7 +85,7 @@ export const getViewerToken = async (groupId: string, actorId: string) => {
     return await retracedClient.getViewerToken(groupId, actorId, true);
   } catch (_error) {
     throw new Error(
-      "Unable to get viewer token from Retraced. Please check Retraced configuration.",
+      'Unable to get viewer token from Retraced. Please check Retraced configuration.'
     );
   }
 };

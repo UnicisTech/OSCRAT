@@ -37,7 +37,7 @@ export default function Comments({ task }: { task: TaskExtended }) {
   const handleCreateComment = useCallback(
     async (
       text: string,
-      reset: (initialValues?: Partial<FormData> | undefined) => void,
+      reset: (initialValues?: Partial<FormData> | undefined) => void
     ) => {
       try {
         await createComment({ text });
@@ -83,11 +83,11 @@ export default function Comments({ task }: { task: TaskExtended }) {
 
   return (
     <IssuePanelContainer>
-      <div style={{ marginTop: "30px" }}>
+      <div style={{ marginTop: '30px' }}>
         {task.comments
           .sort(
             (a, b) =>
-              Date.parse(a.createdAt as any) - Date.parse(b.createdAt as any),
+              Date.parse(a.createdAt as any) - Date.parse(b.createdAt as any)
           )
           .map((comment) => (
             <Comment
@@ -100,16 +100,16 @@ export default function Comments({ task }: { task: TaskExtended }) {
             />
           ))}
       </div>
-      <AccessControl resource="task" actions={["update"]}>
+      <AccessControl resource="task" actions={['update']}>
         <CreateCommentForm handleCreate={handleCreateComment} />
       </AccessControl>
       <ConfirmationDialog
         visible={confirmationDialogVisible}
         onCancel={() => setConfirmationDialogVisible(false)}
         onConfirm={() => handleDeleteComment(commentToDelete)}
-        title={t("confirm-delete-comment")}
+        title={t('confirm-delete-comment')}
       >
-        {t("delete-comment-warning")}
+        {t('delete-comment-warning')}
       </ConfirmationDialog>
     </IssuePanelContainer>
   );

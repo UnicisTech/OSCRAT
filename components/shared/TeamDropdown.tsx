@@ -13,7 +13,6 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import useCanAccess from '@/hooks/useCanAccess';
 
-
 const TeamDropdown = () => {
   const router = useRouter();
   const { slug } = router.query as { slug: string };
@@ -39,32 +38,32 @@ const TeamDropdown = () => {
     },
     {
       id: 1,
-      name: t("profile"),
+      name: t('profile'),
       items: [
         {
           id: data?.user.id,
           name: data?.user?.name,
-          href: "/settings/account",
+          href: '/settings/account',
           icon: UserCircleIcon,
         },
       ],
     },
     {
       id: 3,
-      name: "",
+      name: '',
       items: [
         {
-          id: "all-teams",
-          name: t("all-teams"),
-          href: "/teams",
+          id: 'all-teams',
+          name: t('all-teams'),
+          href: '/teams',
           icon: RectangleStackIcon,
         },
-        ...(canAccess("team", ["create"])
+        ...(canAccess('team', ['create'])
           ? [
               {
-                id: "new-team",
-                name: t("new-team"),
-                href: "/teams?newTeam=true",
+                id: 'new-team',
+                name: t('new-team'),
+                href: '/teams?newTeam=true',
                 icon: FolderPlusIcon,
               },
             ]
@@ -80,7 +79,7 @@ const TeamDropdown = () => {
         className="flex h-10 cursor-pointer items-center justify-between rounded border border-gray-300 px-4 text-sm font-bold dark:border-gray-600"
       >
         {currentTeam?.name || data?.user?.name}
-        <ChevronUpDownIcon className="w-5 h-5" />
+        <ChevronUpDownIcon className="h-5 w-5" />
       </div>
       <ul
         tabIndex={0}

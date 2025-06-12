@@ -1,43 +1,43 @@
-import env from "@/lib/env";
-import { ApiError } from "@/lib/errors";
-import jackson from "@/lib/jackson";
-import { sendAudit } from "@/lib/retraced";
-import { throwIfNoTeamAccess } from "models/team";
-import { throwIfNotAllowed } from "models/user";
-import type { NextApiRequest, NextApiResponse } from "next";
+import env from '@/lib/env';
+import { ApiError } from '@/lib/errors';
+import jackson from '@/lib/jackson';
+import { sendAudit } from '@/lib/retraced';
+import { throwIfNoTeamAccess } from 'models/team';
+import { throwIfNotAllowed } from 'models/user';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
   const { method } = req;
 
   try {
     if (!env.teamFeatures.sso) {
-      throw new ApiError(404, "Not Found");
+      throw new ApiError(404, 'Not Found');
     }
 
     switch (method) {
-      case "GET":
+      case 'GET':
         await handleGET(req, res);
         break;
-      case "POST":
+      case 'POST':
         await handlePOST(req, res);
         break;
-      case "PATCH":
+      case 'PATCH':
         await handlePATCH(req, res);
         break;
-      case "DELETE":
+      case 'DELETE':
         await handleDELETE(req, res);
         break;
       default:
-        res.setHeader("Allow", "GET, POST, PATCH, DELETE");
+        res.setHeader('Allow', 'GET, POST, PATCH, DELETE');
         res.status(405).json({
           error: { message: `Method ${method} Not Allowed` },
         });
     }
   } catch (err: any) {
-    const message = err.message || "Something went wrong";
+    const message = err.message || 'Something went wrong';
     const status = err.status || 500;
     console.error(err);
     res.status(status).json({ error: { message } });
@@ -47,7 +47,7 @@ export default async function handler(
 // Get the SAML connection for the team.
 const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team_sso", "read");
+  throwIfNotAllowed(teamMember, 'team_sso', 'read');
 
   const { apiController } = await jackson();
 
@@ -62,7 +62,7 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 // Create a SAML connection for the team.
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team_sso", "create");
+  throwIfNotAllowed(teamMember, 'team_sso', 'create');
 
   const { metadataUrl, encodedRawMetadata } = req.body;
 
@@ -78,8 +78,8 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   sendAudit({
-    action: "sso.connection.create",
-    crud: "c",
+    action: 'sso.connection.create',
+    crud: 'c',
     user: teamMember.user,
     team: teamMember.team,
   });
@@ -89,7 +89,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const handlePATCH = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team_sso", "create");
+  throwIfNotAllowed(teamMember, 'team_sso', 'create');
 
   const {
     metadataUrl,
@@ -114,8 +114,8 @@ const handlePATCH = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   sendAudit({
-    action: "sso.connection.patch",
-    crud: "u",
+    action: 'sso.connection.patch',
+    crud: 'u',
     user: teamMember.user,
     team: teamMember.team,
   });
@@ -125,7 +125,7 @@ const handlePATCH = async (req: NextApiRequest, res: NextApiResponse) => {
 
 const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, "team_sso", "delete");
+  throwIfNotAllowed(teamMember, 'team_sso', 'delete');
 
   const { clientID, clientSecret } = req.query as {
     clientID: string;
@@ -137,8 +137,8 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   await apiController.deleteConnections({ clientID, clientSecret });
 
   sendAudit({
-    action: "sso.connection.delete",
-    crud: "c",
+    action: 'sso.connection.delete',
+    crud: 'c',
     user: teamMember.user,
     team: teamMember.team,
   });

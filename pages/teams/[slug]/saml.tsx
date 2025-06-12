@@ -26,7 +26,6 @@ const TeamSSO: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
 
   if (error) {
     return <Error message={error.message} />;
-
   }
 
   return (
@@ -46,17 +45,17 @@ const TeamSSO: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
           connectionIsOIDC,
         }) => {
           const ssoType = connectionIsSAML
-            ? "SAML"
+            ? 'SAML'
             : connectionIsOIDC
-              ? "OIDC"
-              : "";
-          if (operation === "CREATE") {
+              ? 'OIDC'
+              : '';
+          if (operation === 'CREATE') {
             toast.success(`${ssoType} connection created successfully.`);
-          } else if (operation === "UPDATE") {
+          } else if (operation === 'UPDATE') {
             toast.success(`${ssoType} connection updated successfully.`);
-          } else if (operation === "DELETE") {
+          } else if (operation === 'DELETE') {
             toast.success(`${ssoType} connection deleted successfully.`);
-          } else if (operation === "COPY") {
+          } else if (operation === 'COPY') {
             toast.success(`Contents copied to clipboard`);
           }
         }}
@@ -64,7 +63,7 @@ const TeamSSO: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
         classNames={BOXYHQ_UI_CSS}
         componentProps={{
           connectionList: {
-            cols: ["provider", "type", "status", "actions"],
+            cols: ['provider', 'type', 'status', 'actions'],
           },
           editOIDCConnection: { displayInfo: false },
           editSAMLConnection: { displayInfo: false },
@@ -94,19 +93,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(req, res);
   const teamMember = await getTeamMember(
     session?.user.id as string,
-    query.slug as string,
+    query.slug as string
   );
 
   try {
-    throwIfNotAllowed(teamMember, "team_sso", "read");
+    throwIfNotAllowed(teamMember, 'team_sso', 'read');
 
     const SPConfigURL = env.jackson.selfHosted
       ? `${env.jackson.externalUrl}/.well-known/saml-configuration`
-      : "/well-known/saml-configuration";
+      : '/well-known/saml-configuration';
 
     return {
       props: {
-        ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+        ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
         error: null,
         teamFeatures: env.teamFeatures,
         SPConfigURL,
@@ -117,7 +116,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
     return {
       props: {
-        ...(locale ? await serverSideTranslations(locale, ["common"]) : {}),
+        ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
         error: {
           message,
         },

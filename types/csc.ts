@@ -1,4 +1,4 @@
-import type { Session } from "next-auth";
+import type { Session } from 'next-auth';
 
 export type CscOption = {
   label: string;
@@ -6,7 +6,7 @@ export type CscOption = {
 };
 
 export type CscAuditLog = {
-  actor: Session["user"];
+  actor: Session['user'];
   date: number;
   event: string;
   diff: {
@@ -41,22 +41,22 @@ export type Section = {
   value: string;
 };
 
-export type ISO = "default" | "2013" | "2022" | "nistcsfv2";
+export type ISO = 'default' | '2013' | '2022' | 'nistcsfv2';
 
 type CscStatusesPropMap = {
-  default: "csc_statuses";
-  2013: "csc_statuses_2013";
-  2022: "csc_statuses_2022";
-  nistcsfv2: "csc_statuses_nistcsfv2";
+  default: 'csc_statuses';
+  2013: 'csc_statuses_2013';
+  2022: 'csc_statuses_2022';
+  nistcsfv2: 'csc_statuses_nistcsfv2';
 };
 
 export type CscStatusesProp = CscStatusesPropMap[ISO];
 
 type CscControlsPropMap = {
-  default: "csc_controls";
-  2013: "csc_controls_2013";
-  2022: "csc_controls_2022";
-  nistcsfv2: "csc_controls_nistcsfv2";
+  default: 'csc_controls';
+  2013: 'csc_controls_2013';
+  2022: 'csc_controls_2022';
+  nistcsfv2: 'csc_controls_nistcsfv2';
 };
 
 export type CscControlsProp = CscControlsPropMap[ISO];

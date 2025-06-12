@@ -13,9 +13,9 @@ import { WithoutRing } from 'sharedStyles';
 import { useTask } from 'hooks/useTask';
 import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 
-import "react-quill/dist/quill.snow.css";
-import dynamic from "next/dynamic";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
+import dynamic from 'next/dynamic';
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface FormData {
   title: string;
@@ -73,10 +73,10 @@ const EditTask = ({
             <Modal.Body>
               <div
                 style={{
-                  display: "flex",
-                  width: "100%",
-                  margin: "0 auto",
-                  flexDirection: "column",
+                  display: 'flex',
+                  width: '100%',
+                  margin: '0 auto',
+                  flexDirection: 'column',
                 }}
               >
                 <Field
@@ -98,7 +98,7 @@ const EditTask = ({
                   aria-required={true}
                   isRequired
                   defaultValue={statuses.find(
-                    ({ value }) => value === task.status,
+                    ({ value }) => value === task.status
                   )}
                   validate={async (value) => {
                     if (value) {
@@ -106,8 +106,8 @@ const EditTask = ({
                     }
 
                     return new Promise((resolve) =>
-                      setTimeout(resolve, 300),
-                    ).then(() => "Please select a status");
+                      setTimeout(resolve, 300)
+                    ).then(() => 'Please select a status');
                   }}
                 >
                   {({ fieldProps: { id, ...rest }, error }) => (
@@ -117,7 +117,7 @@ const EditTask = ({
                           inputId={id}
                           {...rest}
                           options={statuses}
-                          validationState={error ? "error" : "default"}
+                          validationState={error ? 'error' : 'default'}
                         />
                         {error && <ErrorMessage>{error}</ErrorMessage>}
                       </WithoutRing>
@@ -136,8 +136,8 @@ const EditTask = ({
                     }
 
                     return new Promise((resolve) =>
-                      setTimeout(resolve, 300),
-                    ).then(() => "Please select a due date");
+                      setTimeout(resolve, 300)
+                    ).then(() => 'Please select a due date');
                   }}
                 >
                   {({ fieldProps: { id, ...rest }, error }) => (
@@ -156,7 +156,7 @@ const EditTask = ({
                 <Field
                   label="Description"
                   name="description"
-                  defaultValue={task.description || ""}
+                  defaultValue={task.description || ''}
                 >
                   {({ fieldProps }: any) => (
                     <Fragment>
@@ -174,14 +174,14 @@ const EditTask = ({
                   setVisible(!visible);
                 }}
               >
-                {t("close")}
+                {t('close')}
               </Button>
               <LoadingButton
                 type="submit"
                 appearance="primary"
                 isLoading={submitting}
               >
-                {t("save-changes")}
+                {t('save-changes')}
               </LoadingButton>
             </Modal.Actions>
           </form>

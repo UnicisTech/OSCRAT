@@ -1,8 +1,8 @@
-import { useFormik } from "formik";
-import { useTranslation } from "next-i18next";
-import { Button } from "react-daisyui";
-import toast from "react-hot-toast";
-import * as Yup from "yup";
+import { useFormik } from 'formik';
+import { useTranslation } from 'next-i18next';
+import { Button } from 'react-daisyui';
+import toast from 'react-hot-toast';
+import * as Yup from 'yup';
 
 import { Card, InputWithLabel } from '@/components/shared';
 import { passwordPolicies } from '@/lib/common';
@@ -20,8 +20,8 @@ const UpdatePassword = () => {
 
   const formik = useFormik({
     initialValues: {
-      currentPassword: "",
-      newPassword: "",
+      currentPassword: '',
+      newPassword: '',
     },
     validationSchema: schema,
     onSubmit: async (values) => {
@@ -44,15 +44,15 @@ const UpdatePassword = () => {
         <Card>
           <Card.Body>
             <Card.Header>
-              <Card.Title>{t("password")}</Card.Title>
-              <Card.Description>{t("change-password-text")}</Card.Description>
+              <Card.Title>{t('password')}</Card.Title>
+              <Card.Description>{t('change-password-text')}</Card.Description>
             </Card.Header>
             <div className="flex flex-col space-y-3">
               <InputWithLabel
                 type="password"
-                label={t("current-password")}
+                label={t('current-password')}
                 name="currentPassword"
-                placeholder={t("current-password")}
+                placeholder={t('current-password')}
                 value={formik.values.currentPassword}
                 error={
                   formik.touched.currentPassword
@@ -63,9 +63,9 @@ const UpdatePassword = () => {
               />
               <InputWithLabel
                 type="password"
-                label={t("new-password")}
+                label={t('new-password')}
                 name="newPassword"
-                placeholder={t("new-password")}
+                placeholder={t('new-password')}
                 value={formik.values.newPassword}
                 error={
                   formik.touched.newPassword
@@ -85,7 +85,7 @@ const UpdatePassword = () => {
                 disabled={!formik.dirty || !formik.isValid}
                 size="md"
               >
-                {t("change-password")}
+                {t('change-password')}
               </Button>
             </div>
           </Card.Footer>
