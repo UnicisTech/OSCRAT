@@ -13,7 +13,7 @@ export type Question = {
   answers: Answer[];
 };
 
- type Step = {
+type Step = {
   id: number;
   question: string;
   answers: {

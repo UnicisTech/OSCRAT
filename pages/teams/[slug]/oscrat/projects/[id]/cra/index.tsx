@@ -26,13 +26,13 @@ export default function FormPage() {
 
   const handleAnswerChange = (stepId: number, answer: string) => {
     // Identify if the selected answer is eliminatory
-    const questionObj = steps.find(q => q.id === stepId);
-    const selectedAnswer = questionObj?.answers.find(a => a.text === answer);
+    const questionObj = steps.find((q) => q.id === stepId);
+    const selectedAnswer = questionObj?.answers.find((a) => a.text === answer);
     const isEliminatory = selectedAnswer?.isEliminatory || false;
 
     const newAnswers = {
       ...answers,
-      [stepId]: [answer, isEliminatory]
+      [stepId]: [answer, isEliminatory],
     };
 
     setAnswers(newAnswers);
@@ -41,7 +41,9 @@ export default function FormPage() {
 
   const handleComplete = () => {
     // Check if an eliminatory answer has been selected
-    const foundEliminatory = Object.values(answers).some(([_, isEliminatory]) => isEliminatory);
+    const foundEliminatory = Object.values(answers).some(
+      ([_, isEliminatory]) => isEliminatory
+    );
 
     setIsEligible(foundEliminatory);
     setShowResult(true);
@@ -51,7 +53,9 @@ export default function FormPage() {
 
   // Check if we need to show the result (if the assessment is complete)
   useEffect(() => {
-    const allAnswered = steps.every(q => answers[q.id] && answers[q.id][0] !== null);
+    const allAnswered = steps.every(
+      (q) => answers[q.id] && answers[q.id][0] !== null
+    );
 
     if (allAnswered && activeStep > TOTAL_QUESTIONS) {
       handleComplete();
@@ -59,7 +63,13 @@ export default function FormPage() {
   }, [activeStep, answers]);
 
   if (showResult) {
-    return <Result isEligible={isEligible} teamSlug={slug as string} projectId={id as string} />;
+    return (
+      <Result
+        isEligible={isEligible}
+        teamSlug={slug as string}
+        projectId={id as string}
+      />
+    );
   }
 
   return (
@@ -74,4 +84,3 @@ export default function FormPage() {
     />
   );
 }
-

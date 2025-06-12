@@ -18,7 +18,9 @@ export default function Step({
       return;
     }
 
-    const isEliminatory = step.answers.find(a => a.text === selectedAnswer)?.isEliminatory || false;
+    const isEliminatory =
+      step.answers.find((a) => a.text === selectedAnswer)?.isEliminatory ||
+      false;
     if (isEliminatory || activeStep === total) {
       onComplete();
       return;

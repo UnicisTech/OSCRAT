@@ -12,10 +12,7 @@ interface ProductProps {
   onShowMore?: () => void;
 }
 
-const Product: React.FC<ProductProps> = ({
-  project,
-  onShowMore,
-}) => {
+const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
   const { t, ready } = useTranslation('common');
 
   // Standard way: don't render until translations are ready

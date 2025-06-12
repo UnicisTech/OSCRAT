@@ -9,7 +9,7 @@ export default function CraForm({
   answers,
   onAnswerChange,
   onComplete,
-  total
+  total,
 }: CraFormProps) {
   return (
     <div

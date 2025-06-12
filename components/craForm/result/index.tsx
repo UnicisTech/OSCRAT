@@ -3,15 +3,19 @@ import Button from '@/components/button';
 import { useRouter } from 'next/navigation';
 import { ResultProps } from '@/types/oscrat/craForm/form';
 
-export default function Result({ isEligible, teamSlug, projectId }: ResultProps) {
+export default function Result({
+  isEligible,
+  teamSlug,
+  projectId,
+}: ResultProps) {
   const router = useRouter();
 
   const handleNavigateBack = () => {
-      router.push(`/teams/${teamSlug}/oscrat/projects/${projectId}`);
+    router.push(`/teams/${teamSlug}/oscrat/projects/${projectId}`);
   };
 
   const handleRestart = () => {
-      router.push(`/teams/${teamSlug}/oscrat/projects`);
+    router.push(`/teams/${teamSlug}/oscrat/projects`);
   };
 
   if (!isEligible) {
@@ -25,7 +29,8 @@ export default function Result({ isEligible, teamSlug, projectId }: ResultProps)
             No Qualification Required
           </h1>
           <p className="mb-8 text-sm text-gray-600 md:text-base">
-            Your product does not fall within the scope of the Cyber Resilience Act.
+            Your product does not fall within the scope of the Cyber Resilience
+            Act.
             <br />
             You can check another product or return to the main page.
           </p>
@@ -45,12 +50,13 @@ export default function Result({ isEligible, teamSlug, projectId }: ResultProps)
           </div>
         </div>
         <p className="mt-8 max-w-2xl px-4 text-center text-xs text-gray-500">
-          Note: This self-assessment is solely intended to evaluate the potential compliance of the product and does not constitute or imply formal certification.
+          Note: This self-assessment is solely intended to evaluate the
+          potential compliance of the product and does not constitute or imply
+          formal certification.
         </p>
       </div>
     );
   }
-
 
   return (
     <div className="flex flex-col items-center justify-center p-4 font-['Inter',_sans-serif]">
@@ -62,8 +68,8 @@ export default function Result({ isEligible, teamSlug, projectId }: ResultProps)
           Product Requires Assessment
         </h1>
         <p className="mb-8 text-sm text-gray-600 md:text-base">
-          Your product falls within the scope of the Cyber Resilience Act
-          as a <span className="font-semibold text-gray-700">Class I PDE</span>.
+          Your product falls within the scope of the Cyber Resilience Act as a{' '}
+          <span className="font-semibold text-gray-700">Class I PDE</span>.
           <br />
           Follow the steps below to continue the assessment.
         </p>
@@ -75,7 +81,11 @@ export default function Result({ isEligible, teamSlug, projectId }: ResultProps)
             variant="normal"
           />
           <Button
-            onClick={() => router.push(`/teams/${teamSlug}/oscrat/projects/${projectId}/cra/details`)}
+            onClick={() =>
+              router.push(
+                `/teams/${teamSlug}/oscrat/projects/${projectId}/cra/details`
+              )
+            }
             className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
             text="Continue Assessment"
             variant="primary"
@@ -83,7 +93,9 @@ export default function Result({ isEligible, teamSlug, projectId }: ResultProps)
         </div>
       </div>
       <p className="mt-8 max-w-2xl px-4 text-center text-xs text-gray-500">
-        Note: This self-assessment is solely intended to evaluate the potential compliance of the product and does not constitute or imply formal certification.
+        Note: This self-assessment is solely intended to evaluate the potential
+        compliance of the product and does not constitute or imply formal
+        certification.
       </p>
     </div>
   );

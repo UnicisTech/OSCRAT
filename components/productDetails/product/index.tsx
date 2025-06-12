@@ -15,11 +15,11 @@ interface ProductProps {
 }
 
 const Product: React.FC<ProductProps> = ({
-                                           project,
-                                           onDelete,
-                                           onEdit,
-                                           onWithdraw,
-                                         }) => {
+  project,
+  onDelete,
+  onEdit,
+  onWithdraw,
+}) => {
   const { t, ready } = useTranslation('common');
 
   // Standard way: don't render until translations are ready
