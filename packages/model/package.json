@@ -6,13 +6,12 @@
   "main": "index.ts",
   "scripts": {
     "generate": "prisma generate",
-    "push": "prisma db push --accept-data-loss --skip-generate",
     "studio": "prisma studio",
     "migrate": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "reset": "prisma migrate reset",
     "seed:oscrat": "npx tsx prisma/seed-oscrat.ts",
-    "build": "prisma generate && prisma db push --accept-data-loss --skip-generate"
+    "build": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.7.0"

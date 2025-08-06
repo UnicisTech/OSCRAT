@@ -8,35 +8,33 @@
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    
     "dev": "pnpm --filter @oscrat/model generate && pnpm -r --parallel dev",
     "build": "pnpm --filter @oscrat/model generate && pnpm -r build",
     "start": "pnpm -r start",
-    "check-types": "pnpm -r check-types",
-    "check-format": "prettier --check .",
-    "check-lint": "pnpm -r check-lint",
-    "format": "prettier --write .",
-    "test-all": "pnpm run check-format && pnpm run check-lint && pnpm run check-types && pnpm run build",
     "clean": "pnpm -r clean && rm -rf node_modules",
-    "frontend:dev": "pnpm --filter @oscrat/model generate && pnpm --filter @oscrat/frontend dev",
+    
+    "dev:setup": "pnpm install && pnpm services:db:up && pnpm db:migrate:dev && pnpm db:seed",
+    
+    "lint": "pnpm -r check-lint",
+    "typecheck": "pnpm -r check-types",
+    "format": "prettier --write .",
+    "test-all": "pnpm format && pnpm lint && pnpm typecheck && pnpm build",
+    
     "frontend:build": "pnpm --filter @oscrat/model generate && pnpm --filter @oscrat/frontend build",
     "frontend:start": "pnpm --filter @oscrat/frontend start",
-    "db:generate": "pnpm --filter @oscrat/model generate",
-    "db:push": "pnpm --filter @oscrat/model push",
-    "db:studio": "pnpm --filter @oscrat/model studio",
-    "db:migrate": "pnpm --filter @oscrat/model migrate",
-    "db:seed": "pnpm --filter @oscrat/model seed:oscrat",
-    "db:all": "pnpm run db:generate && pnpm run db:push && pnpm run db:migrate",
-    "db:deploy": "pnpm --filter @oscrat/model migrate:deploy",
-    "db:reset": "pnpm --filter @oscrat/model reset",
-    "services:db:up": "docker-compose up -d",
-    "services:db:down": "docker-compose down",
-    "services:db:logs": "docker-compose logs -f",
-    "services:jobrunner:up": "docker-compose --profile jobrunner up -d jobrunner",
-    "services:jobrunner:down": "docker-compose --profile jobrunner down",
-    "services:jobrunner:logs": "docker-compose --profile jobrunner logs -f jobrunner",
-    "jobrunner:dev": "pnpm --filter @oscrat/model generate && pnpm --filter @oscrat/jobrunner dev",
     "jobrunner:build": "pnpm --filter @oscrat/model generate && pnpm --filter @oscrat/jobrunner build",
-    "jobrunner:start": "pnpm --filter @oscrat/jobrunner start"
+    "jobrunner:start": "pnpm --filter @oscrat/jobrunner start",
+    
+    "db:generate": "pnpm --filter @oscrat/model generate",
+    "db:studio": "pnpm --filter @oscrat/model studio",
+    "db:migrate:dev": "pnpm --filter @oscrat/model migrate",
+    "db:migrate:deploy": "pnpm --filter @oscrat/model migrate:deploy",
+    "db:seed": "pnpm --filter @oscrat/model seed:oscrat",
+    "db:reset": "pnpm --filter @oscrat/model reset",
+    
+    "services:db:up": "docker-compose up -d db",
+    "services:db:down": "docker-compose down"
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.0",

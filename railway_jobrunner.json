@@ -1,10 +1,10 @@
 {
   "build": {
     "builder": "nixpacks",
-    "buildCommand": "pnpm db:generate && pnpm jobrunner:build"
+    "buildCommand": "pnpm jobrunner:build"
   },
   "deploy": {
-    "preDeployCommand": "pnpm db:deploy",
+    "preDeployCommand": "pnpm db:migrate:deploy",
     "startCommand": "pnpm jobrunner:start",
     "restartPolicyType": "on_failure",
     "restartPolicyMaxRetries": 10
