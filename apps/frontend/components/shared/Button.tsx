@@ -1,15 +1,16 @@
 import React from 'react';
+import { ButtonHTMLAttributes, MouseEvent } from 'react';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
-interface ButtonProps {
+type ButtonProps = {
   text: string;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   variant: ButtonVariant;
   className?: string;
   disabled?: boolean;
   fullWidth?: boolean;
-}
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button: React.FC<ButtonProps> = ({
   text,

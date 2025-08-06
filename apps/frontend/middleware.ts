@@ -11,6 +11,7 @@ const unAuthenticatedRoutes = [
   '/api/oauth/**',
   '/api/scim/v2.0/**',
   '/auth/**',
+  '/form',
   '/invitations/*',
   '/api/invitations/*',
   '/terms-condition',

@@ -1,8 +1,8 @@
-import TabsManager from '@/components/versions/versionDetails/tabs/TabManager';
+import TabsManager from '@/components/oscrat/versions/versionDetails/tabs/TabManager';
 import { withProductLayout } from '@/lib/layout-helpers';
-import TABS_CONFIG from '@/components/versions/versionDetails/tabs/tabs';
-import Version from '@/components/versions/versionDetails/version';
-import ConformityRow from '@/components/versions/versionDetails/conformityRow';
+import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/tabs';
+import Version from '@/components/oscrat/versions/versionDetails/version';
+import ConformityRow from '@/components/oscrat/versions/versionDetails/conformityRow';
 import { useParams } from 'next/navigation';
 
 export default function Index() {
@@ -15,7 +15,7 @@ export default function Index() {
 
   return (
     <>
-      <Version versionId={version} />
+      <Version />
       <ConformityRow />
       <TabsManager tabs={TABS_CONFIG} />
     </>

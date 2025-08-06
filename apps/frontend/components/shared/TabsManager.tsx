@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import NotSupportedTab from '@/components/products/productDetails/tabs/allTabs/notSupported';
-import SupportedTab from '@/components/products/productDetails/tabs/allTabs/supported';
+import NotSupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/notSupported';
+import SupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/supported';
 import { OscratProductVersionSummary } from '@oscrat/model';
 
 export type TabConfig = {

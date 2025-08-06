@@ -285,6 +285,8 @@ export const transformToVersionDetail = (
       name: vuln.name,
       severity: vuln.severity,
       status: vuln.status,
+      versionId: version.id,
+      description: vuln.description || '',
       createdAt: vuln.createdAt,
       updatedAt: vuln.updatedAt,
       createdBy: vuln.createdBy,

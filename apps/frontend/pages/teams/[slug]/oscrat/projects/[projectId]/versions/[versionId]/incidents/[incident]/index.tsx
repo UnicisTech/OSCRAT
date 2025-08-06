@@ -1,5 +1,5 @@
-import Incident from '@/components/versions/versionDetails/tabs/allTabs/incidents/incident';
-import Summary from '@/components/versions/versionDetails/tabs/allTabs/incidents/summary';
+import Incident from '@/components/oscrat/versions/versionDetails/tabs/allTabs/incidents/incident';
+import Summary from '@/components/oscrat/versions/versionDetails/tabs/allTabs/incidents/summary';
 import { withProductLayout } from '@/lib/layout-helpers';
 
 export default function Index() {

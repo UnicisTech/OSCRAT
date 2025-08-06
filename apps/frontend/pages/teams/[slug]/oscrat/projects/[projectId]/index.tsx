@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { withProductLayout } from '@/lib/layout-helpers';
-import { ProductDetails } from '@/components/products/ProductDetails';
+import { ProductDetails } from '@/components/oscrat/products/ProductDetails';
 
 export default function ProductDashboard() {
   const params = useParams();

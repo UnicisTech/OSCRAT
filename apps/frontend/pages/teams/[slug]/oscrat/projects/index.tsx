@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProductListContent } from '@/components/products/ProductListContent';
+import { ProductListContent } from '@/components/oscrat/products/ProductListContent';
 import { withProductLayout } from '@/lib/layout-helpers';
 
 function ProductList() {

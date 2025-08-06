@@ -1,7 +1,7 @@
-import { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, MouseEvent } from 'react';
 
 type ButtonProps = {
-  onClick: () => void;
+  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   text: string;
   variant?: 'primary' | 'normal';
@@ -21,7 +21,7 @@ export default function Button({
 
   return (
     <button
-      onClick={onClick}
+      onClick={(e) => onClick(e)}
       className={`rounded px-4 py-2 ${variantStyles[variant]} ${className}`}
       {...rest}
     >

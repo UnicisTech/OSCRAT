@@ -87,6 +87,10 @@ const Login: NextPageWithLayout<
   //   router.push(redirectAfterSignIn || '/teams');
   // }
 
+  const handleStartForm = () => {
+    router.push('/form');
+  };
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -198,10 +202,20 @@ const Login: NextPageWithLayout<
             <div className="mt-3 space-y-3">
               <Button
                 className="bg-primary-light"
-                disabled={formik.dirty}
+                disabled={!formik.dirty}
                 variant="primary"
                 text={t('sign-in')}
                 fullWidth
+              />
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleStartForm();
+                }}
+                variant="secondary"
+                text={t('applicability-check')}
+                fullWidth
+                type="button"
               />
               <AgreeMessage text="sign-in" />
             </div>

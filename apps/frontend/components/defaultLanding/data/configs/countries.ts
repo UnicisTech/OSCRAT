@@ -1,4 +1,4 @@
-export default [
+const countries = [
   { label: 'Andorra', value: 'andorra' },
   { label: 'United Arab Emirates', value: 'united arab emirates' },
   { label: 'Afghanistan', value: 'afghanistan' },
@@ -267,3 +267,5 @@ export default [
   { label: 'Zimbabwe', value: 'zimbabwe' },
   { label: 'Other', value: 'other' },
 ];
+
+export default countries;
