@@ -1,4 +1,4 @@
-# Unicis Platform Community (free and open source)
+# OSCRAT Platform Community (free and open source)
 
 ![Static Badge](https://img.shields.io/badge/Github%20stargazers%2C%20https%3A%2F%2Fgithub.com%2FUnicisTech%2Funicis-platform-ce%2Fstargazers?logo=github&label=GitHub%20Star&link=https%3A%2F%2Fgithub.com%2FUnicisTech%2Funicis-platform-ce%2Fstargazer)
 ![Static Badge](https://img.shields.io/badge/Github%20fork%2C%20https%3A%2F%2Fgithub.com%2FUnicisTech%2Funicis-platform-ce%2Ffork?logo=github&label=GitHub%20Fork&link=https%3A%2F%2Fgithub.com%2FUnicisTech%2Funicis-platform-ce%2Ffork)
@@ -7,9 +7,21 @@
 ![Static Badge](https://img.shields.io/badge/LinkedIn%2C%20https%3A%2F%2Fwww.linkedin.com%2Fcompany%2Funicis-tech-o%C3%BC%2F?logo=LinkedIn&label=LinkedIn&link=https%3A%2F%2Fwww.linkedin.com%2Fcompany%2Funicis-tech-o%C3%BC%2F) |
 <a href="https://discord.com/invite/8TwyeD97HD">Discord</a>
 
-Unicis Platform Community Edition - an open core, enterprise-ready trust management platform for startups and SMEs.
+OSCRAT Platform Community Edition - an open core, enterprise-ready trust management platform for startups and SMEs.
 
-Please star ⭐ the repo if you want us to continue developing and improving the Unicis Platform! 😀
+Please star ⭐ the repo if you want us to continue developing and improving the OSCRAT Platform! 😀
+
+## Structure
+
+```
+oscrat-platform/
+├── apps/
+│   └── frontend/          # @oscrat/frontend (Next.js app)
+├── packages/
+│   └── model/             # @oscrat/model (Database & types)
+├── docker-compose.yml     # Local development services
+└── package.json           # Workspace orchestrator
+```
 
 ## 📖 Additional Resources
 
@@ -58,7 +70,7 @@ git clone https://github.com/RaduCatalinAndrei/OSCRAT.git
 #### 2. Go to the project folder
 
 ```bash
-cd oscrat
+cd oscrat-oves
 ```
 
 #### 3. Install dependencies
@@ -67,34 +79,40 @@ cd oscrat
 pnpm install
 ```
 
-#### 4. Set up your .env file
+#### 4. Set up your .env files
 
-Duplicate `.env.example` to `.env`.
-
-```bash
-cp .env.example .env
-```
-
-#### 5. Create a database (Optional)
-
-To make the process of installing dependencies easier, we offer a `docker-compose.yml` with a Postgres container.
+Duplicate `.env.example` to `.env` in both the frontend and model packages.
 
 ```bash
-docker-compose up -d
+cp apps/frontend/.env.example apps/frontend/.env
+cp packages/model/.env.example packages/model/.env
 ```
+
+#### 5. Start local services (Database)
+
+```bash
+pnpm services:up
+```
+
+This starts PostgreSQL and Redis containers for local development.
 
 #### 6. Set up database schema
 
 ```bash
-npx prisma db push
+pnpm db:generate
+pnpm db:push
 ```
 
-#### 7. Start the server
-
-In a development environment:
+#### 7. Start the development server
 
 ```bash
-pnpm run dev
+pnpm dev
+```
+
+Or to start only the frontend:
+
+```bash
+pnpm frontend:dev
 ```
 
 #### 8. Start the Prisma Studio
@@ -102,28 +120,26 @@ pnpm run dev
 Prisma Studio is a visual editor for the data in your database.
 
 ```bash
-npx prisma studio
+pnpm db:studio
 ```
 
-#### 9. Testing
+### Available Scripts
 
-We are using [Playwright](https://playwright.dev/) to execute E2E tests. Add all tests inside the `/tests` folder.
+#### Root Level
+- `pnpm dev` - Start all apps in development
+- `pnpm build` - Build all apps
+- `pnpm check-types` - Type check all packages
+- `pnpm services:up` - Start local services (PostgreSQL, Redis)
+- `pnpm services:down` - Stop local services
+- `pnpm db:generate` - Generate Prisma client
+- `pnpm db:push` - Push database schema
+- `pnpm db:studio` - Open Prisma Studio
+- `pnpm db:seed` - Seed database with test data
 
-Update `playwright.config.ts` to change the playwright configuration.
-
-##### Install Playwright dependencies
-
-```bash
-pnpm run playwright:update
-```
-
-##### Run E2E tests
-
-```bash
-pnpm run test:e2e
-```
-
-_Note: HTML test report is generated inside the `report` folder. Currently supported browsers for test execution `chromium` and `firefox`_
+#### Frontend Only
+- `pnpm frontend:dev` - Start frontend only
+- `pnpm frontend:build` - Build frontend only
+- `pnpm frontend:start` - Start frontend in production mode
 
 #### Free and open source community edition - all-in-one tools for security, privacy and compliance team
 

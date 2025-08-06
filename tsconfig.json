@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "types": ["node", "jest"],
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -15,12 +14,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
-    "noImplicitAny": false,
-    "paths": {
-      "@/*": ["*"]
-    }
+    "noImplicitAny": false
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "next-auth.d.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist", ".next", "build"]
 }
