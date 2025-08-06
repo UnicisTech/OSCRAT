@@ -1,0 +1,28 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "pnpm db:deploy && pnpm jobrunner:build"
+  },
+  "deploy": {
+    "startCommand": "pnpm jobrunner:start",
+    "restartPolicyType": "on_failure",
+    "restartPolicyMaxRetries": 10
+  },
+  "watchPaths": [
+    "apps/jobrunner/**",
+    "packages/model/**",
+    "package.json",
+    "pnpm-lock.yaml"
+  ],
+  "environments": {
+    "production": {
+      "variables": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": { "$ref": "DATABASE_URL" },
+        "JOB_POLL_INTERVAL_MS": { "$ref": "JOB_POLL_INTERVAL_MS" },
+        "MAX_CONCURRENT_JOBS": { "$ref": "MAX_CONCURRENT_JOBS" },
+        "JOBRUNNER_WORKSPACE_ROOT": { "$ref": "JOBRUNNER_WORKSPACE_ROOT" }
+      }
+    }
+  }
+}
