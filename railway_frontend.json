@@ -1,9 +1,10 @@
 {
   "build": {
     "builder": "nixpacks",
-    "buildCommand": "pnpm db:deploy && pnpm frontend:build"
+    "buildCommand": "pnpm db:generate && pnpm frontend:build"
   },
   "deploy": {
+    "preDeployCommand": "pnpm db:deploy",
     "startCommand": "pnpm frontend:start",
     "healthcheckPath": "/",
     "healthcheckTimeout": 300,
