@@ -16,14 +16,11 @@ COPY pnpm-lock.yaml ./
 COPY packages/ ./packages/
 COPY apps/frontend/ ./apps/frontend/
 
-# Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Build the frontend app (includes db:generate)
 RUN pnpm frontend:build
 
-# Expose the port on which your Next.js app will run
-EXPOSE 4002
+EXPOSE 3000
 
 # Set environment variables
 ARG NEXTAUTH_URL=${NEXTAUTH_URL}

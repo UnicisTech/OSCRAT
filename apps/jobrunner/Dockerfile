@@ -50,24 +50,18 @@ COPY --from=base /app/packages ./packages
 COPY --from=base /app/apps/jobrunner/dist ./apps/jobrunner/dist
 COPY --from=base /app/apps/jobrunner/package.json ./apps/jobrunner/package.json
 
-# Install production dependencies only
 RUN pnpm install --frozen-lockfile --prod
 
-# Generate Prisma client for production
 RUN pnpm --filter @oscrat/model generate
 
-# Create non-root user
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S jobrunner -u 1001
 
-# Change ownership of the app directory
 RUN chown -R jobrunner:nodejs /app
 USER jobrunner
 
-# Expose port
 EXPOSE 3001
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "console.log('Health check passed')" || exit 1
 
