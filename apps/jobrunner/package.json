@@ -10,7 +10,7 @@
     "start": "tsx src/index.ts",
     "check-types": "tsc --pretty --noEmit",
     "check-format": "prettier --check .",
-    "check-lint": "eslint . --ext ts --ext js",
+    "check-lint": "npx eslint .",
     "format": "prettier --write .",
     "clean": "rm -rf dist node_modules"
   },
@@ -22,13 +22,6 @@
     "zx": "^8.5.5"
   },
   "devDependencies": {
-    "@types/node": "20.14.0",
-    "@typescript-eslint/eslint-plugin": "7.12.0",
-    "@typescript-eslint/parser": "7.12.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "9.1.0",
-    "prettier": "3.3.0",
-    "tsx": "^4.7.1",
-    "typescript": "5.4.5"
+    "@types/node": "20.14.0"
   }
 }

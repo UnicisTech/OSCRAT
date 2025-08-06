@@ -16,5 +16,6 @@
     "incremental": true,
     "noImplicitAny": false
   },
-  "exclude": ["node_modules", "dist", ".next", "build"]
+  "exclude": ["node_modules", "dist", ".next", "build"],
+  "references": [{ "path": "./apps/frontend" }, { "path": "./apps/jobrunner" }]
 }

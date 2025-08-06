@@ -2,51 +2,51 @@
   "name": "oscrat-platform",
   "version": "0.2.1",
   "private": true,
+  "type": "module",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    
     "dev": "pnpm --filter @oscrat/model generate && pnpm -r --parallel dev",
     "build": "pnpm --filter @oscrat/model generate && pnpm -r build",
     "start": "pnpm -r start",
     "clean": "pnpm -r clean && rm -rf node_modules",
-    
     "dev:setup": "pnpm install && pnpm services:db:up && pnpm db:migrate:dev && pnpm db:seed",
-    
     "lint": "pnpm -r check-lint",
     "typecheck": "pnpm -r check-types",
     "format": "prettier --write .",
     "test-all": "pnpm format && pnpm lint && pnpm typecheck && pnpm build",
-    
     "frontend:build": "pnpm --filter @oscrat/model generate && pnpm --filter @oscrat/frontend build",
     "frontend:start": "pnpm --filter @oscrat/frontend start",
     "jobrunner:build": "pnpm --filter @oscrat/model generate && pnpm --filter @oscrat/jobrunner build",
     "jobrunner:start": "pnpm --filter @oscrat/jobrunner start",
-    
     "db:generate": "pnpm --filter @oscrat/model generate",
     "db:studio": "pnpm --filter @oscrat/model studio",
     "db:migrate:dev": "pnpm --filter @oscrat/model migrate",
     "db:migrate:deploy": "pnpm --filter @oscrat/model migrate:deploy",
     "db:seed": "pnpm --filter @oscrat/model seed:oscrat",
     "db:reset": "pnpm --filter @oscrat/model reset",
-    
     "services:db:up": "docker-compose up -d db",
     "services:db:down": "docker-compose down"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.1.0",
+    "@eslint/compat": "^1.3.1",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.32.0",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
-    "@typescript-eslint/eslint-plugin": "7.12.0",
-    "@typescript-eslint/parser": "7.12.0",
-    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "8.39.0",
+    "@typescript-eslint/parser": "8.39.0",
+    "eslint": "^9.32.0",
     "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-react": "7.34.2",
+    "globals": "^16.3.0",
     "prettier": "3.3.0",
     "prettier-plugin-tailwindcss": "0.6.11",
     "prisma": "^6.7.0",
     "tailwindcss": "3.4.3",
+    "tsx": "^4.7.1",
     "typescript": "5.4.5"
   },
   "pnpm": {

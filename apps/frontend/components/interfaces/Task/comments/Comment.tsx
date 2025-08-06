@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import CommentEdit from './CommentEdit';
 import CommentView from './CommentView';
 import CommentHeader from './CommentHeader';
-import type { Comment } from '@oscrat/model';
+import type { Comment as CommentType } from '@oscrat/model';
 import type { ExtendedComment } from 'types';
 import CommentAvatar from './CommentAvatar';
 

@@ -7,6 +7,7 @@ const CopyrightItem = () => {
           <a
             href="https://www.unicis.tech/?mtm_campaign=platform&mtm_source=platform_beta"
             target="_blank"
+            rel="noreferrer"
           >
             Unicis.Tech OÜ
           </a>

@@ -8,7 +8,7 @@
     "start": "next start",
     "check-types": "tsc --pretty --noEmit",
     "check-format": "prettier --check .",
-    "check-lint": "eslint . --ext ts --ext tsx --ext js",
+    "check-lint": "npx eslint .",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -111,7 +111,7 @@
   },
   "devDependencies": {
     "@compiled/babel-plugin": "^0.37.1",
-    "@trivago/prettier-plugin-sort-imports": "4.3.0",
+    "@next/eslint-plugin-next": "^15.4.5",
     "@types/bcryptjs": "2.4.6",
     "@types/crypto-js": "4.2.2",
     "@types/formidable": "3.4.5",
@@ -124,17 +124,9 @@
     "@types/react-datepicker": "^6.2.0",
     "@types/styled-components": "^5.1.34",
     "@types/uuid": "9.0.8",
-    "@typescript-eslint/eslint-plugin": "7.12.0",
-    "@typescript-eslint/parser": "7.12.0",
     "daisyui": "^4.11.1",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.3",
-    "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-react": "7.34.2",
+    "eslint-config-next": "^15.4.5",
     "micromatch": "^4.0.8",
-    "postcss": "8.4.38",
-    "prettier": "3.3.0",
-    "prettier-plugin-tailwindcss": "0.6.11",
-    "typescript": "5.4.5"
+    "postcss": "8.4.38"
   }
 }

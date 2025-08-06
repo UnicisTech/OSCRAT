@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 'use client';
 
 import * as React from 'react';
@@ -26,7 +24,7 @@ const SelectTrigger = React.forwardRef<
     )}
     {...props}
   >
-    {children}
+    {children as React.ReactNode}
     <SelectPrimitive.Icon asChild>
       <ChevronDown className="h-4 w-4 opacity-50" />
     </SelectPrimitive.Icon>

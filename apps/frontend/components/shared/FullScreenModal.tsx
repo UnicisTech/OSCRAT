@@ -55,11 +55,17 @@ const FullScreenModal: React.FC<FullScreenModalProps> = ({
   };
 
   const handleCancel = () => {
-    onCancel ? onCancel() : onClose();
+    if (onCancel) {
+      onCancel();
+    } else {
+      onClose();
+    }
   };
 
   const handleContinue = () => {
-    onContinue && onContinue();
+    if (onContinue) {
+      onContinue();
+    }
   };
 
   return (

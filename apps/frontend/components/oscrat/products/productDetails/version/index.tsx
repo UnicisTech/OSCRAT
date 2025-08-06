@@ -112,16 +112,18 @@ const Version: React.FC<VersionProps> = ({
               {data.openIncidents > 0 ? (
                 <div
                   className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                      data.openIncidents
+                    data.openIncidents
                   )}`}
                 >
                   <BsExclamationCircleFill className="text-red-600" />
-                  <p>{data.openIncidents} {t('oscrat.ui.open')}</p>
+                  <p>
+                    {data.openIncidents} {t('oscrat.ui.open')}
+                  </p>
                 </div>
               ) : (
                 <p
                   className={`rounded-full border px-2 py-0.5 ${getBorderClass(
-                      data.openIncidents
+                    data.openIncidents
                   )}`}
                 >
                   {t('oscrat.ui.none')}
@@ -139,16 +141,18 @@ const Version: React.FC<VersionProps> = ({
               {data.openVulnerabilities > 0 ? (
                 <div
                   className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                      data.openVulnerabilities
+                    data.openVulnerabilities
                   )}`}
                 >
                   <BsExclamationCircleFill className="text-red-600" />
-                  <p>{data.openVulnerabilities} {t('oscrat.ui.open')}</p>
+                  <p>
+                    {data.openVulnerabilities} {t('oscrat.ui.open')}
+                  </p>
                 </div>
               ) : (
                 <p
                   className={`rounded-full border px-2 py-0.5 ${getBorderClass(
-                      data.openVulnerabilities
+                    data.openVulnerabilities
                   )}`}
                 >
                   {t('oscrat.ui.none')}
@@ -156,34 +160,34 @@ const Version: React.FC<VersionProps> = ({
               )}
             </div>
           </div>
-        {/*  TODO: Wait for task implementation in DB*/}
-        {/*  <div className="flex flex-col">*/}
-        {/*    <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">*/}
-        {/*      {t('oscrat.ui.tasks')}*/}
-        {/*    </span>*/}
-        {/*    <div*/}
-        {/*      className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}*/}
-        {/*    >*/}
-        {/*      {openTasks > 0 ? (*/}
-        {/*        <div*/}
-        {/*          className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(*/}
-        {/*            openTasks*/}
-        {/*          )}`}*/}
-        {/*        >*/}
-        {/*          <BsExclamationCircleFill className="text-blue-600" />*/}
-        {/*          <p>{displayTasks}</p>*/}
-        {/*        </div>*/}
-        {/*      ) : (*/}
-        {/*        <p*/}
-        {/*          className={`rounded-full border px-2 py-0.5 ${getBorderClass(*/}
-        {/*            openTasks*/}
-        {/*          )}`}*/}
-        {/*        >*/}
-        {/*          {displayTasks}*/}
-        {/*        </p>*/}
-        {/*      )}*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
+          {/*  TODO: Wait for task implementation in DB*/}
+          {/*  <div className="flex flex-col">*/}
+          {/*    <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">*/}
+          {/*      {t('oscrat.ui.tasks')}*/}
+          {/*    </span>*/}
+          {/*    <div*/}
+          {/*      className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}*/}
+          {/*    >*/}
+          {/*      {openTasks > 0 ? (*/}
+          {/*        <div*/}
+          {/*          className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(*/}
+          {/*            openTasks*/}
+          {/*          )}`}*/}
+          {/*        >*/}
+          {/*          <BsExclamationCircleFill className="text-blue-600" />*/}
+          {/*          <p>{displayTasks}</p>*/}
+          {/*        </div>*/}
+          {/*      ) : (*/}
+          {/*        <p*/}
+          {/*          className={`rounded-full border px-2 py-0.5 ${getBorderClass(*/}
+          {/*            openTasks*/}
+          {/*          )}`}*/}
+          {/*        >*/}
+          {/*          {displayTasks}*/}
+          {/*        </p>*/}
+          {/*      )}*/}
+          {/*    </div>*/}
+          {/*  </div>*/}
         </div>
 
         <div className="ml-12 flex flex-1 justify-end font-medium text-gray-600">
