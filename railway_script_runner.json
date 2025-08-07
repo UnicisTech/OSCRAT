@@ -1,0 +1,20 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "pnpm install --frozen-lockfile"
+  },
+  "deploy": {
+    "startCommand": "${SCRIPT_COMMAND:-echo 'No script specified. Set SCRIPT_COMMAND variable to run a script.'}",
+    "restartPolicyType": "never"
+  },
+  "watchPaths": ["packages/model/**", "package.json", "pnpm-lock.yaml"],
+  "environments": {
+    "production": {
+      "variables": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": { "$ref": "DATABASE_URL" },
+        "SCRIPT_COMMAND": "echo 'Set SCRIPT_COMMAND to your desired script (e.g., pnpm seed)'"
+      }
+    }
+  }
+}
