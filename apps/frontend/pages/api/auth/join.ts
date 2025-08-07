@@ -56,15 +56,13 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   console.log(`[Auth] checking invitation, hasInviteToken: ${!!inviteToken}`);
-  let invitation = null;
-  if (inviteToken) {
-    try {
-      invitation = await getInvitation({ token: inviteToken });
-      console.log(`[Auth] invitation fetched, valid: ${!!invitation}`);
-    } catch (error: any) {
-      console.log(`[Auth] getInvitation failed, token: ${inviteToken}, error: ${error.message}`);
-      throw error;
-    }
+  let invitation;
+  try {
+    invitation = inviteToken ? await getInvitation({ token: inviteToken }) : null;
+    console.log(`[Auth] invitation fetched, valid: ${!!invitation}`);
+  } catch (error: any) {
+    console.log(`[Auth] getInvitation failed, token: ${inviteToken}, error: ${error.message}`);
+    throw error;
   }
 
   if (invitation && (await isInvitationExpired(invitation))) {
