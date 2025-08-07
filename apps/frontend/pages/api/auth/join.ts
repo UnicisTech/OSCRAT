@@ -44,54 +44,106 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   } = req.body;
   const name = `${firstName} ${lastName}`;
   
-  await validateRecaptcha(recaptchaToken);
+  console.log(`[Auth] signup started, email: ${email}, team: ${team}, hasInviteToken: ${!!inviteToken}`);
+  
+  console.log(`[Auth] validating recaptcha`);
+  try {
+    await validateRecaptcha(recaptchaToken);
+    console.log(`[Auth] recaptcha validated`);
+  } catch (error: any) {
+    console.log(`[Auth] recaptcha validation failed, error: ${error.message}`);
+    throw error;
+  }
 
-  const invitation = inviteToken
-    ? await getInvitation({ token: inviteToken })
-    : null;
+  console.log(`[Auth] checking invitation, hasInviteToken: ${!!inviteToken}`);
+  let invitation = null;
+  if (inviteToken) {
+    try {
+      invitation = await getInvitation({ token: inviteToken });
+      console.log(`[Auth] invitation fetched, valid: ${!!invitation}`);
+    } catch (error: any) {
+      console.log(`[Auth] getInvitation failed, token: ${inviteToken}, error: ${error.message}`);
+      throw error;
+    }
+  }
 
   if (invitation && (await isInvitationExpired(invitation))) {
+    console.log(`[Auth] invitation expired, token: ${inviteToken}`);
     throw new ApiError(400, 'Invitation expired. Please request a new one.');
   }
 
   // If invitation is present, use the email from the invitation instead of the email in the request body
   const emailToUse = invitation ? invitation.email : email;
+  console.log(`[Auth] using email: ${emailToUse}, fromInvitation: ${!!invitation}`);
 
+  console.log(`[Auth] checking business email policy`);
   if (env.disableNonBusinessEmailSignup && !isBusinessEmail(emailToUse)) {
+    console.log(`[Auth] non-business email rejected: ${emailToUse}`);
     throw new ApiError(
       400,
       `We currently only accept work email addresses for sign-up. Please use your work email to create an account. If you don't have a work email, feel free to contact our support team for assistance.`
     );
   }
 
-  if (await getUser({ email: emailToUse })) {
-    throw new ApiError(400, 'An user with this email already exists.');
+  console.log(`[Auth] checking existing user, email: ${emailToUse}`);
+  try {
+    const existingUser = await getUser({ email: emailToUse });
+    if (existingUser) {
+      console.log(`[Auth] user already exists: ${emailToUse}`);
+      throw new ApiError(400, 'An user with this email already exists.');
+    }
+    console.log(`[Auth] user doesn't exist, proceeding with signup`);
+  } catch (error: any) {
+    if (error.status === 400) {
+      throw error; // Re-throw ApiError
+    }
+    console.log(`[Auth] getUser failed, email: ${emailToUse}, error: ${error.message}`);
+    throw error;
   }
 
+  console.log(`[Auth] validating password policy`);
   validatePasswordPolicy(password);
 
   // Check if team name is available
   if (!invitation) {
+    console.log(`[Auth] checking team availability, name: ${team}`);
     if (!team) {
       throw new ApiError(400, 'A team name is required.');
     }
 
     const slug = slugify(team);
-    const nameCollisions = await isTeamExists([{ name: team }, { slug }]);
-
-    if (nameCollisions) {
-      throw new ApiError(400, 'A team with this name already exists.');
+    try {
+      const nameCollisions = await isTeamExists([{ name: team }, { slug }]);
+      if (nameCollisions) {
+        console.log(`[Auth] team name collision, name: ${team}, slug: ${slug}`);
+        throw new ApiError(400, 'A team with this name already exists.');
+      }
+      console.log(`[Auth] team name available, name: ${team}, slug: ${slug}`);
+    } catch (error: any) {
+      if (error.status === 400) {
+        throw error; // Re-throw ApiError
+      }
+      console.log(`[Auth] isTeamExists failed, name: ${team}, slug: ${slug}, error: ${error.message}`);
+      throw error;
     }
   }
 
-  const user = await createUser({
-    name,
-    firstName,
-    lastName,
-    email: emailToUse,
-    password: await hashPassword(password),
-    emailVerified: invitation ? new Date() : null,
-  });
+  console.log(`[Auth] creating user, email: ${emailToUse}`);
+  let user;
+  try {
+    user = await createUser({
+      name,
+      firstName,
+      lastName,
+      email: emailToUse,
+      password: await hashPassword(password),
+      emailVerified: invitation ? new Date() : null,
+    });
+    console.log(`[Auth] user created, userId: ${user.id}, email: ${emailToUse}`);
+  } catch (error: any) {
+    console.log(`[Auth] createUser failed, email: ${emailToUse}, error: ${error.message}`);
+    throw error;
+  }
 
   // Create team if user is not invited
   // So we can create the team with the owner
