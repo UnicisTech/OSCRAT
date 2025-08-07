@@ -3,7 +3,7 @@
     "builder": "nixpacks",
     "buildCommand": "pnpm frontend:build",
     "watchPatterns": [
-      "apps/jobrunner/**",
+      "apps/frontend/**",
       "packages/model/**",
       "package.json",
       "pnpm-lock.yaml"
