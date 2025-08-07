@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { Session } from 'next-auth';
 import type { Role, TeamMemberDetail } from '@oscrat/model';
 import * as TeamOps from '@oscrat/model/operations';
+import { randomUUID } from 'crypto';
 
 export interface AuthenticatedTeamContext {
   user: Session['user'];
@@ -52,6 +53,15 @@ export function withAuth<T = any>(
 ) {
   return (handler: (req: AuthenticatedRequest, res: NextApiResponse<T>) => Promise<void>) => {
     return async (req: NextApiRequest, res: NextApiResponse<T>) => {
+      const { method, url } = req;
+      const requestId = randomUUID().slice(0, 8);
+      
+      // Set security headers
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('X-Frame-Options', 'DENY');
+      
+      console.log(`[API] ${method} ${url} start, team: ${req.query.slug || 'none'}, id: ${requestId}`);
+
       try {
         const teamContext = await getAuthenticatedTeamContext(req, res);
         
@@ -64,11 +74,13 @@ export function withAuth<T = any>(
         // Attach team context to request
         (req as AuthenticatedRequest).teamContext = teamContext;
         
-        return await handler(req as AuthenticatedRequest, res);
+        await handler(req as AuthenticatedRequest, res);
+        console.log(`[API] ${method} ${url} success, user: ${teamContext.user.id}, id: ${requestId}`);
       } catch (error: any) {
         const message = error.message || 'Something went wrong';
         const status = error.status || (error.message === 'Unauthorized' ? 401 : 403);
         
+        console.log(`[API Error] ${method} ${url} failed, error: ${message}, id: ${requestId}`);
         res.status(status).json({ error: { message } } as T);
       }
     };

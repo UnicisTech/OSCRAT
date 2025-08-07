@@ -2,6 +2,7 @@ import { getVersions, createVersion } from 'models/oscrat';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductVersionCreate } from '@oscrat/model';
+import { ApiError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedRequest,
@@ -16,9 +17,7 @@ export default function handler(
       return withAuth(['team', 'create'])(handlePOST)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST']);
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -42,9 +41,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 
   // Ensure the productId matches the URL parameter
   if (versionData.productId !== projectId) {
-    return res.status(400).json({
-      error: { message: 'Product ID in body must match URL parameter' },
-    });
+    throw new ApiError(400, 'Product ID in body must match URL parameter');
   }
 
   // Add createdBy field from the authenticated user
@@ -54,6 +51,8 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   };
 
   const version = await createVersion(teamMember.teamId, createData);
+
+  console.log(`[OSCRAT] version created, versionId: ${version.id}, projectId: ${projectId}, version: ${versionData.version}, createdBy: ${teamMember.userId}`);
 
   res.status(201).json({ data: version });
 };

@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { WorkerJobType, type RepoGenerateSbomPayload } from '@oscrat/model';
+import { ApiError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedRequest,
@@ -20,9 +21,7 @@ export default function handler(
       return withAuth(['team', 'create'])(handlePOST)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST']);
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -39,9 +38,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
     WorkerJobType.REPO_GENERATE_SBOM
   );
 
-  console.log(
-    `[SBOM Jobs API] Found ${jobs.length} SBOM jobs for version ${versionId}`
-  );
+  console.log(`[SBOM] jobs listed, versionId: ${versionId}, count: ${jobs.length}`);
 
   res.status(200).json({ data: jobs });
 };
@@ -54,17 +51,8 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { repositoryId } = req.body;
 
   if (!repositoryId) {
-    console.error(
-      `[SBOM Jobs API] Missing repository ID for version ${versionId}`
-    );
-    return res.status(400).json({
-      error: { message: 'Repository ID is required' },
-    });
+    throw new ApiError(400, 'Repository ID is required');
   }
-
-  console.log(
-    `[SBOM Jobs API] Creating SBOM job for repository ${repositoryId}`
-  );
 
   // Create SBOM generation job payload
   const payload: RepoGenerateSbomPayload = {
@@ -77,7 +65,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
     payload,
   });
 
-  console.log(`[SBOM Jobs API] Job created successfully: ${job.id}`);
+  console.log(`[SBOM] job created, jobId: ${job.id}, repositoryId: ${repositoryId}, versionId: ${versionId}, triggeredBy: ${teamMember.userId}`);
 
   res.status(201).json({ data: job });
 };

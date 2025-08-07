@@ -1,33 +1,27 @@
 import { hashPassword, validatePasswordPolicy } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ApiError } from 'next/dist/server/api-utils';
+import { ApiError } from '@/lib/errors';
 import { recordMetric } from '@/lib/metrics';
+import { withApiHandler } from '@/lib/middleware';
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    switch (method) {
-      case 'POST':
-        await handlePOST(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'POST');
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'POST':
+      await handlePOST(req, res);
+      break;
+    default:
+      res.setHeader('Allow', 'POST');
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
+
+export default withApiHandler(handler);
 
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const { token, password } = req.body;

@@ -22,9 +22,7 @@ export default function handler(
       return withAuth(['team_api_key', 'create'])(handlePOST)(req, res);
     default:
       res.setHeader('Allow', 'GET, POST');
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -49,6 +47,8 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
     name,
     teamId: teamMember.teamId,
   });
+
+  console.log(`[API Key] created, name: ${name}, teamId: ${teamMember.teamId}`);
 
   recordMetric('apikey.created');
 

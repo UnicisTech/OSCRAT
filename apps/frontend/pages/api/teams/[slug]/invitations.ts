@@ -34,9 +34,7 @@ export default function handler(
       return withAuth(['team_invitation', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', 'GET, POST, PUT, DELETE');
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -93,6 +91,8 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   });
 
   recordMetric('invitation.created');
+
+  console.log(`[Invitation] sent, email: ${email}, role: ${role}, teamId: ${teamMember.teamId}`);
 
   res.status(200).json({ data: invitation });
 };

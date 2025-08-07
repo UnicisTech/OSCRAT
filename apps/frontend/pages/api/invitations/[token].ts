@@ -2,28 +2,21 @@ import { getInvitation, isInvitationExpired } from 'models/invitation';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { ApiError } from '@/lib/errors';
+import { withApiHandler } from '@/lib/middleware';
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'GET');
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    res.status(400).json({
-      error: { message: error.message },
-    });
+  switch (method) {
+    case 'GET':
+      await handleGET(req, res);
+      break;
+    default:
+      res.setHeader('Allow', 'GET');
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -38,6 +31,9 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   recordMetric('invitation.fetched');
+  console.log(`[Invitation] fetched, token: ${token}, teamId: ${invitation.teamId}`);
 
   res.status(200).json({ data: invitation });
 };
+
+export default withApiHandler(handler);

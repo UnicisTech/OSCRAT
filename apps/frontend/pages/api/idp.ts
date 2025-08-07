@@ -1,16 +1,24 @@
 import jackson from '@/lib/jackson';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { withApiHandler } from '@/lib/middleware';
+import { ApiError } from '@/lib/errors';
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  try {
-    const { directorySync } = await jackson();
-    res.status(200).json({ data: directorySync.providers() });
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-    res.status(status).json({ error: { message } });
+  const { method } = req;
+
+  if (method !== 'GET') {
+    res.setHeader('Allow', 'GET');
+    throw new ApiError(405, `Method ${method} Not Allowed`);
   }
+
+  const { directorySync } = await jackson();
+  const providers = directorySync.providers();
+  
+  console.log('[IDP] providers fetched');
+  res.status(200).json({ data: providers });
 }
+
+export default withApiHandler(handler);

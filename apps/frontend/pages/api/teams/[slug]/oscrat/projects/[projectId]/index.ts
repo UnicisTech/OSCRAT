@@ -2,6 +2,7 @@ import { getProjectDetail, updateProject, deleteProject } from 'models/oscrat';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductUpdate } from '@oscrat/model';
+import { ApiError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedRequest,
@@ -18,9 +19,7 @@ export default function handler(
       return withAuth(['team', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -36,9 +35,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   );
 
   if (!project) {
-    return res.status(404).json({
-      error: { message: 'Project not found' },
-    });
+    throw new ApiError(404, 'Project not found');
   }
 
   res.status(200).json({ data: project });
@@ -67,6 +64,8 @@ const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => 
   const { projectId } = req.query;
 
   await deleteProject(teamMember.teamId, projectId as string);
+
+  console.log(`[OSCRAT] project deleted, projectId: ${projectId}, teamId: ${teamMember.teamId}`);
 
   res.status(200).json({ data: {} });
 };

@@ -2,6 +2,7 @@ import { sendEvent } from '@/lib/svix';
 import { createTask, getTeamTasks } from 'models/task';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
+import { ApiError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedRequest,
@@ -15,11 +16,8 @@ export default function handler(
     case 'GET':
       return withAuth(['task', 'read'])(handleGET)(req, res);
     default:
-      res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
-      res.status(405).json({
-        data: null,
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      res.setHeader('Allow', ['GET', 'POST']);
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 

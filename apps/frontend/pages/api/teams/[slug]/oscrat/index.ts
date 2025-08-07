@@ -6,6 +6,7 @@ import {
 } from 'models/oscrat';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
+import { ApiError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedRequest,
@@ -22,9 +23,7 @@ export default function handler(
       return withAuth(['team', 'update'])(handlePUT)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT']);
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -55,6 +54,8 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
     organizationData
   );
 
+  console.log(`[OSCRAT] organization created, orgId: ${organization.id}, teamId: ${teamMember.teamId}`);
+
   res.status(201).json({ data: organization });
 };
 
@@ -68,6 +69,8 @@ const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
     teamMember.teamId,
     organizationData
   );
+
+  console.log(`[OSCRAT] organization updated, orgId: ${organization.id}, teamId: ${teamMember.teamId}`);
 
   res.status(200).json({ data: organization });
 };

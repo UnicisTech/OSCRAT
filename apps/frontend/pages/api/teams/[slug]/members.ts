@@ -28,9 +28,7 @@ export default function handler(
       return withAuth(['team_member', 'update'])(handlePATCH)(req, res);
     default:
       res.setHeader('Allow', 'GET, DELETE, PUT, PATCH');
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -90,6 +88,8 @@ const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => 
   });
 
   recordMetric('member.removed');
+
+  console.log(`[Team] member removed, userId: ${userId}, teamId: ${teamMember.teamId}, removedBy: ${user.id}`);
 
   res.status(200).json({ data: {} });
 };

@@ -7,38 +7,36 @@ import { recordMetric } from '@/lib/metrics';
 import { validateRecaptcha } from '@/lib/recaptcha';
 import rateLimit from '@/lib/rate-limit';
 import { getIpAddress } from '@/lib/utils';
+import { withApiHandler } from '@/lib/middleware';
 
 const limiter = rateLimit({
   interval: 60 * 1000, // 60 seconds
   uniqueTokenPerInterval: 500, // Max 500 requests per second
 });
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { method } = req;
+
   try {
     await limiter.check(5, getIpAddress(req), res); // 5 requests per minute for IP address
-    try {
-      switch (req.method) {
-        case 'POST':
-          await handlePOST(req, res);
-          break;
-        default:
-          res.setHeader('Allow', 'POST');
-          res.status(405).json({
-            error: { message: `Method ${req.method} Not Allowed` },
-          });
-      }
-    } catch (error: any) {
-      const message = error.message || 'Something went wrong';
-      const status = error.status || 500;
-      res.status(status).json({ error: { message } });
-    }
   } catch (error: any) {
-    res.status(429).json({ error: { message: 'Rate limit exceeded' } });
+    throw new ApiError(429, 'Rate limit exceeded');
+  }
+
+  switch (method) {
+    case 'POST':
+      await handlePOST(req, res);
+      break;
+    default:
+      res.setHeader('Allow', 'POST');
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
+
+export default withApiHandler(handler);
 
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const { email, recaptchaToken } = req.body;
@@ -49,6 +47,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     throw new ApiError(422, 'The e-mail address you entered is invalid');
   }
 
+  console.log(`[DB] findUser, email: ${email}`);
   const user = await prisma.user.findUnique({
     where: { email },
   });

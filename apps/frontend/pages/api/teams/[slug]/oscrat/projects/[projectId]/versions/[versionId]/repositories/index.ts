@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratRepositoryCreate } from '@oscrat/model';
+import { ApiError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedRequest,
@@ -20,9 +21,7 @@ export default function handler(
       return withAuth(['team', 'create'])(handlePOST)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST']);
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -52,10 +51,6 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { versionId } = req.query;
   const repositoryData = req.body as OscratRepositoryCreate;
 
-  console.log(
-    `[Repository API] Creating repository ${repositoryData.name} for version ${versionId}`
-  );
-
   const repository = await createRepository(
     prisma,
     teamMember.teamId,
@@ -63,9 +58,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
     repositoryData
   );
 
-  console.log(
-    `[Repository API] Repository created successfully: ${repository.id}`
-  );
+  console.log(`[OSCRAT] repository created, repositoryId: ${repository.id}, name: ${repositoryData.name}, versionId: ${versionId}`);
 
   res.status(201).json({ data: repository });
 };

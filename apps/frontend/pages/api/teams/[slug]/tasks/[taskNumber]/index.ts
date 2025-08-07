@@ -2,6 +2,7 @@ import { sendEvent } from '@/lib/svix';
 import { getTaskBySlugAndNumber, updateTask, deleteTask } from 'models/task';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
+import { ApiError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedRequest,
@@ -18,10 +19,7 @@ export default function handler(
       return withAuth(['task', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
-      res.status(405).json({
-        data: null,
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -33,21 +31,13 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const taskNumberAsNumber = Number(taskNumber);
 
   if (isNaN(taskNumberAsNumber)) {
-    return res.status(400).json({
-      error: {
-        message: 'Invalid task number',
-      },
-    });
+    throw new ApiError(400, 'Invalid task number');
   }
 
   const task = await getTaskBySlugAndNumber(taskNumberAsNumber, slug as string);
 
   if (!task) {
-    return res.status(404).json({
-      error: {
-        message: 'Task not found',
-      },
-    });
+    throw new ApiError(404, 'Task not found');
   }
 
   return res.status(200).json({ data: task, error: null });
@@ -61,25 +51,19 @@ const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const taskNumberAsNumber = Number(taskNumber);
 
   if (isNaN(taskNumberAsNumber)) {
-    return res.status(400).json({
-      error: {
-        message: 'Invalid task number',
-      },
-    });
+    throw new ApiError(400, 'Invalid task number');
   }
 
   const data = req.body;
   const task = await updateTask(taskNumberAsNumber, slug as string, data);
 
   if (!task) {
-    return res.status(404).json({
-      error: {
-        message: 'Task not found',
-      },
-    });
+    throw new ApiError(404, 'Task not found');
   }
 
   await sendEvent(teamMember.teamId, 'task.updated', task);
+
+  console.log(`[Task] updated, taskId: ${task.id}, taskNumber: ${taskNumber}, teamId: ${teamMember.teamId}`);
 
   return res.status(200).json({ data: task, error: null });
 };
@@ -93,24 +77,18 @@ const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => 
   const taskNumberAsNumber = Number(taskNumber);
 
   if (isNaN(taskNumberAsNumber)) {
-    return res.status(400).json({
-      error: {
-        message: 'Invalid task number',
-      },
-    });
+    throw new ApiError(400, 'Invalid task number');
   }
 
   const task = await deleteTask(taskNumberAsNumber, slug as string);
 
   if (!task) {
-    return res.status(404).json({
-      error: {
-        message: 'Task not found',
-      },
-    });
+    throw new ApiError(404, 'Task not found');
   }
 
   await sendEvent(teamMember.teamId, 'task.deleted', task);
+
+  console.log(`[Task] deleted, taskId: ${task.id}, taskNumber: ${taskNumber}, teamId: ${teamMember.teamId}`);
 
   return res.status(200).json({ data: {}, error: null });
 };

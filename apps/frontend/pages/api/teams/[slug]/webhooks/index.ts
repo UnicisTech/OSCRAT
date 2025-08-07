@@ -31,9 +31,7 @@ export default function handler(
       return withAuth(['team_webhook', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', 'POST, GET, DELETE');
-      res.status(405).json({
-        error: { message: `Method ${method} Not Allowed` },
-      });
+      throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
@@ -71,6 +69,8 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   });
 
   recordMetric('webhook.created');
+
+  console.log(`[Webhook] created, endpointId: ${endpoint?.id}, url: ${url}, teamId: ${teamMember.team.id}, createdBy: ${user.id}`);
 
   res.status(200).json({ data: endpoint });
 };
