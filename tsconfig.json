@@ -14,8 +14,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "declaration": false
   },
   "exclude": ["node_modules", "dist", ".next", "build"],
-  "references": [{ "path": "./apps/frontend" }, { "path": "./apps/jobrunner" }]
+  "references": [{ "path": "./apps/jobrunner" }]
 }
