@@ -3,10 +3,16 @@ import { EndpointIn, Svix } from 'svix';
 import env from './env';
 import type { AppEvent } from 'types';
 
-const svix = new Svix(env.svix.apiKey);
+const getSvixClient = () => {
+  if (!env.svix.apiKey) {
+    return null;
+  }
+  return new Svix(env.svix.apiKey);
+};
 
 export const findOrCreateApp = async (name: string, uid: string) => {
-  if (!env.svix.apiKey) {
+  const svix = getSvixClient();
+  if (!svix) {
     return;
   }
 

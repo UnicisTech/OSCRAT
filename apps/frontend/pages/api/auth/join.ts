@@ -98,11 +98,18 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!invitation) {
     const slug = slugify(team);
 
-    await createTeam({
-      userId: user.id,
-      name: team,
-      slug,
-    });
+    console.log(`[Auth] creating team, name: ${team}, slug: ${slug}, userId: ${user.id}`);
+    try {
+      await createTeam({
+        userId: user.id,
+        name: team,
+        slug,
+      });
+      console.log(`[Auth] team created successfully, name: ${team}, userId: ${user.id}`);
+    } catch (error: any) {
+      console.log(`[Auth] team creation failed, name: ${team}, userId: ${user.id}, error: ${error.message}`);
+      throw error;
+    }
   }
 
   // Send account verification email

@@ -20,17 +20,38 @@ export const createTeam = async (param: {
 }) => {
   const { userId, name, slug } = param;
 
+  console.log(
+    `[Team] creating team record, name: ${name}, slug: ${slug}, userId: ${userId}`
+  );
   const team = await TeamOps.createTeam(prisma, { userId, name, slug });
 
-  await findOrCreateApp(team.name, team.id);
+  try {
+    await findOrCreateApp(team.name, team.id);
+    console.log(`[Team] svix app created successfully, teamId: ${team.id}`);
+  } catch (error: any) {
+    console.log(
+      `[Team] svix app creation failed, teamId: ${team.id}, error: ${error.message}`
+    );
+  }
 
-  await createOrganization(team.id, {
-    name: name, // Use team name as organization name
-    type: OscratOrganizationType.OTHER, // Default to OTHER, can be changed later
-    size: OscratOrganizationSize.STARTUP, // Default to STARTUP, can be changed later
-    roles: [OscratOrganizationRole.MANUFACTURER], // Default role, can be changed later
-    createdBy: userId,
-  });
+  console.log(
+    `[Team] creating organization, teamId: ${team.id}, userId: ${userId}`
+  );
+  try {
+    await createOrganization(team.id, {
+      name: name, // Use team name as organization name
+      type: OscratOrganizationType.OTHER, // Default to OTHER, can be changed later
+      size: OscratOrganizationSize.STARTUP, // Default to STARTUP, can be changed later
+      roles: [OscratOrganizationRole.MANUFACTURER], // Default role, can be changed later
+      createdBy: userId,
+    });
+    console.log(`[Team] organization created successfully, teamId: ${team.id}`);
+  } catch (error: any) {
+    console.log(
+      `[Team] organization creation failed, teamId: ${team.id}, error: ${error.message}`
+    );
+    throw error; // This is critical - re-throw the error
+  }
 
   return team;
 };
@@ -92,7 +113,6 @@ export const updateTeam = async (slug: string, data: any) => {
 export const isTeamExists = async (condition: any) => {
   return await TeamOps.isTeamExists(prisma, condition);
 };
-
 
 // Get the current user's team member object
 export const getTeamMember = async (userId: string, slug: string) => {
