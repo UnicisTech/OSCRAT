@@ -1,13 +1,12 @@
 import json from '@/components/defaultLanding/data/availableExtensions.json';
-import { PrismaClient } from '@oscrat/model/server';
+import { prisma } from '@/lib/prisma';
+import * as AttachmentOps from '@oscrat/model/operations';
 import formidable from 'formidable';
 import fs from 'fs';
 import { NextApiRequest } from 'next';
 import { v4 as uuidv4 } from 'uuid';
 
 const availableExtensions = json['availableExtensions'] as any;
-
-const prisma = new PrismaClient();
 
 export const createAttachment = async (
   taskId: number,
@@ -16,24 +15,25 @@ export const createAttachment = async (
   url: string,
   attachmentId: string
 ) => {
-  return prisma.attachment.create({
-    data: {
-      taskId,
-      filename,
-      fileData: new Uint8Array(fileData),
-      url,
-      id: attachmentId,
-    },
-  });
+  return await AttachmentOps.createAttachment(
+    prisma,
+    taskId,
+    filename,
+    fileData,
+    url,
+    attachmentId
+  );
 };
 
 export const findAttachmentById = async (id: string) => {
-  const attachment = await prisma.attachment.findUnique({
-    where: { id },
-  });
-  return attachment;
+  return await AttachmentOps.findAttachmentById(prisma, id);
 };
 
+export const deleteAttachment = async (id: string) => {
+  return await AttachmentOps.deleteAttachment(prisma, id);
+};
+
+// File handling utilities remain in frontend
 export const readFile = (
   req: NextApiRequest
 ): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
@@ -73,18 +73,10 @@ export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
   return url;
 };
 
-export const deleteAttachment = async (id: string) => {
-  await prisma.attachment.delete({
-    where: {
-      id,
-    },
-  });
-};
-
 const getFileExtensionFromFileName = (fileName: string) => {
   const lastDotIndex = fileName.lastIndexOf('.');
   if (lastDotIndex !== -1 && lastDotIndex < fileName.length - 1) {
-    return fileName.substr(lastDotIndex + 1).toLowerCase();
+    return fileName.substring(lastDotIndex + 1).toLowerCase();
   }
   return null;
 };

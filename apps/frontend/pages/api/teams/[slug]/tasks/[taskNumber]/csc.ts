@@ -3,20 +3,19 @@ import {
   changeControlInIssue,
   removeControlsFromIssue,
 } from 'models/team';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import type { ISO } from 'types';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'PUT':
-      return handlePUT(req, res);
+      return withAuth(['task', 'update'])(handlePUT)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
       res.status(405).json({
@@ -26,9 +25,8 @@ export default async function handler(
   }
 }
 
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
 
@@ -46,7 +44,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (operation === 'add') {
     await addControlsToIssue({
-      user: teamMember.user,
+      user: user,
       taskNumber: taskNumberAsNumber,
       slug: slug as string,
       controls,
@@ -56,7 +54,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (operation === 'remove') {
     await removeControlsFromIssue({
-      user: teamMember.user,
+      user: user,
       taskNumber: taskNumberAsNumber,
       slug: slug as string,
       controls,
@@ -66,7 +64,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (operation === 'change') {
     await changeControlInIssue({
-      user: teamMember.user,
+      user: user,
       taskNumber: taskNumberAsNumber,
       slug: slug as string,
       controls,

@@ -7,8 +7,8 @@ import { getViewerToken } from '@/lib/retraced';
 import { getSession } from '@/lib/session';
 import useCanAccess from 'hooks/useCanAccess';
 import { useTeamContext } from '@/context/TeamContext';
-import { getTeamMember } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
+import { getTeamMember } from '@/lib/middleware/teamAuth';
+import { isAllowed } from '@/lib/middleware';
 import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -90,8 +90,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     query.slug as string
   );
 
+  if (!teamMember) {
+    return {
+      notFound: true,
+    };
+  }
+
   try {
-    throwIfNotAllowed(teamMember, 'team_audit_log', 'read');
+    if (!isAllowed(teamMember.role, 'team_audit_log', 'read')) {
+      return { notFound: true };
+    }
 
     const auditLogToken = await getViewerToken(
       teamMember.team.id,

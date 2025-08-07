@@ -1,36 +1,15 @@
-import { ApiError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
-import { Invitation, Role } from '@oscrat/model';
-import { v4 as uuidv4 } from 'uuid';
+import * as InvitationOps from '@oscrat/model/operations';
+import { Role } from '@oscrat/model';
 
 export const getInvitations = async (teamId: string) => {
-  return await prisma.invitation.findMany({
-    where: {
-      teamId,
-    },
-  });
+  return await InvitationOps.getInvitations(prisma, teamId);
 };
 
 export const getInvitation = async (
   key: { token: string } | { id: string }
 ) => {
-  const invitation = await prisma.invitation.findUnique({
-    where: key,
-    include: {
-      team: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-  });
-
-  if (!invitation) {
-    throw new ApiError(404, 'Invitation not found.');
-  }
-
-  return invitation;
+  return await InvitationOps.getInvitation(prisma, key);
 };
 
 export const createInvitation = async (param: {
@@ -39,29 +18,15 @@ export const createInvitation = async (param: {
   email: string;
   role: Role;
 }) => {
-  const { teamId, invitedBy, email, role } = param;
-  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-  return await prisma.invitation.create({
-    data: {
-      token: uuidv4(),
-      expires,
-      teamId,
-      invitedBy,
-      email,
-      role,
-    },
-  });
+  return await InvitationOps.createInvitation(prisma, param);
 };
 
 export const deleteInvitation = async (
   key: { token: string } | { id: string }
 ) => {
-  return await prisma.invitation.delete({
-    where: key,
-  });
+  return await InvitationOps.deleteInvitation(prisma, key);
 };
 
-export const isInvitationExpired = async (invitation: Invitation) => {
-  return invitation.expires.getTime() < Date.now();
+export const isInvitationExpired = (invitation: { expires: Date }) => {
+  return InvitationOps.isInvitationExpired(invitation);
 };

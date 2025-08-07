@@ -6,20 +6,18 @@ import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import type { TeamProperties } from 'types';
 import * as Yup from 'yup';
-import { useSetCscIso } from '@/lib/api/hooks/csc';
+import { useSetCscIso, useGetCscIso } from '@/lib/api/hooks/csc';
 import { extractErrorMessage } from '@/lib/utils';
 
 const CSCSettings = ({ team }: { team: Team }) => {
   const { t } = useTranslation('common');
   const { mutateAsync: setIso, isPending: isLoading } = useSetCscIso(team.slug);
-
-  const teamProperties = team.properties as TeamProperties;
+  const { data: currentIso } = useGetCscIso(team.slug);
 
   const formik = useFormik({
     initialValues: {
-      iso: teamProperties?.csc_iso || 'default',
+      iso: currentIso || 'default',
     },
     validationSchema: Yup.object().shape({
       iso: Yup.string().required('Choose ISO set'),

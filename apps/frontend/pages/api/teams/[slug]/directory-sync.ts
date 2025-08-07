@@ -1,49 +1,37 @@
 import env from '@/lib/env';
 import jackson from '@/lib/jackson';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import { sendAudit } from '@/lib/retraced';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    if (!env.teamFeatures.dsync) {
-      throw new ApiError(404, 'Not Found');
-    }
+  if (!env.teamFeatures.dsync) {
+    throw new ApiError(404, 'Not Found');
+  }
 
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      case 'POST':
-        await handlePOST(req, res);
-        break;
-      case 'DELETE':
-        await handleDELETE(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'GET, POST');
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'GET':
+      return withAuth(['team_dsync', 'read'])(handleGET)(req, res);
+    case 'POST':
+      return withAuth(['team_dsync', 'create'])(handlePOST)(req, res);
+    case 'DELETE':
+      return withAuth(['team_dsync', 'delete'])(handleDELETE)(req, res);
+    default:
+      res.setHeader('Allow', 'GET, POST');
+      res.status(405).json({
+        error: { message: `Method ${method} Not Allowed` },
+      });
   }
 }
 
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_dsync', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { directorySync } = await jackson();
 
@@ -59,9 +47,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).json({ data });
 };
 
-const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_dsync', 'create');
+const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { name, provider } = req.body;
 
@@ -81,16 +68,15 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   sendAudit({
     action: 'dsync.connection.create',
     crud: 'c',
-    user: teamMember.user,
+    user: user,
     team: teamMember.team,
   });
 
   res.status(201).json({ data });
 };
 
-const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_dsync', 'delete');
+const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { dsyncId } = req.query as { dsyncId: string };
 
@@ -101,7 +87,7 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   sendAudit({
     action: 'dsync.connection.delete',
     crud: 'd',
-    user: teamMember.user,
+    user: user,
     team: teamMember.team,
   });
 

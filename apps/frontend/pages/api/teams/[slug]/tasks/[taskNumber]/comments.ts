@@ -4,26 +4,25 @@ import {
   deleteComment,
   getComments,
 } from 'models/comment';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import { sendEvent } from '@/lib/svix';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return handleGET(req, res);
+      return withAuth(['task', 'read'])(handleGET)(req, res);
     case 'POST':
-      return handlePOST(req, res);
+      return withAuth(['task', 'update'])(handlePOST)(req, res);
     case 'PUT':
-      return handlePUT(req, res);
+      return withAuth(['task', 'update'])(handlePUT)(req, res);
     case 'DELETE':
-      return handleDELETE(req, res);
+      return withAuth(['task', 'update'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST', 'DELETE', 'PUT']);
       res.status(405).json({
@@ -34,9 +33,8 @@ export default async function handler(
 }
 
 // Get comments for a task
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
   const taskNumberAsNumber = Number(taskNumber);
@@ -58,9 +56,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Create a comment
-const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
   const taskNumberAsNumber = Number(taskNumber);
@@ -74,7 +71,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const { text } = req.body;
-  const userId = teamMember.user.id;
+  const userId = user.id;
 
   const comment = await createComment({
     text,
@@ -97,9 +94,8 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Edit a comment
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { text, id } = req.body;
 
@@ -117,9 +113,8 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Delete a comment
-const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { id } = req.body;
 

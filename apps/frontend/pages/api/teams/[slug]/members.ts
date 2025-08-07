@@ -6,50 +6,37 @@ import { Role } from '@oscrat/model';
 import {
   getTeamMembers,
   removeTeamMember,
-  throwIfNoTeamAccess,
 } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      case 'DELETE':
-        await handleDELETE(req, res);
-        break;
-      case 'PUT':
-        await handlePUT(req, res);
-        break;
-      case 'PATCH':
-        await handlePATCH(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'GET, DELETE, PUT, PATCH');
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'GET':
+      return withAuth(['team_member', 'read'])(handleGET)(req, res);
+    case 'DELETE':
+      return withAuth(['team_member', 'delete'])(handleDELETE)(req, res);
+    case 'PUT':
+      return withAuth(['team', 'leave'])(handlePUT)(req, res);
+    case 'PATCH':
+      return withAuth(['team_member', 'update'])(handlePATCH)(req, res);
+    default:
+      res.setHeader('Allow', 'GET, DELETE, PUT, PATCH');
+      res.status(405).json({
+        error: { message: `Method ${method} Not Allowed` },
+      });
   }
 }
 
 // Get members of a team
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_member', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const members = await getTeamMembers(teamMember.team.slug);
 
@@ -59,9 +46,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Delete the member from the team
-const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_member', 'delete');
+const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { userId } = req.query as { userId: string };
 
@@ -99,7 +85,7 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   sendAudit({
     action: 'member.remove',
     crud: 'd',
-    user: teamMember.user,
+    user: user,
     team: teamMember.team,
   });
 
@@ -109,9 +95,8 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Leave a team
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'leave');
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const totalTeamOwners = await prisma.teamMember.count({
     where: {
@@ -124,7 +109,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     throw new ApiError(400, 'A team should have at least one owner.');
   }
 
-  await removeTeamMember(teamMember.teamId, teamMember.user.id);
+  await removeTeamMember(teamMember.teamId, user.id);
 
   recordMetric('member.left');
 
@@ -132,9 +117,8 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Update the role of a member
-const handlePATCH = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_member', 'update');
+const handlePATCH = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { memberId, role } = req.body as { memberId: string; role: Role };
 
@@ -153,7 +137,7 @@ const handlePATCH = async (req: NextApiRequest, res: NextApiResponse) => {
   sendAudit({
     action: 'member.update',
     crud: 'u',
-    user: teamMember.user,
+    user: user,
     team: teamMember.team,
   });
 

@@ -1,47 +1,36 @@
 import { createApiKey, fetchApiKeys } from 'models/apiKey';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import env from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    if (!env.teamFeatures.apiKey) {
-      throw new ApiError(404, 'Not Found');
-    }
+  if (!env.teamFeatures.apiKey) {
+    throw new ApiError(404, 'Not Found');
+  }
 
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      case 'POST':
-        await handlePOST(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'GET, POST');
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'GET':
+      return withAuth(['team_api_key', 'read'])(handleGET)(req, res);
+    case 'POST':
+      return withAuth(['team_api_key', 'create'])(handlePOST)(req, res);
+    default:
+      res.setHeader('Allow', 'GET, POST');
+      res.status(405).json({
+        error: { message: `Method ${method} Not Allowed` },
+      });
   }
 }
 
 // Get API keys
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_api_key', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const apiKeys = await fetchApiKeys(teamMember.teamId);
 
@@ -51,9 +40,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Create an API key
-const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_api_key', 'create');
+const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { name } = JSON.parse(req.body) as { name: string };
 

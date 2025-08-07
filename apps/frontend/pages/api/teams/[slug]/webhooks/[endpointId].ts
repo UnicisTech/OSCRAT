@@ -1,49 +1,38 @@
 import { ApiError } from '@/lib/errors';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import { sendAudit } from '@/lib/retraced';
 import { findOrCreateApp, findWebhook, updateWebhook } from '@/lib/svix';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { EndpointIn } from 'svix';
 import { recordMetric } from '@/lib/metrics';
 import env from '@/lib/env';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    if (!env.teamFeatures.webhook) {
-      throw new ApiError(404, 'Not Found');
-    }
+  if (!env.teamFeatures.webhook) {
+    throw new ApiError(404, 'Not Found');
+  }
 
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      case 'PUT':
-        await handlePUT(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'GET, PUT');
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (err: any) {
-    const message = err.message || 'Something went wrong';
-    const status = err.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'GET':
+      return withAuth(['team_webhook', 'read'])(handleGET)(req, res);
+    case 'PUT':
+      return withAuth(['team_webhook', 'update'])(handlePUT)(req, res);
+    default:
+      res.setHeader('Allow', 'GET, PUT');
+      res.status(405).json({
+        error: { message: `Method ${method} Not Allowed` },
+      });
   }
 }
 
 // Get a Webhook
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_webhook', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { endpointId } = req.query as {
     endpointId: string;
@@ -63,9 +52,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Update a Webhook
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_webhook', 'update');
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { endpointId } = req.query as {
     endpointId: string;
@@ -94,7 +82,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   sendAudit({
     action: 'webhook.update',
     crud: 'u',
-    user: teamMember.user,
+    user: user,
     team: teamMember.team,
   });
 

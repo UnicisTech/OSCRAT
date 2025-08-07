@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "main": "index.ts",
+  "types": "index.ts",
   "scripts": {
     "generate": "prisma generate",
     "studio": "prisma studio",
     "migrate": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "reset": "prisma migrate reset",
+    "reset:force": "prisma migrate reset --force",
     "seed:oscrat": "npx tsx prisma/seed-oscrat.ts",
     "build": "prisma generate"
   },

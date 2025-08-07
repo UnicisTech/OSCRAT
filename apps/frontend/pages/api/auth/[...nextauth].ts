@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { Role } from '@oscrat/model';
 import { getAccount } from 'models/account';
-import { addTeamMember, getTeam } from 'models/team';
+import { addTeamMember, getTeam, getTeamDetail } from 'models/team';
 import { createUser, getUser } from 'models/user';
 import NextAuth, { Account, NextAuthOptions, Profile, User } from 'next-auth';
 import BoxyHQSAMLProvider from 'next-auth/providers/boxyhq-saml';
@@ -228,8 +228,22 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      if (token && session) {
-        session.user.id = token.sub as string;
+      if (token && session && token.sub) {
+        session.user.id = token.sub;
+        
+        // Fetch complete user data from database
+        try {
+          const user = await getUser({ id: token.sub });
+          if (user) {
+            session.user.name = user.name;
+            session.user.email = user.email;
+            session.user.image = user.image;
+            session.user.firstName = user.firstName;
+            session.user.lastName = user.lastName;
+          }
+        } catch (error) {
+          console.error('Error fetching user data in session callback:', error);
+        }
       }
 
       return session;
@@ -248,9 +262,13 @@ export const authOptions: NextAuthOptions = {
 export default NextAuth(authOptions);
 
 const linkToTeam = async (profile: Profile, userId: string) => {
-  const team = await getTeam({
+  const team = await getTeamDetail({
     id: profile.requested.tenant,
   });
+
+  if (!team) {
+    throw new Error(`Team with ID ${profile.requested.tenant} not found`);
+  }
 
   // Sort out roles
   const roles = profile.roles || profile.groups || [];

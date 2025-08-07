@@ -28,6 +28,7 @@
     "db:migrate:deploy": "pnpm --filter @oscrat/model migrate:deploy",
     "db:seed": "pnpm --filter @oscrat/model seed:oscrat",
     "db:reset": "pnpm --filter @oscrat/model reset",
+    "db:reset:force": "pnpm --filter @oscrat/model reset:force",
     "services:db:up": "docker-compose up -d db",
     "services:db:down": "docker-compose down"
   },

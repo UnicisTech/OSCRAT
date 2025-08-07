@@ -7,11 +7,10 @@ import {
   saveFileAsAttachment,
 } from 'models/attachment';
 import { checkExtensionAndMIMEType } from 'models/attachment';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import path from 'path';
 import { promisify } from 'util';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
 
 export const config = {
   api: {
@@ -19,19 +18,19 @@ export const config = {
   },
 };
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return handleGET(req, res);
+      return withAuth(['task', 'read'])(handleGET)(req, res);
     case 'POST':
-      return handlePOST(req, res);
+      return withAuth(['task', 'update'])(handlePOST)(req, res);
     case 'DELETE':
-      return handleDELETE(req, res);
+      return withAuth(['task', 'update'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'POST']);
       res.status(405).json({
@@ -42,9 +41,8 @@ export default async function handler(
 }
 
 // Download an attachment
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { id } = req.query;
 
@@ -89,9 +87,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Upload an attachment
-const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   try {
     const { fields, files } = await readFile(req);
@@ -130,9 +127,8 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
 // Delete a comment
 
-const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { id } = req.query;
 

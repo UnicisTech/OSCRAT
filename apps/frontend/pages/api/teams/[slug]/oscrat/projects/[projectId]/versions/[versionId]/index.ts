@@ -1,44 +1,32 @@
 import { getVersionDetail, updateVersion, deleteVersion } from 'models/oscrat';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import type { OscratProductVersionUpdate } from '@oscrat/model';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      case 'PUT':
-        await handlePUT(req, res);
-        break;
-      case 'DELETE':
-        await handleDELETE(req, res);
-        break;
-      default:
-        res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'GET':
+      return withAuth(['team', 'read'])(handleGET)(req, res);
+    case 'PUT':
+      return withAuth(['team', 'update'])(handlePUT)(req, res);
+    case 'DELETE':
+      return withAuth(['team', 'delete'])(handleDELETE)(req, res);
+    default:
+      res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
+      res.status(405).json({
+        error: { message: `Method ${method} Not Allowed` },
+      });
   }
 }
 
 // Get version detail
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;
 
@@ -57,9 +45,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Update version
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'update');
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;
   const versionData = req.body as OscratProductVersionUpdate;
@@ -80,9 +67,8 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Delete version
-const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'delete');
+const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;
 

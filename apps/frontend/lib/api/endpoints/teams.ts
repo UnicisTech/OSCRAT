@@ -1,10 +1,9 @@
 import {
-  TeamWithMemberCount,
   TeamMemberWithUser,
   TeamProperties,
 } from '@/types';
 import { api } from '@/lib/api/client';
-import { Team } from '@oscrat/model';
+import { Team, TeamSummary } from '@oscrat/model';
 import { Permission } from '@/lib/permissions';
 
 export type UpdateTeamData = {
@@ -14,15 +13,15 @@ export type UpdateTeamData = {
 };
 
 export const teamsEndpoints = {
-  list: () => api.get<TeamWithMemberCount[]>('/teams'),
+  list: () => api.get<TeamSummary[]>('/teams'),
 
   create: (name: string, slug: string) =>
     api.post<Team>('/teams', { name, slug }),
 
-  getTeam: (slug: string) => api.get<TeamWithMemberCount>(`/teams/${slug}`),
+  getTeam: (slug: string) => api.get<Team>(`/teams/${slug}`),
 
   updateTeam: (slug: string, data: UpdateTeamData) =>
-    api.put<TeamWithMemberCount>(`/teams/${slug}`, data),
+    api.put<Team>(`/teams/${slug}`, data),
 
   deleteTeam: (slug: string) => api.delete<void>(`/teams/${slug}`),
 

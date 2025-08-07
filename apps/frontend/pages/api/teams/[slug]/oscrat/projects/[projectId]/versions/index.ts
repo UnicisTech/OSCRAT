@@ -1,41 +1,30 @@
 import { getVersions, createVersion } from 'models/oscrat';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import type { OscratProductVersionCreate } from '@oscrat/model';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      case 'POST':
-        await handlePOST(req, res);
-        break;
-      default:
-        res.setHeader('Allow', ['GET', 'POST']);
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'GET':
+      return withAuth(['team', 'read'])(handleGET)(req, res);
+    case 'POST':
+      return withAuth(['team', 'create'])(handlePOST)(req, res);
+    default:
+      res.setHeader('Allow', ['GET', 'POST']);
+      res.status(405).json({
+        error: { message: `Method ${method} Not Allowed` },
+      });
   }
 }
 
 // Get all versions for a product
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { projectId } = req.query;
 
@@ -45,9 +34,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Create version for a product
-const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'create');
+const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { projectId } = req.query;
   const versionData = req.body as OscratProductVersionCreate;

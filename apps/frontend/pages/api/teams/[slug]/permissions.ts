@@ -1,37 +1,29 @@
 import { permissions, Permission } from '@/lib/permissions';
-import { throwIfNoTeamAccess } from 'models/team';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import type { ApiResponse } from '@/types';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
-  try {
-    switch (req.method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'GET');
-        res.status(405).json({
-          error: { message: `Method ${req.method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (req.method) {
+    case 'GET':
+      return withAuth(['team', 'read'])(handleGET)(req, res);
+    default:
+      res.setHeader('Allow', 'GET');
+      res.status(405).json({
+        error: { message: `Method ${req.method} Not Allowed` },
+      });
   }
 }
 
 // Get permissions for a team for the current user
 const handleGET = async (
-  req: NextApiRequest,
+  req: AuthenticatedRequest,
   res: NextApiResponse<ApiResponse<Permission[]>>
 ) => {
-  const teamRole = await throwIfNoTeamAccess(req, res);
+  const { teamMember } = req.teamContext;
 
-  res.json({ data: permissions[teamRole.role] } as ApiResponse<Permission[]>);
+  res.json({ data: permissions[teamMember.role] } as ApiResponse<Permission[]>);
 };

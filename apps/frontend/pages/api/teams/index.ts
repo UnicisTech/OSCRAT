@@ -2,47 +2,34 @@ import { slugify } from '@/lib/common';
 import { ApiError } from '@/lib/errors';
 import { getSession } from '@/lib/session';
 import { createTeam, getTeams, isTeamExists } from 'models/team';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      case 'POST':
-        await handlePOST(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'GET, POST');
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'GET':
+      return withAuth(['team', 'read'])(handleGET)(req, res);
+    case 'POST':
+      return handlePOST(req, res);
+    default:
+      res.setHeader('Allow', 'GET, POST');
+      res.status(405).json({
+        error: { message: `Method ${method} Not Allowed` },
+      });
   }
 }
 
 // Get teams
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
-  const session = await getSession(req, res);
-
-  const teams = await getTeams(session?.user.id as string);
+  const teams = await getTeams(user.id);
 
   recordMetric('team.fetched');
 
@@ -50,10 +37,10 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Create a team
-const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { name } = req.body;
+  const { user } = req.teamContext;
 
-  const session = await getSession(req, res);
   const slug = slugify(name);
 
   if (await isTeamExists([{ slug }])) {
@@ -61,7 +48,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const team = await createTeam({
-    userId: session?.user?.id as string,
+    userId: user.id,
     name,
     slug,
   });

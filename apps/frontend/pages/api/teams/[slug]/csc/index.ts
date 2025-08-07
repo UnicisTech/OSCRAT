@@ -1,17 +1,16 @@
 import { setCscStatus } from 'models/team';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'PUT':
-      return handlePUT(req, res);
+      return withAuth(['team', 'read'])(handlePUT)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
       res.status(405).json({
@@ -21,9 +20,8 @@ export default async function handler(
   }
 }
 
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'read');
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { slug } = req.query;
   const { control, value } = req.body;

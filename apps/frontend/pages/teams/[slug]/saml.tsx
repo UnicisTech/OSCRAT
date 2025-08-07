@@ -9,8 +9,8 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import env from '@/lib/env';
 import { BOXYHQ_UI_CSS } from '@/components/styles';
 import { getSession } from '@/lib/session';
-import { getTeamMember } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
+import { getTeamMember } from '@/lib/middleware/teamAuth';
+import { isAllowed } from '@/lib/middleware';
 import { NextPageWithLayout } from 'types';
 import { inferSSRProps } from '@/lib/inferSSRProps';
 import TeamLayout from '@/components/layouts/TeamLayout';
@@ -96,8 +96,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     query.slug as string
   );
 
+  if (!teamMember) {
+    return {
+      notFound: true,
+    };
+  }
+
   try {
-    throwIfNotAllowed(teamMember, 'team_sso', 'read');
+    if (!isAllowed(teamMember.role, 'team_sso', 'read')) {
+      return { notFound: true };
+    }
 
     const SPConfigURL = env.jackson.selfHosted
       ? `${env.jackson.externalUrl}/.well-known/saml-configuration`

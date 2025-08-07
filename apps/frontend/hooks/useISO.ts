@@ -10,7 +10,7 @@ export function useISO(slug: string, initialIso?: ISO) {
   const { data: response, isLoading, isError, error } = useGetCscIso(slug);
 
   // Use initialIso if provided, otherwise use the fetched data
-  const iso = initialIso ?? response?.iso;
+  const iso = initialIso ?? response;
 
   return {
     iso,

@@ -11,49 +11,38 @@ import {
   getInvitations,
   isInvitationExpired,
 } from 'models/invitation';
-import { addTeamMember, throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { addTeamMember } from 'models/team';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
+import { toPlainObject } from '@/lib/utils';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
-  try {
-    switch (method) {
-      case 'GET':
-        await handleGET(req, res);
-        break;
-      case 'POST':
-        await handlePOST(req, res);
-        break;
-      case 'PUT':
-        await handlePUT(req, res);
-        break;
-      case 'DELETE':
-        await handleDELETE(req, res);
-        break;
-      default:
-        res.setHeader('Allow', 'GET, POST, PUT, DELETE');
-        res.status(405).json({
-          error: { message: `Method ${method} Not Allowed` },
-        });
-    }
-  } catch (error: any) {
-    const message = error.message || 'Something went wrong';
-    const status = error.status || 500;
-
-    res.status(status).json({ error: { message } });
+  switch (method) {
+    case 'GET':
+      return withAuth(['team_invitation', 'read'])(handleGET)(req, res);
+    case 'POST':
+      return withAuth(['team_invitation', 'create'])(handlePOST)(req, res);
+    case 'PUT':
+      return withAuth()(handlePUT)(req, res);
+    case 'DELETE':
+      return withAuth(['team_invitation', 'delete'])(handleDELETE)(req, res);
+    default:
+      res.setHeader('Allow', 'GET, POST, PUT, DELETE');
+      res.status(405).json({
+        error: { message: `Method ${method} Not Allowed` },
+      });
   }
 }
 
 // Invite a user to a team
-const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_invitation', 'create');
+const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { email, role } = req.body;
 
@@ -87,7 +76,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const invitation = await createInvitation({
     teamId: teamMember.teamId,
-    invitedBy: teamMember.userId,
+    invitedBy: user.id,
     email,
     role,
   });
@@ -99,7 +88,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   sendAudit({
     action: 'member.invitation.create',
     crud: 'c',
-    user: teamMember.user,
+    user,
     team: teamMember.team,
   });
 
@@ -109,9 +98,8 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Get all invitations for a team
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_invitation', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const invitations = await getInvitations(teamMember.teamId);
 
@@ -121,16 +109,15 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Delete an invitation
-const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team_invitation', 'delete');
+const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { id } = req.query as { id: string };
 
   const invitation = await getInvitation({ id });
 
   if (
-    invitation.invitedBy != teamMember.user.id ||
+    invitation.invitedBy != user.id ||
     invitation.teamId != teamMember.teamId
   ) {
     throw new ApiError(
@@ -144,7 +131,7 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
   sendAudit({
     action: 'member.invitation.delete',
     crud: 'd',
-    user: teamMember.user,
+    user,
     team: teamMember.team,
   });
 
@@ -156,7 +143,7 @@ const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Accept an invitation to an organization
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { inviteToken } = req.body as { inviteToken: string };
 
   const invitation = await getInvitation({ token: inviteToken });
@@ -181,7 +168,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     invitation.role
   );
 
-  await sendEvent(invitation.team.id, 'member.created', teamMember);
+  await sendEvent(invitation.team.id, 'member.created', toPlainObject(teamMember));
   await deleteInvitation({ token: inviteToken });
 
   recordMetric('member.created');

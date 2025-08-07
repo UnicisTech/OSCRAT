@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { Card, Error, LetterAvatar, Loading } from '@/components/shared';
 import { useTeams } from 'hooks/useTeams';
-import { Team } from '@oscrat/model';
+import { TeamSummary } from '@oscrat/model';
 import { ApiResponse } from 'types';
 
 const Teams = () => {
@@ -19,7 +19,7 @@ const Teams = () => {
     return <Error />;
   }
 
-  const leaveTeam = async (team: Team) => {
+  const leaveTeam = async (team: TeamSummary) => {
     const response = await axios.put<ApiResponse>(
       `/api/teams/${team.slug}/members`
     );
@@ -72,7 +72,7 @@ const Teams = () => {
                         </div>
                       </Link>
                     </td>
-                    <td className="px-6 py-3">{team._count.members}</td>
+                    <td className="px-6 py-3">{team.membersCount}</td>
                     <td className="px-6 py-3">
                       {new Date(team.createdAt).toDateString()}
                     </td>

@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma';
 import { getCscStatusesProp, getCscControlsProp } from '@/lib/csc';
-import { getSession } from '@/lib/session';
 import { findOrCreateApp } from '@/lib/svix';
 import {
   Role,
@@ -8,8 +7,9 @@ import {
   OscratOrganizationSize,
   OscratOrganizationRole,
 } from '@oscrat/model';
+import * as TeamOps from '@oscrat/model/operations';
+import { createOrganization } from '@/models/oscrat/organization';
 import { controls } from '@/components/defaultLanding/data/configs/csc';
-import type { NextApiRequest, NextApiResponse } from 'next';
 import type { TeamProperties, TaskProperties, ISO } from 'types';
 import type { Session } from 'next-auth';
 
@@ -20,43 +20,31 @@ export const createTeam = async (param: {
 }) => {
   const { userId, name, slug } = param;
 
-  const team = await prisma.team.create({
-    data: {
-      name,
-      slug,
-    },
-  });
-
-  await addTeamMember(team.id, userId, Role.OWNER);
+  const team = await TeamOps.createTeam(prisma, { userId, name, slug });
 
   await findOrCreateApp(team.name, team.id);
 
-  // TODO, org should start in an uninitialized state
-  await prisma.oscratOrganization.create({
-    data: {
-      name: name, // Use team name as organization name
-      type: OscratOrganizationType.OTHER, // Default to OTHER, can be changed later
-      size: OscratOrganizationSize.STARTUP, // Default to STARTUP, can be changed later
-      roles: [OscratOrganizationRole.MANUFACTURER], // Default role, can be changed later
-      teamId: team.id,
-      createdBy: userId,
-      updatedBy: userId,
-    },
+  await createOrganization(team.id, {
+    name: name, // Use team name as organization name
+    type: OscratOrganizationType.OTHER, // Default to OTHER, can be changed later
+    size: OscratOrganizationSize.STARTUP, // Default to STARTUP, can be changed later
+    roles: [OscratOrganizationRole.MANUFACTURER], // Default role, can be changed later
+    createdBy: userId,
   });
 
   return team;
 };
 
 export const getTeam = async (key: { id: string } | { slug: string }) => {
-  return await prisma.team.findUniqueOrThrow({
-    where: key,
-  });
+  return await TeamOps.getTeam(prisma, key);
+};
+
+export const getTeamDetail = async (key: { id: string } | { slug: string }) => {
+  return await TeamOps.getTeamDetail(prisma, key);
 };
 
 export const deleteTeam = async (key: { id: string } | { slug: string }) => {
-  return await prisma.team.delete({
-    where: key,
-  });
+  return await TeamOps.deleteTeam(prisma, key);
 };
 
 export const addTeamMember = async (
@@ -64,200 +52,55 @@ export const addTeamMember = async (
   userId: string,
   role: Role
 ) => {
-  return await prisma.teamMember.upsert({
-    create: {
-      teamId,
-      userId,
-      role,
-    },
-    update: {
-      role,
-    },
-    where: {
-      teamId_userId: {
-        teamId,
-        userId,
-      },
-    },
-  });
+  return await TeamOps.addTeamMember(prisma, teamId, userId, role);
 };
 
 export const removeTeamMember = async (teamId: string, userId: string) => {
-  return await prisma.teamMember.delete({
-    where: {
-      teamId_userId: {
-        teamId,
-        userId,
-      },
-    },
-  });
+  return await TeamOps.removeTeamMember(prisma, teamId, userId);
 };
 
 export const getTeams = async (userId: string) => {
-  return await prisma.team.findMany({
-    where: {
-      members: {
-        some: {
-          userId,
-        },
-      },
-    },
-    include: {
-      _count: {
-        select: { members: true },
-      },
-    },
-  });
+  return await TeamOps.getTeams(prisma, userId);
 };
 
 export const getOwnedTeams = async (userId: string) => {
-  return await prisma.team.findMany({
-    where: {
-      members: {
-        some: {
-          userId,
-          role: Role.OWNER,
-        },
-      },
-    },
-    include: {
-      _count: {
-        select: { members: true },
-      },
-    },
-  });
+  return await TeamOps.getOwnedTeams(prisma, userId);
 };
 
 // Check if the user is a member of the team
 export async function isTeamMember(userId: string, teamId: string) {
-  const teamMember = await prisma.teamMember.findFirstOrThrow({
-    where: {
-      userId,
-      teamId,
-    },
-  });
-
-  return (
-    teamMember.role === Role.MEMBER ||
-    teamMember.role === Role.OWNER ||
-    teamMember.role === Role.ADMIN
-  );
+  return await TeamOps.isTeamMember(prisma, userId, teamId);
 }
 
 export async function getTeamRoles(userId: string) {
-  const teamRoles = await prisma.teamMember.findMany({
-    where: {
-      userId,
-    },
-    select: {
-      teamId: true,
-      role: true,
-    },
-  });
-
-  return teamRoles;
+  return await TeamOps.getTeamRoles(prisma, userId);
 }
 
 // Check if the user is an admin or owner of the team
 export async function isTeamAdmin(userId: string, teamId: string) {
-  const teamMember = await prisma.teamMember.findFirstOrThrow({
-    where: {
-      userId,
-      teamId,
-    },
-  });
-
-  return teamMember.role === Role.ADMIN || teamMember.role === Role.OWNER;
+  return await TeamOps.isTeamAdmin(prisma, userId, teamId);
 }
 
 export const getTeamMembers = async (slug: string) => {
-  return await prisma.teamMember.findMany({
-    where: {
-      team: {
-        slug,
-      },
-    },
-    include: {
-      user: true,
-    },
-  });
+  return await TeamOps.getTeamMembers(prisma, slug);
 };
 
 export const updateTeam = async (slug: string, data: any) => {
-  return await prisma.team.update({
-    where: {
-      slug,
-    },
-    data: data,
-  });
+  return await TeamOps.updateTeam(prisma, { slug }, data);
 };
 
 export const isTeamExists = async (condition: any) => {
-  return await prisma.team.count({
-    where: {
-      OR: condition,
-    },
-  });
+  return await TeamOps.isTeamExists(prisma, condition);
 };
 
-// Check if the current user has access to the team
-// Should be used in API routes to check if the user has access to the team
-export const throwIfNoTeamAccess = async (
-  req: NextApiRequest,
-  res: NextApiResponse
-) => {
-  const session = await getSession(req, res);
-
-  if (!session) {
-    throw new Error('Unauthorized');
-  }
-
-  const teamMember = await getTeamMember(
-    session.user.id,
-    req.query.slug as string
-  );
-
-  if (!teamMember) {
-    throw new Error('You do not have access to this team');
-  }
-
-  return {
-    ...teamMember,
-    user: {
-      ...session.user,
-    },
-  };
-};
 
 // Get the current user's team member object
 export const getTeamMember = async (userId: string, slug: string) => {
-  const teamMember = await prisma.teamMember.findFirstOrThrow({
-    where: {
-      userId,
-      team: {
-        slug,
-      },
-      role: {
-        in: ['ADMIN', 'MEMBER', 'OWNER', 'AUDITOR'],
-      },
-    },
-    include: {
-      team: true,
-    },
-  });
-
-  return teamMember;
+  return await TeamOps.getTeamMember(prisma, userId, slug);
 };
 
 export const incrementTaskIndex = async (teamId: string) => {
-  try {
-    await prisma.team.update({
-      where: { id: teamId },
-      data: { taskIndex: { increment: 1 } },
-    });
-  } catch (error) {
-    console.error(error);
-  }
+  return await TeamOps.incrementTaskIndex(prisma, teamId);
 };
 //TODO: should delete
 export const getTeamPropertiesBySlug = async (slug: string) => {

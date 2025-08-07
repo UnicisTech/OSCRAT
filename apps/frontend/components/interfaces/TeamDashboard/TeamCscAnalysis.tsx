@@ -94,7 +94,7 @@ const ProcessingActivitiesAnalysis = ({
             style={{ width: '49%' }}
             className="stats stat-value dark:bg-base-100 bg-white p-4 shadow"
           >
-            <RadarChart iso={cscIso.iso} statuses={statuses} />
+            <RadarChart iso={cscIso} statuses={statuses} />
           </div>
         </div>
       </div>

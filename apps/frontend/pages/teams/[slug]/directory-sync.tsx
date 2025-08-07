@@ -15,8 +15,8 @@ import { toast } from 'react-hot-toast';
 import type { NextPageWithLayout } from 'types';
 import env from '@/lib/env';
 import { getSession } from '@/lib/session';
-import { getTeamMember } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
+import { getTeamMember } from '@/lib/middleware/teamAuth';
+import { isAllowed } from '@/lib/middleware';
 import { inferSSRProps } from '@/lib/inferSSRProps';
 import TeamLayout from '@/components/layouts/TeamLayout';
 import AccountLayout from '@/components/layouts/AccountLayout';
@@ -123,8 +123,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     query.slug as string
   );
 
+  if (!teamMember) {
+    return {
+      notFound: true,
+    };
+  }
+
   try {
-    throwIfNotAllowed(teamMember, 'team_dsync', 'read');
+    if (!isAllowed(teamMember.role, 'team_dsync', 'read')) {
+      return { notFound: true };
+    }
 
     return {
       props: {

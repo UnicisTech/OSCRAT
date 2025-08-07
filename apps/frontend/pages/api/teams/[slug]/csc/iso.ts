@@ -1,19 +1,18 @@
 import { setCscIso, getCscIso } from 'models/team';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { throwIfNoTeamAccess } from 'models/team';
-import { throwIfNotAllowed } from 'models/user';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return handleGET(req, res);
+      return withAuth(['team', 'read'])(handleGET)(req, res);
     case 'PUT':
-      return handlePUT(req, res);
+      return withAuth(['team', 'read'])(handlePUT)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
       res.status(405).json({
@@ -23,9 +22,8 @@ export default async function handler(
   }
 }
 
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { slug } = req.query;
 
@@ -35,12 +33,11 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 
   console.log('hande get iso responce', responce);
 
-  return res.status(200).json({ data: { iso: responce }, error: null });
+  return res.status(200).json({ data: responce, error: null });
 };
 
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'team', 'read');
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { slug } = req.query;
   const { iso } = req.body;
@@ -54,5 +51,5 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 
   console.log('hande put isoresponce ', responce);
 
-  return res.status(200).json({ data: { iso: responce }, error: null });
+  return res.status(200).json({ data: responce, error: null });
 };

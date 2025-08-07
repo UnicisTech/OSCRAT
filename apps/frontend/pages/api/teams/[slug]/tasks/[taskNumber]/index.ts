@@ -1,22 +1,21 @@
 import { sendEvent } from '@/lib/svix';
 import { getTaskBySlugAndNumber, updateTask, deleteTask } from 'models/task';
-import { throwIfNoTeamAccess } from 'models/team';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { throwIfNotAllowed } from 'models/user';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return handleGET(req, res);
+      return withAuth(['task', 'read'])(handleGET)(req, res);
     case 'PUT':
-      return handlePUT(req, res);
+      return withAuth(['task', 'update'])(handlePUT)(req, res);
     case 'DELETE':
-      return handleDELETE(req, res);
+      return withAuth(['task', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
       res.status(405).json({
@@ -27,9 +26,8 @@ export default async function handler(
 }
 
 // Get task by slug and taskNumber
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
   const taskNumberAsNumber = Number(taskNumber);
@@ -56,9 +54,8 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Edit a task
-const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'update');
+const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
   const taskNumberAsNumber = Number(taskNumber);
@@ -88,9 +85,8 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Delete the task
-const handleDELETE = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'delete');
+const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
 

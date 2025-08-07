@@ -14,11 +14,11 @@ export type UpdateTaskCscData = {
 
 export const cscEndpoints = {
   getCscIso: (slug: string) => {
-    return api.get<{ iso: ISO }>(`/teams/${slug}/csc/iso`);
+    return api.get<ISO>(`/teams/${slug}/csc/iso`);
   },
 
   setCscIso: (slug: string, iso: ISO) =>
-    api.put<{ iso: ISO }>(`/teams/${slug}/csc/iso`, { iso }),
+    api.put<ISO>(`/teams/${slug}/csc/iso`, { iso }),
 
   updateCscStatus: (slug: string, data: UpdateCscStatusData) =>
     api.put<{ statuses: Record<string, string> }>(`/teams/${slug}/csc`, data),

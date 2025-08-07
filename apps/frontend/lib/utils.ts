@@ -34,3 +34,8 @@ export function extractErrorMessage(
 
   return fallbackMessage;
 }
+
+/** Convert any object to a plain Record<string, unknown> for APIs that require it */
+export function toPlainObject<T>(obj: T): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(obj));
+}

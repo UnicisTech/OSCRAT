@@ -1,4 +1,4 @@
-import type { Prisma, TeamMember, User, Comment } from '@oscrat/model';
+import type { Prisma, TeamMember, User, Comment, TeamSummary } from '@oscrat/model';
 import type { TaskCscProperties, TeamCscProperties } from './csc';
 
 export type ApiError = {
@@ -19,13 +19,6 @@ export type ApiResponse<T = unknown> =
 
 export type Role = 'owner' | 'member';
 
-export type TeamWithMemberCount = Prisma.TeamGetPayload<{
-  include: {
-    _count: {
-      select: { members: true };
-    };
-  };
-}>;
 
 export type TaskExtended = Prisma.TaskGetPayload<{
   include: {

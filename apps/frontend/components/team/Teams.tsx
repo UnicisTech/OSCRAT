@@ -1,5 +1,5 @@
 import { LetterAvatar } from '@/components/shared';
-import { Team } from '@oscrat/model';
+import { TeamSummary } from '@oscrat/model';
 import { useTeams } from 'hooks/useTeams';
 import { useTeam } from 'hooks/useTeam';
 import { useTranslation } from 'next-i18next';
@@ -16,7 +16,7 @@ import { extractErrorMessage } from '@/lib/utils';
 const Teams = () => {
   const router = useRouter();
   const { t } = useTranslation('common');
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<TeamSummary | null>(null);
   const {
     teams: teamsResponse,
     isLoading: isLoadingTeams,
@@ -95,7 +95,7 @@ const Teams = () => {
                       </div>
                     </Link>
                   </td>
-                  <td>{team._count.members}</td>
+                  <td>{team.membersCount}</td>
                   <td>{new Date(team.createdAt).toDateString()}</td>
                   <td>
                     <Button

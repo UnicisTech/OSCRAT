@@ -1,20 +1,19 @@
 import { sendEvent } from '@/lib/svix';
 import { createTask, getTeamTasks } from 'models/task';
-import { throwIfNoTeamAccess } from 'models/team';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { throwIfNotAllowed } from 'models/user';
+import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import type { NextApiResponse } from 'next';
 
-export default async function handler(
-  req: NextApiRequest,
+export default function handler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'POST':
-      return handlePOST(req, res);
+      return withAuth(['task', 'create'])(handlePOST)(req, res);
     case 'GET':
-      return handleGET(req, res);
+      return withAuth(['task', 'read'])(handleGET)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
       res.status(405).json({
@@ -25,9 +24,8 @@ export default async function handler(
 }
 
 // Get team tasks
-const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'read');
+const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember } = req.teamContext;
 
   const tasks = await getTeamTasks(teamMember.team.slug as string);
 
@@ -35,18 +33,16 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 // Create a task
-const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
-  const teamMember = await throwIfNoTeamAccess(req, res);
-  throwIfNotAllowed(teamMember, 'task', 'create');
+const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+  const { teamMember, user } = req.teamContext;
 
   const { title, status, duedate, description } = req.body;
   const {
-    user: { id: authorId },
     teamId,
   } = teamMember;
 
   const task = await createTask({
-    authorId,
+    authorId: user.id,
     teamId,
     title,
     status,

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { createHash, randomBytes } from 'crypto';
+import * as ApiKeyOps from '@oscrat/model/operations';
 
 interface CreateApiKeyParams {
   name: string;
@@ -7,43 +7,21 @@ interface CreateApiKeyParams {
 }
 
 export const hashApiKey = (apiKey: string) => {
-  return createHash('sha256').update(apiKey).digest('hex');
+  return ApiKeyOps.hashApiKey(apiKey);
 };
 
 export const generateUniqueApiKey = () => {
-  const apiKey = randomBytes(16).toString('hex');
-
-  return [hashApiKey(apiKey), apiKey];
+  return ApiKeyOps.generateUniqueApiKey();
 };
 
 export const createApiKey = async (params: CreateApiKeyParams) => {
-  const { name, teamId } = params;
-
-  const [hashedKey, apiKey] = generateUniqueApiKey();
-
-  await prisma.apiKey.create({
-    data: {
-      name,
-      hashedKey: hashedKey,
-      team: { connect: { id: teamId } },
-    },
-  });
-
-  return apiKey;
+  return await ApiKeyOps.createApiKey(prisma, params);
 };
 
 export const fetchApiKeys = async (teamId: string) => {
-  return prisma.apiKey.findMany({
-    where: {
-      teamId,
-    },
-  });
+  return await ApiKeyOps.fetchApiKeys(prisma, teamId);
 };
 
 export const deleteApiKey = async (id: string) => {
-  return prisma.apiKey.delete({
-    where: {
-      id,
-    },
-  });
+  return await ApiKeyOps.deleteApiKey(prisma, id);
 };

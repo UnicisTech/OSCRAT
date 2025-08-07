@@ -1,44 +1,11 @@
 import { prisma } from '@/lib/prisma';
+import * as CommentOps from '@oscrat/model/operations';
 
 export const getComments = async (params: {
   taskNumber: number;
   slug: string;
 }) => {
-  const { taskNumber, slug } = params;
-
-  const task = await prisma.task.findFirst({
-    where: {
-      taskNumber,
-      team: {
-        slug,
-      },
-    },
-  });
-
-  if (!task) {
-    return [];
-  }
-
-  const comments = await prisma.comment.findMany({
-    where: {
-      taskId: task.id,
-    },
-    include: {
-      createdBy: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          image: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'asc',
-    },
-  });
-
-  return comments;
+  return await CommentOps.getComments(prisma, params);
 };
 
 export const createComment = async (params: {
@@ -47,61 +14,13 @@ export const createComment = async (params: {
   taskNumber: number;
   slug: string;
 }) => {
-  const { text, taskNumber, slug, userId } = params;
-
-  const task = await prisma.task.findFirst({
-    where: {
-      taskNumber,
-      team: {
-        slug,
-      },
-    },
-  });
-
-  if (!task) {
-    return null;
-  }
-
-  const comment = await prisma.comment.create({
-    data: {
-      text,
-      taskId: task.id,
-      createdById: userId,
-    },
-  });
-
-  return comment;
+  return await CommentOps.createComment(prisma, params);
 };
 
 export const updateComment = async (id: number, text: string) => {
-  const commentToEdit = await prisma.comment.findFirst({
-    where: {
-      id,
-    },
-  });
-
-  if (!commentToEdit) {
-    return null;
-  }
-
-  const editedComment = await prisma.comment.update({
-    where: {
-      id: commentToEdit.id,
-    },
-    data: {
-      text,
-    },
-  });
-
-  return editedComment;
+  return await CommentOps.updateComment(prisma, id, text);
 };
 
 export const deleteComment = async (id: number) => {
-  const comment = await prisma.comment.delete({
-    where: {
-      id,
-    },
-  });
-
-  return comment;
+  return await CommentOps.deleteComment(prisma, id);
 };
