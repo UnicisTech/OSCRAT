@@ -1,13 +1,13 @@
 {
   "build": {
     "builder": "nixpacks",
-    "buildCommand": "pnpm install --frozen-lockfile"
+    "buildCommand": "pnpm install --frozen-lockfile",
+    "watchPatterns": ["railway_script_runner.json"]
   },
   "deploy": {
     "startCommand": "pnpm db:generate && ${SCRIPT_COMMAND:-echo 'No script specified. Set SCRIPT_COMMAND variable to run a script.'}",
     "restartPolicyType": "never"
   },
-  "watchPaths": ["packages/model/**", "package.json", "pnpm-lock.yaml"],
   "environments": {
     "production": {
       "variables": {

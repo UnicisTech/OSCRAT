@@ -1,7 +1,13 @@
 {
   "build": {
     "builder": "nixpacks",
-    "buildCommand": "pnpm jobrunner:build"
+    "buildCommand": "pnpm jobrunner:build",
+    "watchPatterns": [
+      "apps/jobrunner/**",
+      "packages/model/**",
+      "package.json",
+      "pnpm-lock.yaml"
+    ]
   },
   "deploy": {
     "preDeployCommand": "pnpm db:migrate:deploy",
@@ -9,12 +15,6 @@
     "restartPolicyType": "on_failure",
     "restartPolicyMaxRetries": 10
   },
-  "watchPaths": [
-    "apps/jobrunner/**",
-    "packages/model/**",
-    "package.json",
-    "pnpm-lock.yaml"
-  ],
   "environments": {
     "production": {
       "variables": {
