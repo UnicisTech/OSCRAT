@@ -27,7 +27,7 @@ export interface OscratRepositoryUpdate extends Partial<OscratRepositoryBase> {}
 export interface OscratRepositorySummary extends OscratRepositoryBase {
   id: string;
   authType: OscratRepositoryAuthType;
-  organizationId: string;
+  teamId: string;
   versionId: string;
   productId: string; // Denormalized for easier queries
   createdAt: Date;
@@ -39,10 +39,10 @@ export interface OscratRepositoryDetail extends OscratRepositorySummary {
   // Same as summary for now, can be extended if needed
 }
 
-/** Repository with organization and product for job processing */
+/** Repository with team and product for job processing */
 export type OscratRepositoryWithRelations = Prisma.OscratRepositoryGetPayload<{
   include: {
-    organization: {
+    team: {
       select: {
         id: true;
         name: true;

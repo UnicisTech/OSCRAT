@@ -9,7 +9,7 @@ import type {
 
 /** Include for repository summary queries */
 const REPOSITORY_SUMMARY_INCLUDE = {
-  organization: {
+  team: {
     select: {
       id: true,
       name: true,
@@ -31,7 +31,7 @@ const REPOSITORY_SUMMARY_INCLUDE = {
 
 /** Include for repository detail queries */
 const REPOSITORY_DETAIL_INCLUDE = {
-  organization: {
+  team: {
     select: {
       id: true,
       name: true,
@@ -62,12 +62,12 @@ const transformToRepositorySummary = (
   provider: repository.provider,
   repositoryUrl: repository.repositoryUrl,
   user: repository.user,
-  targetBranch: repository.targetBranch ?? undefined,
-  targetTag: repository.targetTag ?? undefined,
-  targetCommit: repository.targetCommit ?? undefined,
+  targetBranch: repository.targetBranch || undefined,
+  targetTag: repository.targetTag || undefined,
+  targetCommit: repository.targetCommit || undefined,
   authType: repository.authType,
-  accessToken: repository.accessToken ?? undefined,
-  organizationId: repository.organizationId,
+  accessToken: repository.accessToken || undefined,
+  teamId: repository.teamId,
   versionId: repository.versionId,
   productId: repository.productId,
   createdAt: repository.createdAt,
@@ -85,12 +85,12 @@ const transformToRepositoryDetail = (
   provider: repository.provider,
   repositoryUrl: repository.repositoryUrl,
   user: repository.user,
-  targetBranch: repository.targetBranch ?? undefined,
-  targetTag: repository.targetTag ?? undefined,
-  targetCommit: repository.targetCommit ?? undefined,
+  targetBranch: repository.targetBranch || undefined,
+  targetTag: repository.targetTag || undefined,
+  targetCommit: repository.targetCommit || undefined,
   authType: repository.authType,
-  accessToken: repository.accessToken ?? undefined,
-  organizationId: repository.organizationId,
+  accessToken: repository.accessToken || undefined,
+  teamId: repository.teamId,
   versionId: repository.versionId,
   productId: repository.productId,
   createdAt: repository.createdAt,
@@ -106,7 +106,7 @@ export const getVersionRepository = async (
   const repository = await prisma.oscratRepository.findFirst({
     where: {
       versionId,
-      organization: { teamId },
+      teamId,
     },
     include: REPOSITORY_SUMMARY_INCLUDE,
   });
@@ -124,7 +124,7 @@ export const getProductRepository = async (
   const repository = await prisma.oscratRepository.findFirst({
     where: {
       productId,
-      organization: { teamId },
+      teamId,
       version: { status: 'ACTIVE' },
     },
     include: REPOSITORY_SUMMARY_INCLUDE,
@@ -145,7 +145,7 @@ export const getRepositoryDetail = async (
   const repository = await prisma.oscratRepository.findFirst({
     where: {
       id: repositoryId,
-      organization: { teamId },
+      teamId,
     },
     include: REPOSITORY_DETAIL_INCLUDE,
   });
@@ -161,7 +161,7 @@ export const getRepositoryById = async (
   return await prisma.oscratRepository.findUnique({
     where: { id: repositoryId },
     include: {
-      organization: {
+      team: {
         select: {
           id: true,
           name: true,
@@ -207,14 +207,14 @@ export const createRepository = async (
     where: {
       id: versionId,
       product: {
-        organization: { teamId },
+        teamId,
       },
     },
     include: {
       product: {
         select: {
           id: true,
-          organizationId: true,
+          teamId: true,
         },
       },
     },
@@ -226,7 +226,7 @@ export const createRepository = async (
       id: version.id,
       version: version.version,
       productId: version.product.id,
-      organizationId: version.product.organizationId,
+      teamId: version.product.teamId,
     });
   }
 
@@ -264,7 +264,7 @@ export const createRepository = async (
       targetCommit: data.targetCommit,
       authType: data.authType,
       accessToken: data.accessToken,
-      organizationId: version.product.organizationId,
+      teamId: teamId,
       versionId: versionId,
       productId: version.product.id,
     },
@@ -275,7 +275,7 @@ export const createRepository = async (
     id: repository.id,
     name: repository.name,
     provider: repository.provider,
-    organizationId: repository.organizationId,
+    teamId: repository.teamId,
     versionId: repository.versionId,
   });
 
@@ -293,7 +293,7 @@ export const updateRepository = async (
   const repository = await prisma.oscratRepository.findFirst({
     where: {
       id: repositoryId,
-      organization: { teamId },
+      teamId,
     },
     select: { id: true },
   });
@@ -331,7 +331,7 @@ export const deleteRepository = async (
   const repository = await prisma.oscratRepository.findFirst({
     where: {
       id: repositoryId,
-      organization: { teamId },
+      teamId,
     },
     select: { id: true },
   });
@@ -354,27 +354,20 @@ export const createProductRepository = async (
   data: OscratRepositoryCreate
 ): Promise<OscratRepositoryDetail> => {
   // Find the active version of the product
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const product = await prisma.oscratProduct.findFirst({
+    where: { 
+      id: productId,
+      teamId,
+    },
     include: {
-      products: {
-        where: { id: productId },
-        include: {
-          versions: {
-            where: { status: 'ACTIVE' },
-            orderBy: { createdAt: 'desc' },
-            take: 1,
-          },
-        },
+      versions: {
+        where: { status: 'ACTIVE' },
+        orderBy: { createdAt: 'desc' },
+        take: 1,
       },
     },
   });
 
-  if (!organization) {
-    throw new Error(`No OSCRAT organization found for team: ${teamId}`);
-  }
-
-  const product = organization.products[0];
   if (!product) {
     throw new Error(`Product ${productId} not found for team: ${teamId}`);
   }

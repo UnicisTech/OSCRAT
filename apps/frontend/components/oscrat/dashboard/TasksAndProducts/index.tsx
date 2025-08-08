@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaExclamationCircle } from 'react-icons/fa';
-import { useProductContext } from '@/context/ProductContext';
+import { useTeamContext } from '@/context/TeamContext';
 import { useTranslation } from 'next-i18next';
 
 // TODO: De legat cand termina Radu de facut hook/api endpoint pt getAllProducts(details not summary)
@@ -26,7 +26,7 @@ const TasksSummaryCard = ({ data }) => {
   const StatusPill = ({ category }) => {
     const { t, ready } = useTranslation('common');
     const hasOpenItems = category.count > 0;
-    const { teamId } = useProductContext();
+    const { slug: teamId } = useTeamContext();
 
     if (!ready) return null;
 

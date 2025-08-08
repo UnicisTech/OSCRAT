@@ -11,14 +11,14 @@ import type { OscratRepositoryDetail } from '@oscrat/model';
 const RepositorySection = () => {
   const { t } = useTranslation('common');
   const params = useParams();
-  const projectId = params?.projectId as string;
+  const productId = params?.productId as string;
   const versionId = params?.versionId as string;
   const { slug } = useTeamContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateMode, setIsCreateMode] = useState(false);
 
   const { repository, isLoading, isError, error, deleteRepository } =
-    useOscratRepository(slug, projectId, versionId);
+    useOscratRepository(slug, productId, versionId);
 
   const handleEditRepository = () => {
     setIsCreateMode(false);
@@ -89,7 +89,7 @@ const RepositorySection = () => {
             setVisible={setIsModalOpen}
             repository={undefined}
             teamId={slug}
-            projectId={projectId}
+            productId={productId}
             versionId={versionId}
             isCreateMode={isCreateMode}
           />
@@ -232,7 +232,7 @@ const RepositorySection = () => {
           setVisible={setIsModalOpen}
           repository={repository as OscratRepositoryDetail}
           teamId={slug}
-          projectId={projectId}
+          productId={productId}
           versionId={versionId}
           isCreateMode={isCreateMode}
         />

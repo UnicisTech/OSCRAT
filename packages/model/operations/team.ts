@@ -1,24 +1,68 @@
-import { PrismaClient, Team as PrismaTeam, type Prisma } from '@prisma/client';
+import { 
+  PrismaClient, 
+  Team as PrismaTeam, 
+  type Prisma,
+  Role,
+  OscratOrganizationType,
+  OscratOrganizationSize,
+  OscratOrganizationRole,
+  OscratProductIncidentStatus,
+  OscratProductVulnerabilityStatus,
+} from '@prisma/client';
 import type {
   Team,
   TeamSummary,
   TeamDetail,
   TeamCreate,
   TeamUpdate,
+  TeamWithProducts,
   TeamMemberSummary,
   TeamMemberDetail,
 } from '../types/team';
-import { Role } from '@prisma/client';
+import type { OscratProductSummary, OscratProductDetail } from '../types/product';
 
 /** Include for team summary queries */
 const TEAM_SUMMARY_INCLUDE = {
   _count: {
     select: { members: true },
   },
-} as const;
+};
 
 /** Include for team detail queries */
-const TEAM_DETAIL_INCLUDE = {} as const;
+const TEAM_DETAIL_INCLUDE = {};
+
+/** Include for team with product summaries (lightweight with counts) */
+const TEAM_WITH_PRODUCTS_SUMMARY_INCLUDE = {
+  products: {
+    include: {
+      reportingOrganizations: true,
+      _count: {
+        select: {
+          versions: true,
+        },
+      },
+      versions: {
+        select: {
+          id: true,
+          status: true,
+          incidents: {
+            select: {
+              id: true,
+              status: true,
+            },
+          },
+          vulnerabilities: {
+            select: {
+              id: true,
+              status: true,
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 
 /** Include for team member queries */
 const TEAM_MEMBER_INCLUDE = {
@@ -39,6 +83,9 @@ const TEAM_MEMBER_INCLUDE = {
       taskIndex: true,
       defaultRole: true,
       properties: true,
+      type: true,
+      size: true,
+      orgRoles: true,
       createdAt: true,
       updatedAt: true,
       _count: {
@@ -46,7 +93,76 @@ const TEAM_MEMBER_INCLUDE = {
       },
     },
   },
-} as const;
+};
+
+/** Transform Prisma product to ProductSummary (lightweight with counts) */
+const transformToProductSummary = (
+  product: any // Will be properly typed with Prisma payload
+): OscratProductSummary => {
+  const versions = product.versions || [];
+  const activeVersionsCount = versions.filter((v: any) => v.status === 'ACTIVE').length;
+  const totalOpenIncidents = versions.reduce((sum: number, v: any) => {
+    const openIncidents = (v.incidents || []).filter((i: any) => i.status === 'NOT_REPORTED').length;
+    return sum + openIncidents;
+  }, 0);
+  const totalOpenVulnerabilities = versions.reduce((sum: number, v: any) => {
+    const openVulns = (v.vulnerabilities || []).filter((vuln: any) => 
+      vuln.status === 'OPEN' || vuln.status === 'ACTIVELY_EXPLOITED'
+    ).length;
+    return sum + openVulns;
+  }, 0);
+
+  return {
+    id: product.id,
+    name: product.name,
+    type: product.type,
+    productCategory: product.productCategory,
+    complianceStatus: product.complianceStatus,
+    externalReportingAcronyms: product.reportingOrganizations?.map((org: any) => org.acronym) || [],
+    versionsCount: product._count?.versions || 0,
+    activeVersionsCount,
+    totalOpenIncidents,
+    totalOpenVulnerabilities,
+    status: product.status,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
+    createdBy: product.createdBy,
+    updatedBy: product.updatedBy,
+  };
+};
+
+/** Transform Prisma product to ProductDetail (full data with relations) */
+const transformToProductDetail = (
+  product: any // Will be properly typed with Prisma payload
+): OscratProductDetail => ({
+  id: product.id,
+  name: product.name,
+  type: product.type,
+  productCategory: product.productCategory,
+  complianceStatus: product.complianceStatus,
+  externalReportingAcronyms: product.reportingOrganizations?.map((org: any) => org.acronym) || [],
+  versions: product.versions?.map((version: any) => ({
+    id: version.id,
+    version: version.version,
+    status: version.status,
+    productId: version.productId,
+    openIncidents: (version.incidents || []).filter((i: any) => i.status === 'NOT_REPORTED').length,
+    openVulnerabilities: (version.vulnerabilities || []).filter((vuln: any) => 
+      vuln.status === 'OPEN' || vuln.status === 'ACTIVELY_EXPLOITED'
+    ).length,
+    hasRepository: !!version.repository,
+    sbomReportsCount: version._count?.sbomReports || 0,
+    createdAt: version.createdAt,
+    updatedAt: version.updatedAt,
+    createdBy: version.createdBy,
+    updatedBy: version.updatedBy,
+  })) || [],
+  status: product.status,
+  createdAt: product.createdAt,
+  updatedAt: product.updatedAt,
+  createdBy: product.createdBy,
+  updatedBy: product.updatedBy,
+});
 
 /** Transform Prisma team to basic Team */
 const transformToTeam = (team: PrismaTeam): Team => ({
@@ -86,6 +202,10 @@ const transformToTeamDetail = (
   properties: team.properties as Record<string, any>,
   createdAt: team.createdAt,
   updatedAt: team.updatedAt,
+  // Organization fields
+  type: team.type,
+  size: team.size,
+  orgRoles: team.orgRoles,
 });
 
 /** Transform Prisma team member to TeamMemberSummary */
@@ -104,7 +224,7 @@ const transformToTeamMemberSummary = (
     id: member.user.id,
     name: member.user.name,
     email: member.user.email,
-    image: member.user.image ?? undefined,
+    image: member.user.image || undefined,
   },
 });
 
@@ -124,7 +244,7 @@ const transformToTeamMemberDetail = (
     id: member.user.id,
     name: member.user.name,
     email: member.user.email,
-    image: member.user.image ?? undefined,
+    image: member.user.image || undefined,
   },
   team: {
     id: member.team.id,
@@ -134,6 +254,9 @@ const transformToTeamMemberDetail = (
     taskIndex: member.team.taskIndex,
     defaultRole: member.team.defaultRole,
     properties: member.team.properties as Record<string, any>,
+    type: member.team.type,
+    size: member.team.size,
+    orgRoles: member.team.orgRoles,
     createdAt: member.team.createdAt,
     updatedAt: member.team.updatedAt,
   },
@@ -144,13 +267,17 @@ export const createTeam = async (
   prisma: PrismaClient,
   data: TeamCreate
 ): Promise<TeamDetail> => {
-  const { userId, name, slug, domain } = data;
+  const { userId, name, slug, domain, type, size, orgRoles } = data;
 
   const team = await prisma.team.create({
     data: {
       name,
       slug,
       domain,
+      // Organization fields with defaults
+      type: type ?? OscratOrganizationType.OTHER,
+      size: size ?? OscratOrganizationSize.STARTUP,
+      orgRoles: orgRoles ?? [OscratOrganizationRole.MANUFACTURER],
     },
   });
 
@@ -338,24 +465,20 @@ export const getTeamMember = async (
   userId: string,
   slug: string
 ): Promise<TeamMemberDetail | null> => {
-  try {
-    const member = await prisma.teamMember.findFirstOrThrow({
-      where: {
-        userId,
-        team: {
-          slug,
-        },
-        role: {
-          in: [Role.ADMIN, Role.MEMBER, Role.OWNER, Role.AUDITOR],
-        },
+  const member = await prisma.teamMember.findFirst({
+    where: {
+      userId,
+      team: {
+        slug,
       },
-      include: TEAM_MEMBER_INCLUDE,
-    });
+      role: {
+        in: [Role.ADMIN, Role.MEMBER, Role.OWNER, Role.AUDITOR],
+      },
+    },
+    include: TEAM_MEMBER_INCLUDE,
+  });
 
-    return transformToTeamMemberDetail(member);
-  } catch {
-    return null;
-  }
+  return member ? transformToTeamMemberDetail(member) : null;
 };
 
 /** Get team roles for a user */
@@ -382,18 +505,14 @@ export const isTeamMember = async (
   userId: string,
   teamId: string
 ): Promise<boolean> => {
-  try {
-    const member = await prisma.teamMember.findFirstOrThrow({
-      where: {
-        userId,
-        teamId,
-      },
-    });
+  const member = await prisma.teamMember.findFirst({
+    where: {
+      userId,
+      teamId,
+    },
+  });
 
-    return member.role === Role.MEMBER || member.role === Role.OWNER || member.role === Role.ADMIN;
-  } catch {
-    return false;
-  }
+  return member ? (member.role === Role.MEMBER || member.role === Role.OWNER || member.role === Role.ADMIN) : false;
 };
 
 /** Check if user is team admin or owner */
@@ -402,18 +521,14 @@ export const isTeamAdmin = async (
   userId: string,
   teamId: string
 ): Promise<boolean> => {
-  try {
-    const member = await prisma.teamMember.findFirstOrThrow({
-      where: {
-        userId,
-        teamId,
-      },
-    });
+  const member = await prisma.teamMember.findFirst({
+    where: {
+      userId,
+      teamId,
+    },
+  });
 
-    return member.role === Role.ADMIN || member.role === Role.OWNER;
-  } catch {
-    return false;
-  }
+  return member ? (member.role === Role.ADMIN || member.role === Role.OWNER) : false;
 };
 
 /** Check if team exists with given conditions */
@@ -434,13 +549,35 @@ export const isTeamExists = async (
 export const incrementTaskIndex = async (
   prisma: PrismaClient,
   teamId: string
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     await prisma.team.update({
       where: { id: teamId },
       data: { taskIndex: { increment: 1 } },
     });
+    return true;
   } catch (error) {
-    // Silent fail - task index is not critical
+    console.warn('Failed to increment task index for team:', teamId, error);
+    return false;
   }
 };
+
+/** Get team with product summaries (lightweight) */
+export const getTeamWithProductsSummary = async (
+  prisma: PrismaClient,
+  key: { id: string } | { slug: string }
+): Promise<TeamWithProducts | null> => {
+  const team = await prisma.team.findUnique({
+    where: key,
+    include: TEAM_WITH_PRODUCTS_SUMMARY_INCLUDE,
+  });
+
+  if (!team) return null;
+
+  return {
+    ...transformToTeamDetail(team),
+    products: team.products.map(transformToProductSummary),
+  };
+};
+
+

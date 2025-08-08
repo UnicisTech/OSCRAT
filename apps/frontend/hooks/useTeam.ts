@@ -9,7 +9,7 @@ import {
   useSetCscIso,
   useUpdateCscStatus,
 } from '@/lib/api/hooks/csc';
-import type { UpdateTeamData } from '@/lib/api/endpoints/teams';
+import type { TeamSettingsUpdate } from '@oscrat/model';
 import type { ISO } from '@/types';
 import type {
   UpdateCscStatusData,
@@ -33,6 +33,7 @@ export function useTeam(slug: string) {
     error,
   } = useGetTeam(slug);
 
+
   // Team mutations
   const updateMutation = useUpdateTeam(slug);
   const deleteMutation = useDeleteTeam(slug);
@@ -50,7 +51,7 @@ export function useTeam(slug: string) {
   const updateCscStatusMutation = useUpdateCscStatus(slug);
 
   // Team actions
-  const updateTeam = async (data: UpdateTeamData) => {
+  const updateTeam = async (data: TeamSettingsUpdate) => {
     return updateMutation.mutateAsync(data);
   };
 

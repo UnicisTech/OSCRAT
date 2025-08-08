@@ -1,5 +1,5 @@
 import TabsManager from '@/components/oscrat/versions/versionDetails/tabs/TabManager';
-import { withProductLayout } from '@/lib/layout-helpers';
+import { withProductDetailLayout } from '@/lib/layout-helpers';
 import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/tabs';
 import Version from '@/components/oscrat/versions/versionDetails/version';
 import ConformityRow from '@/components/oscrat/versions/versionDetails/conformityRow';
@@ -22,6 +22,6 @@ export default function Index() {
   );
 }
 
-Index.getLayout = withProductLayout;
+Index.getLayout = withProductDetailLayout;
 
 export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';

@@ -39,8 +39,8 @@ export const getAssessments = async (
   projectId: string
 ): Promise<OscratAssessmentSummary[]> => {
   // Verify project ownership first
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: projectId },
@@ -49,7 +49,7 @@ export const getAssessments = async (
     },
   });
 
-  if (!organization || organization.products.length === 0) {
+  if (!team || team.products.length === 0) {
     throw new Error(`Project ${projectId} not found for team: ${teamId}`);
   }
 
@@ -69,8 +69,8 @@ export const getAssessmentDetail = async (
   assessmentId: string
 ): Promise<OscratAssessmentDetail | null> => {
   // Verify project ownership first
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: projectId },
@@ -79,7 +79,7 @@ export const getAssessmentDetail = async (
     },
   });
 
-  if (!organization || organization.products.length === 0) {
+  if (!team || team.products.length === 0) {
     throw new Error(`Project ${projectId} not found for team: ${teamId}`);
   }
 
@@ -101,8 +101,8 @@ export const createAssessment = async (
   data: OscratAssessmentCreate
 ): Promise<OscratAssessmentDetail> => {
   // Verify project ownership and find active version
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: projectId },
@@ -117,11 +117,11 @@ export const createAssessment = async (
     },
   });
 
-  if (!organization || organization.products.length === 0) {
+  if (!team || team.products.length === 0) {
     throw new Error(`Project ${projectId} not found for team: ${teamId}`);
   }
 
-  const product = organization.products[0];
+  const product = team.products[0];
   const activeVersion = product.versions[0];
 
   if (!activeVersion) {
@@ -150,8 +150,8 @@ export const deleteAssessment = async (
   assessmentId: string
 ): Promise<void> => {
   // Verify project ownership first
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: projectId },
@@ -160,7 +160,7 @@ export const deleteAssessment = async (
     },
   });
 
-  if (!organization || organization.products.length === 0) {
+  if (!team || team.products.length === 0) {
     throw new Error(`Project ${projectId} not found for team: ${teamId}`);
   }
 

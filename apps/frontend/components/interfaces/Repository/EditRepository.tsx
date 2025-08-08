@@ -48,7 +48,7 @@ const EditRepository = ({
   setVisible,
   repository,
   teamId,
-  projectId,
+  productId,
   versionId,
   isCreateMode = false,
 }: {
@@ -56,21 +56,21 @@ const EditRepository = ({
   setVisible: (visible: boolean) => void;
   repository?: OscratRepositoryDetail;
   teamId: string;
-  projectId: string;
+  productId: string;
   versionId: string;
   isCreateMode?: boolean;
 }) => {
   const { t } = useTranslation('common');
   const { updateRepository } = useOscratRepositoryDetail(
     teamId,
-    projectId,
+    productId,
     versionId,
     repository?.id || '',
     { enabled: !isCreateMode }
   );
   const { createRepository } = useOscratRepository(
     teamId,
-    projectId,
+    productId,
     versionId
   );
 

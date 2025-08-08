@@ -3,14 +3,14 @@ import {
   TeamProperties,
 } from '@/types';
 import { api } from '@/lib/api/client';
-import { Team, TeamSummary } from '@oscrat/model';
+import { 
+  Team, 
+  TeamSummary, 
+  TeamWithProducts,
+  TeamSettingsUpdate,
+  OscratProductSummary,
+} from '@oscrat/model';
 import { Permission } from '@/lib/permissions';
-
-export type UpdateTeamData = {
-  name?: string;
-  slug?: string;
-  domain?: string;
-};
 
 export const teamsEndpoints = {
   list: () => api.get<TeamSummary[]>('/teams'),
@@ -19,8 +19,11 @@ export const teamsEndpoints = {
     api.post<Team>('/teams', { name, slug }),
 
   getTeam: (slug: string) => api.get<Team>(`/teams/${slug}`),
+  
+  getTeamProducts: (slug: string) => 
+    api.get<OscratProductSummary[]>(`/teams/${slug}/products`),
 
-  updateTeam: (slug: string, data: UpdateTeamData) =>
+  updateTeam: (slug: string, data: TeamSettingsUpdate) =>
     api.put<Team>(`/teams/${slug}`, data),
 
   deleteTeam: (slug: string) => api.delete<void>(`/teams/${slug}`),

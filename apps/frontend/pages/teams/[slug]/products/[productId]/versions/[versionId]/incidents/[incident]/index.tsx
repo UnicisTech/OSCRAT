@@ -1,6 +1,6 @@
 import Incident from '@/components/oscrat/versions/versionDetails/tabs/allTabs/incidents/incident';
 import Summary from '@/components/oscrat/versions/versionDetails/tabs/allTabs/incidents/summary';
-import { withProductLayout } from '@/lib/layout-helpers';
+import { withProductDetailLayout } from '@/lib/layout-helpers';
 
 export default function Index() {
   return (
@@ -11,6 +11,6 @@ export default function Index() {
   );
 }
 
-Index.getLayout = withProductLayout;
+Index.getLayout = withProductDetailLayout;
 
 export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';

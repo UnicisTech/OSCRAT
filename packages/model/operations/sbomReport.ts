@@ -140,7 +140,7 @@ export const getSbomReportsByProductId = async (
       productId,
       version: {
         product: {
-          organization: { teamId },
+          teamId,
         },
       },
     },
@@ -172,7 +172,7 @@ export const getSbomReportById = async (
       id: reportId,
       version: {
         product: {
-          organization: { teamId },
+          teamId,
         },
       },
     },
@@ -202,7 +202,7 @@ export const getSbomReportFile = async (
       id: reportId,
       version: {
         product: {
-          organization: { teamId },
+          teamId,
         },
       },
     },

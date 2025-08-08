@@ -9,12 +9,12 @@ import type {
 export const oscratVersionEndpoints = {
   listVersions: (teamId: string, productId: string) =>
     api.get<OscratProductVersionSummary[]>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions`
+      `/teams/${teamId}/products/${productId}/versions`
     ),
 
   getVersionDetail: (teamId: string, productId: string, versionId: string) =>
     api.get<OscratProductVersionDetail>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}`
     ),
 
   createVersion: (
@@ -23,7 +23,7 @@ export const oscratVersionEndpoints = {
     data: OscratProductVersionCreate
   ) =>
     api.post<OscratProductVersionDetail>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions`,
+      `/teams/${teamId}/products/${productId}/versions`,
       data
     ),
 
@@ -34,12 +34,12 @@ export const oscratVersionEndpoints = {
     data: OscratProductVersionUpdate
   ) =>
     api.put<OscratProductVersionDetail>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}`,
+      `/teams/${teamId}/products/${productId}/versions/${versionId}`,
       data
     ),
 
   deleteVersion: (teamId: string, productId: string, versionId: string) =>
     api.delete<void>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}`
     ),
 };

@@ -357,52 +357,46 @@ const sampleReportingOrganizations = [
   },
 ];
 
-async function seedOscratData(organizationIdOrSlug: string) {
+async function seedOscratData(teamSlug: string) {
   try {
-    let organization;
-
-    // Try to find organization by ID first
-    organization = await prisma.oscratOrganization.findUnique({
-      where: { id: organizationIdOrSlug },
-      select: { id: true, createdBy: true, name: true },
+    // Find team by slug (unified Team/Organization model)
+    const team = await prisma.team.findUnique({
+      where: { slug: teamSlug },
+      select: { 
+        id: true, 
+        name: true, 
+        members: {
+          where: { role: 'OWNER' },
+          select: { userId: true },
+          take: 1
+        }
+      },
     });
 
-    // If not found by ID, try to find by team slug
-    if (!organization) {
-      const team = await prisma.team.findUnique({
-        where: { slug: organizationIdOrSlug },
-        include: {
-          oscratOrganization: {
-            select: { id: true, createdBy: true, name: true },
-          },
-        },
-      });
-
-      if (team?.oscratOrganization) {
-        organization = team.oscratOrganization;
-      }
-    }
-
-    if (!organization) {
+    if (!team) {
       throw new Error(
-        `Organization with ID or team slug "${organizationIdOrSlug}" not found.`
+        `Team with slug "${teamSlug}" not found.`
       );
     }
 
-    const targetOrgId = organization.id;
-    const targetUserId = organization.createdBy;
+    const targetTeamId = team.id;
+    const targetUserId = team.members[0]?.userId;
+    
+    if (!targetUserId) {
+      throw new Error(`No owner found for team "${teamSlug}".`);
+    }
 
     console.log(
-      `Seeding OSCRAT data for organization: ${organization.name} (${targetOrgId})`
+      `Seeding OSCRAT data for team: ${team.name} (${targetTeamId})`
     );
     console.log(`Using creator: ${targetUserId}`);
 
-    // Clean up existing data for this organization
+    // Clean up existing data for this team
     console.log('Cleaning up existing data...');
 
-    // First get all products for this organization to clean up their related data
+    // First get all products for this team to clean up their related data
     const existingProducts = await prisma.oscratProduct.findMany({
-      where: { organizationId: targetOrgId },
+      where: { teamId: targetTeamId },
       select: { id: true },
     });
 
@@ -461,7 +455,7 @@ async function seedOscratData(organizationIdOrSlug: string) {
 
     // Delete existing products
     const deletedProducts = await prisma.oscratProduct.deleteMany({
-      where: { organizationId: targetOrgId },
+      where: { teamId: targetTeamId },
     });
 
     console.log(`   • Removed ${deletedProducts.count} existing products`);
@@ -469,7 +463,7 @@ async function seedOscratData(organizationIdOrSlug: string) {
     // Delete existing reporting organizations
     const deletedReportingOrgs =
       await prisma.oscratReportingOrganization.deleteMany({
-        where: { organizationId: targetOrgId },
+        where: { teamId: targetTeamId },
       });
 
     console.log(
@@ -494,7 +488,7 @@ async function seedOscratData(organizationIdOrSlug: string) {
           complianceStatus: productData.complianceStatus,
           conformityProcedure: productData.conformityProcedure,
           riskLevel: productData.riskLevel,
-          organizationId: targetOrgId,
+          teamId: targetTeamId,
           createdBy: targetUserId,
           updatedBy: targetUserId,
         },
@@ -635,7 +629,7 @@ async function seedOscratData(organizationIdOrSlug: string) {
           name: reportingOrgData.name,
           acronym: reportingOrgData.acronym,
           reportingEmail: reportingOrgData.reportingEmail,
-          organizationId: targetOrgId,
+          teamId: targetTeamId,
           createdBy: targetUserId,
           updatedBy: targetUserId,
         },
@@ -701,21 +695,19 @@ async function seedOscratData(organizationIdOrSlug: string) {
 // CLI execution
 async function main() {
   const args = process.argv.slice(2);
-  const organizationIdOrSlug = args[0];
+  const teamSlug = args[0];
 
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 Usage: pnpm tsx prisma/seed-oscrat.ts <organizationId|teamSlug>
 
 Arguments:
-  organizationId|teamSlug  Required. Either the ID of the OSCRAT organization 
-                          or the slug of the team associated with the organization.
-                          The script will use the organization's creator as the user for all records.
+  teamSlug                Required. The slug of the team to seed data for.
+                          The script will use the team owner as the user for all records.
 
 Examples:
-  pnpm tsx prisma/seed-oscrat.ts abc123-def456-ghi789    # Using organization ID
-  pnpm tsx prisma/seed-oscrat.ts oscrat_team            # Using team slug
-  pnpm run seed:oscrat oscrat_team                      # Using team slug
+  pnpm tsx prisma/seed-oscrat.ts testtest              # Using team slug
+  pnpm run seed:oscrat testtest                        # Using team slug
 
 Options:
   --help, -h      Show this help message
@@ -730,16 +722,16 @@ What gets created:
     process.exit(0);
   }
 
-  if (!organizationIdOrSlug) {
-    console.error('Error: Organization ID or team slug is required.');
+  if (!teamSlug) {
+    console.error('Error: Team slug is required.');
     console.log(
-      'Usage: pnpm tsx prisma/seed-oscrat.ts <organizationId|teamSlug>'
+      'Usage: pnpm tsx prisma/seed-oscrat.ts <teamSlug>'
     );
     console.log('Run with --help for more information.');
     process.exit(1);
   }
 
-  await seedOscratData(organizationIdOrSlug);
+  await seedOscratData(teamSlug);
 }
 
 // Export for programmatic use

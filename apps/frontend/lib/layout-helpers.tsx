@@ -16,9 +16,9 @@ export function withTeamLayout(page: React.ReactNode) {
 }
 
 /**
- * Common layout pattern for product pages: AccountLayout > TeamLayout > ProductLayout
+ * Layout pattern for product detail pages: AccountLayout > TeamLayout > ProductLayout > VersionLayout
  */
-export function withProductLayout(page: React.ReactNode) {
+export function withProductDetailLayout(page: React.ReactNode) {
   return (
     <AccountLayout>
       <TeamLayout>
@@ -26,6 +26,17 @@ export function withProductLayout(page: React.ReactNode) {
           <VersionLayout>{page}</VersionLayout>
         </ProductLayout>
       </TeamLayout>
+    </AccountLayout>
+  );
+}
+
+/**
+ * Layout pattern for product list pages: AccountLayout > TeamLayout
+ */
+export function withProductListLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>{page}</TeamLayout>
     </AccountLayout>
   );
 }

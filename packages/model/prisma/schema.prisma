@@ -61,8 +61,6 @@ model User {
   Task          Task[]
   teamMembers   TeamMember[]
 
-  createdOscratOrganizations      OscratOrganization[]          @relation("OscratOrganizationCreatedBy")
-  updatedOscratOrganizations      OscratOrganization[]          @relation("OscratOrganizationUpdatedBy")
   createdOscratProducts           OscratProduct[]               @relation("OscratProductCreatedBy")
   updatedOscratProducts           OscratProduct[]               @relation("OscratProductUpdatedBy")
   createdOscratProductVersions    OscratProductVersion[]        @relation("OscratProductVersionCreatedBy")
@@ -98,11 +96,22 @@ model Team {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now())
   properties         Json                @default("{}")
+  
+  // Organization fields from OscratOrganization
+  type               OscratOrganizationType   @default(OTHER)
+  size               OscratOrganizationSize   @default(STARTUP)
+  orgRoles           OscratOrganizationRole[] @default([MANUFACTURER])
+  
+  // Existing Team relationships
   apiKeys            ApiKey[]
   invitations        Invitation[]
   tasks              Task[]
   members            TeamMember[]
-  oscratOrganization OscratOrganization?
+  
+  // Relationships from OscratOrganization
+  products                    OscratProduct[]
+  repositories                OscratRepository[]
+  reportingOrganizations      OscratReportingOrganization[]
 }
 
 model Task {
@@ -347,35 +356,14 @@ enum OscratProductVersionStatus {
 
 // OSCRAT Models
 
-model OscratOrganization {
-  id    String                   @id @default(uuid())
-  name  String
-  type  OscratOrganizationType
-  size  OscratOrganizationSize
-  roles OscratOrganizationRole[]
-
-  teamId String @unique
-  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  products               OscratProduct[]
-  repositories           OscratRepository[]
-  reportingOrganizations OscratReportingOrganization[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  createdBy String
-  updatedBy String
-
-  createdByUser User @relation("OscratOrganizationCreatedBy", fields: [createdBy], references: [id])
-  updatedByUser User @relation("OscratOrganizationUpdatedBy", fields: [updatedBy], references: [id])
-}
+// OscratOrganization model removed - merged into Team
 
 model OscratProduct {
   id   String @id @default(uuid())
   name String
 
-  organizationId String
-  organization   OscratOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  teamId String
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   type                   OscratProductType
   reportingOrganizations OscratReportingOrganization[]
@@ -452,8 +440,8 @@ model OscratReportingOrganization {
   acronym        String
   reportingEmail String
 
-  organizationId String
-  organization   OscratOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  teamId String
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   assignedProducts OscratProduct[]
 
@@ -536,20 +524,20 @@ model OscratRepository {
 
   authType    OscratRepositoryAuthType @default(PERSONAL_ACCESS_TOKEN)
   accessToken String?
-
-  organizationId String
-  organization   OscratOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  versionId String               @unique
+  
+  teamId String
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  versionId String        @unique
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
   productId String // Denormalized for easier queries
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([organizationId, versionId])
-  @@index([organizationId, productId])
+  
+  @@index([teamId, versionId])
+  @@index([teamId, productId])
 }
 
 // Worker Job Models

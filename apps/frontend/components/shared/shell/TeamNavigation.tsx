@@ -50,10 +50,10 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
       children: [
         {
           name: t('Projects'),
-          href: `/teams/${slug}/oscrat/projects`,
+          href: `/teams/${slug}/products`,
           active:
             activePathname?.startsWith(`/teams/${slug}`) &&
-            activePathname.includes('projects'),
+            activePathname.includes('products'),
         },
         {
           name: t('Reports'),

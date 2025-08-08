@@ -11,11 +11,11 @@ export default function Result({
   const router = useRouter();
 
   const handleNavigateBack = () => {
-    router.push(`/teams/${teamSlug}/oscrat/projects/${projectId}`);
+    router.push(`/teams/${teamSlug}/products/${projectId}`);
   };
 
   const handleRestart = () => {
-    router.push(`/teams/${teamSlug}/oscrat/projects`);
+    router.push(`/teams/${teamSlug}/products`);
   };
 
   if (!isEligible) {
@@ -83,7 +83,7 @@ export default function Result({
           <Button
             onClick={() =>
               router.push(
-                `/teams/${teamSlug}/oscrat/projects/${projectId}/cra/details`
+                `/teams/${teamSlug}/products/${projectId}/cra/details`
               )
             }
             className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"

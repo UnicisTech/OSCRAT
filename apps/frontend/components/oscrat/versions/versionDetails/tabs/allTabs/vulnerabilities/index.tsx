@@ -70,10 +70,10 @@ interface ItemProps {
 }
 
 const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
-  const { teamId, projectId } = useProductContext();
+  const { teamId, productId } = useProductContext();
   const { versionId } = useVersionContext();
-  const { project } = useOscratProject(teamId, projectId);
-  const { version } = useOscratVersion(teamId, projectId, versionId);
+  const { project } = useOscratProject(teamId, productId);
+  const { version } = useOscratVersion(teamId, productId, versionId);
 
   const StatusPill: React.FC<{ status: OscratProductVulnerabilityStatus }> = ({
     status,
@@ -154,8 +154,8 @@ const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
 
 export default function Index() {
   const { versionId } = useVersionContext();
-  const { teamId, projectId } = useProductContext();
-  const { version } = useOscratVersion(teamId, projectId, versionId);
+  const { teamId, productId } = useProductContext();
+  const { version } = useOscratVersion(teamId, productId, versionId);
   const { t, ready } = useTranslation('common');
   const router = useRouter();
   const pathname = usePathname();

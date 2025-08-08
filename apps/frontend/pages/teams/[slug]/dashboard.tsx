@@ -1,7 +1,7 @@
 import { useTeamContext } from '@/context/TeamContext';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import { withProductLayout } from '@/lib/layout-helpers';
+import { withTeamLayout } from '@/lib/layout-helpers';
 import CompletedAppCheck from '@/components/oscrat/dashboard/CompletedAppCheck';
 import TasksAndProducts from '@/components/oscrat/dashboard/TasksAndProducts';
 import RecentActivities from '@/components/oscrat/dashboard/RecentActivities';
@@ -24,7 +24,7 @@ const TeamDashboard = () => {
   );
 };
 
-TeamDashboard.getLayout = withProductLayout;
+TeamDashboard.getLayout = withTeamLayout;
 
 export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';
 

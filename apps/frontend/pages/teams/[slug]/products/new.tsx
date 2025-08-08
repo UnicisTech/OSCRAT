@@ -5,19 +5,24 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
 import { useTeamContext } from '@/context/TeamContext';
-import { useOscratOrganization } from '@/hooks/oscrat/useOscratOrganization';
+import { useCreateProject } from '@/lib/api/hooks/oscrat/projects';
 import { OscratProductType, OscratProductCategory } from '@oscrat/model';
 import type { OscratProductCreate } from '@oscrat/model';
 import { getProductTypeKey, getProductCategoryKey } from '@/utils/translation';
 import toast from 'react-hot-toast';
-import { withProductLayout } from '@/lib/layout-helpers';
+import { withProductListLayout } from '@/lib/layout-helpers';
 
-export default function AddProject() {
+export default function AddProduct() {
   const { t } = useTranslation('common');
   const { slug: teamId } = useTeamContext();
   const { data: session } = useSession();
   const router = useRouter();
-  const { createProject, isLoading } = useOscratOrganization(teamId);
+  
+  const createProjectMutation = useCreateProject(teamId);
+  const createProduct = async (data: OscratProductCreate) => {
+    return createProjectMutation.mutateAsync(data);
+  };
+  const isLoading = createProjectMutation.isPending;
 
   const [name, setName] = useState('');
   const [type, setType] = useState<OscratProductType | ''>('');
@@ -30,7 +35,7 @@ export default function AddProject() {
 
     // Validation
     if (!name.trim()) {
-      setError('Project name is required');
+      setError('Product name is required');
       return;
     }
 
@@ -50,22 +55,22 @@ export default function AddProject() {
     }
 
     try {
-      const projectData: OscratProductCreate = {
+      const productData: OscratProductCreate = {
         name: name.trim(),
         type: type as OscratProductType,
         productCategory: category as OscratProductCategory,
         createdBy: session.user.id,
       };
 
-      await createProject(projectData);
+      await createProduct(productData);
 
       // Show success toast
-      toast.success('Project created successfully');
-      // Navigate back to projects list on success
-      router.replace(`/teams/${teamId}/oscrat/projects`);
+      toast.success('Product created successfully');
+      // Navigate back to products list on success
+      router.replace(`/teams/${teamId}/products`);
     } catch (err) {
-      console.error('Error creating project:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create project');
+      console.error('Error creating product:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create product');
     }
   };
 
@@ -76,7 +81,7 @@ export default function AddProject() {
     <div className="mt-10 flex w-full justify-center">
       <div className="w-full rounded-lg border bg-white p-6 shadow-lg md:w-1/2 lg:w-1/3 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
         <h2 className="mb-4 text-xl font-medium dark:text-gray-100">
-          {t('add-new-project')}
+          {t('add-new-product')}
         </h2>
 
         {error && (
@@ -143,7 +148,7 @@ export default function AddProject() {
 
         <div className="mt-6 flex gap-3">
           <button
-            onClick={() => router.push(`/teams/${teamId}/oscrat/projects`)}
+            onClick={() => router.push(`/teams/${teamId}/products`)}
             className="flex-1 rounded bg-gray-500 p-2 text-white hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700"
             disabled={isLoading}
           >
@@ -162,6 +167,6 @@ export default function AddProject() {
   );
 }
 
-AddProject.getLayout = withProductLayout;
+AddProduct.getLayout = withProductListLayout;
 
 export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';

@@ -9,6 +9,7 @@ import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { validateDomain } from '@/lib/common';
 import { ApiError } from '@/lib/errors';
+import type { TeamSettingsUpdate } from '@oscrat/model';
 
 export default function handler(
   req: AuthenticatedRequest,
@@ -33,7 +34,7 @@ export default function handler(
 
 // Get a team by slug
 const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
-  const { teamMember, user } = req.teamContext;
+  const { teamMember } = req.teamContext;
 
   const team = await getTeam({ id: teamMember.teamId });
 
@@ -46,17 +47,15 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
-  const { name, slug, domain } = req.body;
+  // Cast to TeamSettingsUpdate - only user-editable fields
+  const updateData = req.body as TeamSettingsUpdate;
 
-  if (domain?.length > 0 && !validateDomain(domain)) {
+  if (updateData.domain && updateData.domain.length > 0 && !validateDomain(updateData.domain)) {
     throw new ApiError(400, 'Invalid domain name');
   }
 
-  const updatedTeam = await updateTeam(teamMember.team.slug, {
-    name,
-    slug,
-    domain,
-  });
+  // Update team - Prisma will ignore undefined fields
+  const updatedTeam = await updateTeam(teamMember.team.slug, updateData);
 
   sendAudit({
     action: 'team.update',

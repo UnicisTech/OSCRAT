@@ -40,7 +40,6 @@ export {
 
 // Export shared application types (these are safe for client)
 export * from './types/assessment';
-export * from './types/organisation';
 export * from './types/product';
 export * from './types/version';
 export * from './types/vulnerabilities';

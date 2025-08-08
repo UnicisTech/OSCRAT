@@ -14,10 +14,10 @@ import { useProductContext } from '@/context/ProductContext';
 import { useOscratVersions } from '@/hooks/oscrat/useOscratVersion';
 
 interface ProductDetailsProps {
-  projectId: string;
+  productId: string;
 }
 
-export function ProductDetails({ projectId }: ProductDetailsProps) {
+export function ProductDetails({ productId }: ProductDetailsProps) {
   const router = useRouter();
   const { slug } = useTeamContext();
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -25,11 +25,11 @@ export function ProductDetails({ projectId }: ProductDetailsProps) {
   const { t } = useTranslation('common');
 
   const { project, isLoading, isError, error, deleteProject, updateProject } =
-    useOscratProject(slug, projectId, { enabled: !isRedirecting });
+    useOscratProject(slug, productId, { enabled: !isRedirecting });
 
   const { teamId } = useProductContext();
 
-  const { versions } = useOscratVersions(teamId, projectId);
+  const { versions } = useOscratVersions(teamId, productId);
 
   useEffect(() => {
     if (versions) {
@@ -63,7 +63,7 @@ export function ProductDetails({ projectId }: ProductDetailsProps) {
     try {
       await deleteProject.mutateAsync(undefined);
       toast.success('Project deleted successfully');
-      const redirectPath = `/teams/${slug}/oscrat/projects`;
+      const redirectPath = `/teams/${slug}/products`;
       router.replace(redirectPath);
     } catch (error) {
       setIsRedirecting(false);

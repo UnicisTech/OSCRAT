@@ -14,10 +14,10 @@ const Index = () => {
   const { t, ready } = useTranslation('common');
   const { slug } = useTeamContext();
   const { versionId } = useVersionContext();
-  const { teamId, projectId } = useProductContext();
+  const { teamId, productId } = useProductContext();
   const { version, deleteVersion, updateVersion } = useOscratVersion(
     teamId,
-    projectId,
+    productId,
     versionId
   );
 
@@ -78,7 +78,7 @@ const Index = () => {
     try {
       await deleteVersion();
       toast.success('Project deleted successfully');
-      const redirectPath = `/teams/${slug}/oscrat/projects/${projectId}/versions`;
+      const redirectPath = `/teams/${slug}/products/${productId}/versions`;
       router.replace(redirectPath);
     } catch (error) {
       console.error('Failed to delete version:', error);

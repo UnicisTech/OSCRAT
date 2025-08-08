@@ -13,7 +13,7 @@ interface ProductContextType {
   productContext: UseOscratProjectContext;
   accessContext: UseCanAccessContext;
   teamId: string;
-  projectId: string;
+  productId: string;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -25,19 +25,19 @@ export const ProductContextProvider = ({
 }) => {
   const router = useRouter();
   const teamId = router.query.slug as string;
-  const projectId = router.query.projectId as string;
+  const productId = router.query.projectId as string; // Note: URL param is still [projectId]
 
-  const productContext = useOscratProject(teamId, projectId);
+  const productContext = useOscratProject(teamId, productId);
   const accessContext = useCanAccess(teamId);
 
   const contextValue = useMemo<ProductContextType>(
     () => ({
       teamId,
-      projectId,
+      productId,
       productContext,
       accessContext,
     }),
-    [teamId, projectId, productContext, accessContext]
+    [teamId, productId, productContext, accessContext]
   );
 
   if (productContext.isLoading || accessContext.isLoading) {

@@ -27,11 +27,11 @@ export default function handler(
 const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
-  const { projectId } = req.query;
+  const { productId } = req.query;
 
   const project = await getProjectDetail(
     teamMember.teamId,
-    projectId as string
+    productId as string
   );
 
   if (!project) {
@@ -45,12 +45,12 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
-  const { projectId } = req.query;
+  const { productId } = req.query;
   const projectData = req.body as OscratProductUpdate;
 
   const project = await updateProject(
     teamMember.teamId,
-    projectId as string,
+    productId as string,
     projectData
   );
 
@@ -61,11 +61,11 @@ const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
-  const { projectId } = req.query;
+  const { productId } = req.query;
 
-  await deleteProject(teamMember.teamId, projectId as string);
+  await deleteProject(teamMember.teamId, productId as string);
 
-  console.log(`[OSCRAT] project deleted, projectId: ${projectId}, teamId: ${teamMember.teamId}`);
+  console.log(`[OSCRAT] project deleted, productId: ${productId}, teamId: ${teamMember.teamId}`);
 
   res.status(200).json({ data: {} });
 };

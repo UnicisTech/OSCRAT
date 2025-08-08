@@ -81,16 +81,16 @@ const PROJECT_DETAIL_INCLUDE = {
   },
 };
 
-/** Get all projects for a team's organization */
+/** Get all projects for a team */
 export const getProjects = async (
   teamId: string
 ): Promise<OscratProductSummary[]> => {
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: PROJECT_SUMMARY_INCLUDE,
   });
 
-  return organization?.products.map(transformToProductSummary) || [];
+  return team?.products.map(transformToProductSummary) || [];
 };
 
 /** Get detailed information for a specific project */
@@ -98,8 +98,8 @@ export const getProjectDetail = async (
   teamId: string,
   projectId: string
 ): Promise<OscratProductDetail | null> => {
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: projectId },
@@ -108,32 +108,22 @@ export const getProjectDetail = async (
     },
   });
 
-  const product = organization?.products?.[0];
+  const product = team?.products?.[0];
   return product ? transformToProductDetail(product) : null;
 };
 
-/** Create a new project under the team's organization */
+/** Create a new project for the team */
 export const createProject = async (
   teamId: string,
   data: OscratProductCreate
 ): Promise<OscratProductDetail> => {
-  // Find the organization first
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
-    select: { id: true }, // Only need the ID
-  });
-
-  if (!organization) {
-    throw new Error(`No OSCRAT organization found for team: ${teamId}`);
-  }
-
-  // Create the project
+  // Create the project directly linked to the team
   const product = await prisma.oscratProduct.create({
     data: {
       name: data.name,
       type: data.type,
       productCategory: data.productCategory,
-      organizationId: organization.id,
+      teamId: teamId,
       createdBy: data.createdBy,
       updatedBy: data.createdBy,
     },
@@ -150,8 +140,8 @@ export const updateProject = async (
   data: Partial<OscratProductUpdate>
 ): Promise<OscratProductDetail> => {
   // Verify project ownership first
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: projectId },
@@ -160,7 +150,7 @@ export const updateProject = async (
     },
   });
 
-  if (!organization || organization.products.length === 0) {
+  if (!team || team.products.length === 0) {
     throw new Error(`Project ${projectId} not found for team: ${teamId}`);
   }
 
@@ -185,8 +175,8 @@ export const deleteProject = async (
   projectId: string
 ): Promise<void> => {
   // Verify project ownership first
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: projectId },
@@ -195,7 +185,7 @@ export const deleteProject = async (
     },
   });
 
-  if (!organization || organization.products.length === 0) {
+  if (!team || team.products.length === 0) {
     throw new Error(`Project ${projectId} not found for team: ${teamId}`);
   }
 

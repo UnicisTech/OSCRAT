@@ -1,14 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { getCscStatusesProp, getCscControlsProp } from '@/lib/csc';
 import { findOrCreateApp } from '@/lib/svix';
-import {
-  Role,
-  OscratOrganizationType,
-  OscratOrganizationSize,
-  OscratOrganizationRole,
-} from '@oscrat/model';
+import { Role } from '@oscrat/model';
 import * as TeamOps from '@oscrat/model/operations';
-import { createOrganization } from '@/models/oscrat/organization';
 import { controls } from '@/components/defaultLanding/data/configs/csc';
 import type { TeamProperties, TaskProperties, ISO } from 'types';
 import type { Session } from 'next-auth';
@@ -32,25 +26,6 @@ export const createTeam = async (param: {
     console.log(
       `[Team] svix app creation failed, teamId: ${team.id}, error: ${error.message}`
     );
-  }
-
-  console.log(
-    `[Team] creating organization, teamId: ${team.id}, userId: ${userId}`
-  );
-  try {
-    await createOrganization(team.id, {
-      name: name, // Use team name as organization name
-      type: OscratOrganizationType.OTHER, // Default to OTHER, can be changed later
-      size: OscratOrganizationSize.STARTUP, // Default to STARTUP, can be changed later
-      roles: [OscratOrganizationRole.MANUFACTURER], // Default role, can be changed later
-      createdBy: userId,
-    });
-    console.log(`[Team] organization created successfully, teamId: ${team.id}`);
-  } catch (error: any) {
-    console.log(
-      `[Team] organization creation failed, teamId: ${team.id}, error: ${error.message}`
-    );
-    throw error; // This is critical - re-throw the error
   }
 
   return team;
@@ -122,19 +97,23 @@ export const getTeamMember = async (userId: string, slug: string) => {
 export const incrementTaskIndex = async (teamId: string) => {
   return await TeamOps.incrementTaskIndex(prisma, teamId);
 };
-//TODO: should delete
-export const getTeamPropertiesBySlug = async (slug: string) => {
-  const team = await prisma.team.findUnique({
-    where: {
-      slug: slug,
-    },
-    select: {
-      properties: true,
-    },
-  });
 
-  return team?.properties;
+// Get team with product summaries (lightweight)
+export const getTeamWithProducts = async (slug: string) => {
+  return await TeamOps.getTeamWithProductsSummary(prisma, { slug });
 };
+
+// Get products for a team (throws if team not found)
+export const getTeamProducts = async (slug: string) => {
+  const teamWithProducts = await TeamOps.getTeamWithProductsSummary(prisma, { slug });
+  
+  if (!teamWithProducts) {
+    throw new Error(`Team with slug '${slug}' not found`);
+  }
+  
+  return teamWithProducts.products;
+};
+
 
 export const getCscStatusesBySlug = async (slug: string) => {
   const team = await prisma.team.findUniqueOrThrow({

@@ -8,7 +8,7 @@ import {
 export const oscratAssessmentEndpoints = {
   listAssessments: (teamId: string, productId: string, versionId: string) =>
     api.get<OscratAssessmentSummary[]>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/assessments`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/assessments`
     ),
 
   createAssessment: (
@@ -18,7 +18,7 @@ export const oscratAssessmentEndpoints = {
     data: OscratAssessmentCreate
   ) =>
     api.post<OscratAssessmentDetail>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/assessments`,
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/assessments`,
       data
     ),
 
@@ -29,7 +29,7 @@ export const oscratAssessmentEndpoints = {
     assessmentId: string
   ) =>
     api.get<OscratAssessmentDetail>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/assessments/${assessmentId}`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/assessments/${assessmentId}`
     ),
 
   deleteAssessment: (
@@ -39,6 +39,6 @@ export const oscratAssessmentEndpoints = {
     assessmentId: string
   ) =>
     api.delete<void>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/assessments/${assessmentId}`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/assessments/${assessmentId}`
     ),
 };

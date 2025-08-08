@@ -68,8 +68,8 @@ export const getVersions = async (
   productId: string
 ): Promise<OscratProductVersionSummary[]> => {
   // Verify product ownership first
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: productId },
@@ -83,11 +83,11 @@ export const getVersions = async (
     },
   });
 
-  if (!organization || organization.products.length === 0) {
+  if (!team || team.products.length === 0) {
     throw new Error(`Product ${productId} not found for team: ${teamId}`);
   }
 
-  const product = organization.products[0];
+  const product = team.products[0];
   return product.versions.map(transformToVersionSummary);
 };
 
@@ -97,8 +97,8 @@ export const getVersionDetail = async (
   versionId: string
 ): Promise<OscratProductVersionDetail | null> => {
   // First verify that the version belongs to a product owned by the team
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         include: {
@@ -111,12 +111,12 @@ export const getVersionDetail = async (
     },
   });
 
-  if (!organization) {
-    throw new Error(`No organization found for team: ${teamId}`);
+  if (!team) {
+    throw new Error(`No team found: ${teamId}`);
   }
 
   // Find the version across all products
-  const version = organization.products
+  const version = team.products
     .flatMap((product) => product.versions)
     .find((v) => v.id === versionId);
 
@@ -129,8 +129,8 @@ export const createVersion = async (
   data: OscratProductVersionCreate
 ): Promise<OscratProductVersionDetail> => {
   // Verify product ownership first
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         where: { id: data.productId },
@@ -139,7 +139,7 @@ export const createVersion = async (
     },
   });
 
-  if (!organization || organization.products.length === 0) {
+  if (!team || team.products.length === 0) {
     throw new Error(`Product ${data.productId} not found for team: ${teamId}`);
   }
 
@@ -165,8 +165,8 @@ export const updateVersion = async (
   data: OscratProductVersionUpdate
 ): Promise<OscratProductVersionDetail> => {
   // First verify that the version belongs to a product owned by the team
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         include: {
@@ -179,12 +179,12 @@ export const updateVersion = async (
     },
   });
 
-  if (!organization) {
-    throw new Error(`No organization found for team: ${teamId}`);
+  if (!team) {
+    throw new Error(`No team found: ${teamId}`);
   }
 
   // Check if version exists and belongs to team
-  const versionExists = organization.products.some((product) =>
+  const versionExists = team.products.some((product) =>
     product.versions.some((v) => v.id === versionId)
   );
 
@@ -212,8 +212,8 @@ export const deleteVersion = async (
   versionId: string
 ): Promise<void> => {
   // First verify that the version belongs to a product owned by the team
-  const organization = await prisma.oscratOrganization.findFirst({
-    where: { teamId },
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
     include: {
       products: {
         include: {
@@ -226,12 +226,12 @@ export const deleteVersion = async (
     },
   });
 
-  if (!organization) {
-    throw new Error(`No organization found for team: ${teamId}`);
+  if (!team) {
+    throw new Error(`No team found: ${teamId}`);
   }
 
   // Check if version exists and belongs to team
-  const versionExists = organization.products.some((product) =>
+  const versionExists = team.products.some((product) =>
     product.versions.some((v) => v.id === versionId)
   );
 

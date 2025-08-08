@@ -187,7 +187,7 @@ export const getProjectWorkerJobs = async (
   const repositoryIds = await prisma.oscratRepository.findMany({
     where: {
       productId: projectId,
-      organization: { teamId },
+      teamId,
     },
     select: { id: true },
   });
@@ -291,7 +291,7 @@ export const getVersionWorkerJobs = async (
   const repositories = await prisma.oscratRepository.findMany({
     where: {
       versionId,
-      organization: { teamId }, // Include team validation for security
+      teamId, // Include team validation for security
     },
     select: { id: true },
   });

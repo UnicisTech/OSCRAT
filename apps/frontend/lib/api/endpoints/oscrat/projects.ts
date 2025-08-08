@@ -8,14 +8,14 @@ import {
 
 export const oscratProjectEndpoints = {
   listProjects: (teamId: string) =>
-    api.get<OscratProductSummary[]>(`/teams/${teamId}/oscrat/projects`),
+    api.get<OscratProductSummary[]>(`/teams/${teamId}/products`),
 
   createProject: (teamId: string, data: OscratProductCreate) =>
-    api.post<OscratProductDetail>(`/teams/${teamId}/oscrat/projects`, data),
+    api.post<OscratProductDetail>(`/teams/${teamId}/products`, data),
 
   getProjectDetail: (teamId: string, projectId: string) =>
     api.get<OscratProductDetail>(
-      `/teams/${teamId}/oscrat/projects/${projectId}`
+      `/teams/${teamId}/products/${projectId}`
     ),
 
   updateProject: (
@@ -24,10 +24,10 @@ export const oscratProjectEndpoints = {
     data: OscratProductUpdate
   ) =>
     api.put<OscratProductDetail>(
-      `/teams/${teamId}/oscrat/projects/${projectId}`,
+      `/teams/${teamId}/products/${projectId}`,
       data
     ),
 
   deleteProject: (teamId: string, projectId: string) =>
-    api.delete<void>(`/teams/${teamId}/oscrat/projects/${projectId}`),
+    api.delete<void>(`/teams/${teamId}/products/${projectId}`),
 };

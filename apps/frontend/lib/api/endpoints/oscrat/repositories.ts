@@ -9,7 +9,7 @@ import {
 export const oscratRepositoryEndpoints = {
   getRepository: (teamId: string, productId: string, versionId: string) =>
     api.get<OscratRepositorySummary | null>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/repositories`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/repositories`
     ),
 
   createRepository: (
@@ -19,7 +19,7 @@ export const oscratRepositoryEndpoints = {
     data: OscratRepositoryCreate
   ) =>
     api.post<OscratRepositoryDetail>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/repositories`,
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/repositories`,
       data
     ),
 
@@ -30,7 +30,7 @@ export const oscratRepositoryEndpoints = {
     repositoryId: string
   ) =>
     api.get<OscratRepositoryDetail>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/repositories/${repositoryId}`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/repositories/${repositoryId}`
     ),
 
   updateRepository: (
@@ -41,7 +41,7 @@ export const oscratRepositoryEndpoints = {
     data: OscratRepositoryUpdate
   ) =>
     api.put<OscratRepositoryDetail>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/repositories/${repositoryId}`,
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/repositories/${repositoryId}`,
       data
     ),
 
@@ -52,6 +52,6 @@ export const oscratRepositoryEndpoints = {
     repositoryId: string
   ) =>
     api.delete<void>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/repositories/${repositoryId}`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/repositories/${repositoryId}`
     ),
 };

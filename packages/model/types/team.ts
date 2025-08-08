@@ -1,4 +1,10 @@
-import type { Role } from '@prisma/client';
+import type { 
+  Role,
+  OscratOrganizationType,
+  OscratOrganizationSize,
+  OscratOrganizationRole
+} from '@prisma/client';
+import type { OscratProductSummary } from './product';
 
 /** Basic team information */
 export interface Team {
@@ -20,6 +26,15 @@ export interface TeamDetail extends Team {
   taskIndex: number;
   defaultRole: Role;
   properties: Record<string, any>;
+  // Organization fields
+  type: OscratOrganizationType;
+  size: OscratOrganizationSize;
+  orgRoles: OscratOrganizationRole[];
+}
+
+/** Team with products for organization view */
+export interface TeamWithProducts extends TeamDetail {
+  products: OscratProductSummary[];
 }
 
 /** Team member summary for listings */
@@ -49,16 +64,28 @@ export interface TeamCreate {
   slug: string;
   domain?: string;
   userId: string; // Creator user ID
+  // Organization fields (optional, will use defaults)
+  type?: OscratOrganizationType;
+  size?: OscratOrganizationSize;
+  orgRoles?: OscratOrganizationRole[];
 }
 
-/** Interface for updating a team */
-export interface TeamUpdate {
+/** Interface for updating team settings via API (user-editable fields only) */
+export interface TeamSettingsUpdate {
   name?: string;
-  slug?: string;
   domain?: string;
+  type?: OscratOrganizationType;
+  size?: OscratOrganizationSize;
+  orgRoles?: OscratOrganizationRole[];
+}
+
+/** Interface for updating a team (internal use - includes system fields) */
+export interface TeamUpdate extends TeamSettingsUpdate {
+  slug?: string;
   taskIndex?: number;
   properties?: Record<string, any>;
 }
+
 
 /** Interface for team member operations */
 export interface TeamMemberCreate {

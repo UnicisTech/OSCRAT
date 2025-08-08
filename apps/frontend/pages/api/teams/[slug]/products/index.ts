@@ -38,7 +38,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 
   const project = await createProject(teamMember.teamId, projectData);
 
-  console.log(`[OSCRAT] project created, projectId: ${project.id}, name: ${projectData.name}, teamId: ${teamMember.teamId}`);
+  console.log(`[OSCRAT] project created, productId: ${project.id}, name: ${projectData.name}, teamId: ${teamMember.teamId}`);
 
   res.status(201).json({ data: project });
 };

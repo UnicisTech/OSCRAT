@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTeamContext } from '@/context/TeamContext';
-import { useOscratOrganization } from '@/hooks/oscrat/useOscratOrganization';
+import { useTeamProducts } from '@/lib/api/hooks/teams';
 import { useProductFiltering } from '@/hooks/useProductFiltering';
 import SearchBar from '@/components/oscrat/products/productsList/searchBar';
 import ProductComponent from '@/components/oscrat/products/productsList/product';
@@ -13,11 +13,11 @@ import {
 
 export function ProductListContent() {
   const { slug: teamId } = useTeamContext();
-  const { organization, isLoading, isError } = useOscratOrganization(teamId);
+  const { data: products, isLoading, isError } = useTeamProducts(teamId);
   const router = useRouter();
   const pathname = usePathname();
 
-  const products = organization?.products || [];
+  const productsList = products || [];
 
   const {
     searchTerm,
@@ -26,7 +26,7 @@ export function ProductListContent() {
     handleFilterChange,
     filteredProducts,
     filterOptions,
-  } = useProductFiltering(products);
+  } = useProductFiltering(productsList);
 
   const navigateToAddPage = () => {
     router.push(`${pathname}/new`);

@@ -2,7 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { teamsEndpoints } from '@/lib/api/endpoints/teams';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
-import type { UpdateTeamData } from '@/lib/api/endpoints/teams';
+import type { TeamSettingsUpdate } from '@oscrat/model';
 import type { TeamProperties } from '@/types';
 
 // Team list
@@ -21,6 +21,14 @@ export function useGetTeam(slug: string) {
   });
 }
 
+// Team products
+export function useTeamProducts(slug: string) {
+  return useQuery({
+    queryKey: [...queryKeys.teams.detail(slug), 'products'],
+    queryFn: () => teamsEndpoints.getTeamProducts(slug),
+  });
+}
+
 export function useCreateTeam() {
   return useMutation({
     mutationFn: ({ name, slug }: { name: string; slug: string }) =>
@@ -33,7 +41,7 @@ export function useCreateTeam() {
 
 export function useUpdateTeam(slug: string) {
   return useMutation({
-    mutationFn: (data: UpdateTeamData) => teamsEndpoints.updateTeam(slug, data),
+    mutationFn: (data: TeamSettingsUpdate) => teamsEndpoints.updateTeam(slug, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.teams.detail(slug) });
       queryClient.invalidateQueries({ queryKey: queryKeys.teams.all });

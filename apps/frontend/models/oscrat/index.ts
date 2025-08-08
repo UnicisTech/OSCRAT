@@ -1,9 +1,4 @@
-export {
-  getOrganizationSummary,
-  getOrganizationDetail,
-  createOrganization,
-  updateOrganization,
-} from './organization';
+// Organization exports removed - functionality moved to team model
 
 export {
   getProjects,

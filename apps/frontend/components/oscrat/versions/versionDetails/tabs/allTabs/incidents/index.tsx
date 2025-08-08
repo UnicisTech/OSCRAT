@@ -65,10 +65,10 @@ interface ItemProps {
 
 const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
   const { t, ready } = useTranslation('common');
-  const { teamId, projectId } = useProductContext();
+  const { teamId, productId } = useProductContext();
   const { versionId } = useVersionContext();
-  const { project } = useOscratProject(teamId, projectId);
-  const { version } = useOscratVersion(teamId, projectId, versionId);
+  const { project } = useOscratProject(teamId, productId);
+  const { version } = useOscratVersion(teamId, productId, versionId);
 
   if (!ready) return null;
 
@@ -169,8 +169,8 @@ export default function Index() {
   const router = useRouter();
   const pathname = usePathname();
   const { versionId } = useVersionContext();
-  const { teamId, projectId } = useProductContext();
-  const { version } = useOscratVersion(teamId, projectId, versionId);
+  const { teamId, productId } = useProductContext();
+  const { version } = useOscratVersion(teamId, productId, versionId);
 
   // Create tabs dynamically based on incident statuses and count incidents per status
   const tabs: TabData[] = useMemo(() => {

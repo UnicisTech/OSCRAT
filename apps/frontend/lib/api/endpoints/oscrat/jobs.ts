@@ -8,7 +8,7 @@ export interface CreateSbomJobRequest {
 export const oscratJobEndpoints = {
   listSbomJobs: (teamId: string, productId: string, versionId: string) =>
     api.get<WorkerJob[]>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/jobs/sbom`
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/jobs/sbom`
     ),
 
   createSbomJob: (
@@ -18,7 +18,7 @@ export const oscratJobEndpoints = {
     data: CreateSbomJobRequest
   ) =>
     api.post<WorkerJob>(
-      `/teams/${teamId}/oscrat/projects/${productId}/versions/${versionId}/jobs/sbom`,
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/jobs/sbom`,
       data
     ),
 };

@@ -13,7 +13,7 @@ interface VersionContextType {
   versionContext: UseOscratVersionContext;
   accessContext: UseCanAccessContext;
   teamId: string;
-  projectId: string;
+  productId: string;
   versionId: string;
 }
 
@@ -26,21 +26,21 @@ export const VersionContextProvider = ({
 }) => {
   const router = useRouter();
   const teamId = router.query.slug as string;
-  const projectId = router.query.projectId as string;
+  const productId = router.query.projectId as string; // Note: URL param is still [projectId]
   const versionId = router.query.versionId as string;
 
-  const versionContext = useOscratVersion(teamId, projectId, versionId);
+  const versionContext = useOscratVersion(teamId, productId, versionId);
   const accessContext = useCanAccess(teamId);
 
   const contextValue = useMemo<VersionContextType>(
     () => ({
       teamId,
-      projectId,
+      productId,
       versionId,
       versionContext,
       accessContext,
     }),
-    [teamId, projectId, versionId, versionContext, accessContext]
+    [teamId, productId, versionId, versionContext, accessContext]
   );
 
   if (versionContext.isLoading || accessContext.isLoading) {

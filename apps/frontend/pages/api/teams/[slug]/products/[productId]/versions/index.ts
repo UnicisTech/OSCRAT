@@ -25,9 +25,9 @@ export default function handler(
 const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
-  const { projectId } = req.query;
+  const { productId } = req.query;
 
-  const versions = await getVersions(teamMember.teamId, projectId as string);
+  const versions = await getVersions(teamMember.teamId, productId as string);
 
   res.status(200).json({ data: versions });
 };
@@ -36,11 +36,11 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
-  const { projectId } = req.query;
+  const { productId } = req.query;
   const versionData = req.body as OscratProductVersionCreate;
 
   // Ensure the productId matches the URL parameter
-  if (versionData.productId !== projectId) {
+  if (versionData.productId !== productId) {
     throw new ApiError(400, 'Product ID in body must match URL parameter');
   }
 
@@ -52,7 +52,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 
   const version = await createVersion(teamMember.teamId, createData);
 
-  console.log(`[OSCRAT] version created, versionId: ${version.id}, projectId: ${projectId}, version: ${versionData.version}, createdBy: ${teamMember.userId}`);
+  console.log(`[OSCRAT] version created, versionId: ${version.id}, productId: ${productId}, version: ${versionData.version}, createdBy: ${teamMember.userId}`);
 
   res.status(201).json({ data: version });
 };
