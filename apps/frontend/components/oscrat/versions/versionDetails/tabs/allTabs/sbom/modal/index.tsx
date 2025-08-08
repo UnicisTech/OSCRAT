@@ -98,6 +98,7 @@ const ImportModal: React.FC<ImportModalProps> = ({
               >
                 {t('name')}
               </label>
+
               <input
                 type="text"
                 id="ssmName"
