@@ -46,6 +46,13 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
     };
   }, [project, pathname, t]);
 
+  const reportingOrganizations = useMemo(() => {
+    return (
+      project.reportingOrganizations?.map((org) => org.acronym).join(', ') ||
+      t('oscrat.ui.n-a')
+    );
+  }, [project.reportingOrganizations, t]);
+
   if (!ready) return null;
 
   return (
@@ -129,9 +136,7 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
 
         <InfoField
           label={t('oscrat.ui.external-reporting')}
-          value={
-            project.externalReportingAcronyms?.join(', ') || t('oscrat.ui.n-a')
-          }
+          value={reportingOrganizations}
         />
 
         <div className="flex flex-col">
