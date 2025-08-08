@@ -50,7 +50,6 @@ export function ProductListContent() {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onAddProduct={navigateToAddPage}
-        // @ts-ignore-next-line
         filterOptions={filterOptions}
         activeFilters={activeFilters}
         onFilterChange={

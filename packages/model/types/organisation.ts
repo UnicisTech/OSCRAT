@@ -30,6 +30,7 @@ export interface OscratOrganizationDetail {
   createdBy: string;
   updatedBy: string;
   products: OscratProductDetail[];
+  OscratReportingOrganization: string[];
 }
 
 // Input types - simplified using Prisma generated types

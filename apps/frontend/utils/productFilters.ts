@@ -53,11 +53,11 @@ export function matchesFilters(
   // External reporting filter
   if (filters.externalReporting && filters.externalReporting !== '') {
     if (filters.externalReporting === 'None') {
-      if (product.externalReportingAcronyms.length > 0) {
+      if (product.reportingOrganizations.length > 0) {
         return false;
       }
     } else {
-      const hasMatchingOrg = product.externalReportingAcronyms.some(
+      const hasMatchingOrg = product.reportingOrganizations.some(
         (org) => org.acronym === filters.externalReporting
       );
       if (!hasMatchingOrg) {
@@ -80,7 +80,7 @@ export function generateFilterOptions(products: OscratProductSummary[]) {
   const uniqueExternalReporting = Array.from(
     new Set(
       products.flatMap((p) =>
-        p.externalReportingAcronyms.map((org) => org.acronym)
+        p.reportingOrganizations.map((org) => org.acronym)
       )
     )
   );

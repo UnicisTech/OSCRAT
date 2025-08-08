@@ -29,6 +29,7 @@ export {
   OscratConformityProcedure,
   OscratAssessmentType,
   OscratProductVulnerabilitySeverity,
+  OscratReportingOrganization,
   OscratProductVulnerabilityStatus,
   OscratProductIncidentType,
   OscratProductIncidentStatus,

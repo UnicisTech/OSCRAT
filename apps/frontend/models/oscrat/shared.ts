@@ -118,7 +118,7 @@ export const transformToProductSummary = (
     type: product.type,
     productCategory: product.productCategory,
     complianceStatus: product.complianceStatus,
-    externalReportingAcronyms: product.reportingOrganizations || [],
+    reportingOrganizations: product.reportingOrganizations || [],
     versionsCount: product._count?.versions || 0,
     activeVersionsCount,
     totalOpenIncidents,
@@ -141,7 +141,7 @@ export const transformToProductDetail = (
   type: product.type,
   productCategory: product.productCategory,
   complianceStatus: product.complianceStatus,
-  externalReportingAcronyms: product.reportingOrganizations || [],
+  reportingOrganizations: product.reportingOrganizations || [],
   versions:
     product.versions?.map((version) => ({
       id: version.id,

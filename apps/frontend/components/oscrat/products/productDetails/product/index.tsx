@@ -66,7 +66,14 @@ const Index: React.FC<ProductProps> = ({
   // TODO: Add description to product model
   const PRODUCT_DESCRIPTION =
     'High-density semiconductor built on advanced FinFET technology, featuring ~20 billion transistors. Delivers improved performance and power efficiency for mobile, AI, and high-performance applications.';
-  console.log('Project:', project);
+
+  const reportingOrganizations = useMemo(() => {
+    return (
+      project.reportingOrganizations?.map((org) => org.acronym).join(', ') ||
+      t('oscrat.ui.n-a')
+    );
+  }, [project.reportingOrganizations, t]);
+
   return (
     <>
       <ProductEditModal
@@ -77,7 +84,7 @@ const Index: React.FC<ProductProps> = ({
           name: project.name,
           description: PRODUCT_DESCRIPTION,
           type: project.type,
-          reportingOrganizations: project.externalReportingAcronyms,
+          reportingOrganizations: project.reportingOrganizations,
           status: project.status,
           updatedBy: project.updatedBy,
         }}
@@ -234,8 +241,7 @@ const Index: React.FC<ProductProps> = ({
               {t('oscrat.ui.external-reporting')}:
             </span>
             <span className="font-semibold text-black dark:text-gray-100">
-              {project.externalReportingAcronyms?.join(', ') ||
-                t('oscrat.ui.n-a')}
+              {reportingOrganizations || t('oscrat.ui.n-a')}
             </span>
           </div>
           <div className="flex flex-col">

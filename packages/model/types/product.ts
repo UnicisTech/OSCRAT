@@ -13,7 +13,7 @@ export interface OscratProductSummary {
   type: OscratProductType;
   productCategory: OscratProductCategory;
   complianceStatus: OscratProductComplianceStatus;
-  externalReportingAcronyms: OscratReportingOrganization[];
+  reportingOrganizations: OscratReportingOrganization[];
   versionsCount: number;
   activeVersionsCount: number;
   totalOpenIncidents: number;
@@ -32,7 +32,7 @@ export interface OscratProductDetail {
   type: OscratProductType;
   productCategory: OscratProductCategory;
   complianceStatus: OscratProductComplianceStatus;
-  externalReportingAcronyms: OscratReportingOrganization[];
+  reportingOrganizations: OscratReportingOrganization[];
   versions: OscratProductVersionSummary[];
   status: OscratProductStatus;
   createdAt: Date;

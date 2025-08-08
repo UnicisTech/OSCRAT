@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { OscratProductType } from '@oscrat/model';
@@ -29,7 +28,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
   );
   const [editType, setEditType] = useState(initialData.type);
   const [editExternalReporting, setEditExternalReporting] = useState<string[]>(
-    initialData.reportingOrganizations || []
+    initialData.reportingOrganizations?.map((org) => org.acronym) || []
   );
 
   // Reset form when modal opens or initial data changes
@@ -38,22 +37,35 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
       setEditName(initialData.name as string);
       setEditDescription(initialData.description || '');
       setEditType(initialData.type);
-      setEditExternalReporting(initialData.reportingOrganizations || []);
+      setEditExternalReporting(
+        initialData.reportingOrganizations?.map((org) => org.acronym) || []
+      );
       setFormErrors({});
     }
   }, [isOpen, initialData]);
 
-  // Handle save
+  // Handle save - convert acronyms back to full objects
   const handleSave = useCallback(() => {
+    const selectedReportingOrgs = (
+      initialData.reportingOrganizations || []
+    ).filter((org) => editExternalReporting.includes(org.acronym));
+
     onSave({
       name: editName.trim(),
       description: editDescription.trim(),
       type: editType,
-      reportingOrganizations: editExternalReporting,
+      reportingOrganizations: selectedReportingOrgs,
       status: initialData.status,
       updatedBy: initialData.updatedBy,
     });
-  }, [editName, editDescription, editType, editExternalReporting, onSave]);
+  }, [
+    editName,
+    editDescription,
+    editType,
+    editExternalReporting,
+    onSave,
+    initialData,
+  ]);
 
   // Handle external reporting toggle
   const handleExternalReportingToggle = useCallback((option: string) => {
@@ -64,17 +76,11 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
     );
   }, []);
 
-  // Available options
+  // Available options from reporting organizations
   const productTypes = Object.values(OscratProductType);
-  // TODO: Get external reporting options from DB
-  const externalReportingOptions = [
-    'CERT-EU',
-    'NCSC-NL',
-    'NCSC-UK',
-    'NIST',
-    'BSI',
-    'ANSSI',
-  ];
+  const externalReportingOptions = (
+    initialData.reportingOrganizations || []
+  ).map((org) => org.acronym);
 
   if (!ready) return null;
 
