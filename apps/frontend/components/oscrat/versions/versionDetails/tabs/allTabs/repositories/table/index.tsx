@@ -1,20 +1,15 @@
 import React from 'react';
 import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
+import { ExternalLink } from 'lucide-react';
 import { useTranslation } from 'next-i18next';
-
-// --- TYPE DEFINITIONS ---
-interface RepositoryData {
-  id: string;
-  name: string;
-  provider: string;
-  link: string;
-}
+import type { OscratRepositoryDetail } from '@oscrat/model';
 
 interface RepositoryTableProps {
-  repositories: RepositoryData[];
+  repositories: OscratRepositoryDetail[];
   onAddNew: () => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  isLoading?: boolean;
 }
 
 const Table: React.FC<RepositoryTableProps> = ({
@@ -22,6 +17,7 @@ const Table: React.FC<RepositoryTableProps> = ({
   onAddNew,
   onEdit,
   onDelete,
+  isLoading = false,
 }) => {
   const tableHeaders = ['Name', 'Provider', 'Link', ''];
   const { t, ready } = useTranslation('common');
@@ -35,7 +31,8 @@ const Table: React.FC<RepositoryTableProps> = ({
       <div className="mb-4">
         <button
           onClick={onAddNew}
-          className="rounded-sm border border-gray-400 bg-white px-2 py-1 text-[14px] font-medium text-gray-900 hover:bg-gray-50"
+          disabled={isLoading}
+          className="rounded-sm border border-gray-400 bg-white px-2 py-1 text-[14px] font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-50"
         >
           {t('add-new')}
         </button>
@@ -71,24 +68,28 @@ const Table: React.FC<RepositoryTableProps> = ({
                   <td className="px-6 py-4 text-gray-900">{repo.provider}</td>
                   <td className="max-w-xs truncate px-6 py-4 text-gray-900">
                     <a
-                      href={repo.link}
+                      href={repo.repositoryUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="inline-flex items-center text-blue-600 hover:text-blue-800"
                     >
-                      {repo.link}
+                      {repo.repositoryUrl}
+                      <ExternalLink size={14} className="ml-1" />
                     </a>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-4">
                       <button
                         onClick={() => onEdit(repo.id)}
-                        className="text-gray-700 hover:text-blue-600"
+                        disabled={isLoading}
+                        className="text-gray-700 hover:text-blue-600 disabled:opacity-50"
                       >
                         <FaPencilAlt />
                       </button>
                       <button
                         onClick={() => onDelete(repo.id)}
-                        className="text-gray-700 hover:text-red-600"
+                        disabled={isLoading}
+                        className="text-gray-700 hover:text-red-600 disabled:opacity-50"
                       >
                         <FaTrashAlt />
                       </button>

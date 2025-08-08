@@ -3,6 +3,7 @@ import {
   OscratProductCategory,
   OscratProductStatus,
   OscratProductComplianceStatus,
+  OscratReportingOrganization,
 } from '@prisma/client';
 import { OscratProductVersionSummary } from './version';
 
@@ -12,7 +13,7 @@ export interface OscratProductSummary {
   type: OscratProductType;
   productCategory: OscratProductCategory;
   complianceStatus: OscratProductComplianceStatus;
-  externalReportingAcronyms: string[];
+  externalReportingAcronyms: OscratReportingOrganization[];
   versionsCount: number;
   activeVersionsCount: number;
   totalOpenIncidents: number;
@@ -27,10 +28,11 @@ export interface OscratProductSummary {
 export interface OscratProductDetail {
   id: string;
   name: string;
+  organizationId: string;
   type: OscratProductType;
   productCategory: OscratProductCategory;
   complianceStatus: OscratProductComplianceStatus;
-  externalReportingAcronyms: string[];
+  externalReportingAcronyms: OscratReportingOrganization[];
   versions: OscratProductVersionSummary[];
   status: OscratProductStatus;
   createdAt: Date;
@@ -53,6 +55,6 @@ export interface OscratProductUpdate {
   productCategory?: OscratProductCategory;
   complianceStatus?: OscratProductComplianceStatus;
   status: OscratProductStatus;
-  reportingOrganizations?: string[];
+  reportingOrganizations?: OscratReportingOrganization[];
   updatedBy: string;
 }

@@ -51,6 +51,7 @@ const ORGANIZATION_SUMMARY_INCLUDE = {
 
 /** Include for organization detail queries (with full product relations) */
 const ORGANIZATION_DETAIL_INCLUDE = {
+  reportingOrganizations: true,
   products: {
     include: {
       reportingOrganizations: true,
@@ -119,6 +120,7 @@ const transformToOrganizationDetail = (
   createdBy: organization.createdBy,
   updatedBy: organization.updatedBy,
   products: organization.products.map(transformToProductDetail),
+  OscratReportingOrganization: organization.reportingOrganizations,
 });
 
 /** Get organization summary with product counts */

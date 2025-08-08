@@ -34,7 +34,7 @@ export function matchesFilters(
 
   // Open Incidents filter
   if (filters.openIncidents && filters.openIncidents !== '') {
-    const hasOpenIncidents = product.totalOpenIncidents > 0;
+    const hasOpenIncidents = product.openIncidents > 0;
     const shouldHaveIncidents = filters.openIncidents === 'true';
     if (shouldHaveIncidents !== hasOpenIncidents) {
       return false;
@@ -43,7 +43,7 @@ export function matchesFilters(
 
   // Open Vulnerabilities filter
   if (filters.openVulnerabilities && filters.openVulnerabilities !== '') {
-    const hasOpenVulnerabilities = product.totalOpenVulnerabilities > 0;
+    const hasOpenVulnerabilities = product.openVulnerabilities > 0;
     const shouldHaveVulnerabilities = filters.openVulnerabilities === 'true';
     if (shouldHaveVulnerabilities !== hasOpenVulnerabilities) {
       return false;

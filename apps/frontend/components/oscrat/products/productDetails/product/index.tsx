@@ -66,7 +66,7 @@ const Index: React.FC<ProductProps> = ({
   // TODO: Add description to product model
   const PRODUCT_DESCRIPTION =
     'High-density semiconductor built on advanced FinFET technology, featuring ~20 billion transistors. Delivers improved performance and power efficiency for mobile, AI, and high-performance applications.';
-
+  console.log('Project:', project);
   return (
     <>
       <ProductEditModal

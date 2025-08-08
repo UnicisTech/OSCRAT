@@ -1,54 +1,114 @@
 import { useState } from 'react';
+import { useVersionContext } from '@/context/VersionContext';
+import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
 import Table from './table';
 import Modal from './modal';
+import ConfirmationModal from './confirmationModal';
 
-// TODO: Wait for BE implementation and seed data
 export default function Index() {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isCreateMode, setIsCreateMode] = useState(false);
+  const [isConfirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [repositoryToDelete, setRepositoryToDelete] = useState<string | null>(
+    null
+  );
+  const [isDeletingRepository, setIsDeletingRepository] = useState(false);
 
-  // --- TYPE DEFINITIONS ---
-  interface RepositoryData {
-    id: string;
-    name: string;
-    provider: string;
-    link: string;
-  }
+  const { teamId, projectId, versionId } = useVersionContext();
 
-  const initialRepoData: RepositoryData[] = [
-    {
-      id: '1',
-      name: 'v2.3',
-      provider: 'GitHub',
-      link: 'https://github.com/username/repository-name',
-    },
-  ];
+  const { repository, isLoading, isError, error, deleteRepository } =
+    useOscratRepository(teamId, projectId, versionId);
 
-  const [repositories, setRepositories] =
-    useState<RepositoryData[]>(initialRepoData);
+  // Convert single repository to array format for table compatibility
+  const repositories = repository ? [repository] : [];
 
-  const handleAddRepository = (newRepo: Omit<RepositoryData, 'id'>) => {
-    const newEntry = { ...newRepo, id: (repositories.length + 2).toString() };
-    setRepositories((prevRepos) => [...prevRepos, newEntry]);
+  const handleAddRepository = () => {
+    setIsCreateMode(true);
+    setModalOpen(true);
   };
 
-  const handleEdit = (id: string) =>
-    alert(`Edit action for item ${id} is not yet implemented.`);
-  const handleDelete = (id: string) =>
-    alert(`Delete action for item ${id} is not yet implemented.`);
+  const handleEdit = () => {
+    setIsCreateMode(false);
+    setModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    setRepositoryToDelete(id);
+    setConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!repository || !repositoryToDelete) return;
+
+    setIsDeletingRepository(true);
+    try {
+      await deleteRepository();
+      setConfirmDeleteOpen(false);
+      setRepositoryToDelete(null);
+    } catch (error: any) {
+      console.error('Failed to delete repository:', error.message);
+    } finally {
+      setIsDeletingRepository(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDeleteOpen(false);
+    setRepositoryToDelete(null);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 p-4">
+        <div className="flex justify-center p-8">
+          <div className="text-sm text-gray-500">Loading repository...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 p-4">
+        <div className="flex justify-center p-8">
+          <div className="text-sm text-red-500">
+            Error loading repository: {error?.message}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 p-4">
       <Table
         repositories={repositories}
-        onAddNew={() => setModalOpen(true)}
+        onAddNew={handleAddRepository}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        isLoading={isLoading}
       />
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        onAdd={handleAddRepository}
+        repository={repository || undefined}
+        teamId={teamId}
+        projectId={projectId}
+        versionId={versionId}
+        isCreateMode={isCreateMode}
+      />
+
+      <ConfirmationModal
+        isOpen={isConfirmDeleteOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Delete Repository"
+        message={`Are you sure you want to delete the repository "${repository?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={isDeletingRepository}
+        variant="danger"
       />
     </div>
   );

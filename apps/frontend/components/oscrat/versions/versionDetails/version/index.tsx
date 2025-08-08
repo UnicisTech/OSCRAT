@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BsExclamationCircleFill } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
 import { FullScreenModal } from '@/components/shared';
@@ -15,7 +15,7 @@ const Index = () => {
   const { slug } = useTeamContext();
   const { versionId } = useVersionContext();
   const { teamId, projectId } = useProductContext();
-  const { version, deleteVersion } = useOscratVersion(
+  const { version, deleteVersion, updateVersion } = useOscratVersion(
     teamId,
     projectId,
     versionId
@@ -29,7 +29,14 @@ const Index = () => {
   >(null);
 
   // Edit form state
-  const [editName, setEditName] = useState(version?.version);
+  const [editName, setEditName] = useState('');
+
+  // Initialize edit form when version data is available
+  useEffect(() => {
+    if (version?.version) {
+      setEditName(version.version);
+    }
+  }, [version]);
 
   // TODO: Align with design team to see if they belong
   // const [editType, setEditType] = useState(version?.type);
@@ -50,8 +57,21 @@ const Index = () => {
       ? `${version.incidents.length} ${t('oscrat.ui.open')}`
       : t('oscrat.ui.none');
 
-  const handleEdit = () => {
-    // TODO: handle when the form fields are known
+  const handleEdit = async () => {
+    if (!editName.trim()) {
+      toast.error('Version name is required');
+      return;
+    }
+
+    try {
+      await updateVersion({
+        version: editName.trim(),
+      });
+      toast.success('Version updated successfully');
+    } catch (error) {
+      console.error('Failed to update version:', error);
+      toast.error('Failed to update version');
+    }
   };
 
   const handleDelete = async () => {
@@ -74,7 +94,7 @@ const Index = () => {
     switch (modalAction) {
       case 'edit':
         return {
-          title: t('oscrat.ui.edit-product'),
+          title: t('oscrat.ui.edit-version'),
           continueButtonText: t('save'),
           onContinue: () => {
             setShowModal(false);
@@ -84,9 +104,9 @@ const Index = () => {
         };
       case 'delete':
         return {
-          title: t('oscrat.ui.delete-product'),
-          text: t('oscrat.ui.delete-product-confirmation', {
-            productName: version?.version,
+          title: t('oscrat.ui.delete-version'),
+          text: t('oscrat.ui.delete-version-confirmation', {
+            versionName: version?.version,
           }),
           continueButtonText: t('delete'),
           onContinue: () => {
@@ -97,9 +117,9 @@ const Index = () => {
         };
       case 'withdraw':
         return {
-          title: t('oscrat.ui.withdraw-product'),
-          text: t('oscrat.ui.withdraw-product-confirmation', {
-            productName: version?.version,
+          title: t('oscrat.ui.withdraw-version'),
+          text: t('oscrat.ui.withdraw-version-confirmation', {
+            versionName: version?.version,
           }),
           continueButtonText: t('oscrat.ui.withdraw'),
           onContinue: () => {
@@ -110,7 +130,7 @@ const Index = () => {
         };
       default:
         return {
-          title: t('oscrat.ui.product-details'),
+          title: t('oscrat.ui.version-details'),
           continueButtonText: t('oscrat.ui.close'),
           onContinue: () => {
             setShowModal(false);
@@ -148,14 +168,14 @@ const Index = () => {
           <div className="space-y-6">
             <div>
               <label className="mb-2 block text-sm font-medium dark:text-gray-300">
-                {t('oscrat.ui.product-name')}
+                {t('oscrat.ui.version-name')}
               </label>
               <input
                 type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-                placeholder={t('oscrat.ui.product-name')}
+                placeholder={t('oscrat.ui.version-name')}
               />
             </div>
 

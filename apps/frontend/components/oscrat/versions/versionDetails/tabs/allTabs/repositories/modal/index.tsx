@@ -1,7 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { IoClose } from 'react-icons/io5';
-import Divider from '@/components/shared/Divider';
+import React, { Fragment } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
+import TextField from '@atlaskit/textfield';
+import Select, { ValueType } from '@atlaskit/select';
+import Button, { LoadingButton } from '@atlaskit/button';
+import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
+import { IoClose } from 'react-icons/io5';
+import type {
+  OscratRepositoryDetail,
+  OscratRepositoryUpdate,
+} from '@oscrat/model';
+import {
+  useOscratRepositoryDetail,
+  useOscratRepository,
+} from '@/hooks/oscrat/useOscratRepository';
+import { extractErrorMessage } from '@/lib/utils';
+import { WithoutRing } from 'sharedStyles';
 
 // --- TYPE DEFINITIONS ---
 interface RepositoryData {
@@ -22,273 +36,322 @@ interface AddRepositoryModalProps {
   onAdd: (newRepo: Omit<RepositoryData, 'id'>) => void;
 }
 
-const Modal: React.FC<AddRepositoryModalProps> = ({
+interface Option {
+  label: string;
+  value: string;
+}
+
+interface FormData {
+  name: string;
+  provider: ValueType<Option>;
+  user: string;
+  authType: ValueType<Option>;
+  targetBranch?: string;
+  targetTag?: string;
+  targetCommit?: string;
+  accessToken?: string;
+}
+
+const PROVIDER_OPTIONS: Option[] = [
+  { label: 'GitHub', value: 'GITHUB' },
+  { label: 'GitLab', value: 'GITLAB' },
+  { label: 'Bitbucket', value: 'BITBUCKET' },
+];
+
+const AUTH_TYPE_OPTIONS: Option[] = [
+  { label: 'Personal Access Token', value: 'PERSONAL_ACCESS_TOKEN' },
+];
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  repository?: OscratRepositoryDetail;
+  teamId: string;
+  projectId: string;
+  versionId: string;
+  isCreateMode?: boolean;
+}
+
+const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
-  onAdd,
+  repository,
+  teamId,
+  projectId,
+  versionId,
+  isCreateMode = false,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const { t, ready } = useTranslation('common');
+  const { t } = useTranslation('common');
+  const { updateRepository } = useOscratRepositoryDetail(
+    teamId,
+    projectId,
+    versionId,
+    repository?.id || '',
+    { enabled: !isCreateMode }
+  );
+  const { createRepository } = useOscratRepository(
+    teamId,
+    projectId,
+    versionId
+  );
 
-  // Form state
-  const [name, setName] = useState('v2.3');
-  const [provider, setProvider] = useState('GitHub');
-  const [credentialType, setCredentialType] = useState<CredentialType>('token');
-  const [userName, setUserName] = useState('234567345');
-  const [token, setToken] = useState('234567345');
-  const [url, setUrl] = useState('https://github.com/username/repository-name');
+  const selectedProvider = PROVIDER_OPTIONS.find(
+    (option) => option.value === repository?.provider
+  );
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    };
+  const selectedAuthType = AUTH_TYPE_OPTIONS.find(
+    (option) => option.value === repository?.authType
+  );
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+  const defaultValues = {
+    name: repository?.name || '',
+    user: repository?.user || '',
+    targetBranch: repository?.targetBranch || '',
+    targetTag: repository?.targetTag || '',
+    targetCommit: repository?.targetCommit || '',
+    accessToken: repository?.accessToken || '',
+  };
+
+  const generateRepositoryUrl = (
+    provider: string,
+    user: string,
+    name: string
+  ): string => {
+    switch (provider) {
+      case 'GITHUB':
+        return `https://github.com/${user}/${name}`;
+      case 'GITLAB':
+        return `https://gitlab.com/${user}/${name}`;
+      case 'BITBUCKET':
+        return `https://bitbucket.org/${user}/${name}`;
+      default:
+        return '';
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onAdd({ name, provider, link: url });
-    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
-      <div
-        ref={modalRef}
-        className="animate-fade-in-up flex max-h-[90vh] w-full max-w-lg flex-col rounded-lg bg-white shadow-2xl"
-      >
-        <header className="flex items-center justify-between p-4">
-          <h2 className="text-[14px] font-bold text-gray-900">
-            {t('oscrat.ui.add-new-repo')}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <IoClose size={24} />
-          </button>
-        </header>
+      <div className="animate-fade-in-up flex max-h-[90vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-2xl">
+        <Form<FormData>
+          onSubmit={async (data) => {
+            const {
+              name,
+              provider,
+              user,
+              authType,
+              targetBranch,
+              targetTag,
+              targetCommit,
+              accessToken,
+            } = data;
 
-        <Divider className="my-2" />
+            try {
+              const repositoryUrl = generateRepositoryUrl(
+                provider?.value as string,
+                user,
+                name
+              );
 
-        <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden">
-          <main className="space-y-4 overflow-y-auto p-6">
-            <div className="flex justify-between text-sm">
-              <div>
-                <span className="font-semibold text-gray-500">
-                  {t('version')}
-                </span>
-                <span className="text-gray-800">{name}</span>
-              </div>
-              <div>
-                <span className="font-semibold text-gray-500">
-                  {t('product')}
-                </span>
-                <span className="text-gray-800">N5 5nm - 9 7950x</span>
-              </div>
-            </div>
+              const repositoryData = {
+                name,
+                provider: provider?.value as any,
+                repositoryUrl,
+                user,
+                authType: authType?.value as any,
+                targetBranch: targetBranch || undefined,
+                targetTag: targetTag || undefined,
+                targetCommit: targetCommit || undefined,
+                accessToken: accessToken || undefined,
+              };
 
-            <Divider className="my-2" />
+              if (isCreateMode) {
+                await createRepository(repositoryData);
+                toast.success(
+                  t('repository-created') || 'Repository created successfully'
+                );
+              } else {
+                await updateRepository(repositoryData);
+                toast.success(
+                  t('repository-updated') || 'Repository updated successfully'
+                );
+              }
+              onClose();
+            } catch (err: any) {
+              const action = isCreateMode ? 'create' : 'update';
+              toast.error(
+                extractErrorMessage(
+                  err,
+                  t(`error-${action}-repository`) ||
+                    `Failed to ${action} repository`
+                )
+              );
+            }
+          }}
+        >
+          {({ formProps, submitting }) => (
+            <form {...formProps}>
+              <header className="flex items-center justify-between p-4">
+                <h2 className="text-lg font-bold text-gray-900">
+                  {isCreateMode
+                    ? t('oscrat.ui.add-new-repo')
+                    : 'Edit Repository'}
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="text-gray-400 hover:text-gray-600"
+                  type="button"
+                >
+                  <IoClose size={24} />
+                </button>
+              </header>
 
-            <div>
-              <label
-                htmlFor="repoName"
-                className="mb-1 block text-sm font-medium text-gray-900"
-                style={{ fontSize: '14px' }}
-              >
-                {t('name')}
-              </label>
-              <input
-                type="text"
-                id="repoName"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="repoProvider"
-                className="mb-1 block text-sm font-medium text-gray-900"
-                style={{ fontSize: '14px' }}
-              >
-                {t('provider')}
-              </label>
-              <select
-                id="repoProvider"
-                value={provider}
-                onChange={(e) => setProvider(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-              >
-                <option>GitHub</option>
-                <option>GitLab</option>
-                <option>Bitbucket</option>
-              </select>
-            </div>
+              <main className="space-y-4 overflow-y-auto p-6">
+                <Field
+                  aria-required={true}
+                  name="name"
+                  label="Repository Name"
+                  isRequired
+                  defaultValue={defaultValues.name}
+                >
+                  {({ fieldProps }) => (
+                    <Fragment>
+                      <TextField autoComplete="off" {...fieldProps} />
+                    </Fragment>
+                  )}
+                </Field>
 
-            <Divider className="my-2" />
+                <Field<ValueType<Option>>
+                  aria-required={true}
+                  name="provider"
+                  label="Provider"
+                  isRequired
+                  defaultValue={selectedProvider}
+                >
+                  {({ fieldProps: { id, ...rest }, error }) => (
+                    <Fragment>
+                      <WithoutRing>
+                        <Select
+                          inputId={id}
+                          {...rest}
+                          options={PROVIDER_OPTIONS}
+                          placeholder="Select provider"
+                          isInvalid={!!error}
+                        />
+                      </WithoutRing>
+                      {error && <ErrorMessage>{error}</ErrorMessage>}
+                    </Fragment>
+                  )}
+                </Field>
 
-            <div>
-              <label
-                className="mb-2 block text-sm font-medium text-gray-900"
-                style={{ fontSize: '14px' }}
-              >
-                {t('credential')}:
-              </label>
-              <div className="flex items-center space-x-6">
-                <label className="flex cursor-pointer items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="credential"
-                    value="account"
-                    checked={credentialType === 'account'}
-                    onChange={() => setCredentialType('account')}
-                    className="form-radio h-4 w-4 text-blue-600"
-                  />
-                  <span className="text-sm text-gray-700">{t('account')}</span>
-                </label>
-                <label className="flex cursor-pointer items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="credential"
-                    value="token"
-                    checked={credentialType === 'token'}
-                    onChange={() => setCredentialType('token')}
-                    className="form-radio h-4 w-4 text-blue-600"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {t('access-token')}
-                  </span>
-                </label>
-              </div>
-            </div>
-            {credentialType === 'account' && (
-              <>
-                <div>
-                  <label
-                    htmlFor="userName"
-                    className="mb-1 block text-sm font-medium text-gray-900"
-                    style={{ fontSize: '14px' }}
-                  >
-                    {t('user-name')}
-                  </label>
-                  <input
-                    type="text"
-                    id="userName"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="mb-1 block text-sm font-medium text-gray-900"
-                    style={{ fontSize: '14px' }}
-                  >
-                    {t('password')}
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    value={token}
-                    onChange={(e) => setToken(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
-                  />
-                </div>
-              </>
-            )}
-            {credentialType === 'token' && (
-              <>
-                <div>
-                  <label
-                    htmlFor="userName"
-                    className="mb-1 block text-sm font-medium text-gray-900"
-                    style={{ fontSize: '14px' }}
-                  >
-                    {t('user-name')}
-                  </label>
-                  <input
-                    type="text"
-                    id="userName"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="token"
-                    className="mb-1 block text-sm font-medium text-gray-900"
-                    style={{ fontSize: '14px' }}
-                  >
-                    {t('token')}
-                  </label>
-                  <input
-                    type="password"
-                    id="token"
-                    value={token}
-                    onChange={(e) => setToken(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
-                  />
-                </div>
-              </>
-            )}
+                <Field
+                  aria-required={true}
+                  name="user"
+                  label="User"
+                  isRequired
+                  defaultValue={defaultValues.user}
+                >
+                  {({ fieldProps }) => (
+                    <Fragment>
+                      <TextField autoComplete="off" {...fieldProps} />
+                    </Fragment>
+                  )}
+                </Field>
 
-            <Divider className="my-4" />
+                <Field<ValueType<Option>>
+                  aria-required={true}
+                  name="authType"
+                  label="Authentication Type"
+                  isRequired
+                  defaultValue={selectedAuthType}
+                >
+                  {({ fieldProps: { id, ...rest }, error }) => (
+                    <Fragment>
+                      <WithoutRing>
+                        <Select
+                          inputId={id}
+                          {...rest}
+                          options={AUTH_TYPE_OPTIONS}
+                          placeholder="Select authentication type"
+                          isInvalid={!!error}
+                        />
+                      </WithoutRing>
+                      {error && <ErrorMessage>{error}</ErrorMessage>}
+                    </Fragment>
+                  )}
+                </Field>
 
-            <div>
-              <label
-                htmlFor="repoURL"
-                className="mb-1 block text-sm font-medium text-gray-900"
-                style={{ fontSize: '14px' }}
-              >
-                {t('url')}
-              </label>
-              <input
-                type="url"
-                id="repoURL"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm"
-              />
-            </div>
-          </main>
+                <Field
+                  name="targetBranch"
+                  label="Target Branch"
+                  defaultValue={defaultValues.targetBranch}
+                >
+                  {({ fieldProps }) => (
+                    <Fragment>
+                      <TextField autoComplete="off" {...fieldProps} />
+                    </Fragment>
+                  )}
+                </Field>
 
-          <Divider className="my-2" />
+                <Field
+                  name="targetTag"
+                  label="Target Tag"
+                  defaultValue={defaultValues.targetTag}
+                >
+                  {({ fieldProps }) => (
+                    <Fragment>
+                      <TextField autoComplete="off" {...fieldProps} />
+                    </Fragment>
+                  )}
+                </Field>
 
-          <footer className="flex items-center justify-end space-x-3 rounded-b-lg bg-gray-50 p-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              {t('cencel')}
-            </button>
-            <button
-              type="submit"
-              className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              {t('add')}
-            </button>
-          </footer>
-        </form>
+                <Field
+                  name="targetCommit"
+                  label="Target Commit"
+                  defaultValue={defaultValues.targetCommit}
+                >
+                  {({ fieldProps }) => (
+                    <Fragment>
+                      <TextField autoComplete="off" {...fieldProps} />
+                    </Fragment>
+                  )}
+                </Field>
+
+                <Field
+                  name="accessToken"
+                  label="Access Token"
+                  defaultValue={defaultValues.accessToken}
+                >
+                  {({ fieldProps }) => (
+                    <Fragment>
+                      <TextField
+                        autoComplete="off"
+                        type="password"
+                        {...fieldProps}
+                      />
+                    </Fragment>
+                  )}
+                </Field>
+
+                <FormFooter></FormFooter>
+              </main>
+
+              <footer className="flex items-center justify-end space-x-3 rounded-b-lg bg-gray-50 p-4">
+                <Button appearance="default" onClick={onClose} type="button">
+                  {t('close')}
+                </Button>
+                <LoadingButton
+                  type="submit"
+                  appearance="primary"
+                  isLoading={submitting}
+                >
+                  {isCreateMode ? 'Create Repository' : t('save-changes')}
+                </LoadingButton>
+              </footer>
+            </form>
+          )}
+        </Form>
       </div>
     </div>
   );

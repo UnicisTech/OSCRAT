@@ -52,5 +52,5 @@ export interface OscratProductVersionCreate {
 export interface OscratProductVersionUpdate {
   version?: string;
   status?: OscratProductVersionStatus;
-  updatedBy: string;
+  updatedBy?: string;
 }

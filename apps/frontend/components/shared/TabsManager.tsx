@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import NotSupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/notSupported';
 import SupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/supported';
-import { OscratProductVersionSummary } from '@oscrat/model';
+import {
+  OscratProductVersionSummary,
+  OscratProductVersionCreate,
+} from '@oscrat/model';
+import Index from '@/components/oscrat/products/productDetails/addVersion';
+import { useOscratVersions } from '@/hooks/oscrat/useOscratVersion';
+import { useProductContext } from '@/context/ProductContext';
 
 export type TabConfig = {
   id: string;
@@ -23,9 +29,30 @@ export default function TabsManager({
   onButtonClick,
 }: TabsManagerProps) {
   const [activeTab, setActiveTab] = useState(defaultActiveTab || tabs[0]?.id);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const { teamId, projectId } = useProductContext();
+  const { createVersion } = useOscratVersions(teamId, projectId);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
+  };
+
+  const handleButtonClick = () => {
+    if (onButtonClick) {
+      onButtonClick();
+    } else {
+      setShowCreateModal(true);
+    }
+  };
+
+  const handleCreateVersion = async (data: OscratProductVersionCreate) => {
+    await createVersion(data);
+    setShowCreateModal(false);
+  };
+
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
   };
 
   const renderTabContent = (tab: TabConfig) => {
@@ -69,7 +96,7 @@ export default function TabsManager({
           <button
             type="button"
             className="ml-auto rounded border border-gray-300 bg-transparent px-4 py-2 text-sm font-medium text-black hover:bg-gray-100"
-            onClick={() => (onButtonClick ? onButtonClick() : undefined)}
+            onClick={handleButtonClick}
           >
             {buttonText}
           </button>
@@ -87,6 +114,15 @@ export default function TabsManager({
           {activeTab === tab.id && renderTabContent(tab)}
         </div>
       ))}
+
+      {/* Create Version Modal */}
+      <Index
+        isOpen={showCreateModal}
+        onClose={handleCloseModal}
+        onSave={handleCreateVersion}
+        productId={projectId}
+        createdBy="" // Backend will automatically set this from the authenticated user
+      />
     </div>
   );
 }
