@@ -1,4 +1,4 @@
-const dateOptions = {
+const dateOptions: Intl.DateTimeFormatOptions = {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
@@ -35,7 +35,6 @@ export const taskCommentsNavigations = (activeTab: string) => {
 
 export const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
-  const formatter = new Intl.DateTimeFormat('en-US', dateOptions as any);
-  const formattedDate = formatter.format(date);
-  return formattedDate;
+  const formatter = new Intl.DateTimeFormat('en-US', dateOptions);
+  return formatter.format(date);
 };
