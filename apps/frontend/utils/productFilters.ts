@@ -34,7 +34,7 @@ export function matchesFilters(
 
   // Open Incidents filter
   if (filters.openIncidents && filters.openIncidents !== '') {
-    const hasOpenIncidents = product.openIncidents > 0;
+    const hasOpenIncidents = product.totalOpenIncidents > 0;
     const shouldHaveIncidents = filters.openIncidents === 'true';
     if (shouldHaveIncidents !== hasOpenIncidents) {
       return false;
@@ -43,7 +43,7 @@ export function matchesFilters(
 
   // Open Vulnerabilities filter
   if (filters.openVulnerabilities && filters.openVulnerabilities !== '') {
-    const hasOpenVulnerabilities = product.openVulnerabilities > 0;
+    const hasOpenVulnerabilities = product.totalOpenVulnerabilities > 0;
     const shouldHaveVulnerabilities = filters.openVulnerabilities === 'true';
     if (shouldHaveVulnerabilities !== hasOpenVulnerabilities) {
       return false;
@@ -57,9 +57,10 @@ export function matchesFilters(
         return false;
       }
     } else {
-      if (
-        !product.externalReportingAcronyms.includes(filters.externalReporting)
-      ) {
+      const hasMatchingOrg = product.externalReportingAcronyms.some(
+        (org) => org.acronym === filters.externalReporting
+      );
+      if (!hasMatchingOrg) {
         return false;
       }
     }
@@ -77,7 +78,11 @@ export function matchesFilters(
 
 export function generateFilterOptions(products: OscratProductSummary[]) {
   const uniqueExternalReporting = Array.from(
-    new Set(products.flatMap((p) => p.externalReportingAcronyms))
+    new Set(
+      products.flatMap((p) =>
+        p.externalReportingAcronyms.map((org) => org.acronym)
+      )
+    )
   );
 
   return {

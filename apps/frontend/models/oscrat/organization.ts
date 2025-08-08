@@ -120,7 +120,6 @@ const transformToOrganizationDetail = (
   createdBy: organization.createdBy,
   updatedBy: organization.updatedBy,
   products: organization.products.map(transformToProductDetail),
-  OscratReportingOrganization: organization.reportingOrganizations,
 });
 
 /** Get organization summary with product counts */
