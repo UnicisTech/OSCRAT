@@ -7,10 +7,10 @@ import {
 } from '@oscrat/model';
 
 export const oscratProjectEndpoints = {
-  listProjects: (teamId: string) =>
+  listProducts: (teamId: string) =>
     api.get<OscratProductSummary[]>(`/teams/${teamId}/products`),
 
-  createProject: (teamId: string, data: OscratProductCreate) =>
+  createProduct: (teamId: string, data: OscratProductCreate) =>
     api.post<OscratProductDetail>(`/teams/${teamId}/products`, data),
 
   getProjectDetail: (teamId: string, projectId: string) =>

@@ -1,6 +1,6 @@
 import {
   useGetProjectDetail,
-  useCreateProject,
+  useCreateProduct,
   useUpdateProject,
   useDeleteProject,
 } from '@/lib/api/hooks/oscrat/projects';
@@ -29,11 +29,11 @@ export function useOscratProject(
     error,
   } = useGetProjectDetail(teamId, projectId, { enabled });
 
-  const createProjectMutation = useCreateProject(teamId);
+  const createProductMutation = useCreateProduct(teamId);
   const updateProjectMutation = useUpdateProject(teamId, projectId);
 
   const createProject = async (data: OscratProductCreate) => {
-    return createProjectMutation.mutateAsync(data);
+    return createProductMutation.mutateAsync(data);
   };
 
   const updateProject = async (data: OscratProductUpdate) => {
@@ -42,7 +42,7 @@ export function useOscratProject(
 
   const isLoading =
     isFetchingProject ||
-    createProjectMutation.isPending ||
+    createProductMutation.isPending ||
     updateProjectMutation.isPending ||
     deleteProjectMutation.isPending;
 

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
 import { useTeamContext } from '@/context/TeamContext';
-import { useCreateProject } from '@/lib/api/hooks/oscrat/projects';
+import { useCreateProduct } from '@/lib/api/hooks/oscrat/projects';
 import { OscratProductType, OscratProductCategory } from '@oscrat/model';
 import type { OscratProductCreate } from '@oscrat/model';
 import { getProductTypeKey, getProductCategoryKey } from '@/utils/translation';
@@ -18,11 +18,11 @@ export default function AddProduct() {
   const { data: session } = useSession();
   const router = useRouter();
   
-  const createProjectMutation = useCreateProject(teamId);
+  const createProductMutation = useCreateProduct(teamId);
   const createProduct = async (data: OscratProductCreate) => {
-    return createProjectMutation.mutateAsync(data);
+    return createProductMutation.mutateAsync(data);
   };
-  const isLoading = createProjectMutation.isPending;
+  const isLoading = createProductMutation.isPending;
 
   const [name, setName] = useState('');
   const [type, setType] = useState<OscratProductType | ''>('');

@@ -1,9 +1,9 @@
 // Organization exports removed - functionality moved to team model
 
 export {
-  getProjects,
+  getProducts,
   getProjectDetail,
-  createProject,
+  createProduct,
   updateProject,
   deleteProject,
 } from './project';

@@ -81,8 +81,8 @@ const PROJECT_DETAIL_INCLUDE = {
   },
 };
 
-/** Get all projects for a team */
-export const getProjects = async (
+/** Get all products for a team */
+export const getProducts = async (
   teamId: string
 ): Promise<OscratProductSummary[]> => {
   const team = await prisma.team.findUnique({
@@ -112,8 +112,8 @@ export const getProjectDetail = async (
   return product ? transformToProductDetail(product) : null;
 };
 
-/** Create a new project for the team */
-export const createProject = async (
+/** Create a new product for the team */
+export const createProduct = async (
   teamId: string,
   data: OscratProductCreate
 ): Promise<OscratProductDetail> => {

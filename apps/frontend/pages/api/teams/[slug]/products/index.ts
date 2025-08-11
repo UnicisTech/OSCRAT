@@ -1,4 +1,4 @@
-import { getProjects, createProject } from 'models/oscrat';
+import { getProducts, createProduct } from 'models/oscrat';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductCreate } from '@oscrat/model';
@@ -21,24 +21,24 @@ export default function handler(
   }
 }
 
-// Get all projects
+// Get all products
 const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
-  const projects = await getProjects(teamMember.teamId);
+  const products = await getProducts(teamMember.teamId);
 
-  res.status(200).json({ data: projects });
+  res.status(200).json({ data: products });
 };
 
-// Create project
+// Create product
 const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
-  const projectData = req.body as OscratProductCreate;
+  const productData = req.body as OscratProductCreate;
 
-  const project = await createProject(teamMember.teamId, projectData);
+  const product = await createProduct(teamMember.teamId, productData);
 
-  console.log(`[OSCRAT] project created, productId: ${project.id}, name: ${projectData.name}, teamId: ${teamMember.teamId}`);
+  console.log(`[OSCRAT] product created, productId: ${product.id}, name: ${productData.name}, teamId: ${teamMember.teamId}`);
 
-  res.status(201).json({ data: project });
+  res.status(201).json({ data: product });
 };

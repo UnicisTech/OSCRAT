@@ -4,11 +4,11 @@ import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
 import type { OscratProductCreate, OscratProductUpdate } from '@oscrat/model';
 
-// List projects
-export function useGetProjects(teamId: string) {
+// List products
+export function useGetProducts(teamId: string) {
   return useQuery({
     queryKey: queryKeys.oscrat.projects.all(teamId),
-    queryFn: () => oscratProjectEndpoints.listProjects(teamId),
+    queryFn: () => oscratProjectEndpoints.listProducts(teamId),
   });
 }
 
@@ -29,11 +29,11 @@ export function useGetProjectDetail(
   return result;
 }
 
-// Create project
-export function useCreateProject(teamId: string) {
+// Create product
+export function useCreateProduct(teamId: string) {
   return useMutation({
     mutationFn: (data: OscratProductCreate) =>
-      oscratProjectEndpoints.createProject(teamId, data),
+      oscratProjectEndpoints.createProduct(teamId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.all(teamId),
