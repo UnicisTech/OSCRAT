@@ -1,4 +1,5 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
+
 const { i18n } = require('./next-i18next.config');
 const { withGlobalCss } = require('next-global-css');
 

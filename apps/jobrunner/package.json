@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
     "build": "tsc",
     "start": "tsx src/index.ts",
     "check-types": "tsc --pretty --noEmit",
@@ -15,8 +15,10 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
+    "@oscrat/config": "workspace:*",
     "@oscrat/model": "workspace:*",
     "dotenv": "^16.4.5",
+    "dotenv-cli": "^7.4.2",
     "p-queue": "^8.1.0",
     "tempy": "^3.1.0",
     "zx": "^8.5.5"

@@ -6,9 +6,15 @@
     "module": "ES2022",
     "noEmit": false,
     "outDir": "./dist",
-    "rootDir": "./src",
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@oscrat/model": ["../../packages/model"],
+      "@oscrat/model/*": ["../../packages/model/*"],
+      "@oscrat/config": ["../../packages/config/src"],
+      "@oscrat/config/*": ["../../packages/config/src/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

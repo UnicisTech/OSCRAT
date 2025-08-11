@@ -1,13 +1,12 @@
-import { config } from 'dotenv';
 import { PrismaClient } from '@oscrat/model/server';
-import { WorkerJobType, WorkerJobStatus, WorkerJob } from '@oscrat/model';
+import { WorkerJobType, WorkerJob } from '@oscrat/model';
 import { popWorkerJob, finishWorkerJob } from '@oscrat/model/operations';
 import { executeSbomGeneration } from './jobs/sbom';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Load environment variables
-config();
+// Import centralized config
+import { env } from '@oscrat/config';
 
 class JobRunner {
   private prisma: PrismaClient;
@@ -20,7 +19,7 @@ class JobRunner {
 
   constructor() {
     this.prisma = new PrismaClient();
-    this.maxConcurrentJobs = parseInt(process.env.MAX_CONCURRENT_JOBS || '3');
+    this.maxConcurrentJobs = env.jobRunner.maxConcurrentJobs;
     this.workspaceRoot =
       process.env.JOBRUNNER_WORKSPACE_ROOT || '/tmp/jobrunner-workspace';
     console.log(
@@ -166,7 +165,7 @@ class JobRunner {
       clearTimeout(this.pollTimeout);
     }
 
-    const pollInterval = parseInt(process.env.JOB_POLL_INTERVAL_MS || '5000');
+    const pollInterval = env.jobRunner.pollIntervalMs;
     this.pollTimeout = setTimeout(() => {
       this.pollTimeout = null;
       this.processJobs();

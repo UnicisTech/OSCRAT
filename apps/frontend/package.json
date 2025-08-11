@@ -3,7 +3,7 @@
   "version": "0.2.1",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "dotenv -e ../../.env -- next dev",
     "build": "next build",
     "start": "next start",
     "check-types": "tsc --pretty --noEmit",
@@ -66,6 +66,7 @@
     "crypto-js": "4.2.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
+    "dotenv-cli": "^7.4.2",
     "flowbite-datepicker": "^1.2.6",
     "formidable": "3.5.1",
     "formik": "2.4.6",

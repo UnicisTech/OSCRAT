@@ -6,19 +6,20 @@
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {
-    "generate": "prisma generate",
-    "studio": "prisma studio",
-    "migrate": "prisma migrate dev",
-    "migrate:deploy": "prisma migrate deploy",
-    "reset": "prisma migrate reset",
-    "reset:force": "prisma migrate reset --force",
-    "seed:oscrat": "npx tsx prisma/seed-oscrat.ts",
-    "build": "prisma generate"
+    "generate": "dotenv -e ../../.env -- prisma generate",
+    "studio": "dotenv -e ../../.env -- prisma studio",
+    "migrate": "dotenv -e ../../.env -- prisma migrate dev",
+    "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
+    "reset": "dotenv -e ../../.env -- prisma migrate reset",
+    "reset:force": "dotenv -e ../../.env -- prisma migrate reset --force",
+    "seed:oscrat": "dotenv -e ../../.env -- npx tsx prisma/seed-oscrat.ts",
+    "build": "dotenv -e ../../.env -- prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.7.0"
   },
   "devDependencies": {
+    "dotenv-cli": "^10.0.0",
     "prisma": "^6.7.0",
     "tsx": "^4.20.3"
   }
