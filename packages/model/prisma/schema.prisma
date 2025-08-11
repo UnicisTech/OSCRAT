@@ -357,9 +357,9 @@ model OscratOrganization {
   teamId String @unique
   team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  products                    OscratProduct[]
-  repositories                OscratRepository[]
-  OscratReportingOrganization OscratReportingOrganization[]
+  products               OscratProduct[]
+  repositories           OscratRepository[]
+  reportingOrganizations OscratReportingOrganization[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -381,8 +381,8 @@ model OscratProduct {
   reportingOrganizations OscratReportingOrganization[]
   productCategory        OscratProductCategory         @default(DEFAULT)
   complianceStatus       OscratProductComplianceStatus @default(NOT_ASSESSED)
-  conformityProcedure    OscratConformityProcedure      @default(SELF_ASSESSMENT)
-  riskLevel              OscratProductRiskLevel         @default(LOW)
+  conformityProcedure    OscratConformityProcedure     @default(SELF_ASSESSMENT)
+  riskLevel              OscratProductRiskLevel        @default(LOW)
   versions               OscratProductVersion[]
   status                 OscratProductStatus           @default(ACTIVE)
 
@@ -397,27 +397,27 @@ model OscratProduct {
 
 model OscratProductVersion {
   id String @id @default(uuid())
-  
+
   version String
   status  OscratProductVersionStatus @default(DRAFT)
-  
+
   productId String
   product   OscratProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
+
   assessments     OscratProductAssessment[]
   vulnerabilities OscratProductVulnerability[]
   incidents       OscratProductIncident[]
   repository      OscratRepository?
   sbomReports     SbomReport[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdBy String
   updatedBy String
-  
+
   createdByUser User @relation("OscratProductVersionCreatedBy", fields: [createdBy], references: [id])
   updatedByUser User @relation("OscratProductVersionUpdatedBy", fields: [updatedBy], references: [id])
-  
+
   @@index([productId])
   @@index([status])
   @@index([productId, status])
@@ -427,20 +427,20 @@ model OscratProductVersion {
 model OscratProductAssessment {
   id String @id @default(uuid())
 
-  type OscratAssessmentType
+  type          OscratAssessmentType
   schemaVersion String
   rawData       Json
 
   versionId String
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
-  
-  productId String  // Denormalized for easier queries
+
+  productId String // Denormalized for easier queries
 
   createdAt DateTime @default(now())
   createdBy String
 
   createdByUser User @relation("OscratProductAssessmentCreatedBy", fields: [createdBy], references: [id])
-  
+
   @@index([versionId])
   @@index([productId])
   @@index([versionId, type])
@@ -477,8 +477,8 @@ model OscratProductVulnerability {
 
   versionId String
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
-  
-  productId String  // Denormalized for easier queries
+
+  productId String // Denormalized for easier queries
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -487,7 +487,7 @@ model OscratProductVulnerability {
 
   createdByUser User @relation("OscratProductVulnerabilityCreatedBy", fields: [createdBy], references: [id])
   updatedByUser User @relation("OscratProductVulnerabilityUpdatedBy", fields: [updatedBy], references: [id])
-  
+
   @@index([versionId])
   @@index([productId])
   @@index([versionId, status])
@@ -505,8 +505,8 @@ model OscratProductIncident {
 
   versionId String
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
-  
-  productId String  // Denormalized for easier queries
+
+  productId String // Denormalized for easier queries
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -515,7 +515,7 @@ model OscratProductIncident {
 
   createdByUser User @relation("OscratProductIncidentCreatedBy", fields: [createdBy], references: [id])
   updatedByUser User @relation("OscratProductIncidentUpdatedBy", fields: [updatedBy], references: [id])
-  
+
   @@index([versionId])
   @@index([productId])
   @@index([versionId, status])
@@ -529,25 +529,25 @@ model OscratRepository {
   provider      OscratRepositoryProvider
   repositoryUrl String
   user          String
-  
-  targetBranch  String?
-  targetTag     String?
-  targetCommit  String?
-  
+
+  targetBranch String?
+  targetTag    String?
+  targetCommit String?
+
   authType    OscratRepositoryAuthType @default(PERSONAL_ACCESS_TOKEN)
   accessToken String?
-  
+
   organizationId String
   organization   OscratOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
-  versionId String        @unique
+
+  versionId String               @unique
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
-  
-  productId String  // Denormalized for easier queries
-  
+
+  productId String // Denormalized for easier queries
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([organizationId, versionId])
   @@index([organizationId, productId])
 }
@@ -556,45 +556,45 @@ model OscratRepository {
 
 model WorkerJob {
   id String @id @default(uuid())
-  
-  type WorkerJobType
+
+  type   WorkerJobType
   status WorkerJobStatus @default(PENDING)
-  
+
   triggeredByUserId String
-  triggeredByUser   User @relation("WorkerJobTriggeredBy", fields: [triggeredByUserId], references: [id])
-  
+  triggeredByUser   User   @relation("WorkerJobTriggeredBy", fields: [triggeredByUserId], references: [id])
+
   processStartTime DateTime?
   processEndTime   DateTime?
-  createdAt        DateTime @default(now())
-  
-  payload Json
-  result  Json?
+  createdAt        DateTime  @default(now())
+
+  payload    Json
+  result     Json?
   errMessage String?
-  
+
   sbomReport SbomReport?
-  
+
   @@index([status, type])
 }
 
 model SbomReport {
   id String @id @default(uuid())
-  
-  jobId String @unique
+
+  jobId String    @unique
   job   WorkerJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  
+
   versionId String
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
-  
-  productId String  // Denormalized for easier queries
-  
+
+  productId String // Denormalized for easier queries
+
   sbomData Json
-  
+
   sbomFileId String
-  sbomFile   File @relation(fields: [sbomFileId], references: [id], onDelete: Cascade)
-  
+  sbomFile   File   @relation(fields: [sbomFileId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([versionId])
   @@index([productId])
   @@index([versionId, createdAt])
@@ -605,14 +605,14 @@ model SbomReport {
 
 model File {
   id String @id @default(uuid())
-  
+
   filename String
   fileData Bytes
   fileSize Int
   mimeType String?
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   sbomReports SbomReport[]
 }
