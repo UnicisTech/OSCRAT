@@ -14,10 +14,10 @@ export default function Index() {
   );
   const [isDeletingRepository, setIsDeletingRepository] = useState(false);
 
-  const { teamId, projectId, versionId } = useVersionContext();
+  const { teamId, productId, versionId } = useVersionContext();
 
   const { repository, isLoading, isError, error, deleteRepository } =
-    useOscratRepository(teamId, projectId, versionId);
+    useOscratRepository(teamId, productId, versionId);
 
   // Convert single repository to array format for table compatibility
   const repositories = repository ? [repository] : [];
@@ -94,7 +94,7 @@ export default function Index() {
         onClose={() => setModalOpen(false)}
         repository={repository || undefined}
         teamId={teamId}
-        projectId={projectId}
+        projectId={productId}
         versionId={versionId}
         isCreateMode={isCreateMode}
       />

@@ -58,7 +58,7 @@ export function matchesFilters(
       }
     } else {
       const hasMatchingOrg = product.reportingOrganizations.some(
-        (org) => org.acronym === filters.externalReporting
+        (acronym) => acronym === filters.externalReporting
       );
       if (!hasMatchingOrg) {
         return false;
@@ -79,9 +79,7 @@ export function matchesFilters(
 export function generateFilterOptions(products: OscratProductSummary[]) {
   const uniqueExternalReporting = Array.from(
     new Set(
-      products.flatMap((p) =>
-        p.reportingOrganizations.map((org) => org.acronym)
-      )
+      products.flatMap((p) => p.reportingOrganizations)
     )
   );
 

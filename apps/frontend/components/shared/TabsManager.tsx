@@ -31,8 +31,8 @@ export default function TabsManager({
   const [activeTab, setActiveTab] = useState(defaultActiveTab || tabs[0]?.id);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const { teamId, projectId } = useProductContext();
-  const { createVersion } = useOscratVersions(teamId, projectId);
+  const { teamId, productId } = useProductContext();
+  const { createVersion } = useOscratVersions(teamId, productId);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -120,7 +120,7 @@ export default function TabsManager({
         isOpen={showCreateModal}
         onClose={handleCloseModal}
         onSave={handleCreateVersion}
-        productId={projectId}
+        productId={productId}
         createdBy="" // Backend will automatically set this from the authenticated user
       />
     </div>

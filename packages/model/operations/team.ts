@@ -97,7 +97,7 @@ const TEAM_MEMBER_INCLUDE = {
 
 /** Transform Prisma product to ProductSummary (lightweight with counts) */
 const transformToProductSummary = (
-  product: any // Will be properly typed with Prisma payload
+  product: any
 ): OscratProductSummary => {
   const versions = product.versions || [];
   const activeVersionsCount = versions.filter((v: any) => v.status === 'ACTIVE').length;
@@ -118,7 +118,7 @@ const transformToProductSummary = (
     type: product.type,
     productCategory: product.productCategory,
     complianceStatus: product.complianceStatus,
-    externalReportingAcronyms: product.reportingOrganizations?.map((org: any) => org.acronym) || [],
+    reportingOrganizations: product.reportingOrganizations?.map((org: any) => org.acronym) || [],
     versionsCount: product._count?.versions || 0,
     activeVersionsCount,
     totalOpenIncidents,
@@ -133,14 +133,14 @@ const transformToProductSummary = (
 
 /** Transform Prisma product to ProductDetail (full data with relations) */
 const transformToProductDetail = (
-  product: any // Will be properly typed with Prisma payload
+  product: any
 ): OscratProductDetail => ({
   id: product.id,
   name: product.name,
   type: product.type,
   productCategory: product.productCategory,
   complianceStatus: product.complianceStatus,
-  externalReportingAcronyms: product.reportingOrganizations?.map((org: any) => org.acronym) || [],
+  reportingOrganizations: product.reportingOrganizations || [],
   versions: product.versions?.map((version: any) => ({
     id: version.id,
     version: version.version,
@@ -557,7 +557,6 @@ export const incrementTaskIndex = async (
     });
     return true;
   } catch (error) {
-    console.warn('Failed to increment task index for team:', teamId, error);
     return false;
   }
 };

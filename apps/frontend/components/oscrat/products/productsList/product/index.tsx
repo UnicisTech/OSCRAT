@@ -47,10 +47,7 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
   }, [project, pathname, t]);
 
   const reportingOrganizations = useMemo(() => {
-    return (
-      project.reportingOrganizations?.map((org) => org.acronym).join(', ') ||
-      t('oscrat.ui.n-a')
-    );
+    return project.reportingOrganizations?.join(', ') || t('oscrat.ui.n-a');
   }, [project.reportingOrganizations, t]);
 
   if (!ready) return null;

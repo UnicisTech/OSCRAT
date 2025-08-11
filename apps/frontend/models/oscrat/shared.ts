@@ -118,7 +118,7 @@ export const transformToProductSummary = (
     type: product.type,
     productCategory: product.productCategory,
     complianceStatus: product.complianceStatus,
-    reportingOrganizations: product.reportingOrganizations || [],
+    reportingOrganizations: product.reportingOrganizations?.map((org: any) => org.acronym) || [],
     versionsCount: product._count?.versions || 0,
     activeVersionsCount,
     totalOpenIncidents,
@@ -137,7 +137,6 @@ export const transformToProductDetail = (
 ): OscratProductDetail => ({
   id: product.id,
   name: product.name,
-  organizationId: product.organizationId,
   type: product.type,
   productCategory: product.productCategory,
   complianceStatus: product.complianceStatus,
