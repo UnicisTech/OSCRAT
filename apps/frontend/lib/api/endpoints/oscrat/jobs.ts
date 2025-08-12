@@ -1,5 +1,5 @@
 import { api } from '@/lib/api/client';
-import { WorkerJob } from '@oscrat/model';
+import { SbomWorkerJob } from '@oscrat/model';
 
 export interface CreateSbomJobRequest {
   repositoryId: string;
@@ -7,7 +7,7 @@ export interface CreateSbomJobRequest {
 
 export const oscratJobEndpoints = {
   listSbomJobs: (teamId: string, productId: string, versionId: string) =>
-    api.get<WorkerJob[]>(
+    api.get<SbomWorkerJob[]>(
       `/teams/${teamId}/products/${productId}/versions/${versionId}/jobs/sbom`
     ),
 
@@ -17,7 +17,7 @@ export const oscratJobEndpoints = {
     versionId: string,
     data: CreateSbomJobRequest
   ) =>
-    api.post<WorkerJob>(
+    api.post<SbomWorkerJob>(
       `/teams/${teamId}/products/${productId}/versions/${versionId}/jobs/sbom`,
       data
     ),

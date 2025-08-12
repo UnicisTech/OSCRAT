@@ -3,7 +3,25 @@ import {
   WorkerJobType,
   WorkerJobStatus,
   WorkerJob,
+  Prisma,
 } from '@prisma/client';
+import { SbomReportSummary } from './sbomReport';
+
+// Reusable select patterns
+const USER_SELECT = {
+  select: {
+    id: true,
+    name: true,
+    email: true,
+  },
+} as const;
+
+const REPOSITORY_SELECT = {
+  id: true,
+  name: true,
+  repositoryUrl: true,
+  provider: true,
+} as const;
 
 export interface FinishWorkerJobParams {
   jobId: string;
@@ -16,6 +34,24 @@ export interface CreateWorkerJobParams {
   type: WorkerJobType;
   triggeredByUserId: string;
   payload: any;
+}
+
+export interface SbomWorkerJob extends Omit<WorkerJob, 'triggeredByUser'> {
+  /** User who triggered the job */
+  triggeredByUser: {
+    id: string;
+    name: string | null;
+    email: string;
+  };
+  /** Repository this job is processing (extracted from payload) */
+  repository?: {
+    id: string;
+    name: string;
+    repositoryUrl: string;
+    provider: string;
+  };
+  /** SBOM report data (only present for completed jobs with reports) */
+  sbomReportSummary?: SbomReportSummary;
 }
 
 /** Pop a pending worker job by type and set it to IN_PROGRESS */
@@ -31,10 +67,10 @@ export const popWorkerJob = async (
   // Use a transaction to atomically find and update a pending job
   const job = await prisma.$transaction(async (tx) => {
     // Build where clause - optionally filter by job type
-    const whereClause: any = {
+    const whereClause: Prisma.WorkerJobWhereInput = {
       status: WorkerJobStatus.PENDING,
     };
-
+    
     if (jobType) {
       whereClause.type = jobType;
     }
@@ -144,7 +180,7 @@ export const finishWorkerJob = async (
   });
 };
 
-/** Create a new worker job */
+/** Create a new worker job - base function for all job types */
 export const createWorkerJob = async (
   prisma: PrismaClient,
   params: CreateWorkerJobParams
@@ -175,7 +211,62 @@ export const createWorkerJob = async (
   return job;
 };
 
-/** Get worker jobs for a specific project (filtered by repository IDs in payload) */
+export const createSbomJob = async (
+  prisma: PrismaClient,
+  params: {
+    repositoryId: string;
+    triggeredByUserId: string;
+    teamId: string;
+  }
+): Promise<SbomWorkerJob> => {
+  // Verify repository exists and get info
+  const repository = await prisma.oscratRepository.findFirst({
+    where: {
+      id: params.repositoryId,
+      teamId: params.teamId,
+    },
+    select: REPOSITORY_SELECT,
+  });
+
+  if (!repository) {
+    throw new Error(
+      `Repository ${params.repositoryId} not found or not accessible`
+    );
+  }
+
+  // Use base function to create the job
+  const baseJob = await createWorkerJob(prisma, {
+    type: WorkerJobType.REPO_GENERATE_SBOM,
+    triggeredByUserId: params.triggeredByUserId,
+    payload: { repositoryId: params.repositoryId },
+  });
+
+  // Get user info for the enhanced type
+  const user = await prisma.user.findUnique({
+    where: { id: params.triggeredByUserId },
+    select: USER_SELECT.select,
+  });
+
+  if (!user) {
+    throw new Error(`User ${params.triggeredByUserId} not found`);
+  }
+
+  console.log(`[Worker Job Operations] SBOM job created:`, {
+    id: baseJob.id,
+    repositoryId: params.repositoryId,
+    repositoryName: repository.name,
+    triggeredBy: params.triggeredByUserId,
+  });
+
+  // Return as SbomWorkerJob with repository info
+  return {
+    ...baseJob,
+    triggeredByUser: user,
+    repository,
+    sbomReportSummary: undefined, // No report yet for new job
+  };
+};
+
 export const getProjectWorkerJobs = async (
   prisma: PrismaClient,
   teamId: string,
@@ -199,13 +290,14 @@ export const getProjectWorkerJobs = async (
   const repositoryIdStrings = repositoryIds.map((repo) => repo.id);
 
   // Build the where clause for the worker job query
+  // Note: JSON filter requires 'any' type due to Prisma limitations with JSON path queries
   const where: any = {
     payload: {
       path: ['repositoryId'],
       in: repositoryIdStrings,
     },
   };
-
+  
   if (type) {
     where.type = type;
   }
@@ -213,13 +305,7 @@ export const getProjectWorkerJobs = async (
   return await prisma.workerJob.findMany({
     where,
     include: {
-      triggeredByUser: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
+      triggeredByUser: USER_SELECT,
     },
     orderBy: {
       createdAt: 'desc',
@@ -233,13 +319,7 @@ export const getWorkerJob = async (prisma: PrismaClient, jobId: string) => {
   return await prisma.workerJob.findUnique({
     where: { id: jobId },
     include: {
-      triggeredByUser: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
+      triggeredByUser: USER_SELECT,
     },
   });
 };
@@ -251,12 +331,12 @@ export const getWorkerJobs = async (
   type?: WorkerJobType,
   limit: number = 50
 ) => {
-  const where: any = {};
-
+  const where: Prisma.WorkerJobWhereInput = {};
+  
   if (status) {
     where.status = status;
   }
-
+  
   if (type) {
     where.type = type;
   }
@@ -264,13 +344,7 @@ export const getWorkerJobs = async (
   return await prisma.workerJob.findMany({
     where,
     include: {
-      triggeredByUser: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
+      triggeredByUser: USER_SELECT,
     },
     orderBy: {
       createdAt: 'desc',
@@ -279,7 +353,6 @@ export const getWorkerJobs = async (
   });
 };
 
-/** Get worker jobs for a specific version (filtered by repository IDs in payload) */
 export const getVersionWorkerJobs = async (
   prisma: PrismaClient,
   teamId: string,
@@ -308,7 +381,7 @@ export const getVersionWorkerJobs = async (
       in: repositoryIds,
     },
   };
-
+  
   if (type) {
     where.type = type;
   }
@@ -316,11 +389,114 @@ export const getVersionWorkerJobs = async (
   return await prisma.workerJob.findMany({
     where,
     include: {
-      triggeredByUser: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
+      triggeredByUser: USER_SELECT,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: limit,
+  });
+};
+
+/**
+ * Helper to transform a job with includes to SbomWorkerJob
+ */
+const transformToSbomWorkerJob = (
+  job: any,
+  repository?: any
+): SbomWorkerJob => {
+  const sbomReportSummary: SbomReportSummary | undefined = job.sbomReport
+    ? {
+        id: job.sbomReport.id,
+        jobId: job.sbomReport.jobId,
+        versionId: job.sbomReport.versionId,
+        productId: job.sbomReport.productId,
+        sbomData: job.sbomReport.sbomData,
+        sbomFile: {
+          id: job.sbomReport.sbomFile.id,
+          filename: job.sbomReport.sbomFile.filename,
+          fileSize: job.sbomReport.sbomFile.fileSize,
+          mimeType: job.sbomReport.sbomFile.mimeType ?? undefined,
+        },
+        job: {
+          id: job.id,
+          type: job.type,
+          status: job.status,
+          createdAt: job.createdAt,
+          processStartTime: job.processStartTime ?? undefined,
+          processEndTime: job.processEndTime ?? undefined,
+        },
+        createdAt: job.sbomReport.createdAt,
+      }
+    : undefined;
+
+  return {
+    ...job,
+    repository: repository
+      ? {
+          id: repository.id,
+          name: repository.name,
+          repositoryUrl: repository.repositoryUrl,
+          provider: repository.provider,
+        }
+      : undefined,
+    sbomReportSummary,
+  };
+};
+
+export const getSbomWorkerJobs = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string,
+  limit: number = 50
+): Promise<SbomWorkerJob[]> => {
+  console.log(`[Worker Job Operations] Getting SBOM jobs for version:`, {
+    teamId,
+    versionId,
+    limit,
+  });
+
+  // Get repository IDs for this version with team validation
+  const repositories = await prisma.oscratRepository.findMany({
+    where: {
+      versionId,
+      teamId,
+    },
+    select: REPOSITORY_SELECT,
+  });
+
+  const repositoryIds = repositories.map((repo) => repo.id);
+
+  if (repositoryIds.length === 0) {
+    console.log(
+      `[Worker Job Operations] No repositories found for version ${versionId}`
+    );
+    return [];
+  }
+
+  // Build where clause - JSON filter requires 'any' type due to Prisma limitations
+  const where: any = {
+    type: WorkerJobType.REPO_GENERATE_SBOM,
+    payload: {
+      path: ['repositoryId'],
+      in: repositoryIds,
+    },
+  };
+
+  const jobs = await prisma.workerJob.findMany({
+    where,
+    include: {
+      triggeredByUser: USER_SELECT,
+      sbomReport: {
+        include: {
+          sbomFile: {
+            select: {
+              id: true,
+              filename: true,
+              fileSize: true,
+              mimeType: true,
+            },
+          },
         },
       },
     },
@@ -329,4 +505,16 @@ export const getVersionWorkerJobs = async (
     },
     take: limit,
   });
+
+  // Transform jobs with repository and SBOM report information
+  const sbomWorkerJobs: SbomWorkerJob[] = jobs.map((job) => {
+    const repositoryId = (job.payload as any)?.repositoryId;
+    const repository = repositories.find((repo) => repo.id === repositoryId);
+    return transformToSbomWorkerJob(job, repository);
+  });
+
+  console.log(
+    `[Worker Job Operations] Found ${sbomWorkerJobs.length} SBOM jobs with enhanced data`
+  );
+  return sbomWorkerJobs;
 };

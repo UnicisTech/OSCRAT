@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "dom"],
     "baseUrl": ".",
     "paths": {
       "@oscrat/config": ["../config/src"],

@@ -48,3 +48,7 @@ export * from './types/repository';
 export * from './types/team';
 export * from './types/craForm/form';
 export * from './types/jobPayloads';
+
+// Export specific operation types needed by frontend
+export type { SbomWorkerJob } from './operations/workerJob';
+export type { SbomReportSummary } from './operations/sbomReport';

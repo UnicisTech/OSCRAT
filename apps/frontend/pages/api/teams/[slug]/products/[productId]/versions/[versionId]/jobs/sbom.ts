@@ -1,11 +1,10 @@
 import {
-  getVersionWorkerJobs,
-  createWorkerJob,
+  getSbomWorkerJobs,
+  createSbomJob,
 } from '@oscrat/model/operations';
 import { prisma } from '@/lib/prisma';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import { WorkerJobType, type RepoGenerateSbomPayload } from '@oscrat/model';
 import { ApiError } from '@/lib/errors';
 
 export default function handler(
@@ -27,18 +26,15 @@ export default function handler(
 
 // Get SBOM jobs for a version
 const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
-  const { teamMember } = req.teamContext;
+  const { slug: teamId, versionId } = req.query;
 
-  const { versionId } = req.query;
-
-  const jobs = await getVersionWorkerJobs(
+  const jobs = await getSbomWorkerJobs(
     prisma,
-    teamMember.teamId,
-    versionId as string,
-    WorkerJobType.REPO_GENERATE_SBOM
+    teamId as string,
+    versionId as string
   );
 
-  console.log(`[SBOM] jobs listed, versionId: ${versionId}, count: ${jobs.length}`);
+  console.log(`[SBOM] jobs listed, teamId: ${teamId}, versionId: ${versionId}, count: ${jobs.length}`);
 
   res.status(200).json({ data: jobs });
 };
@@ -46,26 +42,20 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 // Create a new SBOM generation job
 const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
-
-  const { versionId } = req.query;
+  const { slug: teamId, versionId } = req.query;
   const { repositoryId } = req.body;
 
   if (!repositoryId) {
     throw new ApiError(400, 'Repository ID is required');
   }
 
-  // Create SBOM generation job payload
-  const payload: RepoGenerateSbomPayload = {
+  const job = await createSbomJob(prisma, {
     repositoryId: repositoryId as string,
-  };
-
-  const job = await createWorkerJob(prisma, {
-    type: WorkerJobType.REPO_GENERATE_SBOM,
     triggeredByUserId: teamMember.userId,
-    payload,
+    teamId: teamId as string,
   });
 
-  console.log(`[SBOM] job created, jobId: ${job.id}, repositoryId: ${repositoryId}, versionId: ${versionId}, triggeredBy: ${teamMember.userId}`);
+  console.log(`[SBOM] job created, jobId: ${job.id}, repositoryId: ${repositoryId}, teamId: ${teamId}, versionId: ${versionId}, triggeredBy: ${teamMember.userId}`);
 
   res.status(201).json({ data: job });
 };
