@@ -92,7 +92,7 @@ export default function Index() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        repository={repository || undefined}
+        repository={!isCreateMode ? repository || undefined : undefined}
         teamId={teamId}
         projectId={productId}
         versionId={versionId}

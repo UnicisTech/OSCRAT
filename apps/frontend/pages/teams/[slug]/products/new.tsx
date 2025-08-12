@@ -10,14 +10,14 @@ import { OscratProductType, OscratProductCategory } from '@oscrat/model';
 import type { OscratProductCreate } from '@oscrat/model';
 import { getProductTypeKey, getProductCategoryKey } from '@/utils/translation';
 import toast from 'react-hot-toast';
-import { withProductListLayout } from '@/lib/layout-helpers';
+import { withTeamLayout } from '@/lib/layout-helpers';
 
 export default function AddProduct() {
   const { t } = useTranslation('common');
   const { slug: teamId } = useTeamContext();
   const { data: session } = useSession();
   const router = useRouter();
-  
+
   const createProductMutation = useCreateProduct(teamId);
   const createProduct = async (data: OscratProductCreate) => {
     return createProductMutation.mutateAsync(data);
@@ -167,6 +167,6 @@ export default function AddProduct() {
   );
 }
 
-AddProduct.getLayout = withProductListLayout;
+AddProduct.getLayout = withTeamLayout;
 
 export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';

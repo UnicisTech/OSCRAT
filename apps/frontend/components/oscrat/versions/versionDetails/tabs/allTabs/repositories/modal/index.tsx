@@ -168,14 +168,10 @@ const Modal: React.FC<ModalProps> = ({
 
               if (isCreateMode) {
                 await createRepository(repositoryData);
-                toast.success(
-                  t('repository-created') || 'Repository created successfully'
-                );
+                toast.success(t('repository-created'));
               } else {
                 await updateRepository(repositoryData);
-                toast.success(
-                  t('repository-updated') || 'Repository updated successfully'
-                );
+                toast.success(t('repository-updated'));
               }
               onClose();
             } catch (err: any) {

@@ -11,16 +11,12 @@ import { useVersionContext } from '@/context/VersionContext';
 import { usePathname, useRouter } from 'next/navigation';
 import normalizeText from '@/utils/normalizeText';
 
-// --- TYPE DEFINITIONS ---
-
-// Defines the structure for each tab
 interface TabData {
   id: OscratProductVulnerabilityStatus;
   title: string;
   count: number;
 }
 
-// Tabs Component: Renders the navigation tabs
 interface TabsProps {
   tabs: TabData[];
   activeTab: OscratProductVulnerabilityStatus;
@@ -78,7 +74,6 @@ const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
   const StatusPill: React.FC<{ status: OscratProductVulnerabilityStatus }> = ({
     status,
   }) => {
-    // Styling for different statuses based on enum values
     const getStatusPillClasses = (status: OscratProductVulnerabilityStatus) => {
       switch (status) {
         case OscratProductVulnerabilityStatus.ACCEPTED_RISK:
@@ -149,8 +144,6 @@ const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
     </div>
   );
 };
-
-// --- MAIN APP COMPONENT ---
 
 export default function Index() {
   const { versionId } = useVersionContext();

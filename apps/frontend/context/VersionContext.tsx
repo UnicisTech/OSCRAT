@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import useCanAccess from '@/hooks/useCanAccess';
 import { Loading } from '@/components/shared';
+import { useProductContext } from '@/context/ProductContext';
+import { useTeamContext } from '@/context/TeamContext';
 
 type UseOscratVersionContext = ReturnType<typeof useOscratVersion>;
 type UseCanAccessContext = ReturnType<typeof useCanAccess>;
@@ -26,11 +28,12 @@ export const VersionContextProvider = ({
 }) => {
   const router = useRouter();
   const teamId = router.query.slug as string;
-  const productId = router.query.projectId as string; // Note: URL param is still [projectId]
+  const { slug } = useTeamContext();
+  const { productId } = useProductContext();
   const versionId = router.query.versionId as string;
 
   const versionContext = useOscratVersion(teamId, productId, versionId);
-  const accessContext = useCanAccess(teamId);
+  const accessContext = useCanAccess(slug);
 
   const contextValue = useMemo<VersionContextType>(
     () => ({

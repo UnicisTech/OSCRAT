@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import useCanAccess from '@/hooks/useCanAccess';
 import { Loading } from '@/components/shared';
+import { useTeamContext } from '@/context/TeamContext';
 
 type UseOscratProjectContext = ReturnType<typeof useOscratProject>;
 type UseCanAccessContext = ReturnType<typeof useCanAccess>;
@@ -25,10 +26,11 @@ export const ProductContextProvider = ({
 }) => {
   const router = useRouter();
   const teamId = router.query.slug as string;
-  const productId = router.query.projectId as string; // Note: URL param is still [projectId]
+  const productId = router.query.productId as string;
+  const { slug } = useTeamContext();
 
   const productContext = useOscratProject(teamId, productId);
-  const accessContext = useCanAccess(teamId);
+  const accessContext = useCanAccess(slug);
 
   const contextValue = useMemo<ProductContextType>(
     () => ({

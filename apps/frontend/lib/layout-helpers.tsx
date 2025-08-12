@@ -29,21 +29,3 @@ export function withProductDetailLayout(page: React.ReactNode) {
     </AccountLayout>
   );
 }
-
-/**
- * Layout pattern for product list pages: AccountLayout > TeamLayout
- */
-export function withProductListLayout(page: React.ReactNode) {
-  return (
-    <AccountLayout>
-      <TeamLayout>{page}</TeamLayout>
-    </AccountLayout>
-  );
-}
-
-/**
- * Helper for AccountLayout only
- */
-export function withAccountLayout(page: React.ReactNode) {
-  return <AccountLayout>{page}</AccountLayout>;
-}

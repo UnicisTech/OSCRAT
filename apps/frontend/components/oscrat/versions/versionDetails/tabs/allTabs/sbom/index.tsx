@@ -1,6 +1,12 @@
 import ImportModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/sbom/modal';
 import Table from '@/components/oscrat/versions/versionDetails/tabs/allTabs/sbom/table';
+import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
+import { useOscratVersionSbomJobs } from '@/hooks/oscrat/useOscratJobs';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useProductContext } from '@/context/ProductContext';
+import { useVersionContext } from '@/context/VersionContext';
+import { useTeamContext } from '@/context/TeamContext';
 
 interface SbomData {
   id: string;
@@ -14,6 +20,39 @@ interface SbomData {
 
 export default function Sbom() {
   const [isImportModalOpen, setImportModalOpen] = useState(false);
+  const { slug: teamId } = useTeamContext();
+  const { productId } = useProductContext();
+  const { versionId } = useVersionContext();
+
+  const { repository, isLoading: isLoadingRepository } = useOscratRepository(
+    teamId,
+    productId,
+    versionId
+  );
+
+  const { createSbomJob, isLoading: isCreatingJob } = useOscratVersionSbomJobs(
+    teamId,
+    productId,
+    versionId
+  );
+
+  // TODO: Revisit this logic now that we have multiple repositories
+  // const handleVerifySbom = async () => {
+  //   if (!repository?.id) {
+  //     toast.error('No repository configured for this project');
+  //     return;
+  //   }
+  //
+  //   try {
+  //     await createSbomJob({ repositoryId: repository.id });
+  //     toast.success('SBOM job created successfully');
+  //   } catch (error: any) {
+  //     toast.error(`Failed to create SBOM job: ${error.message}`);
+  //   }
+  // };
+  //
+  // const isDisabled = !repository || isLoadingRepository || isCreatingJob;
+  // const buttonText = isCreatingJob ? 'Creating...' : 'Verify SBOM';
 
   // TODO: Align with Radu to be added to seed after specs are done
   const initialSbomData: SbomData[] = [
@@ -64,8 +103,7 @@ export default function Sbom() {
 
   const handleGenerate = () =>
     alert('Generate button clicked. Functionality not yet implemented.');
-  const handleValidate = (id: string) =>
-    alert(`Validate action for item ${id}. Functionality not yet implemented.`);
+  const handleValidate = (id: string) => null;
   const handleDelete = (id: string) =>
     alert(`Delete action for item ${id}. Functionality not yet implemented.`);
 
