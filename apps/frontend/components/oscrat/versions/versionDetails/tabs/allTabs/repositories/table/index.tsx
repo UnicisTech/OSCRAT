@@ -28,15 +28,18 @@ const Table: React.FC<RepositoryTableProps> = ({
 
   return (
     <div className="w-full rounded-lg bg-white">
-      <div className="mb-4">
-        <button
-          onClick={onAddNew}
-          disabled={isLoading}
-          className="rounded-sm border border-gray-400 bg-white px-2 py-1 text-[14px] font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-50"
-        >
-          {t('add-new')}
-        </button>
-      </div>
+      {/* Only show Add New button when no repositories exist */}
+      {repositories.length === 0 && (
+        <div className="mb-4">
+          <button
+            onClick={onAddNew}
+            disabled={isLoading}
+            className="rounded-sm border border-gray-400 bg-white px-2 py-1 text-[14px] font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {t('add-new')}
+          </button>
+        </div>
+      )}
 
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-gray-600">

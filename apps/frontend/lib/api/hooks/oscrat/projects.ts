@@ -38,6 +38,10 @@ export function useCreateProduct(teamId: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.all(teamId),
       });
+      // Invalidate team products query used by ProductListContent
+      queryClient.invalidateQueries({
+        queryKey: [...queryKeys.teams.detail(teamId), 'products'],
+      });
       // Also invalidate organization data since it includes product summaries
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.organization.summary(teamId),

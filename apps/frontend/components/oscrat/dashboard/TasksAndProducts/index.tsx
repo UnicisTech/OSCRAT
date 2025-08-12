@@ -26,13 +26,12 @@ const TasksSummaryCard = ({ data }) => {
   const StatusPill = ({ category }) => {
     const { t, ready } = useTranslation('common');
     const hasOpenItems = category.count > 0;
-    const { slug: teamId } = useTeamContext();
 
     if (!ready) return null;
 
     if (hasOpenItems) {
       return (
-        <div className="flex items-center justify-center rounded-full border border-red-500 px-1 py-1 text-sm">
+        <div className="flex items-center rounded-full border border-red-500 px-3 py-1 text-sm">
           <FaExclamationCircle className="mr-1.5 text-red-600" />
           {MOCK_TASKS_SUMMARY.totalOpen} {t('oscrat.ui.open')}
         </div>
@@ -40,7 +39,7 @@ const TasksSummaryCard = ({ data }) => {
     }
 
     return (
-      <div className="flex items-center justify-center rounded-full border border-gray-300 bg-gray-100 px-1 py-1 text-sm font-semibold text-gray-700">
+      <div className="flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700">
         {t('oscrat.ui.none')}
       </div>
     );
@@ -52,11 +51,13 @@ const TasksSummaryCard = ({ data }) => {
       <h2 className="mb-6 text-lg font-bold text-gray-800">
         {t('tasks-open')} ({data.totalOpen})
       </h2>
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-center md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
         {data.categories.map((category) => (
-          <div key={category.label}>
+          <div key={category.label} className="flex flex-col">
             <h3 className="mb-2 text-sm text-gray-600">{category.label}</h3>
-            <StatusPill category={category} />
+            <div className="self-start">
+              <StatusPill category={category} />
+            </div>
           </div>
         ))}
       </div>
@@ -70,9 +71,9 @@ const ProductsSummaryCard = ({ data }) => {
   if (!ready) return null;
 
   const DetailItem = ({ label, value }) => (
-    <div className="text-center">
+    <div className="">
       <h3 className="mb-1 text-sm text-gray-600">{label}</h3>
-      <p className="text-2xl font-bold text-gray-800">{value}</p>
+      <p className="text-xl font-bold text-gray-800">{value}</p>
     </div>
   );
 
@@ -81,7 +82,7 @@ const ProductsSummaryCard = ({ data }) => {
       <h2 className="mb-6 text-lg font-bold text-gray-800">
         {t('products')} ({data.total})
       </h2>
-      <div className="flex items-center justify-around space-x-6">
+      <div className="flex items-center justify-between space-x-6">
         <DetailItem label="Assessment" value={data.assessment} />
         <DetailItem label="Active" value={data.active} />
         <DetailItem label="Withdrawn" value={data.withdrawn} />

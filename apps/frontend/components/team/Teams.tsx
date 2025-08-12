@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
 import { WithLoadingAndError } from '@/components/shared';
-import CreateTeam from './CreateTeam';
+import CreateTeam from '@/components/oscrat/organization/addNewOrganization';
 import { extractErrorMessage } from '@/lib/utils';
 
 const Teams = () => {

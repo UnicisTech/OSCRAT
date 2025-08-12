@@ -118,8 +118,12 @@ export default function SearchBar({
   return (
     <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 className="text-[24px] font-semibold">{t('products')}</h1>
-        <p className="text-[12px] text-gray-500">{t('add-new-project')}</p>
+        <h1 className="text-[24px] font-semibold">
+          {t('oscrat.ui.products-list')}
+        </h1>
+        <p className="text-[12px] text-gray-500">
+          {t('oscrat.ui.add-new-product-verify')}
+        </p>
       </div>
 
       <div className="flex items-center gap-2">

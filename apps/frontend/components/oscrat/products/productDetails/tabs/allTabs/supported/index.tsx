@@ -19,13 +19,14 @@ export default function SupportedTab({ data }: SupportedTabProps) {
         ))}
       </div>
 
-      {!data && (
-        <div className="py-8 text-center">
-          <div className="text-gray-500 dark:text-gray-400">
-            {t('oscrat.ui.no-supported-versions-available')}
+      {!data ||
+        (data?.length === 0 && (
+          <div className="py-8 text-center">
+            <div className="text-gray-500 dark:text-gray-400">
+              {t('oscrat.ui.no-supported-versions-available')}
+            </div>
           </div>
-        </div>
-      )}
+        ))}
     </div>
   );
 }

@@ -36,23 +36,19 @@ export default function Sbom() {
     versionId
   );
 
-  // TODO: Revisit this logic now that we have multiple repositories
-  // const handleVerifySbom = async () => {
-  //   if (!repository?.id) {
-  //     toast.error('No repository configured for this project');
-  //     return;
-  //   }
-  //
-  //   try {
-  //     await createSbomJob({ repositoryId: repository.id });
-  //     toast.success('SBOM job created successfully');
-  //   } catch (error: any) {
-  //     toast.error(`Failed to create SBOM job: ${error.message}`);
-  //   }
-  // };
-  //
-  // const isDisabled = !repository || isLoadingRepository || isCreatingJob;
-  // const buttonText = isCreatingJob ? 'Creating...' : 'Verify SBOM';
+  const handleValidateSbom = async () => {
+    if (!repository?.id) {
+      toast.error('No repository configured for this project');
+      return;
+    }
+
+    try {
+      await createSbomJob({ repositoryId: repository.id });
+      toast.success('SBOM job created successfully');
+    } catch (error: any) {
+      toast.error(`Failed to create SBOM job: ${error.message}`);
+    }
+  };
 
   // TODO: Align with Radu to be added to seed after specs are done
   const initialSbomData: SbomData[] = [
@@ -87,7 +83,6 @@ export default function Sbom() {
   const [sbomData, setSbomData] = useState<SbomData[]>(initialSbomData);
 
   const handleFileImport = (name: string, file: File) => {
-    console.log('Importing file:', file.name, 'with SSM name:', name);
     const newSbomEntry: SbomData = {
       id: (sbomData.length + 2).toString(),
       name,
@@ -103,7 +98,7 @@ export default function Sbom() {
 
   const handleGenerate = () =>
     alert('Generate button clicked. Functionality not yet implemented.');
-  const handleValidate = (id: string) => null;
+  const handleValidate = (id: string) => handleValidateSbom();
   const handleDelete = (id: string) =>
     alert(`Delete action for item ${id}. Functionality not yet implemented.`);
 

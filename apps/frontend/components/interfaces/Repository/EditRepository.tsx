@@ -144,14 +144,10 @@ const EditRepository = ({
 
             if (isCreateMode) {
               await createRepository(repositoryData);
-              toast.success(
-                t('repository-created') || 'Repository created successfully'
-              );
+              toast.success(t('oscrat.ui.repository-created'));
             } else {
               await updateRepository(repositoryData);
-              toast.success(
-                t('repository-updated') || 'Repository updated successfully'
-              );
+              toast.success(t('oscrat.ui.repository-updated'));
             }
             setVisible(false);
           } catch (err: any) {
