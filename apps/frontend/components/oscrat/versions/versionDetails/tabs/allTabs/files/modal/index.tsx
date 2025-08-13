@@ -2,24 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { IoClose, IoCloudUpload } from 'react-icons/io5';
 import { useTranslation } from 'next-i18next';
 
-interface FileData {
-  id: string;
-  name: string;
-  type: string;
-  version: string;
-  dateAdded: string;
-  addedBy: string;
-  lastEdited: string;
-  editedBy: string;
-  file?: File;
-}
-
 interface AddFileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddFile: (
-    newFile: Omit<FileData, 'id' | 'dateAdded' | 'lastEdited'>
-  ) => void;
+  onAddFile: (file: File, description?: string) => void;
 }
 
 const AddFileModal: React.FC<AddFileModalProps> = ({
@@ -30,12 +16,8 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [name, setName] = useState('');
-  const [type, setType] = useState('');
-  const [version, setVersion] = useState('');
-  const [addedBy, setAddedBy] = useState('');
-  const [editedBy, setEditedBy] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [description, setDescription] = useState('');
 
   const { t, ready } = useTranslation('common');
 
@@ -63,12 +45,8 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
 
   // Reset form and close modal
   const handleClose = () => {
-    setName('');
-    setType('');
-    setVersion('');
-    setAddedBy('');
-    setEditedBy('');
     setSelectedFile(null);
+    setDescription('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -80,33 +58,17 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      // Auto-fill name if not already filled
-      if (!name) {
-        setName(file.name);
-      }
-      // Auto-detect type from file extension
-      const fileExtension = file.name.split('.').pop()?.toLowerCase();
-      if (!type && fileExtension) {
-        setType(fileExtension);
-      }
     }
   };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !type || !version || !addedBy || !editedBy) {
-      alert('Please fill out all required fields.');
+    if (!selectedFile) {
+      alert('Please select a file to upload.');
       return;
     }
-    onAddFile({
-      name,
-      type,
-      version,
-      addedBy,
-      editedBy,
-      file: selectedFile || undefined,
-    });
+    onAddFile(selectedFile, description.trim() || undefined);
     handleClose();
   };
 
@@ -174,60 +136,24 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
               </div>
             </div>
 
-            {/* File Name */}
+            {/* Description */}
             <div>
               <label
-                htmlFor="fileName"
+                htmlFor="fileDescription"
                 className="mb-1 block text-sm font-medium text-gray-700"
               >
-                {t('file-name')}
-                <span className="text-red-500">*</span>
+                Description (optional)
               </label>
-              <input
-                type="text"
-                id="fileName"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+              <textarea
+                id="fileDescription"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                placeholder="Enter file name"
+                placeholder="Optional description for this file"
+                rows={3}
               />
             </div>
 
-            {/* File Type */}
-            <div>
-              <label
-                htmlFor="fileType"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                {t('type')} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="fileType"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                placeholder="e.g., pdf, docx, xlsx"
-              />
-            </div>
-
-            {/* Version */}
-            <div>
-              <label
-                htmlFor="fileVersion"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                {t('version')} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="fileVersion"
-                value={version}
-                onChange={(e) => setVersion(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                placeholder="e.g., 1.0, v2.1"
-              />
-            </div>
           </main>
           <footer className="flex items-center justify-end space-x-3 rounded-b-lg border-t border-gray-200 bg-gray-50 p-4">
             <button

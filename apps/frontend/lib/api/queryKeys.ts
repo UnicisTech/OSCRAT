@@ -146,6 +146,13 @@ export const queryKeys = {
               'sbom',
             ] as const,
         },
+        attachments: {
+          all: (teamId: string, versionId: string) =>
+            [
+              ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+              'attachments',
+            ] as const,
+        },
       },
     },
   },

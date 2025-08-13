@@ -73,6 +73,7 @@ model User {
   createdOscratIncidents          OscratProductIncident[]       @relation("OscratProductIncidentCreatedBy")
   updatedOscratIncidents          OscratProductIncident[]       @relation("OscratProductIncidentUpdatedBy")
   triggeredWorkerJobs             WorkerJob[]                   @relation("WorkerJobTriggeredBy")
+  createdAttachments              Attachment[]                  @relation("AttachmentCreatedBy")
 }
 
 model PasswordReset {
@@ -141,14 +142,6 @@ model Comment {
   task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
-model Attachment {
-  id       String @id @default(uuid())
-  taskId   Int
-  filename String
-  fileData Bytes
-  url      String
-  task     Task   @relation(fields: [taskId], references: [id])
-}
 
 model TeamMember {
   id        String   @id @default(uuid())
@@ -346,6 +339,7 @@ enum WorkerJobStatus {
   CANCELLED
 }
 
+
 enum OscratProductVersionStatus {
   DRAFT
   ACTIVE
@@ -397,6 +391,7 @@ model OscratProductVersion {
   incidents       OscratProductIncident[]
   repository      OscratRepository?
   sbomReports     SbomReport[]
+  attachments     Attachment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -577,8 +572,7 @@ model SbomReport {
 
   sbomData Json
 
-  sbomFileId String
-  sbomFile   File   @relation(fields: [sbomFileId], references: [id], onDelete: Cascade)
+  attachment Attachment?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -594,7 +588,6 @@ model SbomReport {
 model File {
   id String @id @default(uuid())
 
-  filename String
   fileData Bytes
   fileSize Int
   mimeType String?
@@ -602,5 +595,41 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sbomReports SbomReport[]
+  attachment Attachment?
+}
+
+// Unified Attachment model
+model Attachment {
+  id String @id @default(uuid())
+  
+  // Display metadata - stored here for UI performance
+  name        String
+  fileSize    Int
+  mimeType    String?
+  description String?
+  url         String?
+  
+  fileId String @unique
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  
+  // Polymorphic associations
+  taskId Int?
+  task   Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  versionId String?
+  version   OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  
+  sbomReportId String? @unique
+  sbomReport   SbomReport? @relation(fields: [sbomReportId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  
+  createdByUser User @relation("AttachmentCreatedBy", fields: [createdBy], references: [id])
+  
+  @@index([taskId])
+  @@index([versionId])
+  @@index([sbomReportId])
+  @@index([name])
 }

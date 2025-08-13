@@ -1,18 +1,15 @@
 import { PrismaClient, File } from '@prisma/client';
 
 export interface CreateFileParams {
-  filename: string;
   fileData: Buffer;
-  fileSize: number;
+  fileSize?: number; // Optional, will calculate from buffer if not provided
   mimeType?: string;
 }
 
+// Simple interface for file data operations (pure storage)
 export interface FileData {
   id: string;
-  filename: string;
   fileData: Buffer;
-  fileSize: number;
-  mimeType?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,24 +19,19 @@ export const createFile = async (
   params: CreateFileParams
 ): Promise<File> => {
   console.log(`[File Operations] Creating file:`, {
-    filename: params.filename,
-    fileSize: params.fileSize,
-    mimeType: params.mimeType,
+    fileSize: params.fileData.length,
   });
 
   const file = await prisma.file.create({
     data: {
-      filename: params.filename,
       fileData: new Uint8Array(params.fileData),
-      fileSize: params.fileSize,
+      fileSize: params.fileSize ?? params.fileData.length,
       mimeType: params.mimeType,
     },
   });
 
   console.log(`[File Operations] File created:`, {
     id: file.id,
-    filename: file.filename,
-    fileSize: file.fileSize,
   });
 
   return file;
@@ -51,9 +43,8 @@ export const createFileInTransaction = async (
 ): Promise<File> => {
   return await tx.file.create({
     data: {
-      filename: params.filename,
       fileData: new Uint8Array(params.fileData),
-      fileSize: params.fileSize,
+      fileSize: params.fileSize ?? params.fileData.length,
       mimeType: params.mimeType,
     },
   });
@@ -71,10 +62,7 @@ export const getFileById = async (
 
   return {
     id: file.id,
-    filename: file.filename,
     fileData: Buffer.from(file.fileData),
-    fileSize: file.fileSize,
-    mimeType: file.mimeType ?? undefined,
     createdAt: file.createdAt,
     updatedAt: file.updatedAt,
   };
@@ -84,25 +72,19 @@ export const getFileData = async (
   prisma: PrismaClient,
   fileId: string
 ): Promise<{
-  filename: string;
   fileData: Buffer;
-  mimeType?: string;
 } | null> => {
   const file = await prisma.file.findUnique({
     where: { id: fileId },
     select: {
-      filename: true,
       fileData: true,
-      mimeType: true,
     },
   });
 
   if (!file) return null;
 
   return {
-    filename: file.filename,
     fileData: Buffer.from(file.fileData),
-    mimeType: file.mimeType ?? undefined,
   };
 };
 
@@ -118,3 +100,4 @@ export const deleteFile = async (
 
   console.log(`[File Operations] File deleted: ${fileId}`);
 };
+

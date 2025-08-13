@@ -7,7 +7,7 @@ import { checkExtensionAndMIMEType } from '@/components/services/taskService';
 import useCanAccess from '@/hooks/useCanAccess';
 import { useTranslation } from 'next-i18next';
 import { EmptyState } from '@/components/shared';
-import { useAttachments } from '@/hooks/useAttachments';
+import { useTaskAttachments } from '@/hooks/useTaskAttachments';
 import { extractErrorMessage } from '@/lib/utils';
 
 const Attachments = ({ task }: { task: TaskExtended }) => {
@@ -19,7 +19,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { uploadAttachment } = useAttachments(
+  const { uploadAttachment } = useTaskAttachments(
     slug as string,
     taskNumber as string
   );

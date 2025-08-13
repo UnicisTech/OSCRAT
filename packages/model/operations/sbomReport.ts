@@ -1,12 +1,17 @@
 import { PrismaClient, type Prisma } from '@prisma/client';
-import { createFileInTransaction, getFileData, CreateFileParams } from './file';
+import { createAttachment, CreateAttachmentParams } from './attachment';
 
 export interface CreateSbomReportParams {
   jobId: string;
   versionId: string;
   productId: string;
   sbomData: any;
-  sbomFile: CreateFileParams;
+  createdBy: string; // User ID who triggered the SBOM generation
+  sbomFile: {
+    filename: string;
+    fileData: Buffer;
+    mimeType?: string;
+  };
 }
 
 export interface SbomReportSummary {
@@ -15,9 +20,10 @@ export interface SbomReportSummary {
   versionId: string;
   productId: string;
   sbomData: any;
-  sbomFile: {
+  attachment?: {
     id: string;
-    filename: string;
+    name: string;
+    description?: string;
     fileSize: number;
     mimeType?: string;
   };
@@ -44,10 +50,11 @@ const SBOM_REPORT_SUMMARY_INCLUDE = {
       processEndTime: true,
     },
   },
-  sbomFile: {
+  attachment: {
     select: {
       id: true,
-      filename: true,
+      name: true,
+      description: true,
       fileSize: true,
       mimeType: true,
     },
@@ -65,12 +72,13 @@ const transformToSbomReportSummary = (
   versionId: report.versionId,
   productId: report.productId,
   sbomData: report.sbomData,
-  sbomFile: {
-    id: report.sbomFile.id,
-    filename: report.sbomFile.filename,
-    fileSize: report.sbomFile.fileSize,
-    mimeType: report.sbomFile.mimeType ?? undefined,
-  },
+  attachment: report.attachment ? {
+    id: report.attachment.id,
+    name: report.attachment.name,
+    description: report.attachment.description ?? undefined,
+    fileSize: report.attachment.fileSize,
+    mimeType: report.attachment.mimeType ?? undefined,
+  } : undefined,
   job: {
     id: report.job.id,
     type: report.job.type,
@@ -92,22 +100,40 @@ export const createSbomReport = async (
     versionId: params.versionId,
     productId: params.productId,
     filename: params.sbomFile.filename,
-    fileSize: params.sbomFile.fileSize,
+    fileSize: params.sbomFile.fileData.length,
   });
 
   const report = await prisma.$transaction(async (tx) => {
-    const file = await createFileInTransaction(tx, params.sbomFile);
-
+    // Create the SBOM report first
     const sbomReport = await tx.sbomReport.create({
       data: {
         jobId: params.jobId,
         versionId: params.versionId,
         productId: params.productId,
         sbomData: params.sbomData,
-        sbomFileId: file.id,
       },
+    });
+
+    // Create the attachment for the SBOM file
+    await createAttachment(prisma, {
+      name: params.sbomFile.filename,
+      description: 'SBOM Report File',
+      fileData: params.sbomFile.fileData,
+      fileSize: params.sbomFile.fileData.length,
+      mimeType: params.sbomFile.mimeType,
+      sbomReportId: sbomReport.id,
+      createdBy: params.createdBy,
+    });
+
+    // Fetch the complete report with attachment
+    const completeReport = await tx.sbomReport.findUnique({
+      where: { id: sbomReport.id },
       include: SBOM_REPORT_SUMMARY_INCLUDE,
     });
+
+    if (!completeReport) {
+      throw new Error(`SBOM report ${sbomReport.id} not found after creation`);
+    }
 
     console.log(`[SBOM Report Operations] SBOM report created:`, {
       id: sbomReport.id,
@@ -116,7 +142,7 @@ export const createSbomReport = async (
       productId: sbomReport.productId,
     });
 
-    return sbomReport;
+    return completeReport;
   });
 
   return transformToSbomReportSummary(report);
@@ -206,17 +232,25 @@ export const getSbomReportFile = async (
         },
       },
     },
-    select: {
-      sbomFileId: true,
+    include: {
+      attachment: {
+        include: {
+          file: true,
+        },
+      },
     },
   });
 
-  if (!report) {
+  if (!report || !report.attachment) {
     console.log(
       `[SBOM Report Operations] SBOM report not found or not accessible: ${reportId}`
     );
     return null;
   }
 
-  return await getFileData(prisma, report.sbomFileId);
+  return {
+    filename: report.attachment.name,
+    fileData: Buffer.from(report.attachment.file.fileData),
+    mimeType: report.attachment.mimeType ?? undefined,
+  };
 };

@@ -1,16 +1,13 @@
 import formidable from 'formidable';
-import fs from 'fs';
 import {
   deleteAttachment,
-  findAttachmentById,
   readFile,
   saveFileAsAttachment,
 } from 'models/attachment';
 import { checkExtensionAndMIMEType } from 'models/attachment';
 import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import path from 'path';
-import { promisify } from 'util';
+import { getTaskBySlugAndNumber } from 'models/task';
 
 export const config = {
   api: {
@@ -40,46 +37,32 @@ export default function handler(
   }
 }
 
-// Download an attachment
+// Get task attachments
 const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
-
-  const { id } = req.query;
+  const { slug, taskNumber } = req.query;
 
   try {
-    const attachment = await findAttachmentById(id as string);
+    const task = await getTaskBySlugAndNumber(
+      parseInt(taskNumber as string, 10),
+      slug as string
+    );
 
-    if (!attachment) {
-      return res.status(200).json({
+    if (!task) {
+      return res.status(404).json({
         data: null,
-        error: { message: 'Attachment not found.' },
+        error: { message: 'Task not found.' },
       });
     }
 
-    const fileData = attachment.fileData;
-    const filename = attachment.filename;
-
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`
-    );
-
-    const writeFileAsync = promisify(fs.writeFile);
-    const tempFilePath = path.join('/tmp', filename);
-
-    await writeFileAsync(tempFilePath, fileData);
-
-    const fileStream = fs.createReadStream(tempFilePath);
-
-    fileStream.pipe(res);
-
-    fileStream.on('close', async () => {
-      await fs.promises.unlink(tempFilePath);
+    // Task should have attachments included from the model function
+    res.status(200).json({
+      data: task.attachments || [],
+      error: null,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send({
+    res.status(500).json({
       data: null,
       error: { message: 'Internal server error.' },
     });
@@ -92,7 +75,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 
   try {
     const { fields, files } = await readFile(req);
-    const { taskId } = fields;
+    const { taskId, description } = fields;
 
     const file = Object.values(files)[0] as formidable.File[];
 
@@ -103,29 +86,32 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
         const uploadParams = {
           taskId: Number(taskId),
           file: file[0],
+          description: Array.isArray(description) ? description[0] : description,
+          createdBy: teamMember.userId,
         };
 
         const url = await saveFileAsAttachment(uploadParams);
-        res.status(200).json({ url });
+        res.status(200).json({ data: { url }, error: null });
       } catch (error) {
         console.error('Failed to save file as attachment:', error);
         res
           .status(500)
-          .json({ error: { message: 'Failed to save file as attachment.' } });
+          .json({ data: null, error: { message: 'Failed to save file as attachment.' } });
       }
     } else {
       res
-        .status(200)
-        .json({ error: { message: 'Not supported type of file.' } });
+        .status(400)
+        .json({ data: null, error: { message: 'Not supported type of file.' } });
     }
   } catch (e) {
-    res.status(200).json({
+    res.status(400).json({
+      data: null,
       error: { message: 'File is too large. Maximum size of file is 10mb.' },
     });
   }
 };
 
-// Delete a comment
+// Delete an attachment
 
 const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;

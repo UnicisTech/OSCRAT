@@ -31,6 +31,7 @@ export type UpdateCommentData = {
 export interface AttachmentUploadParams {
   file: File;
   taskId: number;
+  description?: string;
   slug: string;
 }
 
@@ -95,6 +96,9 @@ export const tasksEndpoints = {
     formData.append('file', params.file);
     formData.append('slug', params.slug);
     formData.append('taskId', String(params.taskId));
+    if (params.description) {
+      formData.append('description', params.description);
+    }
 
     return api.post<{ url: string }>(
       `/teams/${slug}/tasks/${taskNumber}/attachments`,

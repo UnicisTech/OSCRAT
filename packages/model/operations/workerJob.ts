@@ -412,12 +412,12 @@ const transformToSbomWorkerJob = (
         versionId: job.sbomReport.versionId,
         productId: job.sbomReport.productId,
         sbomData: job.sbomReport.sbomData,
-        sbomFile: {
-          id: job.sbomReport.sbomFile.id,
-          filename: job.sbomReport.sbomFile.filename,
-          fileSize: job.sbomReport.sbomFile.fileSize,
-          mimeType: job.sbomReport.sbomFile.mimeType ?? undefined,
-        },
+        attachment: job.sbomReport.attachment ? {
+          id: job.sbomReport.attachment.id,
+          name: job.sbomReport.attachment.name,
+          fileSize: job.sbomReport.attachment.fileSize,
+          mimeType: job.sbomReport.attachment.mimeType ?? undefined,
+        } : undefined,
         job: {
           id: job.id,
           type: job.type,
@@ -489,10 +489,10 @@ export const getSbomWorkerJobs = async (
       triggeredByUser: USER_SELECT,
       sbomReport: {
         include: {
-          sbomFile: {
+          attachment: {
             select: {
               id: true,
-              filename: true,
+              name: true,
               fileSize: true,
               mimeType: true,
             },

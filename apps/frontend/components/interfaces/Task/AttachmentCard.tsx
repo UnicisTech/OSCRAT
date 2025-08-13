@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { Attachment } from 'types';
 import toast from 'react-hot-toast';
 import { AccessControl } from '@/components/shared/AccessControl';
-import { useAttachments } from '@/hooks/useAttachments';
+import { useTaskAttachments } from '@/hooks/useTaskAttachments';
 import { extractErrorMessage } from '@/lib/utils';
 
 type Props = {
@@ -18,7 +18,7 @@ export default function AttachmentsCard({
   teamSlug,
 }: Props) {
   const { t } = useTranslation('common');
-  const { deleteAttachment } = useAttachments(teamSlug, taskNumber);
+  const { deleteAttachment } = useTaskAttachments(teamSlug, taskNumber);
 
   const handleDelete = async () => {
     try {
@@ -32,7 +32,7 @@ export default function AttachmentsCard({
   return (
     <div className="flex w-full flex-row items-center justify-between rounded-md p-2 text-center">
       <a
-        href={`/api/teams/${teamSlug}/tasks/${taskNumber}/attachments?id=${attachment.id}`}
+        href={attachment.url || `/api/attachments/${attachment.id}/download`}
         target="_blank"
         rel="noreferrer"
       >
@@ -53,7 +53,16 @@ export default function AttachmentsCard({
             <path d="M11 10a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0v-4z" />
             <path d="M11 16a1 1 0 0 1 2 0v.01a1 1 0 0 1-2 0V16z" />
           </svg>
-          <p className="hover:underline">{attachment.filename}</p>
+          <div className="flex flex-col">
+            <p className="hover:underline font-medium">{attachment.name}</p>
+            {attachment.description && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">{attachment.description}</p>
+            )}
+            <p className="text-xs text-gray-400">
+              {(attachment.fileSize / 1024).toFixed(1)} KB
+              {attachment.mimeType && ` • ${attachment.mimeType}`}
+            </p>
+          </div>
         </div>
       </a>
       <AccessControl resource="task" actions={['update']}>

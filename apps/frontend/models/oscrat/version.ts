@@ -44,6 +44,7 @@ const VERSION_DETAIL_INCLUDE = {
   incidents: true,
   vulnerabilities: true,
   assessments: true,
+  attachments: true,
   repository: {
     select: {
       id: true,

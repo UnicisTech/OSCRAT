@@ -104,7 +104,7 @@ export const getTaskBySlugAndNumber = async (
   taskNumber: number,
   slug: string
 ) => {
-  return await prisma.task.findFirst({
+  const task = await prisma.task.findFirst({
     where: {
       taskNumber: taskNumber,
       team: {
@@ -126,14 +126,33 @@ export const getTaskBySlugAndNumber = async (
       },
       attachments: {
         select: {
-          filename: true,
-          url: true,
-          taskId: true,
           id: true,
+          name: true,
+          fileSize: true,
+          mimeType: true,
+          description: true,
+          url: true,
+          fileId: true,
+          taskId: true,
+          versionId: true,
+          sbomReportId: true,
+          createdAt: true,
+          updatedAt: true,
+          createdBy: true,
+          createdByUser: {
+            select: {
+              id: true,
+              name: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
         },
       },
     },
   });
+
+  return task;
 };
 
 /** Get all tasks for a team by slug */

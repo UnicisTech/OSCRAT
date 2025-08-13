@@ -78,10 +78,10 @@ async function generateSbomForRepository(
       versionId: repository.version.id,
       productId: repository.version.product.id,
       sbomData: sbomSummary,
+      createdBy: job.triggeredByUserId,
       sbomFile: {
         filename: path.basename(cycloneDxXmlPath),
         fileData: cycloneDxXmlData,
-        fileSize: cycloneDxXmlData.length,
         mimeType: 'application/xml',
       },
     });

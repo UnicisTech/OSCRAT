@@ -27,15 +27,40 @@ export type TaskExtended = Prisma.TaskGetPayload<{
         createdBy: true;
       };
     };
-    attachments: true;
+    attachments: {
+      include: {
+        createdByUser: true;
+      };
+    };
   };
 }>;
 
+// Unified attachment type for all entities (optimized for UI display)
 export type Attachment = {
-  filename: string;
   id: string;
-  taskId: number;
-  url: string;
+  name: string;
+  fileSize: number;
+  mimeType: string | null;
+  description: string | null;
+  url: string | null;
+  fileId: string;
+  taskId: number | null;
+  versionId: string | null;
+  sbomReportId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  createdByUser: { id: string; name: string; firstName: string; lastName: string };
+};
+
+// Attachment with file data for downloads (only when needed)
+export type AttachmentWithFile = Attachment & {
+  file: {
+    id: string;
+    fileData: Buffer;
+    createdAt: Date;
+    updatedAt: Date;
+  };
 };
 
 export type WebookFormSchema = {

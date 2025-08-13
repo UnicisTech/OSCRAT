@@ -2,35 +2,29 @@ import React from 'react';
 import { IoAdd } from 'react-icons/io5';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
-
-interface FileData {
-  id: string;
-  name: string;
-  type: string;
-  version: string;
-  dateAdded: string;
-  addedBy: string;
-  lastEdited: string;
-  editedBy: string;
-}
+import type { Attachment } from '@/types';
 
 interface FileTableProps {
-  files: FileData[];
+  attachments: Attachment[];
   onAddFileClick: () => void;
+  onDownloadFile?: (fileId: string, filename: string) => void;
+  onDeleteFile?: (fileId: string) => void;
 }
 
-const FileTable: React.FC<FileTableProps> = ({ files, onAddFileClick }) => {
+const FileTable: React.FC<FileTableProps> = ({ 
+  attachments, 
+  onAddFileClick, 
+  onDownloadFile, 
+  onDeleteFile 
+}) => {
   const { t, ready } = useTranslation('common');
   if (!ready) return null;
 
   const tableHeaders = [
     'Name',
-    'Type',
-    'Version',
-    'Dated Added',
+    'Description',
+    'Date Added',
     'Added by',
-    'Last Edited',
-    'Edited by',
     '',
   ];
 
@@ -57,25 +51,39 @@ const FileTable: React.FC<FileTableProps> = ({ files, onAddFileClick }) => {
             </tr>
           </thead>
           <tbody>
-            {files.map((file) => (
-              <tr key={file.id} className="border-b bg-white hover:bg-gray-50">
+            {attachments.map((attachment) => (
+              <tr key={attachment.id} className="border-b bg-white hover:bg-gray-50">
                 <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                  {file.name}
+                  {attachment.name}
                 </td>
-                <td className="px-6 py-4">{file.type}</td>
-                <td className="px-6 py-4">{file.version}</td>
-                <td className="px-6 py-4">{file.dateAdded}</td>
-                <td className="px-6 py-4">{file.addedBy}</td>
-                <td className="px-6 py-4">{file.lastEdited}</td>
-                <td className="px-6 py-4">{file.editedBy}</td>
+                <td className="px-6 py-4">{attachment.description || 'No description'}</td>
+                <td className="px-6 py-4">{new Date(attachment.createdAt).toLocaleDateString('en-GB')}</td>
+                <td className="px-6 py-4">
+                  {attachment.createdByUser ? 
+                    `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() || 
+                    attachment.createdByUser.name : 'Unknown'}
+                </td>
                 <td className="px-6 py-4 text-center">
-                  <button
-                    onClick={() => alert('More actions are not yet defined.')}
-                    className="flex cursor-pointer gap-x-2 text-gray-500 hover:text-gray-800"
-                  >
-                    <BsThreeDotsVertical size={18} />
-                    <p>{t('more')}</p>
-                  </button>
+                  <div className="flex gap-2">
+                    {onDownloadFile && (
+                      <button
+                        onClick={() => onDownloadFile(attachment.id, attachment.name)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Download"
+                      >
+                        Download
+                      </button>
+                    )}
+                    {onDeleteFile && (
+                      <button
+                        onClick={() => onDeleteFile(attachment.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Delete"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

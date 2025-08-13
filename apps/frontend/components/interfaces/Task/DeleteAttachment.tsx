@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { Modal, Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import type { Attachment } from 'types';
-import { useAttachments } from '@/hooks/useAttachments';
+import { useTaskAttachments } from '@/hooks/useTaskAttachments';
 import { extractErrorMessage } from '@/lib/utils';
 
 const DeleteAttachment = ({
@@ -21,7 +21,7 @@ const DeleteAttachment = ({
 }) => {
   const { t } = useTranslation('common');
   const [isLoading, setIsLoading] = useState(false);
-  const { deleteAttachment } = useAttachments(teamSlug, taskNumber);
+  const { deleteAttachment } = useTaskAttachments(teamSlug, taskNumber);
 
   const deleteHandler = useCallback(
     async (event: MouseEvent<HTMLButtonElement>) => {
