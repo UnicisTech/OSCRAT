@@ -15,7 +15,6 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
-    "@oscrat/config": "workspace:*",
     "@oscrat/model": "workspace:*",
     "dotenv": "^16.4.5",
     "dotenv-cli": "^7.4.2",

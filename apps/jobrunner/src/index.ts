@@ -5,8 +5,8 @@ import { executeSbomGeneration } from './jobs/sbom';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Import centralized config
-import { env } from '@oscrat/config';
+// Import local config
+import env from './lib/env';
 
 class JobRunner {
   private prisma: PrismaClient;
@@ -20,8 +20,7 @@ class JobRunner {
   constructor() {
     this.prisma = new PrismaClient();
     this.maxConcurrentJobs = env.jobRunner.maxConcurrentJobs;
-    this.workspaceRoot =
-      process.env.JOBRUNNER_WORKSPACE_ROOT || '/tmp/jobrunner-workspace';
+    this.workspaceRoot = env.workspaceRoot;
     console.log(
       `[Job Runner] Configured with ${this.maxConcurrentJobs} max concurrent jobs`
     );

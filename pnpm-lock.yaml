@@ -414,9 +414,6 @@ importers:
 
   apps/jobrunner:
     dependencies:
-      '@oscrat/config':
-        specifier: workspace:*
-        version: link:../../packages/config
       '@oscrat/model':
         specifier: workspace:*
         version: link:../../packages/model
@@ -439,12 +436,6 @@ importers:
       '@types/node':
         specifier: 20.14.0
         version: 20.14.0
-
-  packages/config:
-    dependencies:
-      dotenv:
-        specifier: ^16.0.0
-        version: 16.6.1
 
   packages/model:
     dependencies:
