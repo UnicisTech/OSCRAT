@@ -18,10 +18,10 @@ export interface OscratRepositoryBase {
 }
 
 /** Repository data for creation */
-export interface OscratRepositoryCreate extends OscratRepositoryBase {}
+export type OscratRepositoryCreate = OscratRepositoryBase;
 
 /** Repository data for updates */
-export interface OscratRepositoryUpdate extends Partial<OscratRepositoryBase> {}
+export type OscratRepositoryUpdate = Partial<OscratRepositoryBase>;
 
 /** Repository summary view */
 export interface OscratRepositorySummary extends OscratRepositoryBase {
@@ -35,9 +35,7 @@ export interface OscratRepositorySummary extends OscratRepositoryBase {
 }
 
 /** Repository detail view */
-export interface OscratRepositoryDetail extends OscratRepositorySummary {
-  // Same as summary for now, can be extended if needed
-}
+export type OscratRepositoryDetail = OscratRepositorySummary;
 
 /** Repository with team and product for job processing */
 export type OscratRepositoryWithRelations = Prisma.OscratRepositoryGetPayload<{

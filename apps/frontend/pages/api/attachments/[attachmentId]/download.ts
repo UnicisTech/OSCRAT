@@ -36,8 +36,11 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 
     // TODO: Add permission verification
     if (attachment.taskId) {
+      // TODO: Implement task permission check
     } else if (attachment.versionId) {
+      // TODO: Implement version permission check
     } else if (attachment.sbomReportId) {
+      // TODO: Implement SBOM report permission check
     } else {
       return res.status(400).json({
         data: null,
