@@ -14,21 +14,21 @@ export default function AppShell({ children }) {
   const isFormRoute = router.pathname.startsWith('/form');
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && data?.user?.email && data?.user?.name) {
       const { email, name } = data.user;
-      if (email && name) {
-        const [firstName, lastName] = name.split(' ') as string[];
-        if ((window as any).mt) {
-          (window as any).mt('send', 'pageview', {
-            email: email,
-            firstname: firstName,
-            lastname: lastName,
-            tags: 'BE',
-          });
-        }
+      const nameParts = name.split(' ');
+      const [firstName = '', lastName = ''] = nameParts;
+
+      if (typeof window !== 'undefined' && (window as any).mt) {
+        (window as any).mt('send', 'pageview', {
+          email,
+          firstname: firstName,
+          lastname: lastName,
+          tags: 'BE',
+        });
       }
     }
-  }, [status]);
+  }, [status, data]);
 
   if (status === 'loading') {
     return <Loading />;
