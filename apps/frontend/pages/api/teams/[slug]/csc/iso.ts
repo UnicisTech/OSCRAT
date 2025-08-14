@@ -1,18 +1,18 @@
 import { setCscIso, getCscIso } from 'models/team';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['team', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
     case 'PUT':
-      return withAuth(['team', 'read'])(handlePUT)(req, res);
+      return withTeamAuth(['team', 'read'])(handlePUT)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'PUT']);
       res.status(405).json({
@@ -22,7 +22,7 @@ export default function handler(
   }
 }
 
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { slug } = req.query;
@@ -36,7 +36,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   return res.status(200).json({ data: responce, error: null });
 };
 
-const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { slug } = req.query;

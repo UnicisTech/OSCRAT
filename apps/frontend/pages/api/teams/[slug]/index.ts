@@ -4,7 +4,7 @@ import {
   getTeam,
   updateTeam,
 } from 'models/team';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { validateDomain } from '@/lib/common';
@@ -12,18 +12,18 @@ import { ApiError } from '@/lib/errors';
 import type { TeamSettingsUpdate } from '@oscrat/model';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['team', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
     case 'PUT':
-      return withAuth(['team', 'update'])(handlePUT)(req, res);
+      return withTeamAuth(['team', 'update'])(handlePUT)(req, res);
     case 'DELETE':
-      return withAuth(['team', 'delete'])(handleDELETE)(req, res);
+      return withTeamAuth(['team', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', 'GET, PUT, DELETE');
       res.status(405).json({
@@ -33,7 +33,7 @@ export default function handler(
 }
 
 // Get a team by slug
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const team = await getTeam({ id: teamMember.teamId });
@@ -44,7 +44,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Update a team
-const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   // Cast to TeamSettingsUpdate - only user-editable fields
@@ -70,7 +70,7 @@ const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Delete a team
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   await deleteTeam({ id: teamMember.teamId });

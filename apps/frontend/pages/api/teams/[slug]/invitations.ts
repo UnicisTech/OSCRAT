@@ -12,26 +12,26 @@ import {
   isInvitationExpired,
 } from 'models/invitation';
 import { addTeamMember } from 'models/team';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { toPlainObject } from '@/lib/utils';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['team_invitation', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team_invitation', 'read'])(handleGET)(req, res);
     case 'POST':
-      return withAuth(['team_invitation', 'create'])(handlePOST)(req, res);
+      return withTeamAuth(['team_invitation', 'create'])(handlePOST)(req, res);
     case 'PUT':
-      return withAuth()(handlePUT)(req, res);
+      return withTeamAuth()(handlePUT)(req, res);
     case 'DELETE':
-      return withAuth(['team_invitation', 'delete'])(handleDELETE)(req, res);
+      return withTeamAuth(['team_invitation', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', 'GET, POST, PUT, DELETE');
       throw new ApiError(405, `Method ${method} Not Allowed`);
@@ -39,7 +39,7 @@ export default function handler(
 }
 
 // Invite a user to a team
-const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { email, role } = req.body;
@@ -98,7 +98,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Get all invitations for a team
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const invitations = await getInvitations(teamMember.teamId);
@@ -109,7 +109,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Delete an invitation
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { id } = req.query as { id: string };
@@ -143,7 +143,7 @@ const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => 
 };
 
 // Accept an invitation to an organization
-const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { inviteToken } = req.body as { inviteToken: string };
 
   const invitation = await getInvitation({ token: inviteToken });

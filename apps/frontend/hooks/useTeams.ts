@@ -6,6 +6,7 @@ import {
 } from '@/lib/api/hooks/csc';
 import type { ISO } from '@/types';
 import type { UpdateCscStatusData } from '@/lib/api/endpoints/csc';
+import type { TeamCreateRequest } from '@oscrat/model';
 
 /**
  * Hook to fetch and manage teams list
@@ -16,8 +17,8 @@ export function useTeams() {
 
   const teams = data || [];
 
-  const createTeam = async (name: string, slug: string) => {
-    return createMutation.mutateAsync({ name, slug });
+  const createTeam = async (data: TeamCreateRequest) => {
+    return createMutation.mutateAsync(data);
   };
 
   const isLoading = isFetching || createMutation.isPending;

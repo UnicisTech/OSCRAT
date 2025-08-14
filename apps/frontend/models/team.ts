@@ -1,23 +1,19 @@
 import { prisma } from '@/lib/prisma';
 import { getCscStatusesProp, getCscControlsProp } from '@/lib/csc';
 import { findOrCreateApp } from '@/lib/svix';
-import { Role } from '@oscrat/model';
+import { Role, TeamCreateData } from '@oscrat/model';
 import * as TeamOps from '@oscrat/model/operations';
 import { controls } from '@/components/defaultLanding/data/configs/csc';
 import type { TeamProperties, TaskProperties, ISO } from 'types';
 import type { Session } from 'next-auth';
 
-export const createTeam = async (param: {
-  userId: string;
-  name: string;
-  slug: string;
-}) => {
-  const { userId, name, slug } = param;
+export const createTeam = async (data: TeamCreateData) => {
+  const { userId, name, slug } = data;
 
   console.log(
     `[Team] creating team record, name: ${name}, slug: ${slug}, userId: ${userId}`
   );
-  const team = await TeamOps.createTeam(prisma, { userId, name, slug });
+  const team = await TeamOps.createTeam(prisma, data);
 
   try {
     await findOrCreateApp(team.name, team.id);

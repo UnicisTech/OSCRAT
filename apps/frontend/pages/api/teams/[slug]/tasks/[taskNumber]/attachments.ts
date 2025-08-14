@@ -5,7 +5,7 @@ import {
   saveFileAsAttachment,
 } from 'models/attachment';
 import { checkExtensionAndMIMEType } from 'models/attachment';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { getTaskBySlugAndNumber } from 'models/task';
 
@@ -16,18 +16,18 @@ export const config = {
 };
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['task', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['task', 'read'])(handleGET)(req, res);
     case 'POST':
-      return withAuth(['task', 'update'])(handlePOST)(req, res);
+      return withTeamAuth(['task', 'update'])(handlePOST)(req, res);
     case 'DELETE':
-      return withAuth(['task', 'update'])(handleDELETE)(req, res);
+      return withTeamAuth(['task', 'update'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE', 'POST']);
       res.status(405).json({
@@ -38,7 +38,7 @@ export default function handler(
 }
 
 // Get task attachments
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
   const { slug, taskNumber } = req.query;
 
@@ -70,7 +70,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Upload an attachment
-const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   try {
@@ -113,7 +113,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 
 // Delete an attachment
 
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { id } = req.query;

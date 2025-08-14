@@ -2,7 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { teamsEndpoints } from '@/lib/api/endpoints/teams';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
-import type { TeamSettingsUpdate } from '@oscrat/model';
+import type { TeamSettingsUpdate, TeamCreateRequest } from '@oscrat/model';
 import type { TeamProperties } from '@/types';
 
 // Team list
@@ -31,8 +31,8 @@ export function useTeamProducts(slug: string) {
 
 export function useCreateTeam() {
   return useMutation({
-    mutationFn: ({ name, slug }: { name: string; slug: string }) =>
-      teamsEndpoints.create(name, slug),
+    mutationFn: (data: TeamCreateRequest) =>
+      teamsEndpoints.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.teams.all });
     },

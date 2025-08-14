@@ -1,12 +1,12 @@
 import env from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 import jackson from '@/lib/jackson';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import { sendAudit } from '@/lib/retraced';
 import type { NextApiResponse } from 'next';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
@@ -17,13 +17,13 @@ export default function handler(
 
   switch (method) {
     case 'GET':
-      return withAuth(['team_sso', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team_sso', 'read'])(handleGET)(req, res);
     case 'POST':
-      return withAuth(['team_sso', 'create'])(handlePOST)(req, res);
+      return withTeamAuth(['team_sso', 'create'])(handlePOST)(req, res);
     case 'PATCH':
-      return withAuth(['team_sso', 'create'])(handlePATCH)(req, res);
+      return withTeamAuth(['team_sso', 'create'])(handlePATCH)(req, res);
     case 'DELETE':
-      return withAuth(['team_sso', 'delete'])(handleDELETE)(req, res);
+      return withTeamAuth(['team_sso', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', 'GET, POST, PATCH, DELETE');
       res.status(405).json({
@@ -33,7 +33,7 @@ export default function handler(
 }
 
 // Get the SAML connection for the team.
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { apiController } = await jackson();
@@ -47,7 +47,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Create a SAML connection for the team.
-const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { metadataUrl, encodedRawMetadata } = req.body;
@@ -73,7 +73,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   res.status(201).json({ data: connection });
 };
 
-const handlePATCH = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePATCH = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const {
@@ -108,7 +108,7 @@ const handlePATCH = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   res.status(200).json({ data: connection });
 };
 
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { clientID, clientSecret } = req.query as {

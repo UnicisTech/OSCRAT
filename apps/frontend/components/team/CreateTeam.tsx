@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import Modal from '../shared/Modal';
 import { InputWithLabel } from '../shared';
 import { extractErrorMessage } from '@/lib/utils';
+import { OscratOrganizationType, OscratOrganizationSize } from '@oscrat/model';
 
 interface CreateTeamProps {
   visible: boolean;
@@ -29,10 +30,11 @@ const CreateTeam = ({ visible, setVisible }: CreateTeamProps) => {
     }),
     onSubmit: async (values) => {
       try {
-        const result = await createTeam(
-          values.name,
-          values.name.toLowerCase().replace(/\s+/g, '-')
-        );
+        const result = await createTeam({
+          name: values.name,
+          type: OscratOrganizationType.NATURAL_PERSON,
+          size: OscratOrganizationSize.STARTUP,
+        });
         formik.resetForm();
         setVisible(false);
         toast.success(t('team-created'));

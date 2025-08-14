@@ -7,7 +7,7 @@ import { getViewerToken } from '@/lib/retraced';
 import { getSession } from '@/lib/session';
 import useCanAccess from 'hooks/useCanAccess';
 import { useTeamContext } from '@/context/TeamContext';
-import { getTeamMember } from '@/lib/middleware/teamAuth';
+import { getTeamMember } from '@/lib/middleware/auth';
 import { isAllowed } from '@/lib/middleware';
 import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';

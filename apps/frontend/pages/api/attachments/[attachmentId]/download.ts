@@ -1,16 +1,16 @@
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { findAttachmentById } from 'models/attachment';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['task', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['task', 'read'])(handleGET)(req, res);
     default:
       res.setHeader('Allow', ['GET']);
       res.status(405).json({
@@ -20,7 +20,7 @@ export default function handler(
   }
 }
 
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
   const { attachmentId } = req.query;
 

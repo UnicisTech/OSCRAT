@@ -1,12 +1,12 @@
 import { deleteApiKey } from 'models/apiKey';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import env from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
@@ -17,7 +17,7 @@ export default function handler(
 
   switch (method) {
     case 'DELETE':
-      return withAuth(['team_api_key', 'delete'])(handleDELETE)(req, res);
+      return withTeamAuth(['team_api_key', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', 'DELETE');
       res.status(405).json({
@@ -27,7 +27,7 @@ export default function handler(
 }
 
 // Delete an API key
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { apiKeyId } = req.query as { apiKeyId: string };

@@ -9,7 +9,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import env from '@/lib/env';
 import { BOXYHQ_UI_CSS } from '@/components/styles';
 import { getSession } from '@/lib/session';
-import { getTeamMember } from '@/lib/middleware/teamAuth';
+import { getTeamMember } from '@/lib/middleware/auth';
 import { isAllowed } from '@/lib/middleware';
 import { NextPageWithLayout } from 'types';
 import { inferSSRProps } from '@/lib/inferSSRProps';

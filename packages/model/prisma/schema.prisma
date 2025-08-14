@@ -98,12 +98,16 @@ model Team {
   updatedAt          DateTime            @default(now())
   properties         Json                @default("{}")
   
-  // Organization fields from OscratOrganization
   type               OscratOrganizationType   @default(OTHER)
   size               OscratOrganizationSize   @default(STARTUP)
   orgRoles           OscratOrganizationRole[] @default([MANUFACTURER])
   
-  // Existing Team relationships
+  taxId              String?
+  postalAddress      String?
+  contactEmail       String?
+  contactPhone       String?
+  additionalInformation String?
+  
   apiKeys            ApiKey[]
   invitations        Invitation[]
   tasks              Task[]

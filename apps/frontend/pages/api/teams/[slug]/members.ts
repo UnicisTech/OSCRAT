@@ -7,25 +7,25 @@ import {
   getTeamMembers,
   removeTeamMember,
 } from 'models/team';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['team_member', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team_member', 'read'])(handleGET)(req, res);
     case 'DELETE':
-      return withAuth(['team_member', 'delete'])(handleDELETE)(req, res);
+      return withTeamAuth(['team_member', 'delete'])(handleDELETE)(req, res);
     case 'PUT':
-      return withAuth(['team', 'leave'])(handlePUT)(req, res);
+      return withTeamAuth(['team', 'leave'])(handlePUT)(req, res);
     case 'PATCH':
-      return withAuth(['team_member', 'update'])(handlePATCH)(req, res);
+      return withTeamAuth(['team_member', 'update'])(handlePATCH)(req, res);
     default:
       res.setHeader('Allow', 'GET, DELETE, PUT, PATCH');
       throw new ApiError(405, `Method ${method} Not Allowed`);
@@ -33,7 +33,7 @@ export default function handler(
 }
 
 // Get members of a team
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const members = await getTeamMembers(teamMember.team.slug);
@@ -44,7 +44,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Delete the member from the team
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { userId } = req.query as { userId: string };
@@ -95,7 +95,7 @@ const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => 
 };
 
 // Leave a team
-const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const totalTeamOwners = await prisma.teamMember.count({
@@ -117,7 +117,7 @@ const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Update the role of a member
-const handlePATCH = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePATCH = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { memberId, role } = req.body as { memberId: string; role: Role };

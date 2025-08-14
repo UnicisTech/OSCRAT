@@ -15,7 +15,7 @@ import { toast } from 'react-hot-toast';
 import type { NextPageWithLayout } from 'types';
 import env from '@/lib/env';
 import { getSession } from '@/lib/session';
-import { getTeamMember } from '@/lib/middleware/teamAuth';
+import { getTeamMember } from '@/lib/middleware/auth';
 import { isAllowed } from '@/lib/middleware';
 import { inferSSRProps } from '@/lib/inferSSRProps';
 import TeamLayout from '@/components/layouts/TeamLayout';

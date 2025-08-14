@@ -1,8 +1,8 @@
-import type { 
+import type {
   Role,
   OscratOrganizationType,
   OscratOrganizationSize,
-  OscratOrganizationRole
+  OscratOrganizationRole,
 } from '@prisma/client';
 import type { OscratProductSummary } from './product';
 
@@ -26,10 +26,16 @@ export interface TeamDetail extends Team {
   taskIndex: number;
   defaultRole: Role;
   properties: Record<string, any>;
-  // Organization fields
+
   type: OscratOrganizationType;
   size: OscratOrganizationSize;
   orgRoles: OscratOrganizationRole[];
+
+  taxId?: string | null;
+  postalAddress?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  additionalInformation?: string | null;
 }
 
 /** Team with products for organization view */
@@ -58,16 +64,32 @@ export interface TeamMemberDetail extends TeamMemberSummary {
   team: TeamDetail;
 }
 
-/** Interface for creating a new team */
-export interface TeamCreate {
+export interface TeamCreateRequest {
+  name: string;
+  type?: OscratOrganizationType;
+  size?: OscratOrganizationSize;
+  taxId?: string;
+  postalAddress?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  additionalInformation?: string;
+}
+
+export interface TeamCreateData {
   name: string;
   slug: string;
   domain?: string;
-  userId: string; // Creator user ID
-  // Organization fields (optional, will use defaults)
+  userId: string;
+
   type?: OscratOrganizationType;
   size?: OscratOrganizationSize;
   orgRoles?: OscratOrganizationRole[];
+
+  taxId?: string;
+  postalAddress?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  additionalInformation?: string;
 }
 
 /** Interface for updating team settings via API (user-editable fields only) */
@@ -77,15 +99,19 @@ export interface TeamSettingsUpdate {
   type?: OscratOrganizationType;
   size?: OscratOrganizationSize;
   orgRoles?: OscratOrganizationRole[];
+
+  taxId?: string;
+  postalAddress?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  additionalInformation?: string;
 }
 
-/** Interface for updating a team (internal use - includes system fields) */
 export interface TeamUpdate extends TeamSettingsUpdate {
   slug?: string;
   taskIndex?: number;
   properties?: Record<string, any>;
 }
-
 
 /** Interface for team member operations */
 export interface TeamMemberCreate {

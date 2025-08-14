@@ -1,5 +1,5 @@
 import { ApiError } from '@/lib/errors';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import { sendAudit } from '@/lib/retraced';
 import { findOrCreateApp, findWebhook, updateWebhook } from '@/lib/svix';
 import type { NextApiResponse } from 'next';
@@ -8,7 +8,7 @@ import { recordMetric } from '@/lib/metrics';
 import env from '@/lib/env';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
@@ -19,9 +19,9 @@ export default function handler(
 
   switch (method) {
     case 'GET':
-      return withAuth(['team_webhook', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team_webhook', 'read'])(handleGET)(req, res);
     case 'PUT':
-      return withAuth(['team_webhook', 'update'])(handlePUT)(req, res);
+      return withTeamAuth(['team_webhook', 'update'])(handlePUT)(req, res);
     default:
       res.setHeader('Allow', 'GET, PUT');
       res.status(405).json({
@@ -31,7 +31,7 @@ export default function handler(
 }
 
 // Get a Webhook
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { endpointId } = req.query as {
@@ -52,7 +52,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Update a Webhook
-const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { endpointId } = req.query as {

@@ -8,6 +8,7 @@ import {
   TeamSummary, 
   TeamWithProducts,
   TeamSettingsUpdate,
+  TeamCreateRequest,
   OscratProductSummary,
 } from '@oscrat/model';
 import { Permission } from '@/lib/permissions';
@@ -15,8 +16,8 @@ import { Permission } from '@/lib/permissions';
 export const teamsEndpoints = {
   list: () => api.get<TeamSummary[]>('/teams'),
 
-  create: (name: string, slug: string) =>
-    api.post<Team>('/teams', { name, slug }),
+  create: (data: TeamCreateRequest) =>
+    api.post<Team>('/teams', data),
 
   getTeam: (slug: string) => api.get<Team>(`/teams/${slug}`),
   

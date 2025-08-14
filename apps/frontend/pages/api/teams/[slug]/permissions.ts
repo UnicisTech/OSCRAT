@@ -1,15 +1,15 @@
 import { permissions, Permission } from '@/lib/permissions';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { ApiResponse } from '@/types';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   switch (req.method) {
     case 'GET':
-      return withAuth(['team', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
     default:
       res.setHeader('Allow', 'GET');
       res.status(405).json({
@@ -20,7 +20,7 @@ export default function handler(
 
 // Get permissions for a team for the current user
 const handleGET = async (
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse<ApiResponse<Permission[]>>
 ) => {
   const { teamMember } = req.teamContext;

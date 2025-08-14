@@ -2,20 +2,20 @@ import {
   getVersionAssessmentDetail,
   deleteVersionAssessment,
 } from 'models/oscrat';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['team', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
     case 'DELETE':
-      return withAuth(['team', 'delete'])(handleDELETE)(req, res);
+      return withTeamAuth(['team', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'DELETE']);
       res.status(405).json({
@@ -25,7 +25,7 @@ export default function handler(
 }
 
 // Get assessment detail
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { versionId, assessmentId } = req.query;
@@ -46,7 +46,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Delete assessment
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { versionId, assessmentId } = req.query;

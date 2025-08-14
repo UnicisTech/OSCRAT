@@ -1,22 +1,22 @@
 import { slugify } from '@/lib/common';
 import { ApiError } from '@/lib/errors';
-import { getSession } from '@/lib/session';
 import { createTeam, getTeams, isTeamExists } from 'models/team';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
-import type { NextApiResponse } from 'next';
+import { withTeamAuth, withUserAuth, type AuthenticatedTeamRequest, type AuthenticatedUserRequest } from '@/lib/middleware';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
+import { TeamCreateData, TeamCreateRequest } from '@oscrat/model';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: NextApiRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['team', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
     case 'POST':
-      return handlePOST(req, res);
+      return withUserAuth()(handlePOST)(req, res);
     default:
       res.setHeader('Allow', 'GET, POST');
       throw new ApiError(405, `Method ${method} Not Allowed`);
@@ -24,7 +24,7 @@ export default function handler(
 }
 
 // Get teams
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const teams = await getTeams(user.id);
@@ -35,23 +35,32 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Create a team
-const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
-  const { name } = req.body;
-  const { user } = req.teamContext;
+const handlePOST = async (req: AuthenticatedUserRequest, res: NextApiResponse) => {
+  const requestData: TeamCreateRequest = req.body;
+  const { user } = req.userContext;
 
-  const slug = slugify(name);
+  const slug = slugify(requestData.name);
 
   if (await isTeamExists([{ slug }])) {
     throw new ApiError(400, 'A team with the name already exists.');
   }
 
-  const team = await createTeam({
+  const teamData: TeamCreateData = {
     userId: user.id,
-    name,
+    name: requestData.name,
     slug,
-  });
+    type: requestData.type,
+    size: requestData.size,
+    taxId: requestData.taxId,
+    postalAddress: requestData.postalAddress,
+    contactEmail: requestData.contactEmail,
+    contactPhone: requestData.contactPhone,
+    additionalInformation: requestData.additionalInformation,
+  };
 
-  console.log(`[Team] created, teamId: ${team.id}, name: ${name}, slug: ${slug}, ownerId: ${user.id}`);
+  const team = await createTeam(teamData);
+
+  console.log(`[Team] created, teamId: ${team.id}, name: ${requestData.name}, slug: ${slug}, ownerId: ${user.id}`);
 
   recordMetric('team.created');
 

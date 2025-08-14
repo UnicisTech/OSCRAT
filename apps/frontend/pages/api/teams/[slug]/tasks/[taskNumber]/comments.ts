@@ -4,26 +4,26 @@ import {
   deleteComment,
   getComments,
 } from 'models/comment';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { sendEvent } from '@/lib/svix';
 import { ApiError } from '@/lib/errors';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['task', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['task', 'read'])(handleGET)(req, res);
     case 'POST':
-      return withAuth(['task', 'update'])(handlePOST)(req, res);
+      return withTeamAuth(['task', 'update'])(handlePOST)(req, res);
     case 'PUT':
-      return withAuth(['task', 'update'])(handlePUT)(req, res);
+      return withTeamAuth(['task', 'update'])(handlePUT)(req, res);
     case 'DELETE':
-      return withAuth(['task', 'update'])(handleDELETE)(req, res);
+      return withTeamAuth(['task', 'update'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST', 'DELETE', 'PUT']);
       throw new ApiError(405, `Method ${method} Not Allowed`);
@@ -31,7 +31,7 @@ export default function handler(
 }
 
 // Get comments for a task
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
@@ -54,7 +54,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Create a comment
-const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
@@ -92,7 +92,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Edit a comment
-const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { text, id } = req.body;
@@ -111,7 +111,7 @@ const handlePUT = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Delete a comment
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { id } = req.body;

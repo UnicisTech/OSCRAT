@@ -1,20 +1,20 @@
 import { getVersions, createVersion } from 'models/oscrat';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductVersionCreate } from '@oscrat/model';
 import { ApiError } from '@/lib/errors';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
 
   switch (method) {
     case 'GET':
-      return withAuth(['team', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
     case 'POST':
-      return withAuth(['team', 'create'])(handlePOST)(req, res);
+      return withTeamAuth(['team', 'create'])(handlePOST)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST']);
       throw new ApiError(405, `Method ${method} Not Allowed`);
@@ -22,7 +22,7 @@ export default function handler(
 }
 
 // Get all versions for a product
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { productId } = req.query;
@@ -33,7 +33,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Create version for a product
-const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { productId } = req.query;

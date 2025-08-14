@@ -1,12 +1,12 @@
 import env from '@/lib/env';
 import jackson from '@/lib/jackson';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import { sendAudit } from '@/lib/retraced';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
@@ -17,11 +17,11 @@ export default function handler(
 
   switch (method) {
     case 'GET':
-      return withAuth(['team_dsync', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team_dsync', 'read'])(handleGET)(req, res);
     case 'POST':
-      return withAuth(['team_dsync', 'create'])(handlePOST)(req, res);
+      return withTeamAuth(['team_dsync', 'create'])(handlePOST)(req, res);
     case 'DELETE':
-      return withAuth(['team_dsync', 'delete'])(handleDELETE)(req, res);
+      return withTeamAuth(['team_dsync', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', 'GET, POST');
       res.status(405).json({
@@ -30,7 +30,7 @@ export default function handler(
   }
 }
 
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const { directorySync } = await jackson();
@@ -47,7 +47,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   res.status(200).json({ data });
 };
 
-const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { name, provider } = req.body;
@@ -75,7 +75,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   res.status(201).json({ data });
 };
 
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { dsyncId } = req.query as { dsyncId: string };

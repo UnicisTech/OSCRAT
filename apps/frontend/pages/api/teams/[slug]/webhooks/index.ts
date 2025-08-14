@@ -6,14 +6,14 @@ import {
   findOrCreateApp,
   listWebhooks,
 } from '@/lib/svix';
-import { withAuth, type AuthenticatedRequest } from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { EndpointIn } from 'svix';
 import { recordMetric } from '@/lib/metrics';
 import env from '@/lib/env';
 
 export default function handler(
-  req: AuthenticatedRequest,
+  req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) {
   const { method } = req;
@@ -24,11 +24,11 @@ export default function handler(
 
   switch (method) {
     case 'POST':
-      return withAuth(['team_webhook', 'create'])(handlePOST)(req, res);
+      return withTeamAuth(['team_webhook', 'create'])(handlePOST)(req, res);
     case 'GET':
-      return withAuth(['team_webhook', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team_webhook', 'read'])(handleGET)(req, res);
     case 'DELETE':
-      return withAuth(['team_webhook', 'delete'])(handleDELETE)(req, res);
+      return withTeamAuth(['team_webhook', 'delete'])(handleDELETE)(req, res);
     default:
       res.setHeader('Allow', 'POST, GET, DELETE');
       throw new ApiError(405, `Method ${method} Not Allowed`);
@@ -36,7 +36,7 @@ export default function handler(
 }
 
 // Create a Webhook endpoint
-const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { name, url, eventTypes } = req.body;
@@ -76,7 +76,7 @@ const handlePOST = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Get all webhooks created by a team
-const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember } = req.teamContext;
 
   const app = await findOrCreateApp(teamMember.team.name, teamMember.team.id);
@@ -93,7 +93,7 @@ const handleGET = async (req: AuthenticatedRequest, res: NextApiResponse) => {
 };
 
 // Delete a webhook
-const handleDELETE = async (req: AuthenticatedRequest, res: NextApiResponse) => {
+const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
   const { teamMember, user } = req.teamContext;
 
   const { webhookId } = req.query as { webhookId: string };

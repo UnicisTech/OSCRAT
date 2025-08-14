@@ -1,2 +1,2 @@
-export * from './teamAuth';
+export * from './auth';
 export * from './apiHandler';

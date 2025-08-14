@@ -4,6 +4,7 @@ import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
 import { InputField, TextareaField, RadioGroup } from './components';
+import { OscratOrganizationType, OscratOrganizationSize, TeamCreateRequest } from '@oscrat/model';
 
 const OrganizationForm = ({ visible, setVisible }) => {
   const { t, ready } = useTranslation('common');
@@ -12,6 +13,7 @@ const OrganizationForm = ({ visible, setVisible }) => {
   const [formData, setFormData] = useState({
     organizationType: 'natural',
     organizationName: '',
+    taxId: '',
     postalAddress: "45 Rue de l'Étoile, 75008, Paris, France",
     contactEmail: 'contact@abccompany',
     contactPhone: '123-4567-8901',
@@ -43,8 +45,20 @@ const OrganizationForm = ({ visible, setVisible }) => {
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
 
+      // Build team creation data with defaults
+      const teamData: TeamCreateRequest = {
+        name: formData.organizationName.trim(),
+        type: OscratOrganizationType.NATURAL_PERSON, // Default for now
+        size: OscratOrganizationSize.STARTUP, // Default for now
+        taxId: formData.taxId || undefined,
+        postalAddress: formData.postalAddress || undefined,
+        contactEmail: formData.contactEmail || undefined,
+        contactPhone: formData.contactPhone || undefined,
+        additionalInformation: formData.additionalInfo || undefined,
+      };
+
       // Create the team/organization
-      await createTeam(formData.organizationName.trim(), slug);
+      await createTeam(teamData);
 
       // Show success message
       toast.success(t('team-created'));
@@ -66,6 +80,7 @@ const OrganizationForm = ({ visible, setVisible }) => {
     setFormData({
       organizationType: 'natural',
       organizationName: '',
+      taxId: '',
       postalAddress: '',
       contactEmail: '',
       contactPhone: '',
