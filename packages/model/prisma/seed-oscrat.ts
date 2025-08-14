@@ -357,6 +357,75 @@ const sampleReportingOrganizations = [
   },
 ];
 
+// Sample organization contact data arrays for randomization
+const sampleTaxIds = [
+  'EU123456789',
+  'US98-7654321',
+  'GB999999999',
+  'DE123456789',
+  'FR12345678901',
+  'NL123456789B01',
+  'SE123456789001',
+  'CH-123.456.789',
+];
+
+const sampleAddresses = [
+  '123 Innovation Street, Tech District, Brussels 1000, Belgium',
+  '456 Silicon Avenue, San Francisco, CA 94105, USA',
+  '789 Cyber Lane, London EC1A 1BB, United Kingdom', 
+  '321 Security Boulevard, Berlin 10115, Germany',
+  '654 Digital Plaza, Amsterdam 1012 AB, Netherlands',
+  '987 Tech Park, Stockholm 111 21, Sweden',
+  '147 Innovation Hub, Zurich 8001, Switzerland',
+  '258 Compliance Center, Paris 75001, France',
+];
+
+const sampleContactEmails = [
+  'contact@cybertech-solutions.com',
+  'info@secureiot-innovations.eu',
+  'hello@digitalsafety-org.net',
+  'support@compliancetech.co.uk',
+  'office@cybersecurity-experts.de',
+  'team@iotsecurity-lab.nl',
+  'contact@techcompliance.se',
+  'info@securityfirst.ch',
+];
+
+const samplePhoneNumbers = [
+  '+32 2 123 4567',
+  '+1 415 555 0123',
+  '+44 20 7123 4567',
+  '+49 30 12345678',
+  '+31 20 123 4567',
+  '+46 8 123 456 78',
+  '+41 44 123 45 67',
+  '+33 1 42 34 56 78',
+];
+
+const sampleAdditionalInfo = [
+  'Cybersecurity compliance organization specializing in IoT and critical infrastructure security. Member of ENISA network since 2020. ISO 27001 certified.',
+  'Leading technology security firm focused on industrial automation and smart city solutions. NIST Cybersecurity Framework certified since 2019.',
+  'Digital safety consultancy with expertise in financial services and healthcare compliance. SOC 2 Type II and HIPAA compliant.',
+  'European cybersecurity research institute developing next-generation threat detection systems. Horizon Europe program participant.',
+  'IoT security laboratory providing penetration testing and vulnerability assessments. OWASP member organization.',
+  'Compliance technology startup specializing in automated security monitoring for SMEs. ISO 27001 and GDPR certified.',
+  'Nordic cybersecurity center of excellence focusing on 5G and edge computing security. EU Digital Single Market contributor.',
+  'Swiss cybersecurity consulting firm with focus on banking and finance sector. FINMA regulated and PCI DSS certified.',
+];
+
+/** Generate random organization contact data */
+function generateRandomOrganizationData() {
+  const getRandomItem = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
+  
+  return {
+    taxId: getRandomItem(sampleTaxIds),
+    postalAddress: getRandomItem(sampleAddresses),
+    contactEmail: getRandomItem(sampleContactEmails),
+    contactPhone: getRandomItem(samplePhoneNumbers),
+    additionalInformation: getRandomItem(sampleAdditionalInfo),
+  };
+}
+
 async function seedOscratData(teamSlug: string) {
   try {
     // Find team by slug (unified Team/Organization model)
@@ -390,6 +459,20 @@ async function seedOscratData(teamSlug: string) {
       `Seeding OSCRAT data for team: ${team.name} (${targetTeamId})`
     );
     console.log(`Using creator: ${targetUserId}`);
+
+    // Generate and update team with random organization contact data
+    const organizationData = generateRandomOrganizationData();
+    console.log('Updating team with random organization contact information...');
+    await prisma.team.update({
+      where: { id: targetTeamId },
+      data: {
+        taxId: organizationData.taxId,
+        postalAddress: organizationData.postalAddress,
+        contactEmail: organizationData.contactEmail,
+        contactPhone: organizationData.contactPhone,
+        additionalInformation: organizationData.additionalInformation,
+      },
+    });
 
     // Clean up existing data for this team
     console.log('Cleaning up existing data...');
