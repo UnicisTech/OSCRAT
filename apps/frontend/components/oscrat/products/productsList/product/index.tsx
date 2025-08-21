@@ -5,6 +5,7 @@ import { getProductCategoryKey, getProductTypeKey } from '@/utils/translation';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import StatusBadge from './StatusBadge';
+import ActiveBadge from './ActiveBadge';
 import InfoField from './InfoField';
 
 interface ProductProps {
@@ -66,17 +67,19 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
         </h3>
 
         <nav
-          className="flex font-medium text-gray-600"
+          className="flex gap-6 font-medium text-gray-600"
           role="navigation"
           aria-label="Product actions"
         >
+          <ActiveBadge status={project.status} />
+
           <Link
             href={formPathName}
             aria-label={`Go to form for ${project.name}`}
           >
             <button
               type="button"
-              className="mr-4 h-9 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="h-9 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               {t('go-to-form')}
             </button>

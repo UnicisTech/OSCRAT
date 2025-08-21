@@ -31,7 +31,7 @@ const Index: React.FC<ProductProps> = ({
   >(null);
 
   // Standard way: don't render until translations are ready
-  if (!ready) return null;
+  if (!ready || !project) return null;
 
   // Handle action buttons
   const handleEditClick = () => setShowEditModal(true);
@@ -69,10 +69,10 @@ const Index: React.FC<ProductProps> = ({
 
   const reportingOrganizations = useMemo(() => {
     return (
-      project.reportingOrganizations?.map((org) => org.acronym).join(', ') ||
+      project?.reportingOrganizations?.map((org) => org.acronym).join(', ') ||
       t('oscrat.ui.n-a')
     );
-  }, [project.reportingOrganizations, t]);
+  }, [project?.reportingOrganizations, t]);
 
   return (
     <>

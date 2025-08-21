@@ -8,8 +8,7 @@ import ProductComponent from '@/components/oscrat/products/productDetails/produc
 import TabsManager from '@/components/shared/TabsManager';
 import { useTranslation } from 'next-i18next';
 import createTabsConfig from '@/components/oscrat/products/productDetails/tabs/tabs';
-import { LoadingState, ErrorState } from '@/components/shared/StateComponents';
-import type { OscratProductUpdate } from '@oscrat/model';
+import type { OscratProductDetail, OscratProductUpdate } from '@oscrat/model';
 import { useProductContext } from '@/context/ProductContext';
 import { useOscratVersions } from '@/hooks/oscrat/useOscratVersion';
 
@@ -24,7 +23,7 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
   const [tabs, setTabs] = useState<any>(null);
   const { t } = useTranslation('common');
 
-  const { project, isLoading, isError, error, deleteProject, updateProject } =
+  const { project, deleteProject, updateProject } =
     useOscratProject(slug, productId, { enabled: !isRedirecting });
 
   const { teamId } = useProductContext();
@@ -33,25 +32,10 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
 
   useEffect(() => {
     if (versions) {
-      console.log('mataching versions', versions);
       const tabsConfig = createTabsConfig(versions as any);
       setTabs(tabsConfig);
     }
   }, [versions]);
-
-  const isDeleting = deleteProject.isPending;
-
-  // Handle redirection based on loading states
-  useEffect(() => {
-    if (isLoading || isDeleting || isRedirecting) {
-      return;
-    }
-
-    if (isError) {
-      //router.push('/404');
-      return;
-    }
-  }, [isError, isLoading, isDeleting, isRedirecting]);
 
   const handleDelete = async () => {
     if (!project) {
@@ -84,31 +68,11 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
     }
   };
 
-  if (isLoading || isDeleting || isRedirecting || !project) {
-    return (
-      <LoadingState
-        message={
-          isDeleting || isRedirecting
-            ? 'Deleting project...'
-            : 'Loading product details...'
-        }
-      />
-    );
-  }
-
-  if (isError) {
-    return (
-      <ErrorState
-        message={`Error loading product details: ${error?.message}`}
-      />
-    );
-  }
-
   return (
     <>
       <ProductComponent
-        key={project.id}
-        project={project}
+        key={project?.id}
+        project={project as OscratProductDetail}
         onDelete={handleDelete}
         onWithdraw={handleWithdraw}
         onEdit={handleEdit}

@@ -3,38 +3,20 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import TextField from '@atlaskit/textfield';
 import Select, { ValueType } from '@atlaskit/select';
-import Button, { LoadingButton } from '@atlaskit/button';
+import { LoadingButton } from '@atlaskit/button';
+import { Button } from '@/components/shared';
 import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
 import { IoClose } from 'react-icons/io5';
-import type {
-  OscratRepositoryDetail,
-  OscratRepositoryUpdate,
-} from '@oscrat/model';
+import type { OscratRepositoryDetail } from '@oscrat/model';
 import {
   useOscratRepositoryDetail,
   useOscratRepository,
 } from '@/hooks/oscrat/useOscratRepository';
 import { extractErrorMessage } from '@/lib/utils';
 import { WithoutRing } from 'sharedStyles';
-
-// --- TYPE DEFINITIONS ---
-interface RepositoryData {
-  id: string;
-  name: string;
-  provider: string;
-  link: string;
-}
-
-type CredentialType = 'account' | 'token';
-
-// --- FILE: AddRepositoryModal.tsx ---
-// A modal for adding a new repository.
-
-interface AddRepositoryModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAdd: (newRepo: Omit<RepositoryData, 'id'>) => void;
-}
+import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
+import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
+import { Divider } from '@/components/shared';
 
 interface Option {
   label: string;
@@ -45,21 +27,16 @@ interface FormData {
   name: string;
   provider: ValueType<Option>;
   user: string;
-  authType: ValueType<Option>;
   targetBranch?: string;
   targetTag?: string;
   targetCommit?: string;
-  accessToken?: string;
+  accessToken: string;
 }
 
 const PROVIDER_OPTIONS: Option[] = [
   { label: 'GitHub', value: 'GITHUB' },
   { label: 'GitLab', value: 'GITLAB' },
   { label: 'Bitbucket', value: 'BITBUCKET' },
-];
-
-const AUTH_TYPE_OPTIONS: Option[] = [
-  { label: 'Personal Access Token', value: 'PERSONAL_ACCESS_TOKEN' },
 ];
 
 interface ModalProps {
@@ -95,12 +72,12 @@ const Modal: React.FC<ModalProps> = ({
     versionId
   );
 
+  // Get product and version data for the table
+  const { project } = useOscratProject(teamId, projectId);
+  const { version } = useOscratVersion(teamId, projectId, versionId);
+
   const selectedProvider = PROVIDER_OPTIONS.find(
     (option) => option.value === repository?.provider
-  );
-
-  const selectedAuthType = AUTH_TYPE_OPTIONS.find(
-    (option) => option.value === repository?.authType
   );
 
   const defaultValues = {
@@ -140,7 +117,6 @@ const Modal: React.FC<ModalProps> = ({
               name,
               provider,
               user,
-              authType,
               targetBranch,
               targetTag,
               targetCommit,
@@ -159,11 +135,11 @@ const Modal: React.FC<ModalProps> = ({
                 provider: provider?.value as any,
                 repositoryUrl,
                 user,
-                authType: authType?.value as any,
+                authType: 'PERSONAL_ACCESS_TOKEN' as const,
                 targetBranch: targetBranch || undefined,
                 targetTag: targetTag || undefined,
                 targetCommit: targetCommit || undefined,
-                accessToken: accessToken || undefined,
+                accessToken,
               };
 
               if (isCreateMode) {
@@ -189,11 +165,12 @@ const Modal: React.FC<ModalProps> = ({
           {({ formProps, submitting }) => (
             <form {...formProps}>
               <header className="flex items-center justify-between p-4">
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-sm font-bold text-gray-900">
                   {isCreateMode
                     ? t('oscrat.ui.add-new-repo')
                     : 'Edit Repository'}
                 </h2>
+
                 <button
                   onClick={onClose}
                   className="text-gray-400 hover:text-gray-600"
@@ -202,6 +179,32 @@ const Modal: React.FC<ModalProps> = ({
                   <IoClose size={24} />
                 </button>
               </header>
+
+              <Divider />
+
+              {/* Product and Version Information Table */}
+              <div className="px-6 py-4">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="">
+                      <th className="pb-2 text-left font-normal text-gray-500">
+                        {t('version')}
+                      </th>
+                      <th className="pb-2 text-left font-normal text-gray-500">
+                        {t('product')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="text-sm font-medium">
+                      <td className="py-2 text-gray-900">{version?.version}</td>
+                      <td className="py-2 text-gray-900">{project?.name}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <Divider />
 
               <main className="space-y-4 overflow-y-auto p-6">
                 <Field
@@ -255,29 +258,6 @@ const Modal: React.FC<ModalProps> = ({
                   )}
                 </Field>
 
-                <Field<ValueType<Option>>
-                  aria-required={true}
-                  name="authType"
-                  label="Authentication Type"
-                  isRequired
-                  defaultValue={selectedAuthType}
-                >
-                  {({ fieldProps: { id, ...rest }, error }) => (
-                    <Fragment>
-                      <WithoutRing>
-                        <Select
-                          inputId={id}
-                          {...rest}
-                          options={AUTH_TYPE_OPTIONS}
-                          placeholder="Select authentication type"
-                          isInvalid={!!error}
-                        />
-                      </WithoutRing>
-                      {error && <ErrorMessage>{error}</ErrorMessage>}
-                    </Fragment>
-                  )}
-                </Field>
-
                 <Field
                   name="targetBranch"
                   label="Target Branch"
@@ -315,8 +295,10 @@ const Modal: React.FC<ModalProps> = ({
                 </Field>
 
                 <Field
+                  aria-required={true}
                   name="accessToken"
-                  label="Access Token"
+                  label="Personal Access Token"
+                  isRequired
                   defaultValue={defaultValues.accessToken}
                 >
                   {({ fieldProps }) => (
@@ -324,6 +306,7 @@ const Modal: React.FC<ModalProps> = ({
                       <TextField
                         autoComplete="off"
                         type="password"
+                        placeholder="Enter your personal access token"
                         {...fieldProps}
                       />
                     </Fragment>
@@ -333,17 +316,20 @@ const Modal: React.FC<ModalProps> = ({
                 <FormFooter></FormFooter>
               </main>
 
-              <footer className="flex items-center justify-end space-x-3 rounded-b-lg bg-gray-50 p-4">
-                <Button appearance="default" onClick={onClose} type="button">
-                  {t('close')}
-                </Button>
-                <LoadingButton
+              <footer className="flex items-center justify-end space-x-3 rounded-b-lg p-4">
+                <Button
+                  onClick={onClose}
+                  type="button"
+                  variant="ghost"
+                  className="w-auto"
+                  text={t('cancel')}
+                />
+                <Button
                   type="submit"
-                  appearance="primary"
-                  isLoading={submitting}
-                >
-                  {isCreateMode ? 'Create Repository' : t('save-changes')}
-                </LoadingButton>
+                  text={isCreateMode ? t('add') : t('save')}
+                  variant="primary"
+                  className="w-auto px-[1rem] py-[0.4rem]"
+                />
               </footer>
             </form>
           )}

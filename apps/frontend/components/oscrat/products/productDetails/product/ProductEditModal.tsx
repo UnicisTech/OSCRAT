@@ -23,6 +23,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
   // Form state
   const [editName, setEditName] = useState<string>(initialData.name as string);
+  // TODO: Doesn't work yet, product needs to have description in DB
   const [editDescription, setEditDescription] = useState(
     initialData.description || ''
   );
@@ -125,7 +126,6 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
             placeholder={t('description')}
           />
         </div>
-
         <div>
           <label className="mb-2 block text-sm font-medium dark:text-gray-300">
             {t('oscrat.ui.role')}
@@ -142,7 +142,6 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
             ))}
           </select>
         </div>
-
         <div>
           <label className="mb-2 block text-sm font-medium dark:text-gray-300">
             {t('oscrat.ui.external-reporting')}
@@ -165,6 +164,11 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
                 </label>
               </div>
             ))}
+            {externalReportingOptions.length === 0 && (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('oscrat.ui.no-external-reporting-options')}
+              </p>
+            )}
           </div>
         </div>
       </div>

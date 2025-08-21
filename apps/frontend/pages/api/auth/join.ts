@@ -13,10 +13,7 @@ import { getInvitation, isInvitationExpired } from 'models/invitation';
 import { validateRecaptcha } from '@/lib/recaptcha';
 import { withApiHandler } from '@/lib/middleware';
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
@@ -39,13 +36,16 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     email,
     password,
     team,
+    teamData,
     inviteToken,
     recaptchaToken,
   } = req.body;
   const name = `${firstName} ${lastName}`;
-  
-  console.log(`[Auth] signup started, email: ${email}, team: ${team}, hasInviteToken: ${!!inviteToken}`);
-  
+
+  console.log(
+    `[Auth] signup started, email: ${email}, team: ${team}, hasInviteToken: ${!!inviteToken}`
+  );
+
   console.log(`[Auth] validating recaptcha`);
   try {
     await validateRecaptcha(recaptchaToken);
@@ -58,10 +58,14 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log(`[Auth] checking invitation, hasInviteToken: ${!!inviteToken}`);
   let invitation;
   try {
-    invitation = inviteToken ? await getInvitation({ token: inviteToken }) : null;
+    invitation = inviteToken
+      ? await getInvitation({ token: inviteToken })
+      : null;
     console.log(`[Auth] invitation fetched, valid: ${!!invitation}`);
   } catch (error: any) {
-    console.log(`[Auth] getInvitation failed, token: ${inviteToken}, error: ${error.message}`);
+    console.log(
+      `[Auth] getInvitation failed, token: ${inviteToken}, error: ${error.message}`
+    );
     throw error;
   }
 
@@ -72,7 +76,9 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
   // If invitation is present, use the email from the invitation instead of the email in the request body
   const emailToUse = invitation ? invitation.email : email;
-  console.log(`[Auth] using email: ${emailToUse}, fromInvitation: ${!!invitation}`);
+  console.log(
+    `[Auth] using email: ${emailToUse}, fromInvitation: ${!!invitation}`
+  );
 
   console.log(`[Auth] checking business email policy`);
   if (env.disableNonBusinessEmailSignup && !isBusinessEmail(emailToUse)) {
@@ -95,7 +101,9 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     if (error.status === 400) {
       throw error; // Re-throw ApiError
     }
-    console.log(`[Auth] getUser failed, email: ${emailToUse}, error: ${error.message}`);
+    console.log(
+      `[Auth] getUser failed, email: ${emailToUse}, error: ${error.message}`
+    );
     throw error;
   }
 
@@ -121,7 +129,9 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
       if (error.status === 400) {
         throw error; // Re-throw ApiError
       }
-      console.log(`[Auth] isTeamExists failed, name: ${team}, slug: ${slug}, error: ${error.message}`);
+      console.log(
+        `[Auth] isTeamExists failed, name: ${team}, slug: ${slug}, error: ${error.message}`
+      );
       throw error;
     }
   }
@@ -137,27 +147,59 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
       password: await hashPassword(password),
       emailVerified: invitation ? new Date() : null,
     });
-    console.log(`[Auth] user created, userId: ${user.id}, email: ${emailToUse}`);
+    console.log(
+      `[Auth] user created, userId: ${user.id}, email: ${emailToUse}`
+    );
   } catch (error: any) {
-    console.log(`[Auth] createUser failed, email: ${emailToUse}, error: ${error.message}`);
+    console.log(
+      `[Auth] createUser failed, email: ${emailToUse}, error: ${error.message}`
+    );
     throw error;
   }
 
-  // Create team if user is not invited
-  // So we can create the team with the owner
   if (!invitation) {
-    const slug = slugify(team);
+    const teamName = teamData?.name || team;
+    const slug = slugify(teamName);
 
-    console.log(`[Auth] creating team, name: ${team}, slug: ${slug}, userId: ${user.id}`);
+    console.log(
+      `[Auth] creating team, name: ${teamName}, slug: ${slug}, userId: ${user.id}, enhanced: ${!!teamData}`
+    );
     try {
-      await createTeam({
-        userId: user.id,
-        name: team,
-        slug,
-      });
-      console.log(`[Auth] team created successfully, name: ${team}, userId: ${user.id}`);
+      const nameCollisions = await isTeamExists([{ name: teamName }, { slug }]);
+      if (nameCollisions) {
+        console.log(
+          `[Auth] team name collision, name: ${teamName}, slug: ${slug}`
+        );
+        throw new ApiError(400, 'A team with this name already exists.');
+      }
+
+      const teamCreateData = teamData
+        ? {
+            userId: user.id,
+            name: teamData.name,
+            slug,
+            type: teamData.type,
+            size: teamData.size,
+            taxId: teamData.taxId,
+            postalAddress: teamData.postalAddress,
+            contactEmail: teamData.contactEmail,
+            contactPhone: teamData.contactPhone,
+            additionalInformation: teamData.additionalInformation,
+          }
+        : {
+            userId: user.id,
+            name: team,
+            slug,
+          };
+
+      await createTeam(teamCreateData);
+      console.log(
+        `[Auth] team created successfully, name: ${teamName}, userId: ${user.id}`
+      );
     } catch (error: any) {
-      console.log(`[Auth] team creation failed, name: ${team}, userId: ${user.id}, error: ${error.message}`);
+      console.log(
+        `[Auth] team creation failed, name: ${teamName}, userId: ${user.id}, error: ${error.message}`
+      );
       throw error;
     }
   }
@@ -175,7 +217,9 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     await sendVerificationEmail({ user, verificationToken });
   }
 
-  console.log(`[Auth] signup success, userId: ${user.id}, email: ${emailToUse}, teamCreated: ${!invitation}`);
+  console.log(
+    `[Auth] signup success, userId: ${user.id}, email: ${emailToUse}, teamCreated: ${!invitation}`
+  );
 
   recordMetric('user.signup');
 

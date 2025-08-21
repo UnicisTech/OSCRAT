@@ -244,12 +244,12 @@ const Login: NextPageWithLayout<
         </div>
       </div>
       <p className="mt-3 text-center text-sm font-semibold text-gray-600">
-        {t('dont-have-an-account')}
+        {t('dont-have-an-account')}&nbsp;
         <Link
           href={`/auth/join${params}`}
           className="hover:text-primary-focus font-medium text-blue-600 underline"
         >
-          &nbsp;{t('create-a-free-account')}
+          {t('create-a-free-account')}
         </Link>
       </p>
     </>

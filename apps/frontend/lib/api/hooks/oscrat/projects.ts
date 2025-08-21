@@ -94,6 +94,9 @@ export function useDeleteProject(teamId: string, projectId: string) {
         queryKey: queryKeys.oscrat.projects.all(teamId),
       });
       await queryClient.invalidateQueries({
+        queryKey: [...queryKeys.teams.detail(teamId), 'products'],
+      });
+      await queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.organization.summary(teamId),
       });
       await queryClient.invalidateQueries({
