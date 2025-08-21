@@ -15,6 +15,18 @@ module.exports = {
           dark: '#2C3E8F',
         },
       },
+      fontFamily: {
+        sans: [
+          'Roboto',
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Arial',
+          'sans-serif',
+        ],
+      },
     },
   },
   plugins: [require('@tailwindcss/typography'), require('daisyui')],

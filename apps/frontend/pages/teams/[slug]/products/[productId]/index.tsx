@@ -1,14 +1,40 @@
 'use client';
 
-import { useRouter } from 'next/router';
 import { withProductDetailLayout } from '@/lib/layout-helpers';
 import { ProductDetails } from '@/components/oscrat/products/ProductDetails';
+import { Breadcrumb } from '@/components/shared';
+import { useTranslation } from 'next-i18next';
+import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
+import { useProductContext } from '@/context/ProductContext';
 
 export default function ProductDashboard() {
-  const router = useRouter();
-  const { productId } = router.query;
+  const { t, ready } = useTranslation('common');
+  const { slug, teamId, productId } = useProductContext();
 
-  return <ProductDetails productId={productId as string} />;
+  const { project } = useOscratProject(teamId, productId);
+
+  if (!ready) {
+    return null;
+  }
+
+  const breadcrumbItems = [
+    {
+      label: t('oscrat.ui.products'),
+      href: `/teams/${slug}/products`,
+    },
+    {
+      label: project!.name,
+      href: `/teams/${slug}/products/${productId}`,
+      current: true,
+    },
+  ];
+
+  return (
+    <>
+      <Breadcrumb items={breadcrumbItems} />
+      <ProductDetails productId={productId} />
+    </>
+  );
 }
 
 ProductDashboard.getLayout = withProductDetailLayout;

@@ -3,18 +3,46 @@ import { withProductDetailLayout } from '@/lib/layout-helpers';
 import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/tabs';
 import Version from '@/components/oscrat/versions/versionDetails/version';
 import ConformityRow from '@/components/oscrat/versions/versionDetails/conformityRow';
-import { useParams } from 'next/navigation';
+import { Breadcrumb } from '@/components/shared';
+import { useTranslation } from 'next-i18next';
+import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
+import { useVersionContext } from '@/context/VersionContext';
+import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 
 export default function Index() {
-  const params = useParams();
-  const version = params?.versionId as string;
+  const { t, ready } = useTranslation('common');
+  const { teamId, productId, versionId } = useVersionContext();
 
-  if (!version) {
-    return <div>Loading...</div>;
+  const { project } = useOscratProject(teamId, productId);
+  const { version: versionData } = useOscratVersion(
+    teamId,
+    productId,
+    versionId
+  );
+
+  const breadcrumbItems = [
+    {
+      label: t('oscrat.ui.products'),
+      href: `/teams/${teamId}/products`,
+    },
+    {
+      label: project!.name,
+      href: `/teams/${teamId}/products/${productId}`,
+    },
+    {
+      label: versionData!.version,
+      href: `/teams/${teamId}/products/${productId}/versions/${versionId}`,
+      current: true,
+    },
+  ];
+
+  if (!ready) {
+    return null;
   }
 
   return (
     <>
+      <Breadcrumb items={breadcrumbItems} />
       <Version />
       <ConformityRow />
       <TabsManager tabs={TABS_CONFIG} />

@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaUpload } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { useTranslation } from 'next-i18next';
+import toast from 'react-hot-toast';
 
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (name: string, file: File) => void;
+  onImport: (file: File, description?: string) => void;
 }
 
 const ImportModal: React.FC<ImportModalProps> = ({
@@ -21,6 +22,7 @@ const ImportModal: React.FC<ImportModalProps> = ({
 
   const { t, ready } = useTranslation('common');
 
+  // Handle closing the modal when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -48,18 +50,30 @@ const ImportModal: React.FC<ImportModalProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setFileName(e.target.files[0].name);
+      const selectedFile = e.target.files[0];
+      const fileExtension = selectedFile.name.toLowerCase().split('.').pop();
+
+      // Valid CycloneDX file extensions
+      const validExtensions = ['xml'];
+
+      if (!fileExtension || !validExtensions.includes(fileExtension)) {
+        toast.error('Please select a valid CycloneDX SBOM file (.xml)');
+        e.target.value = '';
+        return;
+      }
+
+      setFile(selectedFile);
+      setFileName(selectedFile.name);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !file) {
-      alert('Please provide a name and select a file.');
+      toast.error('Please provide a name and select a file.');
       return;
     }
-    onImport(name, file);
+    onImport(file, `SBOM: ${name}`);
     handleClose();
   };
 
@@ -125,6 +139,7 @@ const ImportModal: React.FC<ImportModalProps> = ({
                         id="file-upload"
                         name="file-upload"
                         type="file"
+                        accept=".xml"
                         className="sr-only"
                         onChange={handleFileChange}
                       />

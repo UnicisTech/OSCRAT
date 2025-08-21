@@ -2,8 +2,7 @@ import type { User } from '@oscrat/model';
 import UploadAvatar from './UploadAvatar';
 import UpdateName from './UpdateName';
 import UpdateEmail from './UpdateEmail';
-import UpdateTheme from './UpdateTheme';
-import env from '@/lib/env';
+import SignOut from './SignOut';
 
 interface UpdateAccountProps {
   user: Partial<User>;
@@ -16,7 +15,7 @@ const UpdateAccount = ({ user, allowEmailChange }: UpdateAccountProps) => {
       <UpdateName user={user} />
       <UpdateEmail user={user} allowEmailChange={allowEmailChange} />
       <UploadAvatar user={user} />
-      {env.darkModeEnabled && <UpdateTheme />}
+      <SignOut />
     </div>
   );
 };

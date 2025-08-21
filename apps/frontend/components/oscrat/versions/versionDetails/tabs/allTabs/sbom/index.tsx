@@ -2,21 +2,13 @@ import ImportModal from '@/components/oscrat/versions/versionDetails/tabs/allTab
 import Table from '@/components/oscrat/versions/versionDetails/tabs/allTabs/sbom/table';
 import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
 import { useOscratVersionSbomJobs } from '@/hooks/oscrat/useOscratJobs';
+import { useVersionAttachments } from '@/hooks/oscrat/useVersionAttachments';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useProductContext } from '@/context/ProductContext';
 import { useVersionContext } from '@/context/VersionContext';
 import { useTeamContext } from '@/context/TeamContext';
-
-interface SbomData {
-  id: string;
-  name: string;
-  status: 'Active' | 'Archived';
-  dateAdded: string;
-  addedBy: string;
-  lastVerified: string;
-  verifiedBy: string;
-}
+import { extractErrorMessage } from '@/lib/utils';
 
 export default function Sbom() {
   const [isImportModalOpen, setImportModalOpen] = useState(false);
@@ -24,19 +16,23 @@ export default function Sbom() {
   const { productId } = useProductContext();
   const { versionId } = useVersionContext();
 
-  const { repository, isLoading: isLoadingRepository } = useOscratRepository(
-    teamId,
-    productId,
-    versionId
-  );
+  const { repository } = useOscratRepository(teamId, productId, versionId);
 
-  const { createSbomJob, isLoading: isCreatingJob } = useOscratVersionSbomJobs(
-    teamId,
-    productId,
-    versionId
-  );
+  const {
+    jobs,
+    createSbomJob,
+    isLoading: isCreatingJob,
+  } = useOscratVersionSbomJobs(teamId, productId, versionId);
 
-  const handleValidateSbom = async () => {
+  const {
+    attachments,
+    isLoading: isLoadingAttachments,
+    uploadAttachment,
+    downloadAttachment,
+    deleteAttachment,
+  } = useVersionAttachments(teamId, productId, versionId);
+
+  const handleCreateSbomJob = async () => {
     if (!repository?.id) {
       toast.error('No repository configured for this project');
       return;
@@ -45,72 +41,59 @@ export default function Sbom() {
     try {
       await createSbomJob({ repositoryId: repository.id });
       toast.success('SBOM job created successfully');
-    } catch (error: any) {
-      toast.error(`Failed to create SBOM job: ${error.message}`);
+    } catch (error: unknown) {
+      toast.error(
+        `Failed to create SBOM job: ${extractErrorMessage(error, 'Failed to create SBOM job')}`
+      );
     }
   };
 
-  // TODO: Align with Radu to be added to seed after specs are done
-  const initialSbomData: SbomData[] = [
-    {
-      id: '1',
-      name: 'SSM 3.56/2025',
-      status: 'Active',
-      dateAdded: '01.01.2025',
-      addedBy: 'Ravi Patel',
-      lastVerified: '-',
-      verifiedBy: '-',
-    },
-    {
-      id: '2',
-      name: 'SSM 3.2/2025',
-      status: 'Archived',
-      dateAdded: '01.01.2025',
-      addedBy: 'Ravi Patel',
-      lastVerified: '-',
-      verifiedBy: '-',
-    },
-    {
-      id: '3',
-      name: 'SSM 3.12/2025',
-      status: 'Archived',
-      dateAdded: '01.01.2025',
-      addedBy: 'Ravi Patel',
-      lastVerified: '01.01.2025',
-      verifiedBy: 'Emily Carter',
-    },
-  ];
-  const [sbomData, setSbomData] = useState<SbomData[]>(initialSbomData);
-
-  const handleFileImport = (name: string, file: File) => {
-    const newSbomEntry: SbomData = {
-      id: (sbomData.length + 2).toString(),
-      name,
-      status: 'Active',
-      dateAdded: new Date().toLocaleDateString('en-GB'),
-      addedBy: 'Current User',
-      lastVerified: '-',
-      verifiedBy: '-',
-    };
-    setSbomData((prevData) => [...prevData, newSbomEntry]);
-    alert(`File "${file.name}" imported as "${name}" successfully!`);
+  const handleFileImport = async (file: File, description?: string) => {
+    try {
+      await uploadAttachment(file, description);
+      toast.success(`SBOM file "${file.name}" uploaded successfully!`);
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, 'Failed to upload SBOM file'));
+    }
   };
 
-  const handleGenerate = () =>
-    alert('Generate button clicked. Functionality not yet implemented.');
-  const handleValidate = (id: string) => handleValidateSbom();
-  const handleDelete = (id: string) =>
-    alert(`Delete action for item ${id}. Functionality not yet implemented.`);
+  const handleGenerate = () => handleCreateSbomJob();
+
+  const handleValidate = (id: string) => {
+    // TODO: Implement SBOM validation functionality
+    toast.success(
+      `Validate action for SBOM ${id}. Functionality not yet implemented.`
+    );
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteAttachment(id);
+      toast.success('SBOM file deleted successfully');
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, 'Failed to delete SBOM file'));
+    }
+  };
+
+  const handleDownload = async (id: string, filename: string) => {
+    try {
+      await downloadAttachment(id, filename);
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, 'Failed to download SBOM file'));
+    }
+  };
 
   return (
     <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
       <div className="w-full">
         <Table
-          sbomData={sbomData}
+          sbomData={attachments}
           onImportClick={() => setImportModalOpen(true)}
           onGenerate={handleGenerate}
           onValidate={handleValidate}
           onDelete={handleDelete}
+          onDownload={handleDownload}
+          isLoading={isLoadingAttachments || isCreatingJob}
         />
       </div>
 

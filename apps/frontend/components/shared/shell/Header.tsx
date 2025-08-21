@@ -1,15 +1,12 @@
 import Link from 'next/link';
 import React from 'react';
 import { useSession } from 'next-auth/react';
-import { useToggleTheme } from '@/hooks/useToggleTheme';
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
-  SunIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import env from '@/lib/env';
 import { signOut } from 'next-auth/react';
 
 interface HeaderProps {
@@ -17,8 +14,6 @@ interface HeaderProps {
 }
 
 const Header = ({ setSidebarOpen }: HeaderProps) => {
-  const { toggleTheme } = useToggleTheme();
-
   const { status, data } = useSession();
 
   if (status === 'loading' || !data) {
@@ -75,20 +70,6 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
                   </div>
                 </Link>
               </li>
-
-              {env.darkModeEnabled && (
-                <li>
-                  <button
-                    className="block cursor-pointer px-2 py-1 text-sm leading-6 text-gray-900 dark:text-gray-400"
-                    type="button"
-                    onClick={toggleTheme}
-                  >
-                    <div className="flex items-center">
-                      <SunIcon className="mr-1 h-5 w-5" /> Change Theme
-                    </div>
-                  </button>
-                </li>
-              )}
 
               <li>
                 <button

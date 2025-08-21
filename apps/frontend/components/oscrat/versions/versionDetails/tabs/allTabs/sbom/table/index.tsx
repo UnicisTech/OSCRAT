@@ -1,24 +1,19 @@
 import React from 'react';
-import { FaTrashAlt } from 'react-icons/fa';
+import { FaTrashAlt, FaDownload } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
-
-// --- TYPE DEFINITIONS ---
-interface SbomData {
-  id: string;
-  name: string;
-  status: 'Active' | 'Archived';
-  dateAdded: string;
-  addedBy: string;
-  lastVerified: string;
-  verifiedBy: string;
-}
+import type { Attachment } from '@/types';
+import { useVersionContext } from '@/context/VersionContext';
+import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
+import { useOscratVersionSbomJobs } from '@/hooks/oscrat/useOscratJobs';
 
 interface SsmTableProps {
-  sbomData: SbomData[];
+  sbomData: Attachment[];
   onImportClick: () => void;
   onGenerate: () => void;
   onValidate: (id: string) => void;
   onDelete: (id: string) => void;
+  onDownload: (id: string, filename: string) => void;
+  isLoading?: boolean;
 }
 
 const Table: React.FC<SsmTableProps> = ({
@@ -27,10 +22,18 @@ const Table: React.FC<SsmTableProps> = ({
   onGenerate,
   onValidate,
   onDelete,
+  onDownload,
 }) => {
-  // Mock context variables to simulate repository and generation status
-  const hasRepositoryDefined = true;
-  const isSbomGenerating = false;
+  const { teamId, productId, versionId } = useVersionContext();
+  const { version } = useOscratVersion(teamId, productId, versionId);
+  const { isLoading: isSbomGenerating } = useOscratVersionSbomJobs(
+    teamId,
+    productId,
+    versionId
+  );
+
+  const hasRepositoryDefined =
+    version?.repository && Object.keys(version.repository).length > 0;
 
   const { t, ready } = useTranslation('common');
 
@@ -40,32 +43,50 @@ const Table: React.FC<SsmTableProps> = ({
 
   const tableHeaders = [
     'Name',
-    'Status',
-    'Dated Added',
+    'Description',
+    'Date Added',
     'Added by',
-    'Last Verified',
-    'Verified by',
-    '',
+    'Actions',
   ];
 
-  const StatusPill: React.FC<{ status: 'Active' | 'Archived' }> = ({
-    status,
-  }) => {
-    const isActive = status === 'Active';
-    const pillClasses = isActive
-      ? 'bg-green-100 text-green-800'
-      : 'bg-gray-100 text-gray-800';
+  if (sbomData.length === 0) {
     return (
-      <span
-        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${pillClasses}`}
-      >
-        {status}
-      </span>
+      <div className="w-full rounded-lg">
+        <div className="mb-4 flex space-x-2">
+          <button
+            onClick={onImportClick}
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+          >
+            {t('import')}
+          </button>
+          <button
+            onClick={
+              hasRepositoryDefined && !isSbomGenerating ? onGenerate : undefined
+            }
+            disabled={!hasRepositoryDefined || isSbomGenerating}
+            className={`rounded-md border px-4 py-2 text-sm font-medium ${
+              hasRepositoryDefined && !isSbomGenerating
+                ? 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'
+                : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
+            }`}
+          >
+            {t('generate')}
+          </button>
+        </div>
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <p className="text-sm">{t('oscrat.ui.no-sbom-added')}</p>
+          {!hasRepositoryDefined && (
+            <p className="mt-2 text-sm text-red-600">
+              {t('oscrat.ui.to-generate-sbom')}
+            </p>
+          )}
+        </div>
+      </div>
     );
-  };
+  }
 
   return (
-    <div className="bg- w-full rounded-lg">
+    <div className="w-full rounded-lg">
       <div className="mb-4 flex space-x-2">
         <button
           onClick={onImportClick}
@@ -84,21 +105,16 @@ const Table: React.FC<SsmTableProps> = ({
               : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
           }`}
         >
-          {t('generate')}
+          {isSbomGenerating ? `${t('generate')}...` : t('generate')}
         </button>
         {!hasRepositoryDefined && (
           <div className="flex items-center text-sm text-red-600">
             <span className="mr-1">⚠️</span>
-            <span>{t('to-generate-sbom')}</span>
-          </div>
-        )}
-        {hasRepositoryDefined && isSbomGenerating && (
-          <div className="flex items-center text-sm text-yellow-600">
-            <span className="mr-1">⚠️</span>
-            <span> {t('generate')}</span>
+            <span>{t('oscrat.ui.to-generate-sbom')}</span>
           </div>
         )}
       </div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-gray-600">
           <thead className="bg-gray-200 text-xs text-gray-900">
@@ -110,53 +126,50 @@ const Table: React.FC<SsmTableProps> = ({
               ))}
             </tr>
           </thead>
-          <tbody>
-            {sbomData.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={tableHeaders.length}
-                  className="px-6 py-12 text-center text-gray-500"
-                >
-                  {t('oscrat.ui.no-sbom-added')}
+          <tbody className="divide-y divide-gray-200 bg-white">
+            {sbomData.map((attachment) => (
+              <tr key={attachment.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 font-medium text-gray-900">
+                  {attachment.name}
+                </td>
+                <td className="px-6 py-4">
+                  {attachment.description || 'No description'}
+                </td>
+                <td className="px-6 py-4">
+                  {new Date(attachment.createdAt).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4">
+                  {attachment.createdByUser
+                    ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
+                      attachment.createdByUser.name
+                    : 'Unknown'}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => onDownload(attachment.id, attachment.name)}
+                      className="text-blue-600 hover:text-blue-800"
+                      title="Download"
+                    >
+                      <FaDownload size={16} />
+                    </button>
+                    <button
+                      onClick={() => onValidate(attachment.id)}
+                      className="rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
+                    >
+                      {t('validate')}
+                    </button>
+                    <button
+                      onClick={() => onDelete(attachment.id)}
+                      className="text-red-600 hover:text-red-800"
+                      title="Delete"
+                    >
+                      <FaTrashAlt size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
-            ) : (
-              sbomData.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b bg-white hover:bg-gray-50"
-                >
-                  <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                    {item.name}
-                  </td>
-                  <td className="px-6 py-4">
-                    <StatusPill status={item.status} />
-                  </td>
-                  <td className="px-6 py-4">{item.dateAdded}</td>
-                  <td className="px-6 py-4">{item.addedBy}</td>
-                  <td className="px-6 py-4">{item.lastVerified}</td>
-                  <td className="px-6 py-4">{item.verifiedBy}</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end space-x-4">
-                      {item.status === 'Active' && (
-                        <button
-                          onClick={() => onValidate(item.id)}
-                          className="rounded-md border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50"
-                        >
-                          {t('validate')}
-                        </button>
-                      )}
-                      <button
-                        onClick={() => onDelete(item.id)}
-                        className="text-gray-400 hover:text-red-600"
-                      >
-                        <FaTrashAlt />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>

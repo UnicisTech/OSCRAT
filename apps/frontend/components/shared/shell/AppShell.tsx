@@ -1,15 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Loading } from '@/components/shared';
+import { Loading, SidePanel } from '@/components/shared';
 import { useSession } from 'next-auth/react';
-import Header from './Header';
-import Drawer from './Drawer';
 
 export default function AppShell({ children }) {
   const { data, status } = useSession();
   const router = useRouter();
-
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isFormRoute = router.pathname.startsWith('/form');
 
@@ -44,9 +40,8 @@ export default function AppShell({ children }) {
 
   return (
     <>
-      <Drawer sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <div className="lg:pl-64 dark:border-gray-200">
-        <Header setSidebarOpen={setSidebarOpen} />
+      <SidePanel />
+      <div className="pl-64 dark:border-gray-200">
         <main className="bg-white py-10 text-black dark:bg-black dark:text-white">
           <div className="mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
         </main>

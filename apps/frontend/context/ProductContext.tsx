@@ -13,6 +13,7 @@ type UseCanAccessContext = ReturnType<typeof useCanAccess>;
 interface ProductContextType {
   productContext: UseOscratProjectContext;
   accessContext: UseCanAccessContext;
+  slug: string;
   teamId: string;
   productId: string;
 }
@@ -34,12 +35,13 @@ export const ProductContextProvider = ({
 
   const contextValue = useMemo<ProductContextType>(
     () => ({
+      slug,
       teamId,
       productId,
       productContext,
       accessContext,
     }),
-    [teamId, productId, productContext, accessContext]
+    [slug, teamId, productId, productContext, accessContext]
   );
 
   if (productContext.isLoading || accessContext.isLoading) {

@@ -76,14 +76,14 @@ const TeamDropdown = () => {
     <div className="dropdown w-full">
       <div
         tabIndex={0}
-        className="flex h-10 cursor-pointer items-center justify-between rounded border border-gray-300 px-4 text-sm font-bold dark:border-gray-600"
+        className="flex h-10 cursor-pointer items-center justify-between rounded border border-gray-300 px-4 text-sm text-black dark:border-gray-600"
       >
         {currentTeam?.name || data?.user?.name}
         <ChevronUpDownIcon className="h-5 w-5" />
       </div>
       <ul
         tabIndex={0}
-        className="dropdown-content dark:bg-base-100 w-full rounded border bg-white p-2 px-2 shadow-md dark:border-gray-600"
+        className="dropdown-content dark:bg-base-100 w-full rounded border bg-white p-2 px-2 text-[#212121] shadow-md dark:border-gray-600"
       >
         {menus.map(({ id, name, items }) => {
           return (

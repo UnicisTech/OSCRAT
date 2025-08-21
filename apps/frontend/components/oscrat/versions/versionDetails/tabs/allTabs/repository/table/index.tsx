@@ -28,7 +28,7 @@ const Table: React.FC<RepositoryTableProps> = ({
 
   return (
     <div className="w-full rounded-lg bg-white">
-      {/* Only show Add New button when no repositories exist */}
+      {/* Only show Add New button when no repository exist */}
       {repositories.length === 0 && (
         <div className="mb-4">
           <button

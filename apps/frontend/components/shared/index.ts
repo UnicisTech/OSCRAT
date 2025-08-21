@@ -13,3 +13,5 @@ export { default as CopyToClipboardButton } from './CopyToClipboardButton';
 export { default as StatusBadge } from './StatusBadge';
 export { default as PerPageSelector } from './PerPageSelector';
 export { default as FullScreenModal } from './FullScreenModal';
+export { default as Breadcrumb } from './Breadcrumb';
+export { default as SidePanel } from './SidePanel';

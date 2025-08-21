@@ -4,31 +4,33 @@ import { NextApiRequest } from 'next';
 // Shared file upload configuration and utilities
 
 // Common allowed file extensions and their MIME types
-const ALLOWED_EXTENSIONS: Record<string, string> = {
+const ALLOWED_EXTENSIONS: Record<string, string[]> = {
   // Documents
-  'pdf': 'application/pdf',
-  'doc': 'application/msword',
-  'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'txt': 'text/plain',
-  'csv': 'text/csv',
-  
+  pdf: ['application/pdf'],
+  doc: ['application/msword'],
+  docx: [
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ],
+  txt: ['text/plain'],
+  csv: ['text/csv'],
+
   // Data formats
-  'json': 'application/json',
-  'xml': 'application/xml',
-  'yml': 'text/yaml',
-  'yaml': 'text/yaml',
-  
+  json: ['application/json'],
+  xml: ['application/xml', 'text/xml'],
+  yml: ['text/yaml', 'application/x-yaml'],
+  yaml: ['text/yaml', 'application/x-yaml'],
+
   // Archives
-  'zip': 'application/zip',
-  'tar': 'application/x-tar',
-  'gz': 'application/gzip',
-  'tgz': 'application/gzip',
-  
+  zip: ['application/zip'],
+  tar: ['application/x-tar'],
+  gz: ['application/gzip'],
+  tgz: ['application/gzip'],
+
   // Images (for future use)
-  'png': 'image/png',
-  'jpg': 'image/jpeg',
-  'jpeg': 'image/jpeg',
-  'gif': 'image/gif',
+  png: ['image/png'],
+  jpg: ['image/jpeg'],
+  jpeg: ['image/jpeg'],
+  gif: ['image/gif'],
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -42,9 +44,9 @@ export const parseFormData = (
   const options: formidable.Options = {
     maxFileSize: MAX_FILE_SIZE,
   };
-  
+
   const form = formidable(options);
-  
+
   return new Promise((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) reject(err);
@@ -77,8 +79,8 @@ export const validateFile = (file: formidable.File): boolean => {
     return false;
   }
 
-  const allowedMimeType = ALLOWED_EXTENSIONS[extension];
-  return allowedMimeType === file.mimetype;
+  const allowedMimeTypes = ALLOWED_EXTENSIONS[extension];
+  return allowedMimeTypes ? allowedMimeTypes.includes(file.mimetype) : false;
 };
 
 /**
@@ -86,7 +88,10 @@ export const validateFile = (file: formidable.File): boolean => {
  */
 export const getMimeTypeFromExtension = (filename: string): string => {
   const extension = getFileExtension(filename);
-  return extension ? ALLOWED_EXTENSIONS[extension] || 'application/octet-stream' : 'application/octet-stream';
+  if (extension && ALLOWED_EXTENSIONS[extension]) {
+    return ALLOWED_EXTENSIONS[extension][0]; // Return the first/primary MIME type
+  }
+  return 'application/octet-stream';
 };
 
 /**
@@ -102,15 +107,17 @@ export interface FileUploadData {
 /**
  * Extract file data from formidable file
  */
-export const extractFileData = async (file: formidable.File): Promise<FileUploadData> => {
+export const extractFileData = async (
+  file: formidable.File
+): Promise<FileUploadData> => {
   const fs = await import('fs');
-  
+
   if (!file.originalFilename) {
     throw new Error('No filename provided');
   }
 
   const fileData = await fs.promises.readFile(file.filepath);
-  
+
   return {
     filename: file.originalFilename,
     fileData,
