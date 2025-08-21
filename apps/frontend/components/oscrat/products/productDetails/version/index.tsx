@@ -18,15 +18,13 @@ const Version: React.FC<VersionProps> = ({
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleShowMore = (versionId: string) => {
-    router.push(`${pathname}/versions/${versionId}`);
+  const handleShowMore = () => {
+    router.push(`${pathname}/versions/${id}`);
   };
 
   if (!ready) return null;
 
   const { id, version: title, status } = data;
-
-  console.log('dataaa', data);
 
   // If status is not supported, show simplified variant
   if (variant === 'notSupported') {
@@ -62,7 +60,7 @@ const Version: React.FC<VersionProps> = ({
 
           <div className="ml-12 flex flex-1 justify-end font-medium text-gray-600">
             <button
-              onClick={() => handleShowMore(id)}
+              onClick={() => handleShowMore()}
               className="rounded border border-gray-400 px-6 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
             >
               {t('oscrat.ui.show-more')}
@@ -192,7 +190,7 @@ const Version: React.FC<VersionProps> = ({
 
         <div className="ml-12 flex flex-1 justify-end font-medium text-gray-600">
           <button
-            onClick={() => handleShowMore(id)}
+            onClick={() => handleShowMore()}
             className="rounded border border-gray-400 px-6 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
           >
             {t('oscrat.ui.show-more')}

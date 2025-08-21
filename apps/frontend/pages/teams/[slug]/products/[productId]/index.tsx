@@ -1,6 +1,6 @@
 'use client';
 
-import { withProductDetailLayout } from '@/lib/layout-helpers';
+import { withProductLayout } from '@/lib/layout-helpers';
 import { ProductDetails } from '@/components/oscrat/products/ProductDetails';
 import { Breadcrumb } from '@/components/shared';
 import { useTranslation } from 'next-i18next';
@@ -37,6 +37,6 @@ export default function ProductDashboard() {
   );
 }
 
-ProductDashboard.getLayout = withProductDetailLayout;
+ProductDashboard.getLayout = withProductLayout;
 
 export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';

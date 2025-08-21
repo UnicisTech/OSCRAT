@@ -18,6 +18,19 @@ export function withTeamLayout(page: React.ReactNode) {
 /**
  * Layout pattern for product detail pages: AccountLayout > TeamLayout > ProductLayout > VersionLayout
  */
+export function withProductLayout(page: React.ReactNode) {
+  return (
+    <AccountLayout>
+      <TeamLayout>
+        <ProductLayout>{page}</ProductLayout>
+      </TeamLayout>
+    </AccountLayout>
+  );
+}
+
+/**
+ * Layout pattern for product detail pages: AccountLayout > TeamLayout > ProductLayout > VersionLayout
+ */
 export function withProductDetailLayout(page: React.ReactNode) {
   return (
     <AccountLayout>
