@@ -19,6 +19,7 @@ const prisma = new PrismaClient();
 const sampleProducts = [
   {
     name: 'SecureConnect IoT Gateway',
+    description: 'Enterprise-grade IoT gateway solution providing secure connectivity and device management for industrial IoT deployments.',
     type: OscratProductType.IOT_DEVICE,
     productCategory: OscratProductCategory.IMPORTANT_CLASS_I,
     complianceStatus: OscratProductComplianceStatus.COMPLIANT,
@@ -27,6 +28,7 @@ const sampleProducts = [
   },
   {
     name: 'SmartHome Controller Pro',
+    description: 'Advanced home automation controller supporting multiple protocols and seamless integration with popular smart home ecosystems.',
     type: OscratProductType.SMART_HOME_DEVICE,
     productCategory: OscratProductCategory.DEFAULT,
     complianceStatus: OscratProductComplianceStatus.IN_PROGRESS,
@@ -35,6 +37,7 @@ const sampleProducts = [
   },
   {
     name: 'Industrial Monitoring System',
+    description: 'Real-time monitoring and control system for critical industrial infrastructure with built-in redundancy and failover capabilities.',
     type: OscratProductType.INDUSTRIAL_DEVICE,
     productCategory: OscratProductCategory.CRITICAL,
     complianceStatus: OscratProductComplianceStatus.CERTIFIED,
@@ -43,6 +46,7 @@ const sampleProducts = [
   },
   {
     name: 'CyberShield Security Suite',
+    description: 'Comprehensive cybersecurity platform offering threat detection, vulnerability management, and incident response capabilities.',
     type: OscratProductType.SECURITY_SOFTWARE,
     productCategory: OscratProductCategory.IMPORTANT_CLASS_II,
     complianceStatus: OscratProductComplianceStatus.COMPLIANT,
@@ -51,6 +55,7 @@ const sampleProducts = [
   },
   {
     name: 'EdgeDevice Firmware v2.1',
+    description: 'Optimized firmware for edge computing devices with enhanced security features and improved resource management.',
     type: OscratProductType.FIRMWARE,
     productCategory: OscratProductCategory.DEFAULT,
     complianceStatus: OscratProductComplianceStatus.NOT_ASSESSED,
@@ -59,6 +64,7 @@ const sampleProducts = [
   },
   {
     name: 'CloudConnector API Platform',
+    description: 'Scalable API management platform enabling secure cloud connectivity and data integration across hybrid environments.',
     type: OscratProductType.APPLICATION_SOFTWARE,
     productCategory: OscratProductCategory.IMPORTANT_CLASS_I,
     complianceStatus: OscratProductComplianceStatus.PENDING_CERTIFICATION,
@@ -566,6 +572,7 @@ async function seedOscratData(teamSlug: string) {
       const product = await prisma.oscratProduct.create({
         data: {
           name: productData.name,
+          description: productData.description,
           type: productData.type,
           productCategory: productData.productCategory,
           complianceStatus: productData.complianceStatus,

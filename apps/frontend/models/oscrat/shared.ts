@@ -115,6 +115,7 @@ export const transformToProductSummary = (
   return {
     id: product.id,
     name: product.name,
+    description: product.description,
     type: product.type,
     productCategory: product.productCategory,
     complianceStatus: product.complianceStatus,
@@ -137,6 +138,7 @@ export const transformToProductDetail = (
 ): OscratProductDetail => ({
   id: product.id,
   name: product.name,
+  description: product.description,
   type: product.type,
   productCategory: product.productCategory,
   complianceStatus: product.complianceStatus,

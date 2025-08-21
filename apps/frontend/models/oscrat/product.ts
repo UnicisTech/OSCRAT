@@ -93,16 +93,16 @@ export const getProducts = async (
   return team?.products.map(transformToProductSummary) || [];
 };
 
-/** Get detailed information for a specific project */
-export const getProjectDetail = async (
+/** Get detailed information for a specific product */
+export const getProductDetail = async (
   teamId: string,
-  projectId: string
+  productId: string
 ): Promise<OscratProductDetail | null> => {
   const team = await prisma.team.findUnique({
     where: { id: teamId },
     include: {
       products: {
-        where: { id: projectId },
+        where: { id: productId },
         include: PROJECT_DETAIL_INCLUDE,
       },
     },
@@ -121,6 +121,7 @@ export const createProduct = async (
   const product = await prisma.oscratProduct.create({
     data: {
       name: data.name,
+      description: data.description,
       type: data.type,
       productCategory: data.productCategory,
       teamId: teamId,
@@ -134,7 +135,7 @@ export const createProduct = async (
 };
 
 /** Update an existing project */
-export const updateProject = async (
+export const updateProduct = async (
   teamId: string,
   projectId: string,
   data: Partial<OscratProductUpdate>
@@ -159,8 +160,9 @@ export const updateProject = async (
     where: { id: projectId },
     data: {
       name: data.name,
+      description: data.description,
       type: data.type,
-      productCategory: data.productCategory, // Direct mapping, no conversion needed
+      productCategory: data.productCategory,
       updatedBy: data.updatedBy,
     },
     include: PROJECT_DETAIL_INCLUDE,
@@ -170,7 +172,7 @@ export const updateProject = async (
 };
 
 /** Delete a project */
-export const deleteProject = async (
+export const deleteProduct = async (
   teamId: string,
   projectId: string
 ): Promise<void> => {

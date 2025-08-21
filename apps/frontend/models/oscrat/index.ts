@@ -2,11 +2,11 @@
 
 export {
   getProducts,
-  getProjectDetail,
+  getProductDetail,
   createProduct,
-  updateProject,
-  deleteProject,
-} from './project';
+  updateProduct,
+  deleteProduct,
+} from './product';
 
 export {
   getAssessments,

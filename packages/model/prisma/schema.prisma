@@ -357,8 +357,9 @@ enum OscratProductVersionStatus {
 // OscratOrganization model removed - merged into Team
 
 model OscratProduct {
-  id   String @id @default(uuid())
-  name String
+  id          String  @id @default(uuid())
+  name        String
+  description String  @default("")
 
   teamId String
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
