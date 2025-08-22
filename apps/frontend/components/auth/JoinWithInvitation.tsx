@@ -115,6 +115,7 @@ const JoinWithInvitation = ({
         />
         <InputWithLabel
           type="email"
+          name="email"
           label={t('email')}
           value={invitation.email}
           disabled

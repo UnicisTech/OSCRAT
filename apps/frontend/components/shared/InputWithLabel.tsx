@@ -8,6 +8,7 @@ interface InputWithLabelProps {
   label?: React.ReactNode | string;
   labelStyle?: string;
   error?: string;
+  descriptionText?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   disabled?: boolean;
@@ -23,6 +24,7 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
   label,
   labelStyle,
   error,
+  descriptionText,
   onChange,
   onBlur,
   disabled = false,
@@ -49,6 +51,9 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
             label
           )}
         </div>
+      )}
+      {descriptionText && (
+        <p className="mb-2 text-sm text-gray-600">{descriptionText}</p>
       )}
       <input
         id={inputId}

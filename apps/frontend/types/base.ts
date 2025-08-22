@@ -1,4 +1,4 @@
-import type { Prisma, TeamMember, User, Comment, TeamSummary } from '@oscrat/model';
+import type { Prisma, TeamMember, User, Comment } from '@oscrat/model';
 import type { TaskCscProperties, TeamCscProperties } from './csc';
 
 export type ApiError = {
@@ -18,7 +18,6 @@ export type ApiResponse<T = unknown> =
     };
 
 export type Role = 'owner' | 'member';
-
 
 export type TaskExtended = Prisma.TaskGetPayload<{
   include: {
@@ -50,14 +49,19 @@ export type Attachment = {
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
-  createdByUser: { id: string; name: string; firstName: string; lastName: string };
+  createdByUser: {
+    id: string;
+    name: string;
+    firstName: string;
+    lastName: string;
+  };
 };
 
 // Attachment with file data for downloads (only when needed)
 export type AttachmentWithFile = Attachment & {
   file: {
     id: string;
-    fileData: Buffer;
+    fileData: ArrayBuffer;
     createdAt: Date;
     updatedAt: Date;
   };
@@ -90,7 +94,6 @@ export type AppEvent =
   | 'apikey.created'
   | 'apikey.removed'
   | 'apikey.fetched'
-  | 'apikey.removed'
   | 'webhook.created'
   | 'webhook.removed'
   | 'webhook.fetched'
