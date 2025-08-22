@@ -3,10 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { sendAudit } from '@/lib/retraced';
 import { sendEvent } from '@/lib/svix';
 import { Role } from '@oscrat/model';
-import {
-  getTeamMembers,
-  removeTeamMember,
-} from 'models/team';
+import { getTeamMembers, removeTeamMember } from 'models/team';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
@@ -33,7 +30,10 @@ export default function handler(
 }
 
 // Get members of a team
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const members = await getTeamMembers(teamMember.team.slug);
@@ -44,7 +44,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Delete the member from the team
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { userId } = req.query as { userId: string };
@@ -89,13 +92,18 @@ const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse)
 
   recordMetric('member.removed');
 
-  console.log(`[Team] member removed, userId: ${userId}, teamId: ${teamMember.teamId}, removedBy: ${user.id}`);
+  console.log(
+    `[Team] member removed, userId: ${userId}, teamId: ${teamMember.teamId}, removedBy: ${user.id}`
+  );
 
   res.status(200).json({ data: {} });
 };
 
 // Leave a team
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const totalTeamOwners = await prisma.teamMember.count({
@@ -117,7 +125,10 @@ const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Update the role of a member
-const handlePATCH = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePATCH = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { memberId, role } = req.body as { memberId: string; role: Role };

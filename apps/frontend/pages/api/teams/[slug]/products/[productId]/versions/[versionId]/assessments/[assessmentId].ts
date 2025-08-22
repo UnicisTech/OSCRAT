@@ -25,7 +25,10 @@ export default function handler(
 }
 
 // Get assessment detail
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { versionId, assessmentId } = req.query;
@@ -46,7 +49,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Delete assessment
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { versionId, assessmentId } = req.query;

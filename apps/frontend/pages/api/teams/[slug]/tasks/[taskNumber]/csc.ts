@@ -25,7 +25,10 @@ export default function handler(
   }
 }
 
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { slug, taskNumber } = req.query;

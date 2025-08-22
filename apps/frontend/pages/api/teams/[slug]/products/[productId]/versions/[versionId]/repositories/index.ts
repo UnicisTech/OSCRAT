@@ -26,7 +26,10 @@ export default function handler(
 }
 
 // Get repository for a version
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;
@@ -45,7 +48,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Create a new repository
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;
@@ -58,7 +64,9 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
     repositoryData
   );
 
-  console.log(`[OSCRAT] repository created, repositoryId: ${repository.id}, name: ${repositoryData.name}, versionId: ${versionId}`);
+  console.log(
+    `[OSCRAT] repository created, repositoryId: ${repository.id}, name: ${repositoryData.name}, versionId: ${versionId}`
+  );
 
   res.status(201).json({ data: repository });
 };

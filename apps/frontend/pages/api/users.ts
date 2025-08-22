@@ -8,10 +8,7 @@ import { getUser } from 'models/user';
 import { UserReturned } from 'types';
 import { withApiHandler } from '@/lib/middleware';
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
@@ -76,7 +73,9 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     data: toUpdate,
   });
 
-  console.log(`[User] profile updated, userId: ${user.id}, fields: ${Object.keys(toUpdate).join(',')}`);
+  console.log(
+    `[User] profile updated, userId: ${user.id}, fields: ${Object.keys(toUpdate).join(',')}`
+  );
 
   recordMetric('user.updated');
 

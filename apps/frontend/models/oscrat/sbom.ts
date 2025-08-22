@@ -1,4 +1,8 @@
-import type { WorkerJob, SbomWorkerJob, RepoGenerateSbomResult } from '@oscrat/model';
+import type {
+  WorkerJob,
+  SbomWorkerJob,
+  RepoGenerateSbomResult,
+} from '@oscrat/model';
 
 /**
  * Helper to create SBOM job for a repository

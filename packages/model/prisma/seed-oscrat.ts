@@ -19,7 +19,8 @@ const prisma = new PrismaClient();
 const sampleProducts = [
   {
     name: 'SecureConnect IoT Gateway',
-    description: 'Enterprise-grade IoT gateway solution providing secure connectivity and device management for industrial IoT deployments.',
+    description:
+      'Enterprise-grade IoT gateway solution providing secure connectivity and device management for industrial IoT deployments.',
     type: OscratProductType.IOT_DEVICE,
     productCategory: OscratProductCategory.IMPORTANT_CLASS_I,
     complianceStatus: OscratProductComplianceStatus.COMPLIANT,
@@ -28,7 +29,8 @@ const sampleProducts = [
   },
   {
     name: 'SmartHome Controller Pro',
-    description: 'Advanced home automation controller supporting multiple protocols and seamless integration with popular smart home ecosystems.',
+    description:
+      'Advanced home automation controller supporting multiple protocols and seamless integration with popular smart home ecosystems.',
     type: OscratProductType.SMART_HOME_DEVICE,
     productCategory: OscratProductCategory.DEFAULT,
     complianceStatus: OscratProductComplianceStatus.IN_PROGRESS,
@@ -37,7 +39,8 @@ const sampleProducts = [
   },
   {
     name: 'Industrial Monitoring System',
-    description: 'Real-time monitoring and control system for critical industrial infrastructure with built-in redundancy and failover capabilities.',
+    description:
+      'Real-time monitoring and control system for critical industrial infrastructure with built-in redundancy and failover capabilities.',
     type: OscratProductType.INDUSTRIAL_DEVICE,
     productCategory: OscratProductCategory.CRITICAL,
     complianceStatus: OscratProductComplianceStatus.CERTIFIED,
@@ -46,7 +49,8 @@ const sampleProducts = [
   },
   {
     name: 'CyberShield Security Suite',
-    description: 'Comprehensive cybersecurity platform offering threat detection, vulnerability management, and incident response capabilities.',
+    description:
+      'Comprehensive cybersecurity platform offering threat detection, vulnerability management, and incident response capabilities.',
     type: OscratProductType.SECURITY_SOFTWARE,
     productCategory: OscratProductCategory.IMPORTANT_CLASS_II,
     complianceStatus: OscratProductComplianceStatus.COMPLIANT,
@@ -55,7 +59,8 @@ const sampleProducts = [
   },
   {
     name: 'EdgeDevice Firmware v2.1',
-    description: 'Optimized firmware for edge computing devices with enhanced security features and improved resource management.',
+    description:
+      'Optimized firmware for edge computing devices with enhanced security features and improved resource management.',
     type: OscratProductType.FIRMWARE,
     productCategory: OscratProductCategory.DEFAULT,
     complianceStatus: OscratProductComplianceStatus.NOT_ASSESSED,
@@ -64,7 +69,8 @@ const sampleProducts = [
   },
   {
     name: 'CloudConnector API Platform',
-    description: 'Scalable API management platform enabling secure cloud connectivity and data integration across hybrid environments.',
+    description:
+      'Scalable API management platform enabling secure cloud connectivity and data integration across hybrid environments.',
     type: OscratProductType.APPLICATION_SOFTWARE,
     productCategory: OscratProductCategory.IMPORTANT_CLASS_I,
     complianceStatus: OscratProductComplianceStatus.PENDING_CERTIFICATION,
@@ -378,7 +384,7 @@ const sampleTaxIds = [
 const sampleAddresses = [
   '123 Innovation Street, Tech District, Brussels 1000, Belgium',
   '456 Silicon Avenue, San Francisco, CA 94105, USA',
-  '789 Cyber Lane, London EC1A 1BB, United Kingdom', 
+  '789 Cyber Lane, London EC1A 1BB, United Kingdom',
   '321 Security Boulevard, Berlin 10115, Germany',
   '654 Digital Plaza, Amsterdam 1012 AB, Netherlands',
   '987 Tech Park, Stockholm 111 21, Sweden',
@@ -421,8 +427,9 @@ const sampleAdditionalInfo = [
 
 /** Generate random organization contact data */
 function generateRandomOrganizationData() {
-  const getRandomItem = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
-  
+  const getRandomItem = <T>(array: T[]): T =>
+    array[Math.floor(Math.random() * array.length)];
+
   return {
     taxId: getRandomItem(sampleTaxIds),
     postalAddress: getRandomItem(sampleAddresses),
@@ -437,38 +444,36 @@ async function seedOscratData(teamSlug: string) {
     // Find team by slug (unified Team/Organization model)
     const team = await prisma.team.findUnique({
       where: { slug: teamSlug },
-      select: { 
-        id: true, 
-        name: true, 
+      select: {
+        id: true,
+        name: true,
         members: {
           where: { role: 'OWNER' },
           select: { userId: true },
-          take: 1
-        }
+          take: 1,
+        },
       },
     });
 
     if (!team) {
-      throw new Error(
-        `Team with slug "${teamSlug}" not found.`
-      );
+      throw new Error(`Team with slug "${teamSlug}" not found.`);
     }
 
     const targetTeamId = team.id;
     const targetUserId = team.members[0]?.userId;
-    
+
     if (!targetUserId) {
       throw new Error(`No owner found for team "${teamSlug}".`);
     }
 
-    console.log(
-      `Seeding OSCRAT data for team: ${team.name} (${targetTeamId})`
-    );
+    console.log(`Seeding OSCRAT data for team: ${team.name} (${targetTeamId})`);
     console.log(`Using creator: ${targetUserId}`);
 
     // Generate and update team with random organization contact data
     const organizationData = generateRandomOrganizationData();
-    console.log('Updating team with random organization contact information...');
+    console.log(
+      'Updating team with random organization contact information...'
+    );
     await prisma.team.update({
       where: { id: targetTeamId },
       data: {
@@ -814,9 +819,7 @@ What gets created:
 
   if (!teamSlug) {
     console.error('Error: Team slug is required.');
-    console.log(
-      'Usage: pnpm tsx prisma/seed-oscrat.ts <teamSlug>'
-    );
+    console.log('Usage: pnpm tsx prisma/seed-oscrat.ts <teamSlug>');
     console.log('Run with --help for more information.');
     process.exit(1);
   }

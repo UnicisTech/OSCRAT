@@ -5,10 +5,7 @@ import { ApiError } from '@/lib/errors';
 import { recordMetric } from '@/lib/metrics';
 import { withApiHandler } from '@/lib/middleware';
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {

@@ -4,10 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withApiHandler } from '@/lib/middleware';
 import { ApiError } from '@/lib/errors';
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!env.teamFeatures.sso) {
     throw new ApiError(404, 'Not Found');
   }

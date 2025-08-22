@@ -14,9 +14,7 @@ export const oscratProjectEndpoints = {
     api.post<OscratProductDetail>(`/teams/${teamId}/products`, data),
 
   getProjectDetail: (teamId: string, projectId: string) =>
-    api.get<OscratProductDetail>(
-      `/teams/${teamId}/products/${projectId}`
-    ),
+    api.get<OscratProductDetail>(`/teams/${teamId}/products/${projectId}`),
 
   updateProject: (
     teamId: string,

@@ -1,15 +1,17 @@
 import { slugify } from '@/lib/common';
 import { ApiError } from '@/lib/errors';
 import { createTeam, getTeams, isTeamExists } from 'models/team';
-import { withTeamAuth, withUserAuth, type AuthenticatedTeamRequest, type AuthenticatedUserRequest } from '@/lib/middleware';
+import {
+  withTeamAuth,
+  withUserAuth,
+  type AuthenticatedTeamRequest,
+  type AuthenticatedUserRequest,
+} from '@/lib/middleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { TeamCreateData, TeamCreateRequest } from '@oscrat/model';
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
@@ -24,7 +26,10 @@ export default function handler(
 }
 
 // Get teams
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const teams = await getTeams(user.id);
@@ -35,7 +40,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Create a team
-const handlePOST = async (req: AuthenticatedUserRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedUserRequest,
+  res: NextApiResponse
+) => {
   const requestData: TeamCreateRequest = req.body;
   const { user } = req.userContext;
 
@@ -60,7 +68,9 @@ const handlePOST = async (req: AuthenticatedUserRequest, res: NextApiResponse) =
 
   const team = await createTeam(teamData);
 
-  console.log(`[Team] created, teamId: ${team.id}, name: ${requestData.name}, slug: ${slug}, ownerId: ${user.id}`);
+  console.log(
+    `[Team] created, teamId: ${team.id}, name: ${requestData.name}, slug: ${slug}, ownerId: ${user.id}`
+  );
 
   recordMetric('team.created');
 

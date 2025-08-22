@@ -1,7 +1,4 @@
-import {
-  getSbomWorkerJobs,
-  createSbomJob,
-} from '@oscrat/model/operations';
+import { getSbomWorkerJobs, createSbomJob } from '@oscrat/model/operations';
 import { prisma } from '@/lib/prisma';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
@@ -25,7 +22,10 @@ export default function handler(
 }
 
 // Get SBOM jobs for a version
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { slug: teamId, versionId } = req.query;
 
   const jobs = await getSbomWorkerJobs(
@@ -34,13 +34,18 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
     versionId as string
   );
 
-  console.log(`[SBOM] jobs listed, teamId: ${teamId}, versionId: ${versionId}, count: ${jobs.length}`);
+  console.log(
+    `[SBOM] jobs listed, teamId: ${teamId}, versionId: ${versionId}, count: ${jobs.length}`
+  );
 
   res.status(200).json({ data: jobs });
 };
 
 // Create a new SBOM generation job
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
   const { slug: teamId, versionId } = req.query;
   const { repositoryId } = req.body;
@@ -55,7 +60,9 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
     teamId: teamId as string,
   });
 
-  console.log(`[SBOM] job created, jobId: ${job.id}, repositoryId: ${repositoryId}, teamId: ${teamId}, versionId: ${versionId}, triggeredBy: ${teamMember.userId}`);
+  console.log(
+    `[SBOM] job created, jobId: ${job.id}, repositoryId: ${repositoryId}, teamId: ${teamId}, versionId: ${versionId}, triggeredBy: ${teamMember.userId}`
+  );
 
   res.status(201).json({ data: job });
 };

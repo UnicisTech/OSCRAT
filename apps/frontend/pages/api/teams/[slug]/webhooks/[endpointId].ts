@@ -31,7 +31,10 @@ export default function handler(
 }
 
 // Get a Webhook
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { endpointId } = req.query as {
@@ -52,7 +55,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Update a Webhook
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { endpointId } = req.query as {

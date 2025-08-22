@@ -14,10 +14,7 @@ const limiter = rateLimit({
   uniqueTokenPerInterval: 500, // Max 500 requests per second
 });
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   try {

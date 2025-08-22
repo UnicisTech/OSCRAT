@@ -153,7 +153,6 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
                 rows={3}
               />
             </div>
-
           </main>
           <footer className="flex items-center justify-end space-x-3 rounded-b-lg border-t border-gray-200 bg-gray-50 p-4">
             <button

@@ -3,10 +3,7 @@ import jackson from '@/lib/jackson';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withApiHandler } from '@/lib/middleware';
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
@@ -44,7 +41,9 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const profile = await oauthController.userInfo(token);
 
-  console.log(`[Auth] OAuth userinfo success, userId: ${profile.id || 'unknown'}`);
+  console.log(
+    `[Auth] OAuth userinfo success, userId: ${profile.id || 'unknown'}`
+  );
 
   res.json(profile);
 };

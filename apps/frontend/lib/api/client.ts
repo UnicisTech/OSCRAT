@@ -14,12 +14,12 @@ class ApiClient {
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     try {
       const { data } = await this.client.get<ApiResponse<T>>(url, config);
-      
+
       // For blob responses, return raw data directly
       if (config?.responseType === 'blob') {
         return data as T;
       }
-      
+
       if (data.error) {
         throw data.error;
       }

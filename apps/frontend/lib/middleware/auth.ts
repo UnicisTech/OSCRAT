@@ -25,7 +25,10 @@ export interface AuthenticatedUserRequest extends NextApiRequest {
 }
 
 /** Get team member for a user and team slug */
-export const getTeamMember = async (userId: string, slug: string): Promise<TeamMemberDetail | null> => {
+export const getTeamMember = async (
+  userId: string,
+  slug: string
+): Promise<TeamMemberDetail | null> => {
   return await TeamOps.getTeamMember(prisma, userId, slug);
 };
 
@@ -65,12 +68,14 @@ export function createMiddleware<T = any>(
     return async (req: NextApiRequest, res: NextApiResponse<T>) => {
       const { method, url } = req;
       const requestId = randomUUID().slice(0, 8);
-      
+
       // Set security headers
       res.setHeader('X-Content-Type-Options', 'nosniff');
       res.setHeader('X-Frame-Options', 'DENY');
-      
-      console.log(`[API] ${method} ${url} start, ${logPrefix}, id: ${requestId}`);
+
+      console.log(
+        `[API] ${method} ${url} start, ${logPrefix}, id: ${requestId}`
+      );
 
       try {
         let context;
@@ -80,16 +85,21 @@ export function createMiddleware<T = any>(
             contextAttacher(req, context);
           }
         }
-        
+
         await handler(req, res);
-        
+
         const userLog = context?.user?.id ? `, user: ${context.user.id}` : '';
-        console.log(`[API] ${method} ${url} success${userLog}, id: ${requestId}`);
+        console.log(
+          `[API] ${method} ${url} success${userLog}, id: ${requestId}`
+        );
       } catch (error: any) {
         const message = error.message || 'Something went wrong';
-        const status = error.status || (error.message === 'Unauthorized' ? 401 : 500);
-        
-        console.log(`[API Error] ${method} ${url} failed, error: ${message}, id: ${requestId}`);
+        const status =
+          error.status || (error.message === 'Unauthorized' ? 401 : 500);
+
+        console.log(
+          `[API Error] ${method} ${url} failed, error: ${message}, id: ${requestId}`
+        );
         res.status(status).json({ error: { message } } as T);
       }
     };
@@ -97,56 +107,73 @@ export function createMiddleware<T = any>(
 }
 
 /** Team authentication middleware */
-export function withTeamAuth<T = any>(
-  resourceAction?: [Resource, Action]
-) {
-  return (handler: (req: AuthenticatedTeamRequest, res: NextApiResponse<T>) => Promise<void>) => {
+export function withTeamAuth<T = any>(resourceAction?: [Resource, Action]) {
+  return (
+    handler: (
+      req: AuthenticatedTeamRequest,
+      res: NextApiResponse<T>
+    ) => Promise<void>
+  ) => {
     const authFn = async (req: NextApiRequest, res: NextApiResponse) => {
       const teamContext = await getAuthenticatedTeamContext(req, res);
-      
+
       // Check permissions if resource/action specified
       if (resourceAction) {
         const [resource, action] = resourceAction;
         throwIfNotAllowed(teamContext.teamMember, resource, action);
       }
-      
+
       return teamContext;
     };
-    
-    const contextAttacher = (req: NextApiRequest, context: AuthenticatedTeamContext) => {
+
+    const contextAttacher = (
+      req: NextApiRequest,
+      context: AuthenticatedTeamContext
+    ) => {
       (req as AuthenticatedTeamRequest).teamContext = context;
     };
-    
+
     return createMiddleware<T>(authFn, contextAttacher, 'team')(handler);
   };
 }
 
-
 /** User-only authentication middleware (no team membership required) */
 export function withUserAuth<T = any>() {
-  return (handler: (req: AuthenticatedUserRequest, res: NextApiResponse<T>) => Promise<void>) => {
+  return (
+    handler: (
+      req: AuthenticatedUserRequest,
+      res: NextApiResponse<T>
+    ) => Promise<void>
+  ) => {
     const authFn = async (req: NextApiRequest, res: NextApiResponse) => {
       const session = await getSession(req, res);
-      
+
       if (!session) {
         throw new Error('Unauthorized');
       }
-      
+
       return {
         user: session.user,
       } as AuthenticatedUserContext;
     };
-    
-    const contextAttacher = (req: NextApiRequest, context: AuthenticatedUserContext) => {
+
+    const contextAttacher = (
+      req: NextApiRequest,
+      context: AuthenticatedUserContext
+    ) => {
       (req as AuthenticatedUserRequest).userContext = context;
     };
-    
+
     return createMiddleware<T>(authFn, contextAttacher, 'user-auth')(handler);
   };
 }
 
 /** Check if role has permission for resource and action */
-export const isAllowed = (role: Role, resource: Resource, action: Action): boolean => {
+export const isAllowed = (
+  role: Role,
+  resource: Resource,
+  action: Action
+): boolean => {
   const rolePermissions = permissions[role];
 
   if (!rolePermissions) {
@@ -176,4 +203,3 @@ export const throwIfNotAllowed = (
 
   throw new Error(`You are not allowed to perform ${action} on ${resource}`);
 };
-

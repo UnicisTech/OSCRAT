@@ -230,7 +230,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session && token.sub) {
         session.user.id = token.sub;
-        
+
         // Fetch complete user data from database
         try {
           const user = await getUser({ id: token.sub });

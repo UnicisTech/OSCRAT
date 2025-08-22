@@ -11,22 +11,16 @@ interface FileTableProps {
   onDeleteFile?: (fileId: string) => void;
 }
 
-const FileTable: React.FC<FileTableProps> = ({ 
-  attachments, 
-  onAddFileClick, 
-  onDownloadFile, 
-  onDeleteFile 
+const FileTable: React.FC<FileTableProps> = ({
+  attachments,
+  onAddFileClick,
+  onDownloadFile,
+  onDeleteFile,
 }) => {
   const { t, ready } = useTranslation('common');
   if (!ready) return null;
 
-  const tableHeaders = [
-    'Name',
-    'Description',
-    'Date Added',
-    'Added by',
-    '',
-  ];
+  const tableHeaders = ['Name', 'Description', 'Date Added', 'Added by', ''];
 
   return (
     <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
@@ -52,22 +46,32 @@ const FileTable: React.FC<FileTableProps> = ({
           </thead>
           <tbody>
             {attachments.map((attachment) => (
-              <tr key={attachment.id} className="border-b bg-white hover:bg-gray-50">
+              <tr
+                key={attachment.id}
+                className="border-b bg-white hover:bg-gray-50"
+              >
                 <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
                   {attachment.name}
                 </td>
-                <td className="px-6 py-4">{attachment.description || 'No description'}</td>
-                <td className="px-6 py-4">{new Date(attachment.createdAt).toLocaleDateString('en-GB')}</td>
                 <td className="px-6 py-4">
-                  {attachment.createdByUser ? 
-                    `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() || 
-                    attachment.createdByUser.name : 'Unknown'}
+                  {attachment.description || 'No description'}
+                </td>
+                <td className="px-6 py-4">
+                  {new Date(attachment.createdAt).toLocaleDateString('en-GB')}
+                </td>
+                <td className="px-6 py-4">
+                  {attachment.createdByUser
+                    ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
+                      attachment.createdByUser.name
+                    : 'Unknown'}
                 </td>
                 <td className="px-6 py-4 text-center">
                   <div className="flex gap-2">
                     {onDownloadFile && (
                       <button
-                        onClick={() => onDownloadFile(attachment.id, attachment.name)}
+                        onClick={() =>
+                          onDownloadFile(attachment.id, attachment.name)
+                        }
                         className="text-blue-600 hover:text-blue-800"
                         title="Download"
                       >

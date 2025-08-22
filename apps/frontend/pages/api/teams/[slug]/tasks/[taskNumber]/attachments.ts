@@ -38,7 +38,10 @@ export default function handler(
 }
 
 // Get task attachments
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
   const { slug, taskNumber } = req.query;
 
@@ -70,7 +73,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Upload an attachment
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   try {
@@ -86,7 +92,9 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
         const uploadParams = {
           taskId: Number(taskId),
           file: file[0],
-          description: Array.isArray(description) ? description[0] : description,
+          description: Array.isArray(description)
+            ? description[0]
+            : description,
           createdBy: teamMember.userId,
         };
 
@@ -96,12 +104,18 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
         console.error('Failed to save file as attachment:', error);
         res
           .status(500)
-          .json({ data: null, error: { message: 'Failed to save file as attachment.' } });
+          .json({
+            data: null,
+            error: { message: 'Failed to save file as attachment.' },
+          });
       }
     } else {
       res
         .status(400)
-        .json({ data: null, error: { message: 'Not supported type of file.' } });
+        .json({
+          data: null,
+          error: { message: 'Not supported type of file.' },
+        });
     }
   } catch (e) {
     res.status(400).json({
@@ -113,7 +127,10 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
 
 // Delete an attachment
 
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { id } = req.query;

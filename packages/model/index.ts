@@ -53,11 +53,8 @@ export * from './types/jobPayloads';
 // Export specific operation types needed by frontend
 export type { SbomWorkerJob } from './operations/workerJob';
 export type { SbomReportSummary } from './operations/sbomReport';
-export type { 
-  CreateFileParams,
-  FileData
-} from './operations/file';
+export type { CreateFileParams, FileData } from './operations/file';
 export type {
   AttachmentWithFile,
-  CreateAttachmentParams
+  CreateAttachmentParams,
 } from './operations/attachment';

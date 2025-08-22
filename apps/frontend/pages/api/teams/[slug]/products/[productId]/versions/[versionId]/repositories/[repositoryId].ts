@@ -30,7 +30,10 @@ export default function handler(
 }
 
 // Get repository detail
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { repositoryId } = req.query;
@@ -51,7 +54,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Update repository
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { repositoryId } = req.query;
@@ -68,7 +74,10 @@ const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Delete repository
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { repositoryId } = req.query;

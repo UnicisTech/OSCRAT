@@ -25,7 +25,10 @@ export default function handler(
 }
 
 // Get version detail
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;
@@ -45,7 +48,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Update version
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;
@@ -67,7 +73,10 @@ const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Delete version
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;

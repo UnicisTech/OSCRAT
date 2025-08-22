@@ -23,11 +23,7 @@ interface TeamContextType {
 
 const TeamContext = createContext<TeamContextType | undefined>(undefined);
 
-export const TeamContextProvider = ({ 
-  children 
-}: { 
-  children: ReactNode;
-}) => {
+export const TeamContextProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const teamSlug = router.query.slug as string;
 

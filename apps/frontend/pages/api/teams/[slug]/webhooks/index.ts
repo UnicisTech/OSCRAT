@@ -36,7 +36,10 @@ export default function handler(
 }
 
 // Create a Webhook endpoint
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { name, url, eventTypes } = req.body;
@@ -70,13 +73,18 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
 
   recordMetric('webhook.created');
 
-  console.log(`[Webhook] created, endpointId: ${endpoint?.id}, url: ${url}, teamId: ${teamMember.team.id}, createdBy: ${user.id}`);
+  console.log(
+    `[Webhook] created, endpointId: ${endpoint?.id}, url: ${url}, teamId: ${teamMember.team.id}, createdBy: ${user.id}`
+  );
 
   res.status(200).json({ data: endpoint });
 };
 
 // Get all webhooks created by a team
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const app = await findOrCreateApp(teamMember.team.name, teamMember.team.id);
@@ -93,7 +101,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Delete a webhook
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { webhookId } = req.query as { webhookId: string };

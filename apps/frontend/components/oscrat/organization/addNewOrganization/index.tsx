@@ -4,7 +4,11 @@ import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
 import { InputField, TextareaField, RadioGroup } from './components';
-import { OscratOrganizationType, OscratOrganizationSize, TeamCreateRequest } from '@oscrat/model';
+import {
+  OscratOrganizationType,
+  OscratOrganizationSize,
+  TeamCreateRequest,
+} from '@oscrat/model';
 
 const OrganizationForm = ({ visible, setVisible }) => {
   const { t, ready } = useTranslation('common');

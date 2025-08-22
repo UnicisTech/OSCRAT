@@ -4,10 +4,7 @@ import { recordMetric } from '@/lib/metrics';
 import { ApiError } from '@/lib/errors';
 import { withApiHandler } from '@/lib/middleware';
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
@@ -31,7 +28,9 @@ const handleGET = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   recordMetric('invitation.fetched');
-  console.log(`[Invitation] fetched, token: ${token}, teamId: ${invitation.teamId}`);
+  console.log(
+    `[Invitation] fetched, token: ${token}, teamId: ${invitation.teamId}`
+  );
 
   res.status(200).json({ data: invitation });
 };

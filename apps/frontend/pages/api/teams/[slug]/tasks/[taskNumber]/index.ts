@@ -24,7 +24,10 @@ export default function handler(
 }
 
 // Get task by slug and taskNumber
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
@@ -44,7 +47,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Edit a task
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
@@ -63,13 +69,18 @@ const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 
   await sendEvent(teamMember.teamId, 'task.updated', task);
 
-  console.log(`[Task] updated, taskId: ${task.id}, taskNumber: ${taskNumber}, teamId: ${teamMember.teamId}`);
+  console.log(
+    `[Task] updated, taskId: ${task.id}, taskNumber: ${taskNumber}, teamId: ${teamMember.teamId}`
+  );
 
   return res.status(200).json({ data: task, error: null });
 };
 
 // Delete the task
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
@@ -88,7 +99,9 @@ const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse)
 
   await sendEvent(teamMember.teamId, 'task.deleted', task);
 
-  console.log(`[Task] deleted, taskId: ${task.id}, taskNumber: ${taskNumber}, teamId: ${teamMember.teamId}`);
+  console.log(
+    `[Task] deleted, taskId: ${task.id}, taskNumber: ${taskNumber}, teamId: ${teamMember.teamId}`
+  );
 
   return res.status(200).json({ data: {}, error: null });
 };

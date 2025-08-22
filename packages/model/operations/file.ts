@@ -100,4 +100,3 @@ export const deleteFile = async (
 
   console.log(`[File Operations] File deleted: ${fileId}`);
 };
-

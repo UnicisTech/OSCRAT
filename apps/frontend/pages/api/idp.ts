@@ -3,10 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { withApiHandler } from '@/lib/middleware';
 import { ApiError } from '@/lib/errors';
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   if (method !== 'GET') {
@@ -16,7 +13,7 @@ async function handler(
 
   const { directorySync } = await jackson();
   const providers = directorySync.providers();
-  
+
   console.log('[IDP] providers fetched');
   res.status(200).json({ data: providers });
 }

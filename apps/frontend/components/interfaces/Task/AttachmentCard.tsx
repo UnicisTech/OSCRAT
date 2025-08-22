@@ -54,9 +54,11 @@ export default function AttachmentsCard({
             <path d="M11 16a1 1 0 0 1 2 0v.01a1 1 0 0 1-2 0V16z" />
           </svg>
           <div className="flex flex-col">
-            <p className="hover:underline font-medium">{attachment.name}</p>
+            <p className="font-medium hover:underline">{attachment.name}</p>
             {attachment.description && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">{attachment.description}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {attachment.description}
+              </p>
             )}
             <p className="text-xs text-gray-400">
               {(attachment.fileSize / 1024).toFixed(1)} KB

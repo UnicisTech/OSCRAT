@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import * as AttachmentOps from '@oscrat/model/operations/attachment';
-import { parseFormData, validateFile, extractFileData } from '@/lib/utils/fileUpload';
+import {
+  parseFormData,
+  validateFile,
+  extractFileData,
+} from '@/lib/utils/fileUpload';
 import formidable from 'formidable';
 import { v4 as uuidv4 } from 'uuid';
 import type { Attachment } from '@oscrat/model';
@@ -13,7 +17,9 @@ export interface CreateVersionAttachmentParams {
   description?: string;
 }
 
-export const createVersionAttachment = async (params: CreateVersionAttachmentParams) => {
+export const createVersionAttachment = async (
+  params: CreateVersionAttachmentParams
+) => {
   return await AttachmentOps.createAttachment(prisma, {
     name: params.filename,
     description: params.description,
@@ -24,11 +30,15 @@ export const createVersionAttachment = async (params: CreateVersionAttachmentPar
   });
 };
 
-export const getVersionAttachments = async (versionId: string): Promise<Attachment[]> => {
+export const getVersionAttachments = async (
+  versionId: string
+): Promise<Attachment[]> => {
   return await AttachmentOps.getVersionAttachments(prisma, versionId);
 };
 
-export const getVersionAttachmentById = async (attachmentId: string): Promise<Attachment | null> => {
+export const getVersionAttachmentById = async (
+  attachmentId: string
+): Promise<Attachment | null> => {
   return await AttachmentOps.getAttachmentById(prisma, attachmentId);
 };
 
@@ -36,7 +46,9 @@ export const getVersionAttachmentWithData = async (attachmentId: string) => {
   return await AttachmentOps.getAttachmentWithFileById(prisma, attachmentId);
 };
 
-export const deleteVersionAttachment = async (attachmentId: string): Promise<void> => {
+export const deleteVersionAttachment = async (
+  attachmentId: string
+): Promise<void> => {
   return await AttachmentOps.deleteAttachment(prisma, attachmentId);
 };
 
@@ -50,7 +62,9 @@ export interface UploadVersionAttachmentParams {
   description?: string;
 }
 
-export const saveFileAsVersionAttachment = async (params: UploadVersionAttachmentParams): Promise<string> => {
+export const saveFileAsVersionAttachment = async (
+  params: UploadVersionAttachmentParams
+): Promise<string> => {
   const fileUpload = await extractFileData(params.file);
   const attachmentId = uuidv4();
 

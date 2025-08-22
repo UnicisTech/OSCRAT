@@ -355,7 +355,7 @@ export const createProductRepository = async (
 ): Promise<OscratRepositoryDetail> => {
   // Find the active version of the product
   const product = await prisma.oscratProduct.findFirst({
-    where: { 
+    where: {
       id: productId,
       teamId,
     },

@@ -101,15 +101,16 @@ export const getTeamWithProducts = async (slug: string) => {
 
 // Get products for a team (throws if team not found)
 export const getTeamProducts = async (slug: string) => {
-  const teamWithProducts = await TeamOps.getTeamWithProductsSummary(prisma, { slug });
-  
+  const teamWithProducts = await TeamOps.getTeamWithProductsSummary(prisma, {
+    slug,
+  });
+
   if (!teamWithProducts) {
     throw new Error(`Team with slug '${slug}' not found`);
   }
-  
+
   return teamWithProducts.products;
 };
-
 
 export const getCscStatusesBySlug = async (slug: string) => {
   const team = await prisma.team.findUniqueOrThrow({

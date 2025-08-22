@@ -20,7 +20,10 @@ export default function handler(
   }
 }
 
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
   const { attachmentId } = req.query;
 

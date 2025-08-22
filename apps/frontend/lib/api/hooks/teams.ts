@@ -31,8 +31,7 @@ export function useTeamProducts(slug: string) {
 
 export function useCreateTeam() {
   return useMutation({
-    mutationFn: (data: TeamCreateRequest) =>
-      teamsEndpoints.create(data),
+    mutationFn: (data: TeamCreateRequest) => teamsEndpoints.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.teams.all });
     },
@@ -41,7 +40,8 @@ export function useCreateTeam() {
 
 export function useUpdateTeam(slug: string) {
   return useMutation({
-    mutationFn: (data: TeamSettingsUpdate) => teamsEndpoints.updateTeam(slug, data),
+    mutationFn: (data: TeamSettingsUpdate) =>
+      teamsEndpoints.updateTeam(slug, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.teams.detail(slug) });
       queryClient.invalidateQueries({ queryKey: queryKeys.teams.all });

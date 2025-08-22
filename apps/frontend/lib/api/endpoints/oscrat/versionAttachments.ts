@@ -2,7 +2,11 @@ import { api } from '@/lib/api/client';
 import type { Attachment } from '@/types';
 
 export const versionAttachmentsEndpoints = {
-  getVersionAttachments: (teamId: string, productId: string, versionId: string) =>
+  getVersionAttachments: (
+    teamId: string,
+    productId: string,
+    versionId: string
+  ) =>
     api.get<Attachment[]>(
       `/teams/${teamId}/products/${productId}/versions/${versionId}/attachments`
     ),
@@ -20,7 +24,6 @@ export const versionAttachmentsEndpoints = {
         headers: { 'Content-Type': 'multipart/form-data' },
       }
     ),
-
 
   deleteVersionAttachment: (
     teamId: string,

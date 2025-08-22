@@ -38,7 +38,10 @@ export default function handler(
 }
 
 // Get version attachments
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
   const { versionId } = req.query;
 
@@ -59,7 +62,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Upload a new attachment to version
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
   const { versionId } = req.query;
 
@@ -80,21 +86,21 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
         };
 
         const url = await saveFileAsVersionAttachment(uploadParams);
-        res.status(200).json({ 
-          data: { url }, 
-          error: null 
+        res.status(200).json({
+          data: { url },
+          error: null,
         });
       } catch (error) {
         console.error('Failed to save file as version attachment:', error);
-        res.status(500).json({ 
+        res.status(500).json({
           data: null,
-          error: { message: 'Failed to save file as attachment.' } 
+          error: { message: 'Failed to save file as attachment.' },
         });
       }
     } else {
-      res.status(400).json({ 
+      res.status(400).json({
         data: null,
-        error: { message: 'Not supported type of file.' } 
+        error: { message: 'Not supported type of file.' },
       });
     }
   } catch (e) {
@@ -107,7 +113,10 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
 };
 
 // Delete an attachment
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
   const { id } = req.query;
 
@@ -121,9 +130,9 @@ const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse)
 
     await deleteVersionAttachment(id as string);
 
-    return res.status(200).json({ 
-      data: {}, 
-      error: null 
+    return res.status(200).json({
+      data: {},
+      error: null,
     });
   } catch (error) {
     console.error('Error deleting attachment:', error);

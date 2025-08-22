@@ -1,9 +1,5 @@
 import { sendAudit } from '@/lib/retraced';
-import {
-  deleteTeam,
-  getTeam,
-  updateTeam,
-} from 'models/team';
+import { deleteTeam, getTeam, updateTeam } from 'models/team';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
@@ -33,7 +29,10 @@ export default function handler(
 }
 
 // Get a team by slug
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const team = await getTeam({ id: teamMember.teamId });
@@ -44,13 +43,20 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Update a team
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   // Cast to TeamSettingsUpdate - only user-editable fields
   const updateData = req.body as TeamSettingsUpdate;
 
-  if (updateData.domain && updateData.domain.length > 0 && !validateDomain(updateData.domain)) {
+  if (
+    updateData.domain &&
+    updateData.domain.length > 0 &&
+    !validateDomain(updateData.domain)
+  ) {
     throw new ApiError(400, 'Invalid domain name');
   }
 
@@ -70,7 +76,10 @@ const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Delete a team
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   await deleteTeam({ id: teamMember.teamId });

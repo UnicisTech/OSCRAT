@@ -72,13 +72,15 @@ const transformToSbomReportSummary = (
   versionId: report.versionId,
   productId: report.productId,
   sbomData: report.sbomData,
-  attachment: report.attachment ? {
-    id: report.attachment.id,
-    name: report.attachment.name,
-    description: report.attachment.description ?? undefined,
-    fileSize: report.attachment.fileSize,
-    mimeType: report.attachment.mimeType ?? undefined,
-  } : undefined,
+  attachment: report.attachment
+    ? {
+        id: report.attachment.id,
+        name: report.attachment.name,
+        description: report.attachment.description ?? undefined,
+        fileSize: report.attachment.fileSize,
+        mimeType: report.attachment.mimeType ?? undefined,
+      }
+    : undefined,
   job: {
     id: report.job.id,
     type: report.job.type,

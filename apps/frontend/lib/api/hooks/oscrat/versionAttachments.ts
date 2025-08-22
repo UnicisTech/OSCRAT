@@ -15,7 +15,11 @@ export function useGetVersionAttachments(
       versionId
     ),
     queryFn: () =>
-      versionAttachmentsEndpoints.getVersionAttachments(teamId, productId, versionId),
+      versionAttachmentsEndpoints.getVersionAttachments(
+        teamId,
+        productId,
+        versionId
+      ),
   });
 }
 
@@ -32,7 +36,7 @@ export function useUploadVersionAttachment(
       if (data.description) {
         formData.append('description', data.description);
       }
-      
+
       return versionAttachmentsEndpoints.uploadVersionAttachment(
         teamId,
         productId,
@@ -50,7 +54,6 @@ export function useUploadVersionAttachment(
     },
   });
 }
-
 
 // Delete version attachment
 export function useDeleteVersionAttachment(

@@ -389,7 +389,7 @@
       "to-generate-sbom": "To generate an SBOM, first define a repository in the Repository tab.",
       "create-organization": "Create Organization",
       "organization-type": "Organization Type",
-       "organization-size": "Organization Size",
+      "organization-size": "Organization Size",
       "organization-name": "Organization Name",
       "enter-organization-name": "Enter organization name",
       "organization-information": "Organization Information",

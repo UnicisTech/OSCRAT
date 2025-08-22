@@ -15,7 +15,7 @@ export interface CreateAttachmentParams {
   fileSize: number;
   mimeType?: string;
   createdBy: string;
-  
+
   // Only one entity association should be provided
   taskId?: number;
   versionId?: string;
@@ -89,7 +89,9 @@ export const getAttachmentWithFileById = async (
   prisma: PrismaClient,
   attachmentId: string
 ) => {
-  console.log(`[Attachment Operations] Getting attachment with file data: ${attachmentId}`);
+  console.log(
+    `[Attachment Operations] Getting attachment with file data: ${attachmentId}`
+  );
 
   return await prisma.attachment.findUnique({
     where: { id: attachmentId },
@@ -104,19 +106,23 @@ export const getTaskAttachments = async (
   prisma: PrismaClient,
   taskId: number
 ) => {
-  console.log(`[Attachment Operations] Getting attachments for task: ${taskId}`);
+  console.log(
+    `[Attachment Operations] Getting attachments for task: ${taskId}`
+  );
 
   const attachments = await prisma.attachment.findMany({
     where: { taskId },
     include: {
       createdByUser: {
-        select: { id: true, name: true, firstName: true, lastName: true }
-      }
+        select: { id: true, name: true, firstName: true, lastName: true },
+      },
     },
     orderBy: { createdAt: 'desc' },
   });
 
-  console.log(`[Attachment Operations] Found ${attachments.length} attachments for task ${taskId}`);
+  console.log(
+    `[Attachment Operations] Found ${attachments.length} attachments for task ${taskId}`
+  );
   return attachments;
 };
 
@@ -125,19 +131,23 @@ export const getVersionAttachments = async (
   prisma: PrismaClient,
   versionId: string
 ) => {
-  console.log(`[Attachment Operations] Getting attachments for version: ${versionId}`);
+  console.log(
+    `[Attachment Operations] Getting attachments for version: ${versionId}`
+  );
 
   const attachments = await prisma.attachment.findMany({
     where: { versionId },
     include: {
       createdByUser: {
-        select: { id: true, name: true, firstName: true, lastName: true }
-      }
+        select: { id: true, name: true, firstName: true, lastName: true },
+      },
     },
     orderBy: { createdAt: 'desc' },
   });
 
-  console.log(`[Attachment Operations] Found ${attachments.length} attachments for version ${versionId}`);
+  console.log(
+    `[Attachment Operations] Found ${attachments.length} attachments for version ${versionId}`
+  );
   return attachments;
 };
 
@@ -146,7 +156,9 @@ export const getSbomReportAttachment = async (
   prisma: PrismaClient,
   sbomReportId: string
 ) => {
-  console.log(`[Attachment Operations] Getting attachment for SBOM report: ${sbomReportId}`);
+  console.log(
+    `[Attachment Operations] Getting attachment for SBOM report: ${sbomReportId}`
+  );
 
   return await prisma.attachment.findUnique({
     where: { sbomReportId },
@@ -174,7 +186,9 @@ export const deleteAttachment = async (
       where: { id: attachmentId },
     });
 
-    console.log(`[Attachment Operations] Attachment and file deleted: ${attachmentId}`);
+    console.log(
+      `[Attachment Operations] Attachment and file deleted: ${attachmentId}`
+    );
   });
 };
 

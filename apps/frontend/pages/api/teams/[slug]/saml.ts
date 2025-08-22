@@ -33,7 +33,10 @@ export default function handler(
 }
 
 // Get the SAML connection for the team.
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { apiController } = await jackson();
@@ -47,7 +50,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Create a SAML connection for the team.
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { metadataUrl, encodedRawMetadata } = req.body;
@@ -73,7 +79,10 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
   res.status(201).json({ data: connection });
 };
 
-const handlePATCH = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePATCH = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const {
@@ -108,7 +117,10 @@ const handlePATCH = async (req: AuthenticatedTeamRequest, res: NextApiResponse) 
   res.status(200).json({ data: connection });
 };
 
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { clientID, clientSecret } = req.query as {

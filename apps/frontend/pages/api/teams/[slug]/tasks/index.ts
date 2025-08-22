@@ -22,7 +22,10 @@ export default function handler(
 }
 
 // Get team tasks
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const tasks = await getTeamTasks(teamMember.team.slug as string);
@@ -31,13 +34,14 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Create a task
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { title, status, duedate, description } = req.body;
-  const {
-    teamId,
-  } = teamMember;
+  const { teamId } = teamMember;
 
   const task = await createTask({
     authorId: user.id,

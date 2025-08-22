@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import * as AttachmentOps from '@oscrat/model/operations';
-import { parseFormData, validateFile, extractFileData } from '@/lib/utils/fileUpload';
+import {
+  parseFormData,
+  validateFile,
+  extractFileData,
+} from '@/lib/utils/fileUpload';
 import formidable from 'formidable';
 import { NextApiRequest } from 'next';
 import { v4 as uuidv4 } from 'uuid';

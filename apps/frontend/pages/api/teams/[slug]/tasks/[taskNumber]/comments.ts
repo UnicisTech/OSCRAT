@@ -31,7 +31,10 @@ export default function handler(
 }
 
 // Get comments for a task
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
@@ -54,7 +57,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Create a comment
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { slug, taskNumber } = req.query;
@@ -92,7 +98,10 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
 };
 
 // Edit a comment
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { text, id } = req.body;
@@ -111,7 +120,10 @@ const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Delete a comment
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { id } = req.body;

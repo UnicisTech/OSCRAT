@@ -70,7 +70,7 @@ export const popWorkerJob = async (
     const whereClause: Prisma.WorkerJobWhereInput = {
       status: WorkerJobStatus.PENDING,
     };
-    
+
     if (jobType) {
       whereClause.type = jobType;
     }
@@ -297,7 +297,7 @@ export const getProjectWorkerJobs = async (
       in: repositoryIdStrings,
     },
   };
-  
+
   if (type) {
     where.type = type;
   }
@@ -332,11 +332,11 @@ export const getWorkerJobs = async (
   limit: number = 50
 ) => {
   const where: Prisma.WorkerJobWhereInput = {};
-  
+
   if (status) {
     where.status = status;
   }
-  
+
   if (type) {
     where.type = type;
   }
@@ -381,7 +381,7 @@ export const getVersionWorkerJobs = async (
       in: repositoryIds,
     },
   };
-  
+
   if (type) {
     where.type = type;
   }
@@ -412,12 +412,14 @@ const transformToSbomWorkerJob = (
         versionId: job.sbomReport.versionId,
         productId: job.sbomReport.productId,
         sbomData: job.sbomReport.sbomData,
-        attachment: job.sbomReport.attachment ? {
-          id: job.sbomReport.attachment.id,
-          name: job.sbomReport.attachment.name,
-          fileSize: job.sbomReport.attachment.fileSize,
-          mimeType: job.sbomReport.attachment.mimeType ?? undefined,
-        } : undefined,
+        attachment: job.sbomReport.attachment
+          ? {
+              id: job.sbomReport.attachment.id,
+              name: job.sbomReport.attachment.name,
+              fileSize: job.sbomReport.attachment.fileSize,
+              mimeType: job.sbomReport.attachment.mimeType ?? undefined,
+            }
+          : undefined,
         job: {
           id: job.id,
           type: job.type,

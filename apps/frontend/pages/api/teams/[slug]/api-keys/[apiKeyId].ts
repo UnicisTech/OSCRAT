@@ -27,7 +27,10 @@ export default function handler(
 }
 
 // Delete an API key
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { apiKeyId } = req.query as { apiKeyId: string };

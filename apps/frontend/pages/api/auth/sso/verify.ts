@@ -5,10 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withApiHandler } from '@/lib/middleware';
 import { ApiError } from '@/lib/errors';
 
-async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
@@ -50,7 +47,9 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     throw new ApiError(404, 'No SSO connections found for this team.');
   }
 
-  console.log(`[Auth] SSO verify success, teamId: ${team.id}, connections: ${connections.length}`);
+  console.log(
+    `[Auth] SSO verify success, teamId: ${team.id}, connections: ${connections.length}`
+  );
 
   const data = {
     teamId: team.id,

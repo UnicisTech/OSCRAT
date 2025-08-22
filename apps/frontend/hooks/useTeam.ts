@@ -33,7 +33,6 @@ export function useTeam(slug: string) {
     error,
   } = useGetTeam(slug);
 
-
   // Team mutations
   const updateMutation = useUpdateTeam(slug);
   const deleteMutation = useDeleteTeam(slug);

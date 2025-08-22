@@ -30,7 +30,10 @@ export default function handler(
   }
 }
 
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { directorySync } = await jackson();
@@ -47,7 +50,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
   res.status(200).json({ data });
 };
 
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { name, provider } = req.body;
@@ -75,7 +81,10 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
   res.status(201).json({ data });
 };
 
-const handleDELETE = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleDELETE = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember, user } = req.teamContext;
 
   const { dsyncId } = req.query as { dsyncId: string };

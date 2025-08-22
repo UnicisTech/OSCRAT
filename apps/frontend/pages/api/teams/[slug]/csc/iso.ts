@@ -22,7 +22,10 @@ export default function handler(
   }
 }
 
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { slug } = req.query;
@@ -36,7 +39,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
   return res.status(200).json({ data: responce, error: null });
 };
 
-const handlePUT = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePUT = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { slug } = req.query;

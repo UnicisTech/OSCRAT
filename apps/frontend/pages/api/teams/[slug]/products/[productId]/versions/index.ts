@@ -22,7 +22,10 @@ export default function handler(
 }
 
 // Get all versions for a product
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { productId } = req.query;
@@ -33,7 +36,10 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Create version for a product
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const { productId } = req.query;
@@ -52,7 +58,9 @@ const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =
 
   const version = await createVersion(teamMember.teamId, createData);
 
-  console.log(`[OSCRAT] version created, versionId: ${version.id}, productId: ${productId}, version: ${versionData.version}, createdBy: ${teamMember.userId}`);
+  console.log(
+    `[OSCRAT] version created, versionId: ${version.id}, productId: ${productId}, version: ${versionData.version}, createdBy: ${teamMember.userId}`
+  );
 
   res.status(201).json({ data: version });
 };

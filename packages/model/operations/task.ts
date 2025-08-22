@@ -13,7 +13,8 @@ export const createTask = async (
     taskNumber: number;
   }
 ) => {
-  const { authorId, teamId, title, status, duedate, description, taskNumber } = param;
+  const { authorId, teamId, title, status, duedate, description, taskNumber } =
+    param;
 
   return await prisma.task.create({
     data: {

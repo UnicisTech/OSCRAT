@@ -78,9 +78,7 @@ export function matchesFilters(
 
 export function generateFilterOptions(products: OscratProductSummary[]) {
   const uniqueExternalReporting = Array.from(
-    new Set(
-      products.flatMap((p) => p.reportingOrganizations)
-    )
+    new Set(products.flatMap((p) => p.reportingOrganizations))
   );
 
   return {

@@ -22,7 +22,10 @@ export default function handler(
 }
 
 // Get all products
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const products = await getProducts(teamMember.teamId);
@@ -31,14 +34,19 @@ const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) =>
 };
 
 // Create product
-const handlePOST = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handlePOST = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { teamMember } = req.teamContext;
 
   const productData = req.body as OscratProductCreate;
 
   const product = await createProduct(teamMember.teamId, productData);
 
-  console.log(`[OSCRAT] product created, productId: ${product.id}, name: ${productData.name}, teamId: ${teamMember.teamId}`);
+  console.log(
+    `[OSCRAT] product created, productId: ${product.id}, name: ${productData.name}, teamId: ${teamMember.teamId}`
+  );
 
   res.status(201).json({ data: product });
 };

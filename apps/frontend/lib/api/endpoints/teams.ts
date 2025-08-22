@@ -1,11 +1,8 @@
-import {
-  TeamMemberWithUser,
-  TeamProperties,
-} from '@/types';
+import { TeamMemberWithUser, TeamProperties } from '@/types';
 import { api } from '@/lib/api/client';
-import { 
-  Team, 
-  TeamSummary, 
+import {
+  Team,
+  TeamSummary,
   TeamWithProducts,
   TeamSettingsUpdate,
   TeamCreateRequest,
@@ -16,12 +13,11 @@ import { Permission } from '@/lib/permissions';
 export const teamsEndpoints = {
   list: () => api.get<TeamSummary[]>('/teams'),
 
-  create: (data: TeamCreateRequest) =>
-    api.post<Team>('/teams', data),
+  create: (data: TeamCreateRequest) => api.post<Team>('/teams', data),
 
   getTeam: (slug: string) => api.get<Team>(`/teams/${slug}`),
-  
-  getTeamProducts: (slug: string) => 
+
+  getTeamProducts: (slug: string) =>
     api.get<OscratProductSummary[]>(`/teams/${slug}/products`),
 
   updateTeam: (slug: string, data: TeamSettingsUpdate) =>

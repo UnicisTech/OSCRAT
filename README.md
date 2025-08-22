@@ -126,6 +126,7 @@ pnpm db:studio
 ### Available Scripts
 
 #### Root Level
+
 - `pnpm dev` - Start all apps in development
 - `pnpm build` - Build all apps
 - `pnpm check-types` - Type check all packages
@@ -137,6 +138,7 @@ pnpm db:studio
 - `pnpm db:seed` - Seed database with test data
 
 #### Frontend Only
+
 - `pnpm frontend:dev` - Start frontend only
 - `pnpm frontend:build` - Build frontend only
 - `pnpm frontend:start` - Start frontend in production mode
