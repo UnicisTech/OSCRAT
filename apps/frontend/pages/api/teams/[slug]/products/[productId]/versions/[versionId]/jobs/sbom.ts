@@ -47,7 +47,7 @@ const handlePOST = async (
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-  const { slug: teamId, versionId } = req.query;
+  const { slug, versionId } = req.query;
   const { repositoryId } = req.body;
 
   if (!repositoryId) {
@@ -57,11 +57,11 @@ const handlePOST = async (
   const job = await createSbomJob(prisma, {
     repositoryId: repositoryId as string,
     triggeredByUserId: teamMember.userId,
-    teamId: teamId as string,
+    teamId: teamMember.teamId,
   });
 
   console.log(
-    `[SBOM] job created, jobId: ${job.id}, repositoryId: ${repositoryId}, teamId: ${teamId}, versionId: ${versionId}, triggeredBy: ${teamMember.userId}`
+    `[SBOM] job created, jobId: ${job.id}, repositoryId: ${repositoryId}, teamId: ${teamMember.teamId}, versionId: ${versionId}, triggeredBy: ${teamMember.userId}`
   );
 
   res.status(201).json({ data: job });

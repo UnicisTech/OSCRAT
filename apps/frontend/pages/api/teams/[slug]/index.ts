@@ -61,13 +61,13 @@ const handlePUT = async (
   }
 
   // Update team - Prisma will ignore undefined fields
-  const updatedTeam = await updateTeam(teamMember.team.slug, updateData);
+  const updatedTeam = await updateTeam(teamMember.teamSlug, updateData);
 
   sendAudit({
     action: 'team.update',
     crud: 'u',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   recordMetric('team.updated');
@@ -88,7 +88,7 @@ const handleDELETE = async (
     action: 'team.delete',
     crud: 'd',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   recordMetric('team.removed');

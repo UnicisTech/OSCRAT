@@ -44,7 +44,7 @@ const handlePOST = async (
 
   const { name, url, eventTypes } = req.body;
 
-  const app = await findOrCreateApp(teamMember.team.name, teamMember.team.id);
+  const app = await findOrCreateApp(teamMember.teamName, teamMember.teamId);
 
   // TODO: The endpoint URL must be HTTPS.
 
@@ -68,13 +68,13 @@ const handlePOST = async (
     action: 'webhook.create',
     crud: 'c',
     user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   recordMetric('webhook.created');
 
   console.log(
-    `[Webhook] created, endpointId: ${endpoint?.id}, url: ${url}, teamId: ${teamMember.team.id}, createdBy: ${user.id}`
+    `[Webhook] created, endpointId: ${endpoint?.id}, url: ${url}, teamId: ${teamMember.teamId}, createdBy: ${user.id}`
   );
 
   res.status(200).json({ data: endpoint });
@@ -87,7 +87,7 @@ const handleGET = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const app = await findOrCreateApp(teamMember.team.name, teamMember.team.id);
+  const app = await findOrCreateApp(teamMember.teamName, teamMember.teamId);
 
   if (!app) {
     throw new ApiError(400, 'Bad request. Please add a Svix API key.');
@@ -109,13 +109,13 @@ const handleDELETE = async (
 
   const { webhookId } = req.query as { webhookId: string };
 
-  const app = await findOrCreateApp(teamMember.team.name, teamMember.team.id);
+  const app = await findOrCreateApp(teamMember.teamName, teamMember.teamId);
 
   if (!app) {
     throw new ApiError(400, 'Bad request.');
   }
 
-  if (app.uid != teamMember.team.id) {
+  if (app.uid != teamMember.teamId) {
     throw new ApiError(400, 'Bad request.');
   }
 
@@ -125,7 +125,7 @@ const handleDELETE = async (
     action: 'webhook.delete',
     crud: 'd',
     user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   recordMetric('webhook.removed');

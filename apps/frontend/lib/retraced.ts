@@ -1,9 +1,10 @@
-import type { Team } from '@oscrat/model';
 import { Client } from '@retracedhq/retraced';
 import type { CRUD, Event } from '@retracedhq/retraced';
 import type { User } from 'next-auth';
 
 import env from './env';
+
+export type AuditTeam = { id: string; name: string };
 
 export type EventType =
   | 'member.invitation.create'
@@ -25,7 +26,7 @@ export type EventType =
 type Request = {
   action: EventType;
   user: User;
-  team: Team;
+  team: AuditTeam;
   crud: CRUD;
   // target: Target;
 };

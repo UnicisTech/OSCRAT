@@ -28,7 +28,7 @@ const handleGET = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const tasks = await getTeamTasks(teamMember.team.slug as string);
+  const tasks = await getTeamTasks(teamMember.teamSlug);
 
   return res.status(200).json({ data: tasks, error: null });
 };

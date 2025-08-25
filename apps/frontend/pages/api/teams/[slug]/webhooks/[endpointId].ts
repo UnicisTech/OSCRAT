@@ -41,7 +41,7 @@ const handleGET = async (
     endpointId: string;
   };
 
-  const app = await findOrCreateApp(teamMember.team.name, teamMember.team.id);
+  const app = await findOrCreateApp(teamMember.teamName, teamMember.teamId);
 
   if (!app) {
     throw new ApiError(200, 'Bad request.');
@@ -67,7 +67,7 @@ const handlePUT = async (
 
   const { name, url, eventTypes } = req.body;
 
-  const app = await findOrCreateApp(teamMember.team.name, teamMember.team.id);
+  const app = await findOrCreateApp(teamMember.teamName, teamMember.teamId);
 
   if (!app) {
     throw new ApiError(200, 'Bad request.');
@@ -89,7 +89,7 @@ const handlePUT = async (
     action: 'webhook.update',
     crud: 'u',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   recordMetric('webhook.updated');

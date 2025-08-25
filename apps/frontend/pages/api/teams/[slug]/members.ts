@@ -36,7 +36,7 @@ const handleGET = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const members = await getTeamMembers(teamMember.team.slug);
+  const members = await getTeamMembers(teamMember.teamSlug);
 
   recordMetric('member.fetched');
 
@@ -87,7 +87,7 @@ const handleDELETE = async (
     action: 'member.remove',
     crud: 'd',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   recordMetric('member.removed');
@@ -109,7 +109,7 @@ const handlePUT = async (
   const totalTeamOwners = await prisma.teamMember.count({
     where: {
       role: Role.OWNER,
-      teamId: teamMember.teamId,
+      team: { id: teamMember.teamId, name: teamMember.teamName },
     },
   });
 
@@ -149,7 +149,7 @@ const handlePATCH = async (
     action: 'member.update',
     crud: 'u',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   recordMetric('member.role.updated');

@@ -87,13 +87,13 @@ const handlePOST = async (
 
   await sendEvent(teamMember.teamId, 'invitation.created', invitation);
 
-  await sendTeamInviteEmail(teamMember.team, invitation);
+  await sendTeamInviteEmail(teamMember.teamName, invitation);
 
   sendAudit({
     action: 'member.invitation.create',
     crud: 'c',
     user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   recordMetric('invitation.created');
@@ -146,7 +146,7 @@ const handleDELETE = async (
     action: 'member.invitation.delete',
     crud: 'd',
     user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   await sendEvent(teamMember.teamId, 'invitation.removed', invitation);

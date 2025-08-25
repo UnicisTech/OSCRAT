@@ -7,21 +7,20 @@ import {
   Text,
 } from '@react-email/components';
 import EmailLayout from './EmailLayout';
-import { Team } from '@oscrat/model';
 
 interface TeamInviteEmailProps {
-  team: Team;
+  teamName: string;
   invitationLink: string;
   userFirstname?: string;
 }
 
-const TeamInviteEmail = ({ team, invitationLink }: TeamInviteEmailProps) => {
+const TeamInviteEmail = ({ teamName, invitationLink }: TeamInviteEmailProps) => {
   return (
     <Html>
       <Head />
       <Preview>Team Invitation</Preview>
       <EmailLayout>
-        <Text>You have been invited to join the team at {team.name}.</Text>
+        <Text>You have been invited to join the team at {teamName}.</Text>
         <Text>
           Click the link below to accept the invitation and join the team:
         </Text>

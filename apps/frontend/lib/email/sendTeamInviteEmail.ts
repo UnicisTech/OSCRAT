@@ -1,15 +1,15 @@
-import { Invitation, Team } from '@oscrat/model';
+import { Invitation } from '@oscrat/model';
 import { sendEmail } from './sendEmail';
 import { TeamInviteEmail } from '@/components/emailTemplates';
 import { render } from '@react-email/components';
 import env from '../env';
 
 export const sendTeamInviteEmail = async (
-  team: Team,
+  teamName: string,
   invitation: Invitation
 ) => {
   const invitationLink = `${env.appUrl}/invitations/${invitation.token}`;
-  const html = render(TeamInviteEmail({ invitationLink, team }));
+  const html = render(TeamInviteEmail({ invitationLink, teamName }));
 
   await sendEmail({
     to: invitation.email,

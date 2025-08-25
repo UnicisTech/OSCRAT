@@ -68,31 +68,10 @@ const TEAM_WITH_PRODUCTS_SUMMARY_INCLUDE = {
 
 /** Include for team member queries */
 const TEAM_MEMBER_INCLUDE = {
-  user: {
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      image: true,
-    },
-  },
   team: {
     select: {
-      id: true,
       name: true,
       slug: true,
-      domain: true,
-      taskIndex: true,
-      defaultRole: true,
-      properties: true,
-      type: true,
-      size: true,
-      orgRoles: true,
-      createdAt: true,
-      updatedAt: true,
-      _count: {
-        select: { members: true },
-      },
     },
   },
 };
@@ -253,29 +232,9 @@ const transformToTeamMemberDetail = (
   id: member.id,
   userId: member.userId,
   teamId: member.teamId,
+  teamSlug: member.team.slug,
+  teamName: member.team.name,
   role: member.role,
-  createdAt: member.createdAt,
-  updatedAt: member.updatedAt,
-  user: {
-    id: member.user.id,
-    name: member.user.name,
-    email: member.user.email,
-    image: member.user.image || undefined,
-  },
-  team: {
-    id: member.team.id,
-    name: member.team.name,
-    slug: member.team.slug,
-    domain: member.team.domain,
-    taskIndex: member.team.taskIndex,
-    defaultRole: member.team.defaultRole,
-    properties: member.team.properties as Record<string, any>,
-    type: member.team.type,
-    size: member.team.size,
-    orgRoles: member.team.orgRoles,
-    createdAt: member.team.createdAt,
-    updatedAt: member.team.updatedAt,
-  },
 });
 
 /** Create a new team with initial owner */

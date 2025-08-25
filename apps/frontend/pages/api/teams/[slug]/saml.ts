@@ -73,7 +73,7 @@ const handlePOST = async (
     action: 'sso.connection.create',
     crud: 'c',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   res.status(201).json({ data: connection });
@@ -111,7 +111,7 @@ const handlePATCH = async (
     action: 'sso.connection.patch',
     crud: 'u',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   res.status(200).json({ data: connection });
@@ -136,7 +136,7 @@ const handleDELETE = async (
     action: 'sso.connection.delete',
     crud: 'c',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   res.json({ data: {} });

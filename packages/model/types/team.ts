@@ -60,8 +60,13 @@ export interface TeamMemberSummary {
 }
 
 /** Full team member information */
-export interface TeamMemberDetail extends TeamMemberSummary {
-  team: TeamDetail;
+export interface TeamMemberDetail {
+  id: string;
+  userId: string;
+  teamId: string;
+  teamSlug: string;
+  teamName: string;
+  role: Role;
 }
 
 export interface TeamCreateRequest {

@@ -75,7 +75,7 @@ const handlePOST = async (
     action: 'dsync.connection.create',
     crud: 'c',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   res.status(201).json({ data });
@@ -97,7 +97,7 @@ const handleDELETE = async (
     action: 'dsync.connection.delete',
     crud: 'd',
     user: user,
-    team: teamMember.team,
+    team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
   res.status(200).json({ data: {} });

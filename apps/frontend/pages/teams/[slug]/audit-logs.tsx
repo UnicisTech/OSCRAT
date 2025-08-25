@@ -102,7 +102,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
 
     const auditLogToken = await getViewerToken(
-      teamMember.team.id,
+      teamMember.teamId,
       session?.user.id as string
     );
 
