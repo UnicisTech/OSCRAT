@@ -1,4 +1,5 @@
-import { getVersions, createVersion } from 'models/oscrat';
+import { prisma } from '@/lib/prisma';
+import { getVersions, createVersion } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductVersionCreate } from '@oscrat/model';
@@ -30,7 +31,7 @@ const handleGET = async (
 
   const { productId } = req.query;
 
-  const versions = await getVersions(teamMember.teamId, productId as string);
+  const versions = await getVersions(prisma, teamMember.teamId, productId as string);
 
   res.status(200).json({ data: versions });
 };
@@ -56,7 +57,7 @@ const handlePOST = async (
     createdBy: teamMember.userId,
   };
 
-  const version = await createVersion(teamMember.teamId, createData);
+  const version = await createVersion(prisma, teamMember.teamId, createData);
 
   console.log(
     `[OSCRAT] version created, versionId: ${version.id}, productId: ${productId}, version: ${versionData.version}, createdBy: ${teamMember.userId}`

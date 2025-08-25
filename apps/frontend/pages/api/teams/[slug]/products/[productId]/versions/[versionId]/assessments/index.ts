@@ -1,4 +1,5 @@
-import { getVersionAssessments, createVersionAssessment } from 'models/oscrat';
+import { prisma } from '@/lib/prisma';
+import { getVersionAssessments, createVersionAssessment } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratAssessmentCreate } from '@oscrat/model';
@@ -32,6 +33,7 @@ const handleGET = async (
   const { versionId } = req.query;
 
   const assessments = await getVersionAssessments(
+    prisma,
     teamMember.teamId,
     versionId as string
   );
@@ -56,6 +58,7 @@ const handlePOST = async (
   };
 
   const assessment = await createVersionAssessment(
+    prisma,
     teamMember.teamId,
     versionId as string,
     createData

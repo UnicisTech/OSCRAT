@@ -3,6 +3,7 @@ import type {
   OscratOrganizationType,
   OscratOrganizationSize,
   OscratOrganizationRole,
+  OscratReportingOrganization,
 } from '@prisma/client';
 import type { OscratProductSummary } from './product';
 
@@ -36,6 +37,8 @@ export interface TeamDetail extends Team {
   contactEmail?: string | null;
   contactPhone?: string | null;
   additionalInformation?: string | null;
+
+  reportingOrganizations?: OscratReportingOrganization[];
 }
 
 /** Team with products for organization view */

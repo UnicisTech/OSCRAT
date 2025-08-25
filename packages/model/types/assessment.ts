@@ -4,6 +4,7 @@ export interface OscratAssessmentSummary {
   id: string;
   type: OscratAssessmentType;
   schemaVersion: string;
+  versionId: string;
   productId: string;
   createdAt: Date;
   createdBy: string;
@@ -14,6 +15,7 @@ export interface OscratAssessmentDetail {
   type: OscratAssessmentType;
   schemaVersion: string;
   rawData: Record<string, any>;
+  versionId: string;
   productId: string;
   createdAt: Date;
   createdBy: string;

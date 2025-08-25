@@ -1,14 +1,13 @@
-import { prisma } from '@/lib/prisma';
-import type { Prisma } from '@oscrat/model';
+import {
+  PrismaClient,
+  type Prisma,
+  OscratProductVersionStatus,
+} from '@prisma/client';
 import type {
   OscratAssessmentCreate,
   OscratAssessmentSummary,
   OscratAssessmentDetail,
-} from '@oscrat/model';
-import {
-  transformToAssessmentSummary,
-  transformToAssessmentDetail,
-} from './shared';
+} from '../types/assessment';
 
 /** Select for assessment summary queries */
 const ASSESSMENT_SUMMARY_SELECT = {
@@ -19,7 +18,7 @@ const ASSESSMENT_SUMMARY_SELECT = {
   productId: true,
   createdAt: true,
   createdBy: true,
-} as const;
+};
 
 /** Select for assessment detail queries */
 const ASSESSMENT_DETAIL_SELECT = {
@@ -31,30 +30,69 @@ const ASSESSMENT_DETAIL_SELECT = {
   productId: true,
   createdAt: true,
   createdBy: true,
-} as const;
+};
 
-/** Get all assessments for a specific project */
+/** Type aliases for better maintainability */
+type AssessmentSummaryPayload = Prisma.OscratProductAssessmentGetPayload<{
+  select: typeof ASSESSMENT_SUMMARY_SELECT;
+}>;
+
+type AssessmentDetailPayload = Prisma.OscratProductAssessmentGetPayload<{
+  select: typeof ASSESSMENT_DETAIL_SELECT;
+}>;
+
+// Transform functions
+/** Transform Prisma assessment to AssessmentSummary */
+export const transformToAssessmentSummary = (
+  assessment: AssessmentSummaryPayload
+): OscratAssessmentSummary => ({
+  id: assessment.id,
+  type: assessment.type,
+  schemaVersion: assessment.schemaVersion,
+  versionId: assessment.versionId,
+  productId: assessment.productId,
+  createdAt: assessment.createdAt,
+  createdBy: assessment.createdBy,
+});
+
+/** Transform Prisma assessment to AssessmentDetail */
+export const transformToAssessmentDetail = (
+  assessment: AssessmentDetailPayload
+): OscratAssessmentDetail => ({
+  id: assessment.id,
+  type: assessment.type,
+  schemaVersion: assessment.schemaVersion,
+  rawData: assessment.rawData as Record<string, any>,
+  versionId: assessment.versionId,
+  productId: assessment.productId,
+  createdAt: assessment.createdAt,
+  createdBy: assessment.createdBy,
+});
+
+// Query functions
+/** Get all assessments for a specific product */
 export const getAssessments = async (
+  prisma: PrismaClient,
   teamId: string,
-  projectId: string
+  productId: string
 ): Promise<OscratAssessmentSummary[]> => {
-  // Verify project ownership first
+  // Verify product ownership first
   const team = await prisma.team.findUnique({
     where: { id: teamId },
     include: {
       products: {
-        where: { id: projectId },
+        where: { id: productId },
         select: { id: true }, // Only need to verify existence
       },
     },
   });
 
   if (!team || team.products.length === 0) {
-    throw new Error(`Project ${projectId} not found for team: ${teamId}`);
+    throw new Error(`Product ${productId} not found for team: ${teamId}`);
   }
 
   const assessments = await prisma.oscratProductAssessment.findMany({
-    where: { productId: projectId },
+    where: { productId: productId },
     select: ASSESSMENT_SUMMARY_SELECT,
     orderBy: { createdAt: 'desc' },
   });
@@ -64,29 +102,30 @@ export const getAssessments = async (
 
 /** Get detailed information for a specific assessment */
 export const getAssessmentDetail = async (
+  prisma: PrismaClient,
   teamId: string,
-  projectId: string,
+  productId: string,
   assessmentId: string
 ): Promise<OscratAssessmentDetail | null> => {
-  // Verify project ownership first
+  // Verify product ownership first
   const team = await prisma.team.findUnique({
     where: { id: teamId },
     include: {
       products: {
-        where: { id: projectId },
+        where: { id: productId },
         select: { id: true }, // Only need to verify existence
       },
     },
   });
 
   if (!team || team.products.length === 0) {
-    throw new Error(`Project ${projectId} not found for team: ${teamId}`);
+    throw new Error(`Product ${productId} not found for team: ${teamId}`);
   }
 
   const assessment = await prisma.oscratProductAssessment.findFirst({
     where: {
       id: assessmentId,
-      productId: projectId,
+      productId: productId,
     },
     select: ASSESSMENT_DETAIL_SELECT,
   });
@@ -94,21 +133,22 @@ export const getAssessmentDetail = async (
   return assessment ? transformToAssessmentDetail(assessment) : null;
 };
 
-/** Create a new assessment for a project */
+/** Create a new assessment for a product */
 export const createAssessment = async (
+  prisma: PrismaClient,
   teamId: string,
-  projectId: string,
+  productId: string,
   data: OscratAssessmentCreate
 ): Promise<OscratAssessmentDetail> => {
-  // Verify project ownership and find active version
+  // Verify product ownership and find active version
   const team = await prisma.team.findUnique({
     where: { id: teamId },
     include: {
       products: {
-        where: { id: projectId },
+        where: { id: productId },
         include: {
           versions: {
-            where: { status: 'ACTIVE' },
+            where: { status: OscratProductVersionStatus.ACTIVE },
             orderBy: { createdAt: 'desc' },
             take: 1,
           },
@@ -118,14 +158,14 @@ export const createAssessment = async (
   });
 
   if (!team || team.products.length === 0) {
-    throw new Error(`Project ${projectId} not found for team: ${teamId}`);
+    throw new Error(`Product ${productId} not found for team: ${teamId}`);
   }
 
   const product = team.products[0];
   const activeVersion = product.versions[0];
 
   if (!activeVersion) {
-    throw new Error(`No active version found for project ${projectId}`);
+    throw new Error(`No active version found for product ${productId}`);
   }
 
   const assessment = await prisma.oscratProductAssessment.create({
@@ -134,7 +174,7 @@ export const createAssessment = async (
       schemaVersion: data.schemaVersion,
       rawData: data.rawData as Prisma.InputJsonValue,
       versionId: activeVersion.id,
-      productId: projectId,
+      productId: productId,
       createdBy: data.createdBy,
     },
     select: ASSESSMENT_DETAIL_SELECT,
@@ -143,39 +183,41 @@ export const createAssessment = async (
   return transformToAssessmentDetail(assessment);
 };
 
+// Mutation functions
 /** Delete an assessment */
 export const deleteAssessment = async (
+  prisma: PrismaClient,
   teamId: string,
-  projectId: string,
+  productId: string,
   assessmentId: string
 ): Promise<void> => {
-  // Verify project ownership first
+  // Verify product ownership first
   const team = await prisma.team.findUnique({
     where: { id: teamId },
     include: {
       products: {
-        where: { id: projectId },
+        where: { id: productId },
         select: { id: true }, // Only need to verify existence
       },
     },
   });
 
   if (!team || team.products.length === 0) {
-    throw new Error(`Project ${projectId} not found for team: ${teamId}`);
+    throw new Error(`Product ${productId} not found for team: ${teamId}`);
   }
 
-  // Verify assessment exists and belongs to this project
+  // Verify assessment exists and belongs to this product
   const assessment = await prisma.oscratProductAssessment.findFirst({
     where: {
       id: assessmentId,
-      productId: projectId,
+      productId: productId,
     },
     select: { id: true },
   });
 
   if (!assessment) {
     throw new Error(
-      `Assessment ${assessmentId} not found for project ${projectId}`
+      `Assessment ${assessmentId} not found for product ${productId}`
     );
   }
 
@@ -185,8 +227,9 @@ export const deleteAssessment = async (
   });
 };
 
-/** Get all assessments for a specific project version */
+/** Get all assessments for a specific product version */
 export const getVersionAssessments = async (
+  prisma: PrismaClient,
   teamId: string,
   versionId: string
 ): Promise<OscratAssessmentSummary[]> => {
@@ -199,8 +242,10 @@ export const getVersionAssessments = async (
   return assessments.map(transformToAssessmentSummary);
 };
 
+// Version-specific functions
 /** Get detailed information for a specific assessment by version */
 export const getVersionAssessmentDetail = async (
+  prisma: PrismaClient,
   teamId: string,
   versionId: string,
   assessmentId: string
@@ -218,6 +263,7 @@ export const getVersionAssessmentDetail = async (
 
 /** Create a new assessment for a specific version */
 export const createVersionAssessment = async (
+  prisma: PrismaClient,
   teamId: string,
   versionId: string,
   data: OscratAssessmentCreate
@@ -249,6 +295,7 @@ export const createVersionAssessment = async (
 
 /** Delete an assessment from a specific version */
 export const deleteVersionAssessment = async (
+  prisma: PrismaClient,
   teamId: string,
   versionId: string,
   assessmentId: string

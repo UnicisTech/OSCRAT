@@ -1,4 +1,5 @@
-import { getProducts, createProduct } from 'models/oscrat';
+import { prisma } from '@/lib/prisma';
+import { getProducts, createProduct } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductCreate } from '@oscrat/model';
@@ -28,7 +29,7 @@ const handleGET = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const products = await getProducts(teamMember.teamId);
+  const products = await getProducts(prisma, teamMember.teamId);
 
   res.status(200).json({ data: products });
 };
@@ -42,7 +43,7 @@ const handlePOST = async (
 
   const productData = req.body as OscratProductCreate;
 
-  const product = await createProduct(teamMember.teamId, productData);
+  const product = await createProduct(prisma, teamMember.teamId, productData);
 
   console.log(
     `[OSCRAT] product created, productId: ${product.id}, name: ${productData.name}, teamId: ${teamMember.teamId}`

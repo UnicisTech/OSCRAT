@@ -1,7 +1,8 @@
+import { prisma } from '@/lib/prisma';
 import {
   getVersionAssessmentDetail,
   deleteVersionAssessment,
-} from 'models/oscrat';
+} from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 
@@ -34,6 +35,7 @@ const handleGET = async (
   const { versionId, assessmentId } = req.query;
 
   const assessment = await getVersionAssessmentDetail(
+    prisma,
     teamMember.teamId,
     versionId as string,
     assessmentId as string
@@ -58,6 +60,7 @@ const handleDELETE = async (
   const { versionId, assessmentId } = req.query;
 
   await deleteVersionAssessment(
+    prisma,
     teamMember.teamId,
     versionId as string,
     assessmentId as string

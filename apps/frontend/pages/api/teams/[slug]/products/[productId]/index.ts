@@ -1,4 +1,5 @@
-import { getProductDetail, updateProduct, deleteProduct } from 'models/oscrat';
+import { prisma } from '@/lib/prisma';
+import { getProductDetail, updateProduct, deleteProduct } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductUpdate } from '@oscrat/model';
@@ -33,6 +34,7 @@ const handleGET = async (
   const { productId } = req.query;
 
   const project = await getProductDetail(
+    prisma,
     teamMember.teamId,
     productId as string
   );
@@ -55,6 +57,7 @@ const handlePUT = async (
   const projectData = req.body as OscratProductUpdate;
 
   const project = await updateProduct(
+    prisma,
     teamMember.teamId,
     productId as string,
     projectData
@@ -72,7 +75,7 @@ const handleDELETE = async (
 
   const { productId } = req.query;
 
-  await deleteProduct(teamMember.teamId, productId as string);
+  await deleteProduct(prisma, teamMember.teamId, productId as string);
 
   console.log(
     `[OSCRAT] project deleted, productId: ${productId}, teamId: ${teamMember.teamId}`

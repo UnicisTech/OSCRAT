@@ -115,6 +115,7 @@ model Team {
   
   // Relationships from OscratOrganization
   products                    OscratProduct[]
+  productVersions             OscratProductVersion[]
   repositories                OscratRepository[]
   reportingOrganizations      OscratReportingOrganization[]
 }
@@ -391,6 +392,9 @@ model OscratProductVersion {
   productId String
   product   OscratProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  teamId String
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
   assessments     OscratProductAssessment[]
   vulnerabilities OscratProductVulnerability[]
   incidents       OscratProductIncident[]
@@ -410,6 +414,7 @@ model OscratProductVersion {
   @@index([status])
   @@index([productId, status])
   @@index([productId, createdAt])
+  @@index([teamId, id])
 }
 
 model OscratProductAssessment {

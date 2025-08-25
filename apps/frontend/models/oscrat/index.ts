@@ -1,31 +1,4 @@
-// Organization exports removed - functionality moved to team model
-
-export {
-  getProducts,
-  getProductDetail,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-} from './product';
-
-export {
-  getAssessments,
-  getAssessmentDetail,
-  createAssessment,
-  deleteAssessment,
-  getVersionAssessments,
-  getVersionAssessmentDetail,
-  createVersionAssessment,
-  deleteVersionAssessment,
-} from './assessment';
-
-export {
-  getVersions,
-  getVersionDetail,
-  createVersion,
-  updateVersion,
-  deleteVersion,
-} from './version';
+// Product, version, and assessment exports removed - functionality moved to @oscrat/model/operations
 
 export { createSbomJobForRepository, getSbomResult } from './sbom';
 
@@ -40,20 +13,3 @@ export {
   checkExtensionAndMIMEType as checkVersionAttachmentFile,
 } from './versionAttachment';
 
-export type {
-  PrismaProductWithCounts,
-  PrismaProductWithRelations,
-  PrismaAssessmentSummary,
-  PrismaAssessmentDetail,
-  PrismaVersionWithCounts,
-  PrismaVersionWithRelations,
-} from './shared';
-
-export {
-  transformToProductSummary,
-  transformToProductDetail,
-  transformToAssessmentSummary,
-  transformToAssessmentDetail,
-  transformToVersionSummary,
-  transformToVersionDetail,
-} from './shared';

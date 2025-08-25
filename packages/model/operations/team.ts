@@ -19,10 +19,7 @@ import type {
   TeamMemberSummary,
   TeamMemberDetail,
 } from '../types/team';
-import type {
-  OscratProductSummary,
-  OscratProductDetail,
-} from '../types/product';
+import { transformToProductSummary } from './product';
 
 /** Include for team summary queries */
 const TEAM_SUMMARY_INCLUDE = {
@@ -32,10 +29,12 @@ const TEAM_SUMMARY_INCLUDE = {
 };
 
 /** Include for team detail queries */
-const TEAM_DETAIL_INCLUDE = {};
+const TEAM_DETAIL_INCLUDE = {
+  reportingOrganizations: true,
+};
 
-/** Include for team with product summaries (lightweight with counts) */
-const TEAM_WITH_PRODUCTS_SUMMARY_INCLUDE = {
+/** Include for team with products */
+const TEAM_WITH_PRODUCTS_INCLUDE = {
   products: {
     include: {
       reportingOrganizations: true,
@@ -48,16 +47,21 @@ const TEAM_WITH_PRODUCTS_SUMMARY_INCLUDE = {
         select: {
           id: true,
           status: true,
-          incidents: {
+          _count: {
             select: {
-              id: true,
-              status: true,
-            },
-          },
-          vulnerabilities: {
-            select: {
-              id: true,
-              status: true,
+              incidents: {
+                where: { status: OscratProductIncidentStatus.NOT_REPORTED },
+              },
+              vulnerabilities: {
+                where: {
+                  status: {
+                    in: [
+                      OscratProductVulnerabilityStatus.OPEN,
+                      OscratProductVulnerabilityStatus.ACTIVELY_EXPLOITED,
+                    ],
+                  },
+                },
+              },
             },
           },
         },
@@ -76,83 +80,30 @@ const TEAM_MEMBER_INCLUDE = {
   },
 };
 
-/** Transform Prisma product to ProductSummary (lightweight with counts) */
-const transformToProductSummary = (product: any): OscratProductSummary => {
-  const versions = product.versions || [];
-  const activeVersionsCount = versions.filter(
-    (v: any) => v.status === 'ACTIVE'
-  ).length;
-  const totalOpenIncidents = versions.reduce((sum: number, v: any) => {
-    const openIncidents = (v.incidents || []).filter(
-      (i: any) => i.status === 'NOT_REPORTED'
-    ).length;
-    return sum + openIncidents;
-  }, 0);
-  const totalOpenVulnerabilities = versions.reduce((sum: number, v: any) => {
-    const openVulns = (v.vulnerabilities || []).filter(
-      (vuln: any) =>
-        vuln.status === 'OPEN' || vuln.status === 'ACTIVELY_EXPLOITED'
-    ).length;
-    return sum + openVulns;
-  }, 0);
+/** Type aliases for better maintainability */
+type TeamSummaryPayload = Prisma.TeamGetPayload<{
+  include: typeof TEAM_SUMMARY_INCLUDE;
+}>;
 
-  return {
-    id: product.id,
-    name: product.name,
-    description: product.description,
-    type: product.type,
-    productCategory: product.productCategory,
-    complianceStatus: product.complianceStatus,
-    reportingOrganizations:
-      product.reportingOrganizations?.map((org: any) => org.acronym) || [],
-    versionsCount: product._count?.versions || 0,
-    activeVersionsCount,
-    totalOpenIncidents,
-    totalOpenVulnerabilities,
-    status: product.status,
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
-    createdBy: product.createdBy,
-    updatedBy: product.updatedBy,
+type TeamDetailPayload = Prisma.TeamGetPayload<{
+  include: typeof TEAM_DETAIL_INCLUDE;
+}>;
+
+type TeamMemberSummaryPayload = Prisma.TeamMemberGetPayload<{
+  include: {
+    user: { select: { id: true; name: true; email: true; image: true } };
   };
-};
+}>;
 
-/** Transform Prisma product to ProductDetail (full data with relations) */
-const transformToProductDetail = (product: any): OscratProductDetail => ({
-  id: product.id,
-  name: product.name,
-  description: product.description,
-  type: product.type,
-  productCategory: product.productCategory,
-  complianceStatus: product.complianceStatus,
-  reportingOrganizations: product.reportingOrganizations || [],
-  versions:
-    product.versions?.map((version: any) => ({
-      id: version.id,
-      version: version.version,
-      status: version.status,
-      productId: version.productId,
-      openIncidents: (version.incidents || []).filter(
-        (i: any) => i.status === 'NOT_REPORTED'
-      ).length,
-      openVulnerabilities: (version.vulnerabilities || []).filter(
-        (vuln: any) =>
-          vuln.status === 'OPEN' || vuln.status === 'ACTIVELY_EXPLOITED'
-      ).length,
-      hasRepository: !!version.repository,
-      sbomReportsCount: version._count?.sbomReports || 0,
-      createdAt: version.createdAt,
-      updatedAt: version.updatedAt,
-      createdBy: version.createdBy,
-      updatedBy: version.updatedBy,
-    })) || [],
-  status: product.status,
-  createdAt: product.createdAt,
-  updatedAt: product.updatedAt,
-  createdBy: product.createdBy,
-  updatedBy: product.updatedBy,
-});
+type TeamMemberDetailPayload = Prisma.TeamMemberGetPayload<{
+  include: typeof TEAM_MEMBER_INCLUDE;
+}>;
 
+type TeamWithProductsPayload = Prisma.TeamGetPayload<{
+  include: typeof TEAM_WITH_PRODUCTS_INCLUDE & typeof TEAM_DETAIL_INCLUDE;
+}>;
+
+// Transform functions
 /** Transform Prisma team to basic Team */
 const transformToTeam = (team: PrismaTeam): Team => ({
   id: team.id,
@@ -165,9 +116,7 @@ const transformToTeam = (team: PrismaTeam): Team => ({
 
 /** Transform Prisma team to TeamSummary */
 const transformToTeamSummary = (
-  team: Prisma.TeamGetPayload<{
-    include: typeof TEAM_SUMMARY_INCLUDE;
-  }>
+  team: TeamSummaryPayload
 ): TeamSummary => ({
   id: team.id,
   name: team.name,
@@ -179,7 +128,9 @@ const transformToTeamSummary = (
 });
 
 /** Transform Prisma team to TeamDetail */
-const transformToTeamDetail = (team: PrismaTeam): TeamDetail => ({
+const transformToTeamDetail = (
+  team: TeamDetailPayload
+): TeamDetail => ({
   id: team.id,
   name: team.name,
   slug: team.slug,
@@ -199,15 +150,12 @@ const transformToTeamDetail = (team: PrismaTeam): TeamDetail => ({
   contactEmail: team.contactEmail,
   contactPhone: team.contactPhone,
   additionalInformation: team.additionalInformation,
+  reportingOrganizations: team.reportingOrganizations || [],
 });
 
 /** Transform Prisma team member to TeamMemberSummary */
 const transformToTeamMemberSummary = (
-  member: Prisma.TeamMemberGetPayload<{
-    include: {
-      user: { select: { id: true; name: true; email: true; image: true } };
-    };
-  }>
+  member: TeamMemberSummaryPayload
 ): TeamMemberSummary => ({
   id: member.id,
   userId: member.userId,
@@ -225,9 +173,7 @@ const transformToTeamMemberSummary = (
 
 /** Transform Prisma team member to TeamMemberDetail */
 const transformToTeamMemberDetail = (
-  member: Prisma.TeamMemberGetPayload<{
-    include: typeof TEAM_MEMBER_INCLUDE;
-  }>
+  member: TeamMemberDetailPayload
 ): TeamMemberDetail => ({
   id: member.id,
   userId: member.userId,
@@ -237,6 +183,7 @@ const transformToTeamMemberDetail = (
   role: member.role,
 });
 
+// Team CRUD operations
 /** Create a new team with initial owner */
 export const createTeam = async (
   prisma: PrismaClient,
@@ -282,7 +229,13 @@ export const createTeam = async (
     },
   });
 
-  return transformToTeamDetail(team);
+  // Fetch team with includes to populate relations
+  const teamWithIncludes = await prisma.team.findUniqueOrThrow({
+    where: { id: team.id },
+    include: TEAM_DETAIL_INCLUDE,
+  });
+
+  return transformToTeamDetail(teamWithIncludes);
 };
 
 /** Get basic team by ID or slug */
@@ -304,6 +257,7 @@ export const getTeamDetail = async (
 ): Promise<TeamDetail | null> => {
   const team = await prisma.team.findUnique({
     where: key,
+    include: TEAM_DETAIL_INCLUDE,
   });
 
   return team ? transformToTeamDetail(team) : null;
@@ -372,6 +326,7 @@ export const getOwnedTeams = async (
   return teams.map(transformToTeamSummary);
 };
 
+// Team member operations
 /** Add a member to a team */
 export const addTeamMember = async (
   prisma: PrismaClient,
@@ -473,6 +428,7 @@ export const getTeamMember = async (
   return member ? transformToTeamMemberDetail(member) : null;
 };
 
+// Utility functions
 /** Get team roles for a user */
 export const getTeamRoles = async (
   prisma: PrismaClient,
@@ -532,7 +488,7 @@ export const isTeamAdmin = async (
 /** Check if team exists with given conditions */
 export const isTeamExists = async (
   prisma: PrismaClient,
-  condition: Array<Record<string, any>>
+  condition: Array<Prisma.TeamWhereInput>
 ): Promise<boolean> => {
   const count = await prisma.team.count({
     where: {
@@ -566,7 +522,10 @@ export const getTeamWithProductsSummary = async (
 ): Promise<TeamWithProducts | null> => {
   const team = await prisma.team.findUnique({
     where: key,
-    include: TEAM_WITH_PRODUCTS_SUMMARY_INCLUDE,
+    include: {
+      ...TEAM_DETAIL_INCLUDE,
+      ...TEAM_WITH_PRODUCTS_INCLUDE,
+    },
   });
 
   if (!team) return null;

@@ -610,6 +610,7 @@ async function seedOscratData(teamSlug: string) {
             version: versionString,
             status: versionStatus,
             productId: product.id,
+            teamId: targetTeamId,
             createdBy: targetUserId,
             updatedBy: targetUserId,
           },

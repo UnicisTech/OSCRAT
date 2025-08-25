@@ -1,4 +1,5 @@
-import { getVersionDetail, updateVersion, deleteVersion } from 'models/oscrat';
+import { prisma } from '@/lib/prisma';
+import { getVersionDetail, updateVersion, deleteVersion } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductVersionUpdate } from '@oscrat/model';
@@ -34,6 +35,7 @@ const handleGET = async (
   const { versionId } = req.query;
 
   const version = await getVersionDetail(
+    prisma,
     teamMember.teamId,
     versionId as string
   );
@@ -64,6 +66,7 @@ const handlePUT = async (
   };
 
   const version = await updateVersion(
+    prisma,
     teamMember.teamId,
     versionId as string,
     updateData
@@ -81,7 +84,7 @@ const handleDELETE = async (
 
   const { versionId } = req.query;
 
-  await deleteVersion(teamMember.teamId, versionId as string);
+  await deleteVersion(prisma, teamMember.teamId, versionId as string);
 
   res.status(200).json({ data: {} });
 };
