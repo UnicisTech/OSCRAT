@@ -5,11 +5,12 @@ import { FullScreenModal } from '@/components/shared';
 import type { OscratProductVersionCreate } from '@oscrat/model';
 import toast from 'react-hot-toast';
 import normalizeText from '@/utils/normalizeText';
+import { useOscratVersions } from '@/hooks/oscrat/useOscratVersion';
 
 interface CreateVersionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: OscratProductVersionCreate) => Promise<void>;
+  teamId: string;
   productId: string;
   createdBy: string;
 }
@@ -17,13 +18,15 @@ interface CreateVersionModalProps {
 const Index: React.FC<CreateVersionModalProps> = ({
   isOpen,
   onClose,
-  onSave,
+  teamId,
   productId,
   createdBy,
 }) => {
   const { t, ready } = useTranslation('common');
-  const [isLoading, setIsLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Use OSCRAT hook for version management
+  const { createVersion, isLoading } = useOscratVersions(teamId, productId);
 
   // Form state
   const [versionName, setVersionName] = useState('');
@@ -57,9 +60,8 @@ const Index: React.FC<CreateVersionModalProps> = ({
       return;
     }
 
-    setIsLoading(true);
     try {
-      await onSave({
+      await createVersion({
         version: versionName.trim(),
         status,
         productId,
@@ -70,8 +72,6 @@ const Index: React.FC<CreateVersionModalProps> = ({
     } catch (error) {
       console.error('Failed to create version:', error);
       toast.error('Failed to create version');
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -45,5 +45,9 @@ export function useAcceptInvitation() {
   return useMutation({
     mutationFn: ({ token, password }: { token: string; password?: string }) =>
       teamInvitationsEndpoints.acceptInvitation(token, { password }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.teams.all });
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+    },
   });
 }

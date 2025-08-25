@@ -11,11 +11,13 @@ export const teamInvitationsEndpoints = {
     api.post<Invitation>(`/teams/${slug}/invitations`, data),
 
   deleteInvitation: (slug: string, id: string) =>
-    api.delete<void>(`/teams/${slug}/invitations/${id}`),
+    api.delete<void>(`/teams/${slug}/invitations`, {
+      params: { id },
+    }),
 
   getInvitation: (token: string) =>
-    api.get<InvitationWithTeam>(`/api/invitations/${token}`),
+    api.get<InvitationWithTeam>(`invitations/${token}`),
 
   acceptInvitation: (token: string, data: { password?: string }) =>
-    api.post<void>(`/api/invitations/${token}/accept`, data),
+    api.post<void>(`invitations/${token}/accept`, data),
 };

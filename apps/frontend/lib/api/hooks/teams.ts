@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { teamsEndpoints } from '@/lib/api/endpoints/teams';
+import { memberEndpoints } from '@/lib/api/endpoints/teams/members';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
 import type { TeamSettingsUpdate, TeamCreateRequest } from '@oscrat/model';
@@ -122,9 +123,10 @@ export function useGetTeamPermissions(slug: string) {
 
 export function useLeaveTeam(slug: string, id: string) {
   return useMutation({
-    mutationFn: () => teamsEndpoints.removeMember(slug, id),
+    mutationFn: () => memberEndpoints.leaveTeam(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.teams.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.teams.detail(slug) });
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.members(slug),
       });

@@ -16,7 +16,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
-      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
+      return withUserAuth()(handleGET)(req, res);
     case 'POST':
       return withUserAuth()(handlePOST)(req, res);
     default:
@@ -27,10 +27,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 // Get teams
 const handleGET = async (
-  req: AuthenticatedTeamRequest,
+  req: AuthenticatedUserRequest,
   res: NextApiResponse
 ) => {
-  const { teamMember, user } = req.teamContext;
+  const { user } = req.userContext;
 
   const teams = await getTeams(user.id);
 

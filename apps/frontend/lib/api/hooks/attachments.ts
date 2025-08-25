@@ -10,11 +10,12 @@ export function useDownloadAttachment() {
     }: {
       attachmentId: string;
       filename: string;
-    }) =>
-      attachmentsEndpoints
+    }) => {
+      return attachmentsEndpoints
         .downloadAttachment(attachmentId)
         .then((blob: Blob) => {
           saveAs(blob, filename);
-        }),
+        });
+    },
   });
 }

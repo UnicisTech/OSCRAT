@@ -1,14 +1,8 @@
+import { withTeamLayout } from '@/lib/layout-helpers';
 import TeamMembers from './members';
-import TeamLayout from '@/components/layouts/TeamLayout';
-import AccountLayout from '@/components/layouts/AccountLayout';
-import React from 'react';
 
-TeamMembers.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <AccountLayout>
-      <TeamLayout>{page}</TeamLayout>
-    </AccountLayout>
-  );
-};
+TeamMembers.getLayout = withTeamLayout;
+
+export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';
 
 export default TeamMembers;

@@ -145,26 +145,30 @@ const Table: React.FC<SsmTableProps> = ({
                     : 'Unknown'}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => onDownload(attachment.id, attachment.name)}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Download"
-                    >
-                      <FaDownload size={16} />
-                    </button>
+                  <div className="flex items-center space-x-6">
                     <button
                       onClick={() => onValidate(attachment.id)}
-                      className="rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
+                      className="rounded border border-gray-300 bg-transparent px-2 py-1 text-xs text-gray-700 hover:bg-gray-50"
                     >
                       {t('validate')}
                     </button>
+
+                    <button
+                      onClick={() => onDownload(attachment.id, attachment.name)}
+                      className="flex items-center space-x-2 text-gray-600 hover:text-gray-800"
+                      title={t('oscrat.ui.download')}
+                    >
+                      <FaDownload size={14} className="text-gray-500" />
+                      <span className="text-xs">{t('oscrat.ui.download')}</span>
+                    </button>
+
                     <button
                       onClick={() => onDelete(attachment.id)}
-                      className="text-red-600 hover:text-red-800"
-                      title="Delete"
+                      className="flex items-center space-x-2 text-gray-600 hover:text-gray-800"
+                      title={t('oscrat.ui.delete')}
                     >
-                      <FaTrashAlt size={16} />
+                      <FaTrashAlt size={14} />
+                      <span className="text-xs">{t('oscrat.ui.delete')}</span>
                     </button>
                   </div>
                 </td>

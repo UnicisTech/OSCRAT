@@ -7,7 +7,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { type ReactElement, useEffect } from 'react';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-import Join from '@/components/auth/Join';
+import SignupComponent from '@/components/auth/Signup';
 import type { NextPageWithLayout } from 'types';
 import { authProviderEnabled } from '@/lib/auth';
 import { AuthLayout } from '@/components/layouts';
@@ -68,7 +68,7 @@ const Signup: NextPageWithLayout<
                 recaptchaSiteKey={recaptchaSiteKey}
               />
             ) : (
-              <Join recaptchaSiteKey={recaptchaSiteKey} />
+              <SignupComponent recaptchaSiteKey={recaptchaSiteKey} />
             )}
           </>
         )}

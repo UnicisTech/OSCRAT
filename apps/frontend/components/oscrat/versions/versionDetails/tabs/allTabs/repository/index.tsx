@@ -80,7 +80,7 @@ export default function Index() {
   }
 
   return (
-    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 p-4">
+    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 py-3">
       <Table
         repositories={repositories}
         onAddNew={handleAddRepository}

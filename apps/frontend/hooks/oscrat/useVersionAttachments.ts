@@ -42,13 +42,15 @@ export function useVersionAttachments(
   const isLoading =
     isFetchingAttachments ||
     uploadAttachmentMutation.isPending ||
-    baseAttachments.isDownloading ||
     deleteAttachmentMutation.isPending;
+
+  const isDownloading = baseAttachments.isDownloading;
 
   return {
     ...baseAttachments,
     attachments: attachments || [],
     isLoading,
+    isDownloading,
     isError,
     error,
     uploadAttachment,

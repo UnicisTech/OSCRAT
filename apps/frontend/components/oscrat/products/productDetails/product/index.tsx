@@ -7,6 +7,7 @@ import { getBorderClass } from '@/lib/borderUtils';
 import ProductEditModal from './ProductEditModal';
 import ProductActionModal from './ProductActionModal';
 import type { OscratProductUpdate } from '@oscrat/model';
+import { useTeamContext } from '@/context/TeamContext';
 
 interface ProductProps {
   project: OscratProductDetail;
@@ -22,6 +23,7 @@ const Index: React.FC<ProductProps> = ({
   onWithdraw,
 }) => {
   const { t, ready } = useTranslation('common');
+  const { slug } = useTeamContext();
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
@@ -63,10 +65,6 @@ const Index: React.FC<ProductProps> = ({
     setModalAction(null);
   };
 
-  // TODO: Add description to product model
-  const PRODUCT_DESCRIPTION =
-    'High-density semiconductor built on advanced FinFET technology, featuring ~20 billion transistors. Delivers improved performance and power efficiency for mobile, AI, and high-performance applications.';
-
   const reportingOrganizations = useMemo(() => {
     return (
       project?.reportingOrganizations?.map((org) => org.acronym).join(', ') ||
@@ -82,7 +80,7 @@ const Index: React.FC<ProductProps> = ({
         onSave={handleEditSave}
         initialData={{
           name: project.name,
-          description: PRODUCT_DESCRIPTION,
+          description: project.description,
           type: project.type,
           reportingOrganizations: project.reportingOrganizations,
           status: project.status,
@@ -95,7 +93,7 @@ const Index: React.FC<ProductProps> = ({
         onClose={handleCloseModals}
         action={modalAction}
         productName={project.name}
-        productDescription={PRODUCT_DESCRIPTION}
+        productDescription={project.description}
         onDelete={handleDelete}
         onWithdraw={handleWithdraw}
       />
@@ -276,7 +274,7 @@ const Index: React.FC<ProductProps> = ({
               {t('description')}:
             </span>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-              {PRODUCT_DESCRIPTION}
+              {project.description}
             </p>
           </div>
         </div>

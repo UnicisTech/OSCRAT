@@ -22,7 +22,7 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   const baseClasses = fullWidth
     ? 'w-full rounded-md px-2 py-3 text-sm font-medium transition-colors duration-200'
-    : 'rounded-md px-2 py-1 text-sm font-medium sm:w-2/5 transition-colors duration-200';
+    : 'rounded-md px-2 py-1 text-sm font-medium transition-colors duration-200';
 
   const variantClasses = {
     primary:

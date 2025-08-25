@@ -1,4 +1,5 @@
 import React from 'react';
+import { withTeamLayout } from '@/lib/layout-helpers';
 import { Error } from '@/components/shared';
 import { TeamTab } from '@/components/team';
 import { ConnectionsWrapper } from '@boxyhq/react-ui/sso';
@@ -13,8 +14,6 @@ import { getTeamMember } from '@/lib/middleware/auth';
 import { isAllowed } from '@/lib/middleware';
 import { NextPageWithLayout } from 'types';
 import { inferSSRProps } from '@/lib/inferSSRProps';
-import TeamLayout from '@/components/layouts/TeamLayout';
-import AccountLayout from '@/components/layouts/AccountLayout';
 
 const TeamSSO: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
   teamFeatures,
@@ -73,13 +72,7 @@ const TeamSSO: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
   );
 };
 
-TeamSSO.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <AccountLayout>
-      <TeamLayout>{page}</TeamLayout>
-    </AccountLayout>
-  );
-};
+TeamSSO.getLayout = withTeamLayout;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { locale, req, res, query } = context;

@@ -136,18 +136,26 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col gap-y-6 overflow-y-auto px-6 py-6">
-        {/* Team Dropdown */}
-        <TeamDropdown />
+      <div className="flex flex-1 flex-col overflow-y-auto px-6 py-6">
+        {/* Team Content - Only show if user has a team (slug exists) */}
+        {slug && (
+          <div className="flex flex-1 flex-col gap-y-6">
+            {/* Team Dropdown */}
+            <TeamDropdown />
 
-        {/* Primary Navigation */}
-        <nav className="flex flex-1 flex-col">
-          <div role="list" className="space-y-1">
-            {navigationItems.map((item) => renderNavItem(item))}
+            {/* Primary Navigation */}
+            <nav className="flex flex-1 flex-col">
+              <div role="list" className="space-y-1">
+                {navigationItems.map((item) => renderNavItem(item))}
+              </div>
+            </nav>
           </div>
-        </nav>
+        )}
 
-        {/* Account */}
+        {/* Spacer to push Account Settings to bottom when no team content */}
+        {!slug && <div className="flex-1"></div>}
+
+        {/* Account - Always show at bottom */}
         <AccountSettings />
       </div>
     </div>
@@ -155,7 +163,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
 
   return (
     <div
-      className={`fixed inset-y-0 z-50 flex flex-col shadow-xl ${className}`}
+      className={`flex flex-col shadow-lg shadow-gray-400/50 relative z-10 ${className}`}
     >
       {sidebarContent}
     </div>

@@ -1,22 +1,15 @@
+import React from 'react';
+import { withTeamLayout } from '@/lib/layout-helpers';
 import APIKeysContainer from '@/components/apiKey/APIKeysContainer';
 import { GetServerSidePropsContext } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import env from '@/lib/env';
-import TeamLayout from '@/components/layouts/TeamLayout';
-import AccountLayout from '@/components/layouts/AccountLayout';
-import React from 'react';
 
 const APIKeys = ({ teamFeatures }) => {
   return <APIKeysContainer teamFeatures={teamFeatures} />;
 };
 
-APIKeys.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <AccountLayout>
-      <TeamLayout>{page}</TeamLayout>
-    </AccountLayout>
-  );
-};
+APIKeys.getLayout = withTeamLayout;
 
 export async function getServerSideProps({
   locale,

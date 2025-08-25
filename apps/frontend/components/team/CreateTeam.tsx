@@ -20,7 +20,6 @@ const CreateTeam = ({ visible, setVisible }: CreateTeamProps) => {
   const { t } = useTranslation('common');
   const { createTeam } = useTeams();
   const router = useRouter();
-
   const formik = useFormik({
     initialValues: {
       name: '',

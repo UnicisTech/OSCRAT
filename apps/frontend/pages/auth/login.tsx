@@ -27,6 +27,7 @@ import TogglePasswordVisibility from '@/components/shared/TogglePasswordVisibili
 import AgreeMessage from '@/components/auth/AgreeMessage';
 import GoogleReCAPTCHA from '@/components/shared/GoogleReCAPTCHA';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { emailSchema } from '@/lib/validation/inputs';
 
 interface Message {
   text: string | null;
@@ -48,10 +49,11 @@ const Login: NextPageWithLayout<
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-  const { error, success, token } = router.query as {
+  const { error, success, token, email } = router.query as {
     error: string;
     success: string;
     token: string;
+    email: string;
   };
 
   const handlePasswordVisibility = () => {
@@ -60,9 +62,12 @@ const Login: NextPageWithLayout<
 
   useEffect(() => {
     if (status === 'authenticated') {
-      router.push(env.redirectIfAuthenticated);
+      const redirectUrl = token
+        ? `/invitations/${token}`
+        : env.redirectIfAuthenticated;
+      router.push(redirectUrl);
     }
-  }, [status]);
+  }, [status, token, router]);
 
   useEffect(() => {
     if (error) {
@@ -75,7 +80,7 @@ const Login: NextPageWithLayout<
   }, [error, success]);
 
   const redirectUrl = token
-    ? `/invitations/${token}`
+    ? `/teams?token=${token}`
     : env.redirectIfAuthenticated;
 
   //TODO: should delete this
@@ -93,12 +98,13 @@ const Login: NextPageWithLayout<
 
   const formik = useFormik({
     initialValues: {
-      email: '',
+      email: email || '',
       password: '',
     },
     validationSchema: Yup.object().shape({
-      email: Yup.string().required().email(),
-      password: Yup.string().required(),
+      email: emailSchema.required('Email is required'),
+      password: Yup.string()
+        .required('Password is required')
     }),
     onSubmit: async (values) => {
       const { email, password } = values;
@@ -118,6 +124,11 @@ const Login: NextPageWithLayout<
       if (!response?.ok) {
         toast.error(t(response?.error));
         return;
+      }
+      
+      // Redirect after successful login
+      if (response?.ok) {
+        router.push(redirectUrl);
       }
     },
   });

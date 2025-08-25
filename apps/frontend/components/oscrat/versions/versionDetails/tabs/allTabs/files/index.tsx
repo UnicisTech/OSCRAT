@@ -1,14 +1,16 @@
 import AddFileModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/files/modal';
 import FileTable from '@/components/oscrat/versions/versionDetails/tabs/allTabs/files/fileTable';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useVersionContext } from '@/context/VersionContext';
 import { useVersionAttachments } from '@/hooks/oscrat/useVersionAttachments';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
-import type { Attachment } from '@/types';
 
 export default function Files() {
   const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [downloadingFiles, setDownloadingFiles] = useState<Set<string>>(
+    new Set()
+  );
   const { teamId, productId, versionId } = useVersionContext();
 
   const {
@@ -34,10 +36,18 @@ export default function Files() {
   };
 
   const handleDownloadFile = async (fileId: string, filename: string) => {
+    setDownloadingFiles((prev) => new Set(prev).add(fileId));
     try {
       await downloadAttachment(fileId, filename);
+      toast.success('Download will start shortly');
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, 'Failed to download attachment'));
+    } finally {
+      setDownloadingFiles((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(fileId);
+        return newSet;
+      });
     }
   };
 
@@ -52,7 +62,7 @@ export default function Files() {
 
   if (isLoading) {
     return (
-      <div className="flex w-full flex-col items-center py-8">
+      <div className="flex w-full flex-col items-center">
         <div>Loading attachments...</div>
       </div>
     );
@@ -60,19 +70,20 @@ export default function Files() {
 
   if (isError) {
     return (
-      <div className="flex w-full flex-col items-center py-8">
+      <div className="flex w-full flex-col items-center">
         <div>Error loading attachments: {error?.message}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex w-full flex-col items-center py-8">
+    <div className="flex w-full flex-col items-center">
       <FileTable
         attachments={attachments}
         onAddFileClick={() => setAddModalOpen(true)}
         onDownloadFile={handleDownloadFile}
         onDeleteFile={handleDeleteFile}
+        downloadingFiles={downloadingFiles}
       />
 
       <AddFileModal

@@ -4,6 +4,7 @@ import { OscratProductType } from '@oscrat/model';
 import { getProductTypeKey } from '@/utils/translation';
 import { FullScreenModal } from '@/components/shared';
 import type { OscratProductUpdate } from '@oscrat/model';
+import { useTeamContext } from '@/context/TeamContext';
 
 interface ProductEditModalProps {
   isOpen: boolean;
@@ -20,6 +21,11 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 }) => {
   const { t, ready } = useTranslation('common');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const { teamContext } = useTeamContext();
+  const { team } = teamContext;
+
+  // Get all reporting organizations from team
+  const allTeamOrganizations = team?.reportingOrganizations || [];
 
   // Form state
   const [editName, setEditName] = useState<string>(initialData.name as string);
@@ -47,9 +53,9 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
   // Handle save - convert acronyms back to full objects
   const handleSave = useCallback(() => {
-    const selectedReportingOrgs = (
-      initialData.reportingOrganizations || []
-    ).filter((org) => editExternalReporting.includes(org.acronym));
+    const selectedReportingOrgs = allTeamOrganizations.filter((org) =>
+      editExternalReporting.includes(org.acronym)
+    );
 
     onSave({
       name: editName.trim(),
@@ -66,6 +72,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
     editExternalReporting,
     onSave,
     initialData,
+    allTeamOrganizations,
   ]);
 
   // Handle external reporting toggle
@@ -77,11 +84,9 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
     );
   }, []);
 
-  // Available options from reporting organizations
+  // Available options from team's reporting organizations
   const productTypes = Object.values(OscratProductType);
-  const externalReportingOptions = (
-    initialData.reportingOrganizations || []
-  ).map((org) => org.acronym);
+  const externalReportingOptions = allTeamOrganizations.map((org) => org.acronym);
 
   if (!ready) return null;
 

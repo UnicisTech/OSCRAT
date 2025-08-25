@@ -1,4 +1,3 @@
-import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
@@ -8,10 +7,7 @@ import { Card } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
 import { extractErrorMessage } from '@/lib/utils';
 import type { User } from '@oscrat/model';
-
-const schema = Yup.object().shape({
-  email: Yup.string().required(),
-});
+import { updateEmailSchema } from '@/lib/validation/auth';
 
 interface UpdateEmailProps {
   user: Partial<User>;
@@ -26,7 +22,7 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
     initialValues: {
       email: user.email,
     },
-    validationSchema: schema,
+    validationSchema: updateEmailSchema,
     onSubmit: async (values) => {
       const result = await updateUser(values);
 

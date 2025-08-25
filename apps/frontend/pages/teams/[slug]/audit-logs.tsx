@@ -1,3 +1,5 @@
+import React from 'react';
+import { withTeamLayout } from '@/lib/layout-helpers';
 import { Card } from '@/components/shared';
 import { Error } from '@/components/shared';
 import { TeamTab } from '@/components/team';
@@ -15,9 +17,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { NextPageWithLayout } from 'types';
-import TeamLayout from '@/components/layouts/TeamLayout';
-import AccountLayout from '@/components/layouts/AccountLayout';
-import React from 'react';
 
 interface RetracedEventsBrowserProps {
   host: string;
@@ -67,13 +66,7 @@ const Events: NextPageWithLayout<inferSSRProps<typeof getServerSideProps>> = ({
   );
 };
 
-Events.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <AccountLayout>
-      <TeamLayout>{page}</TeamLayout>
-    </AccountLayout>
-  );
-};
+Events.getLayout = withTeamLayout;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!env.teamFeatures.auditLog) {

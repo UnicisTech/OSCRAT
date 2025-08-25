@@ -1,4 +1,3 @@
-import { useTeamContext } from '@/context/TeamContext';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { withTeamLayout } from '@/lib/layout-helpers';
@@ -8,7 +7,6 @@ import RecentActivities from '@/components/oscrat/dashboard/RecentActivities';
 
 const TeamDashboard = () => {
   const { t } = useTranslation('common');
-  const { teamContext } = useTeamContext();
 
   return (
     <>

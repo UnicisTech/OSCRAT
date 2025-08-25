@@ -14,6 +14,10 @@ interface InputWithLabelProps {
   disabled?: boolean;
   required?: boolean;
   className?: string;
+  maxLength?: number;
+  minLength?: number;
+  pattern?: string;
+  autoComplete?: string;
 }
 
 const InputWithLabel: React.FC<InputWithLabelProps> = ({
@@ -30,6 +34,10 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
   disabled = false,
   required = false,
   className = '',
+  maxLength,
+  minLength,
+  pattern,
+  autoComplete,
 }) => {
   const inputId = `input-${name}`;
 
@@ -45,7 +53,6 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
               }
             >
               {label}
-              {required && <span className="ml-1 text-red-500">*</span>}
             </label>
           ) : (
             label
@@ -65,6 +72,10 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
         onBlur={onBlur}
         disabled={disabled}
         required={required}
+        maxLength={maxLength}
+        minLength={minLength}
+        pattern={pattern}
+        autoComplete={autoComplete}
         className={`w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 placeholder-gray-400 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''} ${className} `
           .trim()
           .replace(/\s+/g, ' ')}

@@ -50,3 +50,7 @@ report/
 
 .vscode
 .idea/
+.cursor/rules/core.md
+.cursor/rules/core.mdc
+
+.cursor/rules/task.mdc

@@ -2,6 +2,7 @@ import { TeamMemberWithUser, TeamProperties } from '@/types';
 import { api } from '@/lib/api/client';
 import {
   Team,
+  TeamDetail,
   TeamSummary,
   TeamWithProducts,
   TeamSettingsUpdate,
@@ -15,7 +16,7 @@ export const teamsEndpoints = {
 
   create: (data: TeamCreateRequest) => api.post<Team>('/teams', data),
 
-  getTeam: (slug: string) => api.get<Team>(`/teams/${slug}`),
+  getTeam: (slug: string) => api.get<TeamDetail>(`/teams/${slug}`),
 
   getTeamProducts: (slug: string) =>
     api.get<OscratProductSummary[]>(`/teams/${slug}/products`),
@@ -35,8 +36,8 @@ export const teamsEndpoints = {
     }),
 
   updateMember: (slug: string, userId: string, role: string) =>
-    api.put<TeamMemberWithUser>(`/teams/${slug}/members`, {
-      userId,
+    api.patch<TeamMemberWithUser>(`/teams/${slug}/members`, {
+      memberId: userId,
       role,
     }),
 

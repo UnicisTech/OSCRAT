@@ -1,5 +1,5 @@
 import { sendAudit } from '@/lib/retraced';
-import { deleteTeam, getTeam, updateTeam } from 'models/team';
+import { deleteTeam, getTeamDetail, updateTeam } from 'models/team';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
@@ -35,7 +35,7 @@ const handleGET = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const team = await getTeam({ id: teamMember.teamId });
+  const team = await getTeamDetail({ id: teamMember.teamId });
 
   recordMetric('team.fetched');
 

@@ -7,15 +7,16 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
 import { WithLoadingAndError } from '@/components/shared';
 import CreateTeam from '@/components/oscrat/organization/addNewOrganization';
 import { extractErrorMessage } from '@/lib/utils';
+import { useRouter } from 'next/router';
+import { useAcceptInvitation } from '@/lib/api/hooks/invitations';
 
 const Teams = () => {
-  const router = useRouter();
   const { t } = useTranslation('common');
+  const router = useRouter();
   const [selectedTeam, setSelectedTeam] = useState<TeamSummary | null>(null);
   const {
     teams: teamsResponse,
@@ -25,6 +26,7 @@ const Teams = () => {
   const teamSlug = selectedTeam?.slug || '';
   const { leaveTeam: leaveTeamAction, isLoading: isLeavingTeam } =
     useTeam(teamSlug);
+  const { mutateAsync: acceptInvitationMutation } = useAcceptInvitation();
   const leaveTeam = async () => {
     if (!selectedTeam?.slug) return;
     return leaveTeamAction();
@@ -32,13 +34,27 @@ const Teams = () => {
   const [askConfirmation, setAskConfirmation] = useState(false);
   const [createTeamVisible, setCreateTeamVisible] = useState(false);
 
-  const { newTeam } = router.query as { newTeam: string };
-
+  // Handle invitation acceptance from query param
   useEffect(() => {
-    if (newTeam) {
-      setCreateTeamVisible(true);
-    }
-  }, [newTeam]);
+    const handleInvitationAcceptance = async () => {
+      const inviteToken = router.query.token as string;
+      
+      if (inviteToken) {
+        try {
+          await acceptInvitationMutation({ token: inviteToken });
+          toast.success(t('oscrat.ui.invitation-accepted'));
+          router.replace('/teams', undefined, { shallow: true });
+        } catch (error: unknown) {
+          console.error('Failed to accept invitation:', error);
+          toast.error(extractErrorMessage(error, t('failed-to-accept-invitation')));
+          
+          router.replace('/teams', undefined, { shallow: true });
+        }
+      }
+    };
+
+    handleInvitationAcceptance();
+  }, [router.query.token, acceptInvitationMutation, router, t]);
 
   const handleLeaveTeam = async () => {
     try {
@@ -53,6 +69,8 @@ const Teams = () => {
 
   const isLoading = isLoadingTeams || isLeavingTeam;
 
+  const hasTeams = teamsResponse && teamsResponse.length > 0;
+
   return (
     <>
       <WithLoadingAndError isLoading={isLoading} error={isError}>
@@ -63,7 +81,7 @@ const Teams = () => {
                 {t('all-teams')}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('team-listed')}
+                {hasTeams ? t('team-listed') : t('no-teams-yet')}
               </p>
             </div>
             <Button
@@ -75,45 +93,47 @@ const Teams = () => {
               {t('create-team')}
             </Button>
           </div>
-          <table className="dark:border-base-200 table w-full border-b text-sm">
-            <thead className="dark:bg-base-200 bg-gray-200 text-gray-600 dark:text-gray-400">
-              <tr>
-                <th>{t('name')}</th>
-                <th>{t('members')}</th>
-                <th>{t('created-at')}</th>
-                <th>{t('actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {teamsResponse?.map((team) => (
-                <tr key={team.id}>
-                  <td>
-                    <Link href={`/teams/${team.slug}/dashboard`}>
-                      <div className="flex items-center justify-start space-x-2">
-                        <LetterAvatar name={team.name} />
-                        <span className="underline">{team.name}</span>
-                      </div>
-                    </Link>
-                  </td>
-                  <td>{team.membersCount}</td>
-                  <td>{new Date(team.createdAt).toDateString()}</td>
-                  <td>
-                    <Button
-                      variant="outline"
-                      size="xs"
-                      color="error"
-                      onClick={() => {
-                        setSelectedTeam(team);
-                        setAskConfirmation(true);
-                      }}
-                    >
-                      {t('leave-team')}
-                    </Button>
-                  </td>
+          
+            <table className="dark:border-base-200 table w-full border-b text-sm">
+              <thead className="dark:bg-base-200 bg-gray-200 text-gray-600 dark:text-gray-400">
+                <tr>
+                  <th>{t('name')}</th>
+                  <th>{t('members')}</th>
+                  <th>{t('created-at')}</th>
+                  <th>{t('actions')}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {teamsResponse?.map((team) => (
+                  <tr key={team.id}>
+                    <td>
+                      <Link href={`/teams/${team.slug}/dashboard`}>
+                        <div className="flex items-center justify-start space-x-2">
+                          <LetterAvatar name={team.name} />
+                          <span className="underline">{team.name}</span>
+                        </div>
+                      </Link>
+                    </td>
+                    <td>{team.membersCount}</td>
+                    <td>{new Date(team.createdAt).toDateString()}</td>
+                    <td>
+                      <Button
+                        variant="outline"
+                        size="xs"
+                        color="error"
+                        onClick={() => {
+                          setSelectedTeam(team);
+                          setAskConfirmation(true);
+                        }}
+                      >
+                        {t('leave-team')}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
           <ConfirmationDialog
             visible={askConfirmation}
             title={`${t('leave-team')} ${selectedTeam?.name}`}

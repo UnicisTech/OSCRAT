@@ -2,17 +2,11 @@ import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import * as Yup from 'yup';
 
 import { Card, InputWithLabel } from '@/components/shared';
-import { passwordPolicies } from '@/lib/common';
 import { useAccount } from '@/hooks/useAccount';
 import { extractErrorMessage } from '@/lib/utils';
-
-const schema = Yup.object().shape({
-  currentPassword: Yup.string().required(),
-  newPassword: Yup.string().required().min(passwordPolicies.minLength),
-});
+import { updatePasswordSchema } from '@/lib/validation/auth';
 
 const UpdatePassword = () => {
   const { t } = useTranslation('common');
@@ -23,7 +17,7 @@ const UpdatePassword = () => {
       currentPassword: '',
       newPassword: '',
     },
-    validationSchema: schema,
+    validationSchema: updatePasswordSchema,
     onSubmit: async (values) => {
       const result = await updatePassword(values);
 

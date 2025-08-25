@@ -1,4 +1,3 @@
-import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
@@ -8,11 +7,7 @@ import { User } from '@oscrat/model';
 import { Card, InputWithLabel } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
 import { extractErrorMessage } from '@/lib/utils';
-
-const schema = Yup.object().shape({
-  firstName: Yup.string().required(),
-  lastName: Yup.string().required(),
-});
+import { updateNameSchema } from '@/lib/validation/auth';
 
 const UpdateName = ({ user }: { user: Partial<User> }) => {
   const { t } = useTranslation('common');
@@ -24,7 +19,7 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
       lastName: user.lastName,
     },
     enableReinitialize: true,
-    validationSchema: schema,
+    validationSchema: updateNameSchema,
     onSubmit: async (values) => {
       const result = await updateUser(values);
 

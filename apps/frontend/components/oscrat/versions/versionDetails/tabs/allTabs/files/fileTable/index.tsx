@@ -1,6 +1,5 @@
 import React from 'react';
 import { IoAdd } from 'react-icons/io5';
-import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
 import type { Attachment } from '@/types';
 
@@ -9,6 +8,7 @@ interface FileTableProps {
   onAddFileClick: () => void;
   onDownloadFile?: (fileId: string, filename: string) => void;
   onDeleteFile?: (fileId: string) => void;
+  downloadingFiles?: Set<string>;
 }
 
 const FileTable: React.FC<FileTableProps> = ({
@@ -16,18 +16,25 @@ const FileTable: React.FC<FileTableProps> = ({
   onAddFileClick,
   onDownloadFile,
   onDeleteFile,
+  downloadingFiles = new Set(),
 }) => {
   const { t, ready } = useTranslation('common');
   if (!ready) return null;
 
-  const tableHeaders = ['Name', 'Description', 'Date Added', 'Added by', ''];
+  const tableHeaders = [
+    t('oscrat.ui.file-name'),
+    t('oscrat.ui.file-description'),
+    t('oscrat.ui.date-added'),
+    t('oscrat.ui.added-by'),
+    '',
+  ];
 
   return (
     <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
       <div className="mb-4">
         <button
           onClick={onAddFileClick}
-          className="flex items-center justify-center rounded-md border border-gray-600 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+          className="flex items-center justify-center rounded-md border border-gray-600 bg-white px-3 py-1 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
         >
           <IoAdd className="mr-2" size={18} />
           {t('oscrat.ui.add-file')}
@@ -54,7 +61,7 @@ const FileTable: React.FC<FileTableProps> = ({
                   {attachment.name}
                 </td>
                 <td className="px-6 py-4">
-                  {attachment.description || 'No description'}
+                  {attachment.description || t('oscrat.ui.no-description')}
                 </td>
                 <td className="px-6 py-4">
                   {new Date(attachment.createdAt).toLocaleDateString('en-GB')}
@@ -63,28 +70,48 @@ const FileTable: React.FC<FileTableProps> = ({
                   {attachment.createdByUser
                     ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
                       attachment.createdByUser.name
-                    : 'Unknown'}
+                    : t('oscrat.ui.unknown')}
                 </td>
                 <td className="px-6 py-4 text-center">
-                  <div className="flex gap-2">
+                  <div className="flex gap-6">
                     {onDownloadFile && (
                       <button
                         onClick={() =>
                           onDownloadFile(attachment.id, attachment.name)
                         }
-                        className="text-blue-600 hover:text-blue-800"
-                        title="Download"
+                        disabled={downloadingFiles.has(attachment.id)}
+                        className={`${
+                          downloadingFiles.has(attachment.id)
+                            ? 'cursor-not-allowed text-gray-400'
+                            : 'text-blue-600 hover:text-blue-800'
+                        }`}
+                        title={
+                          downloadingFiles.has(attachment.id)
+                            ? t('oscrat.ui.downloading')
+                            : t('oscrat.ui.download')
+                        }
                       >
-                        Download
+                        {downloadingFiles.has(attachment.id)
+                          ? t('oscrat.ui.downloading')
+                          : t('oscrat.ui.download')}
                       </button>
                     )}
                     {onDeleteFile && (
                       <button
                         onClick={() => onDeleteFile(attachment.id)}
-                        className="text-red-600 hover:text-red-800"
-                        title="Delete"
+                        disabled={downloadingFiles.has(attachment.id)}
+                        className={`${
+                          downloadingFiles.has(attachment.id)
+                            ? 'cursor-not-allowed text-gray-400'
+                            : 'text-red-600 hover:text-red-800'
+                        }`}
+                        title={
+                          downloadingFiles.has(attachment.id)
+                            ? t('oscrat.ui.download-in-progress')
+                            : t('delete')
+                        }
                       >
-                        Delete
+                        {t('delete')}
                       </button>
                     )}
                   </div>

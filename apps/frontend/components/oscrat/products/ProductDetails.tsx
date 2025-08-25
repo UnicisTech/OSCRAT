@@ -43,12 +43,12 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
 
     try {
       await deleteProject.mutateAsync(undefined);
-      toast.success('Project deleted successfully');
+      toast.success(t('oscrat.ui.product-deleted-successfully'));
       const redirectPath = `/teams/${slug}/products`;
       router.replace(redirectPath);
     } catch (error) {
       setIsRedirecting(false);
-      toast.error(extractErrorMessage(error, 'Failed to delete project'));
+      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-delete-product')));
     }
   };
 
@@ -59,9 +59,9 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
   const handleEdit = async (updatedData: OscratProductUpdate) => {
     try {
       await updateProject(updatedData);
-      toast.success('Project updated successfully');
+      toast.success(t('oscrat.ui.product-updated-successfully'));
     } catch (error) {
-      toast.error(extractErrorMessage(error, 'Failed to update project'));
+      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-update-product')));
     }
   };
 

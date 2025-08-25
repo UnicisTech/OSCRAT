@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import { withTeamLayout } from '@/lib/layout-helpers';
 import { CreateDirectory, Directory } from '@/components/directorySync';
 import { Card } from '@/components/shared';
 import { Error } from '@/components/shared';
@@ -9,7 +11,6 @@ import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
 import type { NextPageWithLayout } from 'types';
@@ -18,8 +19,6 @@ import { getSession } from '@/lib/session';
 import { getTeamMember } from '@/lib/middleware/auth';
 import { isAllowed } from '@/lib/middleware';
 import { inferSSRProps } from '@/lib/inferSSRProps';
-import TeamLayout from '@/components/layouts/TeamLayout';
-import AccountLayout from '@/components/layouts/AccountLayout';
 
 const DirectorySync: NextPageWithLayout<
   inferSSRProps<typeof getServerSideProps>
@@ -100,13 +99,7 @@ const DirectorySync: NextPageWithLayout<
   );
 };
 
-DirectorySync.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <AccountLayout>
-      <TeamLayout>{page}</TeamLayout>
-    </AccountLayout>
-  );
-};
+DirectorySync.getLayout = withTeamLayout;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { locale, req, res, query } = context;

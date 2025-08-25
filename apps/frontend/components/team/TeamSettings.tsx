@@ -1,5 +1,4 @@
 import { Card, InputWithLabel } from '@/components/shared';
-import { domainRegex } from '@/lib/common';
 import { Team } from '@oscrat/model';
 import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
@@ -7,9 +6,9 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import * as Yup from 'yup';
 import { useTeam } from '@/hooks/useTeam';
 import { extractErrorMessage } from '@/lib/utils';
+import { teamSettingsSchema } from '@/lib/validation/team';
 
 import { AccessControl } from '../shared/AccessControl';
 
@@ -24,13 +23,7 @@ const TeamSettings = ({ team }: { team: Team }) => {
       slug: team.slug,
       domain: team.domain,
     },
-    validationSchema: Yup.object().shape({
-      name: Yup.string().required('Name is required'),
-      slug: Yup.string().required('Slug is required'),
-      domain: Yup.string().nullable().matches(domainRegex, {
-        message: 'Invalid domain: ${value}',
-      }),
-    }),
+    validationSchema: teamSettingsSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {

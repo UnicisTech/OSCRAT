@@ -4,9 +4,10 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { NextPageWithLayout } from 'types';
 import React from 'react';
 import AccountLayout from '@/components/layouts/AccountLayout';
+import env from '@/lib/env';
 
 const AllTeams: NextPageWithLayout = () => {
-  return <Teams />;
+  return <Teams/>;
 };
 
 AllTeams.getLayout = function getLayout(page: React.ReactNode) {
@@ -17,6 +18,7 @@ export async function getStaticProps({ locale }: GetStaticPropsContext) {
   return {
     props: {
       ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
+      recaptchaSiteKey: env.recaptcha.siteKey,
     },
   };
 }

@@ -1,17 +1,16 @@
-import { hashPassword, validatePasswordPolicy } from '@/lib/auth';
-import { generateToken, slugify } from '@/lib/common';
+import { hashPassword } from '@/lib/auth';
+import { generateToken } from '@/lib/common';
 import { sendVerificationEmail } from '@/lib/email/sendVerificationEmail';
 import { prisma } from '@/lib/prisma';
-import { isBusinessEmail } from '@/lib/email/utils';
 import env from '@/lib/env';
 import { ApiError } from '@/lib/errors';
-import { createTeam, isTeamExists } from 'models/team';
 import { createUser, getUser } from 'models/user';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { getInvitation, isInvitationExpired } from 'models/invitation';
 import { validateRecaptcha } from '@/lib/recaptcha';
 import { withApiHandler } from '@/lib/middleware';
+import { userSignupSchema } from '@/lib/validation/signup';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
@@ -30,113 +29,72 @@ export default withApiHandler(handler);
 
 // Signup the user
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
+  // Create backend-specific schema without retypePassword
+  const backendSignupSchema = userSignupSchema.omit(['retypePassword']);
+  
+  try {
+    await backendSignupSchema.validate(req.body, { abortEarly: false });
+  } catch (error) {
+    if (error instanceof Error && (error as any).errors) {
+      const validationErrors = (error as any).errors;
+      throw new ApiError(400, `Validation failed: ${validationErrors.join(', ')}`);
+    } else {
+      throw new ApiError(400, `Validation failed`);
+    }
+  }
+
   const {
     firstName,
     lastName,
     email,
     password,
-    team,
-    teamData,
     inviteToken,
     recaptchaToken,
   } = req.body;
   const name = `${firstName} ${lastName}`;
 
-  console.log(
-    `[Auth] signup started, email: ${email}, team: ${team}, hasInviteToken: ${!!inviteToken}`
-  );
-
-  console.log(`[Auth] validating recaptcha`);
-  try {
-    await validateRecaptcha(recaptchaToken);
-    console.log(`[Auth] recaptcha validated`);
-  } catch (error: any) {
-    console.log(`[Auth] recaptcha validation failed, error: ${error.message}`);
-    throw error;
+  // Validate recaptcha if provided
+  if (recaptchaToken) {
+    try {
+      await validateRecaptcha(recaptchaToken);
+    } catch (error: any) {
+      throw new ApiError(400, `Recaptcha validation failed: ${error.message}`);
+    }
   }
 
-  console.log(`[Auth] checking invitation, hasInviteToken: ${!!inviteToken}`);
+  // Handle invitation if provided
   let invitation;
-  try {
-    invitation = inviteToken
-      ? await getInvitation({ token: inviteToken })
-      : null;
-    console.log(`[Auth] invitation fetched, valid: ${!!invitation}`);
-  } catch (error: any) {
-    console.log(
-      `[Auth] getInvitation failed, token: ${inviteToken}, error: ${error.message}`
-    );
-    throw error;
+  if (inviteToken) {
+    try {
+      invitation = await getInvitation({ token: inviteToken });
+      
+      if (await isInvitationExpired(invitation)) {
+        throw new ApiError(400, 'Invitation expired. Please request a new one.');
+      }
+    } catch (error: any) {
+      throw new ApiError(400, `Failed to get invitation: ${error.message}`);
+    }
   }
 
-  if (invitation && (await isInvitationExpired(invitation))) {
-    console.log(`[Auth] invitation expired, token: ${inviteToken}`);
-    throw new ApiError(400, 'Invitation expired. Please request a new one.');
-  }
-
-  // If invitation is present, use the email from the invitation instead of the email in the request body
+  // Use email from invitation if available, otherwise use provided email
   const emailToUse = invitation ? invitation.email : email;
-  console.log(
-    `[Auth] using email: ${emailToUse}, fromInvitation: ${!!invitation}`
-  );
 
-  console.log(`[Auth] checking business email policy`);
-  if (env.disableNonBusinessEmailSignup && !isBusinessEmail(emailToUse)) {
-    console.log(`[Auth] non-business email rejected: ${emailToUse}`);
-    throw new ApiError(
-      400,
-      `We currently only accept work email addresses for sign-up. Please use your work email to create an account. If you don't have a work email, feel free to contact our support team for assistance.`
-    );
-  }
-
-  console.log(`[Auth] checking existing user, email: ${emailToUse}`);
+  // Check if user already exists
   try {
     const existingUser = await getUser({ email: emailToUse });
     if (existingUser) {
-      console.log(`[Auth] user already exists: ${emailToUse}`);
       throw new ApiError(400, 'An user with this email already exists.');
     }
-    console.log(`[Auth] user doesn't exist, proceeding with signup`);
   } catch (error: any) {
     if (error.status === 400) {
       throw error; // Re-throw ApiError
     }
-    console.log(
-      `[Auth] getUser failed, email: ${emailToUse}, error: ${error.message}`
-    );
-    throw error;
+    throw new ApiError(500, `Failed to check existing user: ${error.message}`);
   }
 
-  console.log(`[Auth] validating password policy`);
-  validatePasswordPolicy(password);
 
-  // Check if team name is available
-  if (!invitation) {
-    console.log(`[Auth] checking team availability, name: ${team}`);
-    if (!team) {
-      throw new ApiError(400, 'A team name is required.');
-    }
 
-    const slug = slugify(team);
-    try {
-      const nameCollisions = await isTeamExists([{ name: team }, { slug }]);
-      if (nameCollisions) {
-        console.log(`[Auth] team name collision, name: ${team}, slug: ${slug}`);
-        throw new ApiError(400, 'A team with this name already exists.');
-      }
-      console.log(`[Auth] team name available, name: ${team}, slug: ${slug}`);
-    } catch (error: any) {
-      if (error.status === 400) {
-        throw error; // Re-throw ApiError
-      }
-      console.log(
-        `[Auth] isTeamExists failed, name: ${team}, slug: ${slug}, error: ${error.message}`
-      );
-      throw error;
-    }
-  }
-
-  console.log(`[Auth] creating user, email: ${emailToUse}`);
+  // Create user
   let user;
   try {
     user = await createUser({
@@ -147,62 +105,11 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
       password: await hashPassword(password),
       emailVerified: invitation ? new Date() : null,
     });
-    console.log(
-      `[Auth] user created, userId: ${user.id}, email: ${emailToUse}`
-    );
   } catch (error: any) {
-    console.log(
-      `[Auth] createUser failed, email: ${emailToUse}, error: ${error.message}`
-    );
-    throw error;
+    throw new ApiError(500, `Failed to create user: ${error.message}`);
   }
 
-  if (!invitation) {
-    const teamName = teamData?.name || team;
-    const slug = slugify(teamName);
 
-    console.log(
-      `[Auth] creating team, name: ${teamName}, slug: ${slug}, userId: ${user.id}, enhanced: ${!!teamData}`
-    );
-    try {
-      const nameCollisions = await isTeamExists([{ name: teamName }, { slug }]);
-      if (nameCollisions) {
-        console.log(
-          `[Auth] team name collision, name: ${teamName}, slug: ${slug}`
-        );
-        throw new ApiError(400, 'A team with this name already exists.');
-      }
-
-      const teamCreateData = teamData
-        ? {
-            userId: user.id,
-            name: teamData.name,
-            slug,
-            type: teamData.type,
-            size: teamData.size,
-            taxId: teamData.taxId,
-            postalAddress: teamData.postalAddress,
-            contactEmail: teamData.contactEmail,
-            contactPhone: teamData.contactPhone,
-            additionalInformation: teamData.additionalInformation,
-          }
-        : {
-            userId: user.id,
-            name: team,
-            slug,
-          };
-
-      await createTeam(teamCreateData);
-      console.log(
-        `[Auth] team created successfully, name: ${teamName}, userId: ${user.id}`
-      );
-    } catch (error: any) {
-      console.log(
-        `[Auth] team creation failed, name: ${teamName}, userId: ${user.id}, error: ${error.message}`
-      );
-      throw error;
-    }
-  }
 
   // Send account verification email
   if (env.confirmEmail && !user.emailVerified) {
@@ -216,10 +123,6 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
 
     await sendVerificationEmail({ user, verificationToken });
   }
-
-  console.log(
-    `[Auth] signup success, userId: ${user.id}, email: ${emailToUse}, teamCreated: ${!invitation}`
-  );
 
   recordMetric('user.signup');
 

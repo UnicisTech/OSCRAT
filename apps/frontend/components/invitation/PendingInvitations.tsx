@@ -53,8 +53,8 @@ const PendingInvitations = ({ team }: { team: Team }) => {
           {t('description-invitations')}
         </p>
       </div>
-      <table className="dark:border-base-200 table w-full border-b text-sm">
-        <thead className="bg-base-200">
+      <table className="table w-full border-b text-sm">
+        <thead className="bg-gray-200 text-gray-600">
           <tr>
             <th>{t('email')}</th>
             <th>{t('role')}</th>

@@ -29,7 +29,7 @@ const Table: React.FC<RepositoryTableProps> = ({
   // If no repositories exist, show warning message and add button only
   if (repositories.length === 0) {
     return (
-      <div className="w-full rounded-lg bg-white">
+      <div className="w-full rounded-lg bg-white px-4">
         <div className="flex items-center gap-4">
           {/* Add New button */}
           <button
@@ -73,9 +73,13 @@ const Table: React.FC<RepositoryTableProps> = ({
           <tbody>
             {repositories.map((repo) => (
               <tr key={repo.id} className="bg-white hover:bg-gray-50">
-                <td className="bg-white px-6 text-gray-900">{repo.name}</td>
-                <td className="bg-white px-6 text-gray-900">{repo.provider}</td>
-                <td className="max-w-xs truncate bg-white px-6 text-gray-900">
+                <td className="bg-white px-6 py-2 text-gray-900">
+                  {repo.name}
+                </td>
+                <td className="bg-white px-6 py-2 text-gray-900">
+                  {repo.provider}
+                </td>
+                <td className="max-w-xs truncate bg-white px-6 py-2 text-gray-900">
                   <Link
                     href={repo.repositoryUrl}
                     target="_blank"
@@ -87,18 +91,18 @@ const Table: React.FC<RepositoryTableProps> = ({
                 <td className="bg-white px-6 py-2 text-right">
                   <div className="flex items-center justify-end space-x-4">
                     <button
-                      onClick={() => onDelete(repo.id)}
-                      disabled={isLoading}
-                      className="px-3 py-1 text-sm text-gray-500 hover:text-red-600 disabled:opacity-50"
-                    >
-                      Delete
-                    </button>
-                    <button
                       onClick={() => onEdit(repo.id)}
                       disabled={isLoading}
                       className="rounded border border-gray-400 px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                     >
-                      Edit
+                      {t('edit')}
+                    </button>
+                    <button
+                      onClick={() => onDelete(repo.id)}
+                      disabled={isLoading}
+                      className="px-3 py-1 text-sm text-gray-500 hover:text-red-600 disabled:opacity-50"
+                    >
+                      {t('delete')}
                     </button>
                   </div>
                 </td>

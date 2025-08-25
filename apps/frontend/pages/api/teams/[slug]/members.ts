@@ -69,19 +69,14 @@ const handleDELETE = async (
     throw new ApiError(404, 'Team member not found.');
   }
 
-  let teamMemberRemoved;
   try {
-    teamMemberRemoved = await removeTeamMember(teamMember.teamId, userId);
+    await removeTeamMember(teamMember.teamId, userId);
   } catch (error) {
     console.error('Error removing team member:', error);
     throw new ApiError(500, 'Failed to remove team member.');
   }
 
-  if (!teamMemberRemoved) {
-    throw new ApiError(404, 'Team member not found.');
-  }
-
-  await sendEvent(teamMember.teamId, 'member.removed', teamMemberRemoved);
+  await sendEvent(teamMember.teamId, 'member.removed', existingMember);
 
   sendAudit({
     action: 'member.remove',

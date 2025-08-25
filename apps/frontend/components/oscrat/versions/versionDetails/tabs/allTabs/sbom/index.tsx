@@ -78,6 +78,7 @@ export default function Sbom() {
   const handleDownload = async (id: string, filename: string) => {
     try {
       await downloadAttachment(id, filename);
+      toast.success('Download will start shortly');
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, 'Failed to download SBOM file'));
     }

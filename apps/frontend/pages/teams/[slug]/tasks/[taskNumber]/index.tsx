@@ -109,7 +109,7 @@ const TaskById = ({
 TaskById.getLayout = function getLayout(page: React.ReactNode) {
   return (
     <AccountLayout>
-      <TeamLayout>{page}</TeamLayout>
+     {page}
     </AccountLayout>
   );
 };

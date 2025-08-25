@@ -4,22 +4,21 @@ import {
   Loading,
   WithLoadingAndError,
 } from '@/components/shared';
-import { defaultHeaders, passwordPolicies } from '@/lib/common';
-import type { User } from '@oscrat/model';
+import { joinWithInvitationSchema } from '@/lib/validation/auth';
 import { useFormik } from 'formik';
 import { useInvitation } from 'hooks/useInvitation';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import type { ApiResponse } from 'types';
-import * as Yup from 'yup';
 import TogglePasswordVisibility from '../shared/TogglePasswordVisibility';
 import { useRef, useState } from 'react';
 import AgreeMessage from './AgreeMessage';
 import GoogleReCAPTCHA from '../shared/GoogleReCAPTCHA';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { extractErrorMessage } from '@/lib/utils';
+import { useJoin } from '@/hooks/useJoin';
+import { signIn } from 'next-auth/react';
+
 
 interface JoinWithInvitationProps {
   inviteToken: string;
@@ -30,12 +29,12 @@ const JoinWithInvitation = ({
   inviteToken,
   recaptchaSiteKey,
 }: JoinWithInvitationProps) => {
-  const router = useRouter();
   const { t } = useTranslation('common');
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const { isLoading, error, invitation } = useInvitation(inviteToken);
   const [recaptchaToken, setRecaptchaToken] = useState<string>('');
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const { join } = useJoin();
 
   const handlePasswordVisibility = () => {
     setIsPasswordVisible((prev) => !prev);
@@ -47,36 +46,35 @@ const JoinWithInvitation = ({
       lastName: '',
       password: '',
     },
-    validationSchema: Yup.object().shape({
-      firstName: Yup.string().required(),
-      lastName: Yup.string().required(),
-      password: Yup.string().required().min(passwordPolicies.minLength),
-    }),
+    validationSchema: joinWithInvitationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {
-        const response = await fetch('/api/auth/join', {
-          method: 'POST',
-          headers: defaultHeaders,
-          body: JSON.stringify({
-            ...values,
-            recaptchaToken,
-            inviteToken,
-          }),
-        });
-
-        const json = (await response.json()) as ApiResponse<User>;
-
-        recaptchaRef.current?.reset();
-
-        if (!response.ok) {
-          toast.error(json.error.message);
+        if (!invitation) {
+          toast.error(t('invitation-not-found'));
           return;
         }
-
+        
+        // Create the account
+        await join({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: invitation.email,
+          password: values.password,
+          recaptchaToken,
+        });
+        
+        recaptchaRef.current?.reset();
         formik.resetForm();
         toast.success(t('successfully-joined'));
-        router.push(`/auth/login?token=${inviteToken}`);
+    
+        await signIn('credentials', {
+          email: invitation.email,
+          password: values.password,
+          redirect: true,
+          callbackUrl: `/teams?token=${inviteToken}`,
+        });
+        
       } catch (error: unknown) {
         toast.error(extractErrorMessage(error, t('error-joining')));
         recaptchaRef.current?.reset();

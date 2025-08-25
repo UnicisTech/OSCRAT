@@ -128,6 +128,10 @@ const handleDELETE = async (
 
   const { id } = req.query as { id: string };
 
+  if (!id) {
+    throw new ApiError(400, 'Invitation ID is required.');
+  }
+
   const invitation = await getInvitation({ id });
 
   if (
@@ -140,7 +144,12 @@ const handleDELETE = async (
     );
   }
 
-  await deleteInvitation({ id });
+  try {
+    await deleteInvitation({ id });
+  } catch (error) {
+    console.error('Error deleting invitation:', error);
+    throw new ApiError(500, 'Failed to delete invitation.');
+  }
 
   sendAudit({
     action: 'member.invitation.delete',

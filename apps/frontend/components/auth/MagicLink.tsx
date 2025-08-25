@@ -1,5 +1,6 @@
 import { InputWithLabel, Loading } from '@/components/shared';
 import env from '@/lib/env';
+import { magicLinkSchema } from '@/lib/validation/auth';
 import { useFormik } from 'formik';
 import { useInvitation } from 'hooks/useInvitation';
 import { signIn, useSession } from 'next-auth/react';
@@ -9,7 +10,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import * as Yup from 'yup';
 
 interface MagicLinkProps {
   csrfToken: string | undefined;
@@ -31,9 +31,7 @@ const MagicLink = ({ csrfToken }: MagicLinkProps) => {
     initialValues: {
       email: '',
     },
-    validationSchema: Yup.object().shape({
-      email: Yup.string().required().email(),
-    }),
+    validationSchema: magicLinkSchema,
     onSubmit: async (values) => {
       const response = await signIn('email', {
         email: values.email,

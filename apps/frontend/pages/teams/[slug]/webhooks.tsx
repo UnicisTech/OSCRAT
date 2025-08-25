@@ -1,11 +1,11 @@
+import React from 'react';
+import { withTeamLayout } from '@/lib/layout-helpers';
 import { TeamTab } from '@/components/team';
 import { Webhooks } from '@/components/webhook';
 import { useTeamContext } from '@/context/TeamContext';
 import { GetServerSidePropsContext } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import env from '@/lib/env';
-import TeamLayout from '@/components/layouts/TeamLayout';
-import AccountLayout from '@/components/layouts/AccountLayout';
 
 const WebhookList = ({ teamFeatures }) => {
   const { teamContext } = useTeamContext();
@@ -19,13 +19,7 @@ const WebhookList = ({ teamFeatures }) => {
   );
 };
 
-WebhookList.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <AccountLayout>
-      <TeamLayout>{page}</TeamLayout>
-    </AccountLayout>
-  );
-};
+WebhookList.getLayout = withTeamLayout;
 
 export async function getServerSideProps({
   locale,

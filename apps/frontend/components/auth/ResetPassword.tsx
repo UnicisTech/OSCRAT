@@ -1,57 +1,40 @@
 import { InputWithLabel } from '@/components/shared';
-import { defaultHeaders, passwordPolicies } from '@/lib/common';
+import { resetPasswordSchema } from '@/lib/validation/auth';
 import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
-import type { ApiResponse } from 'types';
-import * as Yup from 'yup';
+import { useResetPassword } from '@/hooks/useResetPassword';
+import { handleApiError } from '@/lib/errorHandler';
+import type { ApiError } from '@/types';
 
 const ResetPassword = () => {
-  const [submitting, setSubmitting] = useState<boolean>(false);
   const router = useRouter();
   const { t } = useTranslation('common');
   const { token } = router.query as { token: string };
+  const { resetPassword, isLoading } = useResetPassword();
 
   const formik = useFormik({
     initialValues: {
       password: '',
       confirmPassword: '',
     },
-    validationSchema: Yup.object().shape({
-      password: Yup.string().required().min(passwordPolicies.minLength),
-      confirmPassword: Yup.string().test(
-        'passwords-match',
-        'Passwords must match',
-        (value, context) => value === context.parent.password
-      ),
-    }),
+    validationSchema: resetPasswordSchema,
     onSubmit: async (values) => {
-      setSubmitting(true);
-
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: defaultHeaders,
-        body: JSON.stringify({
-          ...values,
+      try {
+        await resetPassword({
           token,
-        }),
-      });
-
-      const json = (await response.json()) as ApiResponse;
-
-      setSubmitting(false);
-
-      if (!response.ok) {
-        toast.error(json.error.message);
-        return;
+          password: values.password,
+        });
+        
+        formik.resetForm();
+        toast.success(t('password-updated'));
+        router.push('/auth/login');
+      } catch (error: unknown) {
+        const errorMessage = handleApiError(error as ApiError);
+        toast.error(errorMessage);
       }
-
-      formik.resetForm();
-      toast.success(t('password-updated'));
-      router.push('/auth/login');
     },
   });
 
@@ -86,7 +69,7 @@ const ResetPassword = () => {
           <Button
             type="submit"
             color="primary"
-            loading={submitting}
+            loading={isLoading}
             active={formik.dirty}
             fullWidth
             size="md"

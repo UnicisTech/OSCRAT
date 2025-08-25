@@ -6,8 +6,8 @@ import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { Button, Input } from 'react-daisyui';
 import toast from 'react-hot-toast';
-import * as Yup from 'yup';
 import Modal from '../shared/Modal';
+import { inviteMemberSchema } from '@/lib/validation/team';
 
 const InviteMember = ({
   visible,
@@ -26,12 +26,7 @@ const InviteMember = ({
       email: '',
       role: availableRoles[0].id,
     },
-    validationSchema: Yup.object().shape({
-      email: Yup.string().email().required(t('require-email')),
-      role: Yup.string()
-        .required(t('required-role'))
-        .oneOf(availableRoles.map((r) => r.id)),
-    }),
+    validationSchema: inviteMemberSchema,
     onSubmit: async (values) => {
       try {
         await createInvitation(values.email, values.role);
@@ -64,9 +59,10 @@ const InviteMember = ({
               value={formik.values.email}
               placeholder="email@unicis.tech"
               required
+              className="input input-bordered bg-white text-black border-gray-300 placeholder-gray-500"
             />
             <select
-              className="select select-bordered rounded"
+              className="select select-bordered rounded bg-white text-black border-gray-300"
               name="role"
               onChange={formik.handleChange}
               required

@@ -1,5 +1,4 @@
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
@@ -8,6 +7,7 @@ import type { User } from '@oscrat/model';
 import type { ApiResponse } from 'types';
 import { InputWithLabel, Loading, Error } from '@/components/shared';
 import { useInvitation } from 'hooks/useInvitation';
+import { joinOrgWithInvitationSchema } from '@/lib/validation/auth';
 
 const JoinWithInvitation = ({
   inviteToken,
@@ -26,10 +26,7 @@ const JoinWithInvitation = ({
       name: '',
       email: invitation?.email,
     },
-    validationSchema: Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string().required().email(),
-    }),
+    validationSchema: joinOrgWithInvitationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
       const response = await fetch('/api/auth/join', {

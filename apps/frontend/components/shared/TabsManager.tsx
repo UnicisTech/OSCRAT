@@ -1,13 +1,10 @@
 import { useState } from 'react';
 import NotSupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/notSupported';
 import SupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/supported';
-import {
-  OscratProductVersionSummary,
-  OscratProductVersionCreate,
-} from '@oscrat/model';
+import { OscratProductVersionSummary } from '@oscrat/model';
 import Index from '@/components/oscrat/products/productDetails/addVersion';
-import { useOscratVersions } from '@/hooks/oscrat/useOscratVersion';
 import { useProductContext } from '@/context/ProductContext';
+import { useSession } from 'next-auth/react';
 
 export type TabConfig = {
   id: string;
@@ -32,7 +29,7 @@ export default function TabsManager({
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const { teamId, productId } = useProductContext();
-  const { createVersion } = useOscratVersions(teamId, productId);
+  const { data: session } = useSession();
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -44,11 +41,6 @@ export default function TabsManager({
     } else {
       setShowCreateModal(true);
     }
-  };
-
-  const handleCreateVersion = async (data: OscratProductVersionCreate) => {
-    await createVersion(data);
-    setShowCreateModal(false);
   };
 
   const handleCloseModal = () => {
@@ -119,9 +111,9 @@ export default function TabsManager({
       <Index
         isOpen={showCreateModal}
         onClose={handleCloseModal}
-        onSave={handleCreateVersion}
+        teamId={teamId}
         productId={productId}
-        createdBy="" // Backend will automatically set this from the authenticated user
+        createdBy={session?.user?.id || ""}
       />
     </div>
   );

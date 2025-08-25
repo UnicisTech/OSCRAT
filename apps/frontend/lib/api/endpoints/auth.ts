@@ -14,11 +14,11 @@ export type ForgotPasswordData = {
 export type ResetPasswordData = {
   token: string;
   password: string;
-  recaptchaToken: string;
 };
 
 export type JoinData = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   recaptchaToken: string;
