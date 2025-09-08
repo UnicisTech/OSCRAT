@@ -4,6 +4,7 @@ import { StepProps } from '@oscrat/model';
 export default function Step({
   step,
   activeStep,
+  
   total,
   setStep,
   onAnswerChange,
