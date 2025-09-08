@@ -32,7 +32,7 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
       toast.success(t('oscrat.ui.invitation-accepted'));
       router.push(`/teams`);
     } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('failed-to-accept-invitation')));
+      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-accept-invitation')));
     }
   };
 
@@ -41,7 +41,7 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
   }
 
   if (error || !invitation) {
-    return <Error message={(error as any)?.message || t('invitation-not-found')} />;
+    return <Error message={(error as any)?.message || t('oscrat.ui.invitation-not-found')} />;
   }
 
   const emailMatch = data?.user?.email === invitation.email;
@@ -107,9 +107,9 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
           {/* User authenticated and email does not match */}
           {status === 'authenticated' && !emailMatch && (
             <>
-              <p className="text-center text-sm text-gray-700">{`${t('email-mismatch-1')} ${data?.user?.email} ${t('email-mismatch-2')}`}</p>
+              <p className="text-center text-sm text-gray-700">{`${t('oscrat.ui.email-mismatch-1')} ${data?.user?.email} ${t('oscrat.ui.email-mismatch-2')}`}</p>
               <p className="text-center text-sm text-gray-700">
-                {t('email-mismatch-instructions')}
+                {t('oscrat.ui.email-mismatch-instructions')}
               </p>
               <Button
                 fullWidth
