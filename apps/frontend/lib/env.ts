@@ -41,6 +41,12 @@ const env = {
     from: process.env.SMTP_FROM,
   },
 
+  // SendGrid configuration
+  sendgrid: {
+    apiKey: process.env.SENDGRID_API_KEY,
+    fromEmail: process.env.SENDGRID_FROM_EMAIL,
+  },
+
   // Matomo configuration
   matomo: {
     url: `${process.env.NEXT_PUBLIC_MATOMO_URL}`,

@@ -29,6 +29,8 @@
         "SMTP_USER": { "$ref": "SMTP_USER" },
         "SMTP_PASSWORD": { "$ref": "SMTP_PASSWORD" },
         "SMTP_FROM": { "$ref": "SMTP_FROM" },
+        "SENDGRID_API_KEY": { "$ref": "SENDGRID_API_KEY" },
+        "SENDGRID_FROM_EMAIL": { "$ref": "SENDGRID_FROM_EMAIL" },
         "APP_URL": { "$ref": "APP_URL" },
         "CONFIRM_EMAIL": { "$ref": "CONFIRM_EMAIL" },
         "SVIX_URL": { "$ref": "SVIX_URL" },

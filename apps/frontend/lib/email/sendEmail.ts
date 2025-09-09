@@ -1,17 +1,6 @@
-import nodemailer from 'nodemailer';
+import axios from 'axios';
 import {ApiError} from '@/lib/errors';
-
 import env from '../env';
-
-const transporter = nodemailer.createTransport({
-  host: env.smtp.host,
-  port: env.smtp.port,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: env.smtp.user,
-    pass: env.smtp.password,
-  },
-});
 
 interface EmailData {
   to: string;
@@ -20,27 +9,57 @@ interface EmailData {
   text?: string;
 }
 
+const sendgridClient = axios.create({
+  baseURL: 'https://api.sendgrid.com/v3',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 export const sendEmail = async (data: EmailData) => {
-  if (!env.smtp.host) {
-    console.log('SMTP not configured, skipping email send');
-    throw new ApiError(500, 'SMTP not configured');
+  if (!env.sendgrid?.apiKey) {
+    throw new ApiError(500, 'SendGrid API key not configured');
   }
 
-  if (!env.smtp.user || !env.smtp.password) {
-    console.error('SMTP credentials not configured');
-    throw new ApiError(500, 'SMTP credentials not configured');
+  if (!env.sendgrid?.fromEmail) {
+    console.error('SendGrid from email not configured');
+    throw new ApiError(500, 'SendGrid from email not configured');
   }
 
-  const emailDefaults = {
-    from: env.smtp.from,
+  const emailPayload = {
+    personalizations: [
+      {
+        to: [{ email: data.to }],
+        subject: data.subject,
+      },
+    ],
+    from: { email: env.sendgrid.fromEmail },
+    content: [
+      {
+        type: 'text/html',
+        value: data.html,
+      },
+      ...(data.text ? [{
+        type: 'text/plain',
+        value: data.text,
+      }] : []),
+    ],
   };
 
   try {
-    const result = await transporter.sendMail({ ...emailDefaults, ...data });
-    console.log('Email sent successfully:', result.messageId);
-    return result;
-  } catch (error) {
-    console.error('Failed to send email:', error);
+    const response = await sendgridClient.post('/mail/send', emailPayload, {
+      headers: {
+        'Authorization': `Bearer ${env.sendgrid.apiKey}`,
+      },
+    });
+
+    console.log('Email sent successfully:', response.headers['x-message-id']);
+    return {
+      messageId: response.headers['x-message-id'],
+      response: `${response.status} ${response.statusText}`,
+    };
+  } catch (error: any) {
+    console.error('Failed to send email:', error.response?.data || error.message);
     throw new ApiError(500, 'Failed to send email');
   }
 };
