@@ -3,6 +3,13 @@ import AccountLayout from '../components/layouts/AccountLayout';
 import TeamLayout from '../components/layouts/TeamLayout';
 import ProductLayout from '../components/layouts/ProductLayout';
 import VersionLayout from '../components/layouts/VersionLayout';
+import CraLayout from '../components/layouts/CraLayout';
+
+export function withCraLayout(page: React.ReactNode) {
+  return (
+    <CraLayout>{page}</CraLayout>
+  );
+}
 
 export function withAccountLayout(page: React.ReactNode) {
   return (

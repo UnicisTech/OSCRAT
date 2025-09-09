@@ -1,85 +1,207 @@
+import React, { useCallback, useMemo } from 'react';
 import Button from '@/components/button';
-import { StepProps } from '@oscrat/model';
+import { StepProps, RiskAnswer, CraAnswer, ApplicabilityQuestion, RiskQuestion } from '@oscrat/model';
+import { useTranslation } from 'next-i18next';
+import { isApplicabilityAnswer } from '@/types/craForm';
+import { LuInfo } from 'react-icons/lu';
+import { getStepNumberById } from '@/utils/craForm';
 
-export default function Step({
+const Step: React.FC<StepProps> = ({
   step,
+  allSteps,
   activeStep,
-  
   total,
   setStep,
   onAnswerChange,
   selectedAnswer,
-  onComplete,
-}: StepProps) {
-  const { id, question, answers } = step;
+  onNext,
+  onSkip,
+  findPreviousNonSkippedStep,
+}) => {
+  const { t, ready } = useTranslation('common');
+  
+  const { id, question, answerOptions, references } = step;
+  const hint = (step as ApplicabilityQuestion).hint;
+  const remark = (step as ApplicabilityQuestion).remark;
+  const answerType = (step as RiskQuestion).answerType;
+  const isDropdown = answerType === 'DROPDOWN';
 
-  const handleNext = () => {
-    if (!selectedAnswer) {
-      alert('Please select an answer.');
+  if (!ready) return null;
+
+  const handleNext = useCallback((selectedAnswer: CraAnswer | null) => {
+    if (!selectedAnswer) return;
+
+    const isEliminatory = isApplicabilityAnswer(selectedAnswer) ? selectedAnswer.isEliminatory : false;
+    const skipToQuestion = selectedAnswer.skipToQuestion;
+
+    // Handle skip logic
+    if (skipToQuestion) {
+      const targetStep = getStepNumberById(allSteps, skipToQuestion);
+      onSkip?.(activeStep, targetStep);
+      setStep(targetStep);
       return;
     }
 
-    const isEliminatory =
-      step.answers.find((a) => a.text === selectedAnswer)?.isEliminatory ||
-      false;
+    // Handle eliminatory or final step
     if (isEliminatory || activeStep === total) {
-      onComplete();
+      onNext();
       return;
     }
 
-    // If not eliminatory and not the last step, proceed to the next step
+    // Proceed to next step
     setStep(activeStep + 1);
+  }, [activeStep, allSteps, onNext, onSkip, setStep, total]);
+
+  const handleBack = useCallback(() => {
+    const previousStep = findPreviousNonSkippedStep ? 
+      findPreviousNonSkippedStep(activeStep) : 
+      activeStep - 1;
+    setStep(previousStep);
+  }, [activeStep, findPreviousNonSkippedStep, setStep]);
+
+  const handleAnswerSelect = useCallback((answer: CraAnswer) => {
+    // Only update if this is a different answer than currently selected
+    if (selectedAnswer?.text !== answer.text) {
+      onAnswerChange(step, answer.text, answer);
+    }
+  }, [onAnswerChange, step, selectedAnswer]);
+
+  const displayProperties = useMemo(() => {
+    const selectedRiskAnswer = isDropdown && selectedAnswer && 'riskLevel' in selectedAnswer 
+      ? selectedAnswer as RiskAnswer 
+      : null;
+    
+    return {
+      hint: selectedRiskAnswer?.hint || hint,
+      remark: remark,
+      references: selectedRiskAnswer?.references || references
+    };
+  }, [isDropdown, selectedAnswer, hint, remark, references]);
+
+  const renderHintSection = () => {
+    const { hint: displayHint, remark: displayRemark, references: displayReferences } = displayProperties;
+    
+    if (!displayHint && !displayRemark && !displayReferences?.length) {
+      return null;
+    }
+
+    return (
+      <div className="mb-6 w-full rounded-lg border border-blue-300 bg-blue-50 p-4">
+        <div className="flex items-start gap-2">
+          <LuInfo className="h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            {(displayHint || displayRemark) && (
+              <p className="text-sm text-gray-900 leading-relaxed">
+                {displayHint || displayRemark}
+              </p>
+            )}
+
+            {displayReferences && displayReferences.length > 0 && (
+              <>
+                {(displayHint || displayRemark) && <div className="h-3" />}
+                <div className="text-sm">
+                  <span className="text-gray-900">{t('oscrat.ui.references')}: </span>
+                  {displayReferences.map((ref, index) => (
+                    <span key={`${ref.url}-${index}`}>
+                      <a
+                        href={ref.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        {ref.text}
+                      </a>
+                      {index < displayReferences.length - 1 && ', '}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
-  const handleBack = () => {
-    setStep(activeStep - 1);
+  const renderAnswerOptions = () => {
+    if (isDropdown) {
+      return (
+        <div className="my-4">
+          <select
+            className="w-full p-2 border border-gray-300 rounded-md bg-white"
+            value={selectedAnswer?.text || ''}
+            onChange={(e) => {
+              const answer = answerOptions.find(opt => opt.text === e.target.value);
+              if (answer && e.target.value !== '') {
+                handleAnswerSelect(answer);
+              }
+            }}
+            aria-label={question}
+          >
+            <option value="">{t('select')}</option>
+            {answerOptions.map((answer) => (
+              <option key={answer.text} value={answer.text}>
+                {answer.text}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+
+    return (
+      <div className="my-4 flex flex-col gap-2" role="radiogroup" aria-label={question}>
+        {answerOptions.map((answer, index) => {
+          const inputId = `q${id}-ans${index}`;
+          return (
+            <div key={answer.text}>
+              <input
+                type="radio"
+                name={`question-${id}`}
+                value={answer.text}
+                onChange={() => handleAnswerSelect(answer)}
+                checked={selectedAnswer?.text === answer.text}
+                id={inputId}
+                aria-describedby={answer.text}
+              />
+              <label htmlFor={inputId} className="ml-2 text-gray-900 text-sm cursor-pointer">
+                {answer.text}
+              </label>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
-  const handleClose = () => {
-    console.log('Close button pressed');
-    // Add the closing logic
-  };
-
-  const handleAnswerSelect = (answerText: string) => {
-    onAnswerChange(id, answerText);
-  };
+  const renderNavigationButtons = () => (
+    <div className="flex gap-2">
+      {activeStep === 1 ? (
+        <Button onClick={handleBack} text={t('close')} />
+      ) : (
+        <Button onClick={handleBack} text={t('back')} />
+      )}
+      <Button 
+        onClick={() => handleNext(selectedAnswer)} 
+        variant="primary" 
+        text={activeStep !== total ? t('oscrat.ui.next') : t('oscrat.ui.finish')} 
+        disabled={!selectedAnswer}
+      />
+    </div>
+  );
 
   return (
-    <div>
-      <p className="text-[16px] font-semibold">
+    <div className="rounded-lg border border-gray-300 p-6">
+      {renderHintSection()}
+
+      <p className="mb-4 text-lg font-semibold text-gray-900">
         {activeStep}. {question}
       </p>
 
-      <div className="my-4 flex flex-col gap-2">
-        {answers.map((answer, index) => (
-          <div key={index}>
-            <input
-              type="radio"
-              name={`question-${id}`}
-              value={answer.text}
-              onChange={() => handleAnswerSelect(answer.text)}
-              checked={selectedAnswer === answer.text}
-              id={`q${id}-ans${index}`}
-            />
-            <label htmlFor={`q${id}-ans${index}`} className="ml-2">
-              {answer.text}
-            </label>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex gap-2">
-        {activeStep === 1 ? (
-          <Button onClick={handleClose} text="Close" />
-        ) : (
-          <Button onClick={handleBack} text="Back" />
-        )}
-        {activeStep !== total ? (
-          <Button onClick={handleNext} variant="primary" text="Next" />
-        ) : (
-          <Button onClick={handleNext} variant="primary" text="Finish" />
-        )}
-      </div>
+      {renderAnswerOptions()}
+      {renderNavigationButtons()}
     </div>
   );
-}
+};
+
+export default Step;

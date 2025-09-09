@@ -1,46 +1,102 @@
+import React, { useCallback } from 'react';
 import ProgressBar from './progressBar';
 import Step from './step';
-import { CraFormProps } from '@oscrat/model';
+import { CraQuestion } from '@oscrat/model';
+import data from '@/components/craForm/data.json';
+import { CraFormProps } from '@/types/craForm';
+import { useCraForm } from '@/hooks/useCraForm';
+import { 
+  checkIsEliminatory, 
+  clearFormState, 
+} from '@/utils/craForm';
 
-export default function CraForm({
-  questions,
-  activeStep,
-  setActiveStep,
-  answers,
-  onAnswerChange,
-  onComplete,
-  total,
-}: CraFormProps) {
+const CraForm: React.FC<CraFormProps> = ({
+  setIsNotEligible,
+  setShowResult,
+  setHighestRisk,
+}) => {
+  const allQuestions: (CraQuestion)[] = [
+    ...data.applicabilityQuestions,
+    ...data.riskQuestions
+  ];
+  const TOTAL_QUESTIONS = allQuestions.length;
+
+  const {
+    answers,
+    activeStep,
+    selectedAnswer,
+    highestRiskLevel,
+    handleAnswerChange,
+    setActiveStep,
+    handleSkip,
+    findPreviousNonSkippedStep,
+  } = useCraForm({
+    questions: allQuestions,
+    onHighestRiskChange: setHighestRisk
+  });
+
+  const handleNext = useCallback(() => {
+    const currentQuestion = allQuestions[activeStep - 1];
+    const currentAnswer = answers[currentQuestion.id];
+    
+    if (!currentAnswer) return;
+    
+    const isEliminatory = checkIsEliminatory(currentQuestion, currentAnswer.answer.text);
+    
+    if (isEliminatory) {
+      setIsNotEligible(true);
+      setShowResult(true);
+      clearFormState();
+      return;
+    }
+    
+    if (activeStep === TOTAL_QUESTIONS) {
+      setIsNotEligible(false);
+      setHighestRisk(highestRiskLevel);
+      setShowResult(true);
+    } else {
+      setActiveStep(activeStep + 1);
+    }
+  }, [
+    activeStep,
+    allQuestions,
+    answers,
+    highestRiskLevel,
+    setActiveStep,
+    setIsNotEligible,
+    setShowResult,
+    setHighestRisk,
+    TOTAL_QUESTIONS
+  ]);
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '40px',
-      }}
-    >
-      <ProgressBar total={total} step={activeStep} />
+    <div className="flex flex-col gap-4 max-w-2xl mx-auto">
+      <ProgressBar total={TOTAL_QUESTIONS} step={activeStep} />
 
-      {questions?.map((step) => {
-        const isActive = step.id === activeStep;
+      {allQuestions.map((step, index) => {
+        const stepNumber = index + 1;
+        const isActive = stepNumber === activeStep;
 
-        if (!isActive) {
-          return null;
-        }
+        if (!isActive) return null;
 
         return (
           <Step
-            key={step.id}
+            key={`${step.id}-${activeStep}`}
             step={step}
+            allSteps={allQuestions}
             activeStep={activeStep}
-            total={total}
+            total={TOTAL_QUESTIONS}
             setStep={setActiveStep}
-            onAnswerChange={onAnswerChange}
-            selectedAnswer={answers[step.id]?.[0] || null}
-            onComplete={onComplete}
+            onAnswerChange={handleAnswerChange}
+            selectedAnswer={selectedAnswer}
+            onNext={handleNext}
+            onSkip={handleSkip}
+            findPreviousNonSkippedStep={findPreviousNonSkippedStep}
           />
         );
       })}
     </div>
   );
-}
+};
+
+export default CraForm;

@@ -1,48 +1,69 @@
-export type Answer = {
+export type ApplicabilityQuestion = {
+  id: string;
+  question: string;
+  hint?: string;
+  remark?: string;
+  references?: Reference[];
+  answerOptions: ApplicabilityAnswer[];
+};
+
+export type ApplicabilityAnswer = {
   text: string;
   isEliminatory: boolean;
+  skipToQuestion?: string;
 };
 
-export type Answers = {
-  [key: string]: [string | null, boolean?];
-};
-
-export type Question = {
-  id: number;
+export type RiskQuestion = {
+  id: string;
   question: string;
-  answers: Answer[];
+  answerType?: string;
+  references?: Reference[];
+  answerOptions: RiskAnswer[];
 };
 
-type Step = {
-  id: number;
-  question: string;
-  answers: {
-    text: string;
-    isEliminatory: boolean;
-  }[];
+export type RiskAnswer = {
+  text: string;
+  riskLevel?: string;
+  hint?: string;
+  references?: Reference[];
+  skipToQuestion?: string;
 };
+
+export type CraAnswer = ApplicabilityAnswer | RiskAnswer;
+
+export type CraQuestion = ApplicabilityQuestion | RiskQuestion;
+
+export type Reference = {
+  text: string;
+  url: string;
+};
+
+export type Step = ApplicabilityQuestion | RiskQuestion;
 
 export type StepProps = {
   step: Step;
+  allSteps: Step[];
   activeStep: number;
   total: number;
   setStep: (step: number) => void;
-  onAnswerChange: (stepId: number, answer: string) => void;
-  selectedAnswer: string | null;
-  onComplete: () => void;
+  onAnswerChange: (step: Step, answer: string, answerObject: RiskAnswer | ApplicabilityAnswer) => void;
+  selectedAnswer: RiskAnswer | ApplicabilityAnswer | null;
+  onNext: () => void;
+  onSkip?: (fromStep: number, toStep: number) => void;
+  findPreviousNonSkippedStep?: (currentStep: number) => number;
 };
 
 export type ResultProps = {
   isEligible: boolean;
-  teamSlug: string;
-  projectId: string;
+  onTryAgain?: () => void;
+  highestRiskLevel?: string | null;
 };
 
 export type CraFormProps = {
-  questions: Question[];
+  questions: ApplicabilityQuestion[] | RiskQuestion[];
   activeStep: number;
   setActiveStep: (step: number) => void;
-  answers: Answers;
+  answers: ApplicabilityAnswer[] | RiskAnswer[];
   onAnswerChange: (stepId: number, answer: string) => void;
   onComplete: () => void;
   total: number;

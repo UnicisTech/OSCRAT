@@ -1,21 +1,118 @@
+import React from 'react';
 import { LuFileWarning, LuCheckCircle } from 'react-icons/lu';
 import Button from '@/components/button';
 import { useRouter } from 'next/navigation';
 import { ResultProps } from '@oscrat/model';
+import { useTranslation } from 'next-i18next';
+import { useSession } from 'next-auth/react';
+import { Divider } from '@/components/shared';
 
-export default function Result({
+const Result: React.FC<ResultProps> = ({
   isEligible,
-  teamSlug,
-  projectId,
-}: ResultProps) {
+  onTryAgain,
+  highestRiskLevel,
+}) => {
   const router = useRouter();
+  const { t, ready } = useTranslation('common');
+  const { data: session, status } = useSession();
+  
+  if (!ready) return null;
+  
+  const isAuthenticated = status === 'authenticated' && session;
 
-  const handleNavigateBack = () => {
-    router.push(`/teams/${teamSlug}/products/${projectId}`);
+  const handleLogin = () => {
+    router.push('/auth/login');
+  };
+  const handleRegister = () => {
+    router.push('/auth/join');
+  };
+  const handleTryAgain = () => {
+    onTryAgain?.();
+  };
+  const handleBackToHome = () => {
+    router.push('/');
   };
 
-  const handleRestart = () => {
-    router.push(`/teams/${teamSlug}/products`);
+  const formatRiskLevel = (level: string ) => {
+    return level.replace(/_/g, ' ').toUpperCase();
+  };
+
+  // Render buttons based on authentication status
+  const renderAuthButtons = () => {
+    if (isAuthenticated) {
+      return (
+        <>
+          <Button
+            onClick={handleBackToHome}
+            className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
+            text={t('oscrat.ui.go-home')}
+            variant="normal"
+          />
+          <Button
+            onClick={handleTryAgain}
+            className="hover:bg-pri w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
+            text={t('oscrat.ui.try-again')}
+            variant="primary"
+          />
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Button
+          onClick={handleLogin}
+          className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
+          text={t('oscrat.ui.go-home')}
+          variant="normal"
+        />
+        <Button
+          onClick={handleTryAgain}
+          className="hover:bg-pri w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
+          text={t('oscrat.ui.try-again')}
+          variant="primary"
+        />
+      </>
+    );
+  };
+
+  // Render buttons based on eligibility
+  const renderEligibleButtons = () => {
+    if (isAuthenticated) {
+      return (
+        <>
+          <Button
+            onClick={handleBackToHome}
+            className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
+            text={t('oscrat.ui.back-to-home')}
+            variant="normal"
+          />
+          <Button
+            onClick={handleTryAgain}
+            className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
+            text={t('oscrat.ui.check-eligibility')}
+            variant="primary"
+          />
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Button
+          onClick={handleRegister}
+          className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
+          text={t('register')}
+          variant="normal"
+        />
+        <Button
+          onClick={handleLogin}
+          className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
+          text={t('log-in')}
+          variant="primary"
+        />
+      </>
+    );
   };
 
   if (!isEligible) {
@@ -25,78 +122,65 @@ export default function Result({
           <div className="mb-6">
             <LuCheckCircle className="mx-auto h-16 w-16 text-green-500" />
           </div>
+          
           <h1 className="mb-4 text-2xl font-semibold text-gray-800 md:text-3xl">
-            No Qualification Required
+            {t('oscrat.ui.no-qualification-required')}
           </h1>
+          
           <p className="mb-8 text-sm text-gray-600 md:text-base">
-            Your product does not fall within the scope of the Cyber Resilience
-            Act.
+            {t('oscrat.ui.product-no-qualification-desc')}
             <br />
-            You can check another product or return to the main page.
+            {t('oscrat.ui.check-another-product-desc')}
           </p>
+          
           <div className="mb-8 flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            <Button
-              onClick={handleNavigateBack}
-              className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
-              text="Back to Project"
-              variant="normal"
-            />
-            <Button
-              onClick={handleRestart}
-              className="hover:bg-pri w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
-              text="Check Another Product"
-              variant="primary"
-            />
+            {renderAuthButtons()}
           </div>
         </div>
+        
         <p className="mt-8 max-w-2xl px-4 text-center text-xs text-gray-500">
-          Note: This self-assessment is solely intended to evaluate the
-          potential compliance of the product and does not constitute or imply
-          formal certification.
+          {t('oscrat.ui.self-assessment-note')}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 font-['Inter',_sans-serif]">
+    <div className="flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-2xl rounded-lg bg-white p-8 text-center shadow-xl md:p-12 md:pb-4">
         <div className="mb-6">
           <LuFileWarning className="mx-auto h-16 w-16 text-orange-500" />
         </div>
+        
         <h1 className="mb-4 text-2xl font-semibold text-gray-800 md:text-3xl">
-          Product Requires Assessment
+          {t('oscrat.ui.continue-eligibility-check')}
         </h1>
-        <p className="mb-8 text-sm text-gray-600 md:text-base">
-          Your product falls within the scope of the Cyber Resilience Act as a
-          <span className="font-semibold text-gray-700">Class I PDE</span>.
+        
+        <p className="mb-6 text-sm text-gray-600 md:text-base">
+          {t('oscrat.ui.product-within-scope')} 
+          {highestRiskLevel && (
+            <span className="font-semibold text-gray-700">
+              {formatRiskLevel(highestRiskLevel)}
+            </span>
+          )}.
           <br />
-          Follow the steps below to continue the assessment.
+          {t('oscrat.ui.log-in-or-register')}
         </p>
+        
         <div className="mb-8 flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-          <Button
-            onClick={handleNavigateBack}
-            className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
-            text="Back to Project"
-            variant="normal"
-          />
-          <Button
-            onClick={() =>
-              router.push(
-                `/teams/${teamSlug}/products/${projectId}/cra/details`
-              )
-            }
-            className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
-            text="Continue Assessment"
-            variant="primary"
-          />
+          {renderEligibleButtons()}
         </div>
-      </div>
-      <p className="mt-8 max-w-2xl px-4 text-center text-xs text-gray-500">
-        Note: This self-assessment is solely intended to evaluate the potential
-        compliance of the product and does not constitute or imply formal
-        certification.
+
+        <Divider />
+
+        <p className="mt-4 mb-2 max-w-2xl px-4 text-center text-xs text-gray-500">
+        {t('oscrat.ui.self-assessment-note')}
       </p>
+      </div>
+      
+   
     </div>
   );
-}
+};
+
+export default Result;

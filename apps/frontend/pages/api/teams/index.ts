@@ -49,8 +49,12 @@ const handlePOST = async (
 
   const slug = slugify(requestData.name);
 
-  if (await isTeamExists([{ slug }])) {
-    throw new ApiError(400, 'A team with the name already exists.');
+  // Check if user already belongs to a team with this slug
+  const userTeams = await getTeams(user.id);
+  const teamExists = userTeams.some(team => team.slug === slug);
+  
+  if (teamExists) {
+    throw new ApiError(400, 'You already have a team with this name.');
   }
 
   const teamData: TeamCreateData = {

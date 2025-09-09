@@ -1,88 +1,75 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import CraForm from '@/components/craForm';
 import Result from '@/components/craForm/result';
-import steps from '@/components/craForm/questions';
-import { Answers } from '@oscrat/model';
+import { FormPageState } from '@/types/craForm';
+import { clearFormState } from '@/utils/craForm';
 
-export default function FormPage() {
+const FormPage: React.FC = () => {
   const router = useRouter();
 
-  const slug = router.query.slug as string;
-  const id = router.query.id as string;
+  const [state, setState] = useState<FormPageState>({
+    showResult: false,
+    isNotEligible: false,
+    highestRisk: null,
+  });
 
-  const [activeStep, setActiveStep] = useState(1);
-  const [answers, setAnswers] = useState<Answers>({});
-  const [showResult, setShowResult] = useState(false);
-  const [isEligible, setIsEligible] = useState(false);
-  const TOTAL_QUESTIONS = steps.length;
-
-  // Initialize null answers based on number of mock steps
+  // Clear localStorage when user leaves without completing
   useEffect(() => {
-    const initialNullAnswers: Answers = {};
-    steps.forEach((question) => {
-      initialNullAnswers[question.id] = [null];
-    });
-    setAnswers(initialNullAnswers);
-  }, []);
-
-  const handleAnswerChange = (stepId: number, answer: string) => {
-    // Identify if the selected answer is eliminatory
-    const questionObj = steps.find((q) => q.id === stepId);
-    const selectedAnswer = questionObj?.answers.find((a) => a.text === answer);
-    const isEliminatory = selectedAnswer?.isEliminatory || false;
-
-    const newAnswers = {
-      ...answers,
-      [stepId]: [answer, isEliminatory],
+    const handleBeforeUnload = () => {
+      if (!state.showResult) {
+        clearFormState();
+      }
     };
 
-    setAnswers(newAnswers);
-    // API call here to save the progress
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [state.showResult]);
+
+  const handleTryAgain = () => {
+    clearFormState();
+    
+    setState({
+      showResult: false,
+      isNotEligible: false,
+      highestRisk: null,
+    });
+    
+    router.push('/form');
   };
 
-  const handleComplete = () => {
-    // Check if an eliminatory answer has been selected
-    const foundEliminatory = Object.values(answers).some(
-      ([_, isEliminatory]) => isEliminatory
-    );
-
-    setIsEligible(foundEliminatory);
-    setShowResult(true);
-    console.log('Assessment complete:', answers, 'Eligible:', foundEliminatory);
-    // API call here to save the final result
+  const setIsNotEligible = (value: boolean) => {
+    setState(prev => ({ ...prev, isNotEligible: value }));
   };
 
-  // Check if we need to show the result (if the assessment is complete)
-  useEffect(() => {
-    const allAnswered = steps.every(
-      (q) => answers[q.id] && answers[q.id][0] !== null
-    );
+  const setShowResult = (value: boolean) => {
+    setState(prev => ({ ...prev, showResult: value }));
+  };
 
-    if (allAnswered && activeStep > TOTAL_QUESTIONS) {
-      handleComplete();
-    }
-  }, [activeStep, answers]);
+  const setHighestRisk = (value: string | null) => {
+    setState(prev => ({ ...prev, highestRisk: value }));
+  };
 
-  if (showResult) {
+  if (state.showResult) {
     return (
       <Result
-        isEligible={isEligible}
-        teamSlug={slug as string}
-        projectId={id as string}
+        isEligible={!state.isNotEligible}
+        onTryAgain={handleTryAgain}
+        highestRiskLevel={state.highestRisk}
       />
     );
   }
 
   return (
     <CraForm
-      questions={steps}
-      activeStep={activeStep}
-      setActiveStep={setActiveStep}
-      answers={answers}
-      onAnswerChange={handleAnswerChange}
-      onComplete={handleComplete}
-      total={TOTAL_QUESTIONS}
+      setIsNotEligible={setIsNotEligible}
+      setShowResult={setShowResult}
+      setHighestRisk={setHighestRisk}
     />
   );
-}
+};
+
+export default FormPage;
