@@ -6,7 +6,9 @@ import {
   checkVersionAttachmentFile,
   getVersionAttachments,
 } from 'models/oscrat';
+import { handleFormidableError } from '@/lib/utils/fileUpload';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
+import { ApiError } from '@/lib/errors';
 import type { NextApiResponse } from 'next';
 
 export const config = {
@@ -72,7 +74,13 @@ const handlePOST = async (
   try {
     const { fields, files } = await readVersionAttachmentFile(req);
 
-    const file = Object.values(files)[0] as formidable.File[];
+    // Check if files object is empty
+    const fileFields = Object.values(files);
+    if (fileFields.length === 0) {
+      throw new ApiError(400, 'No file uploaded');
+    }
+
+    const file = fileFields[0] as formidable.File[];
 
     const isAllowed = checkVersionAttachmentFile(file[0] as formidable.File);
 
@@ -103,12 +111,14 @@ const handlePOST = async (
         error: { message: 'Not supported type of file.' },
       });
     }
-  } catch (e) {
-    console.error('File upload error:', e);
-    res.status(400).json({
-      data: null,
-      error: { message: 'File is too large. Maximum size of file is 10mb.' },
-    });
+  } catch (error: any) {
+    console.error('File upload error:', error);
+
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    handleFormidableError(error, 10);
   }
 };
 

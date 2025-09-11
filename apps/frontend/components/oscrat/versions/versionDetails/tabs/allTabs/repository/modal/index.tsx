@@ -1,42 +1,40 @@
-import React, { Fragment } from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
-import TextField from '@atlaskit/textfield';
-import Select, { ValueType } from '@atlaskit/select';
-import { LoadingButton } from '@atlaskit/button';
+import { useFormik } from 'formik';
+import { IoClose, IoEye, IoEyeOff } from 'react-icons/io5';
 import { Button } from '@/components/shared';
-import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
-import { IoClose } from 'react-icons/io5';
-import type { OscratRepositoryDetail } from '@oscrat/model';
+import type {
+  OscratRepositoryDetail,
+  OscratRepositoryProvider,
+  OscratRepositoryAuthType,
+} from '@oscrat/model';
+import {
+  OscratRepositoryProvider as RepositoryProvider,
+  OscratRepositoryAuthType as AuthType,
+} from '@oscrat/model';
 import {
   useOscratRepositoryDetail,
   useOscratRepository,
 } from '@/hooks/oscrat/useOscratRepository';
 import { extractErrorMessage } from '@/lib/utils';
-import { WithoutRing } from 'sharedStyles';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
-import { Divider } from '@/components/shared';
+import {
+  createRepositoryCreateSchema,
+  generateRepositoryUrl,
+  type RepositoryCreateInput,
+} from '@/lib/validation/repository';
 
 interface Option {
   label: string;
-  value: string;
-}
-
-interface FormData {
-  name: string;
-  provider: ValueType<Option>;
-  user: string;
-  targetBranch?: string;
-  targetTag?: string;
-  targetCommit?: string;
-  accessToken: string;
+  value: OscratRepositoryProvider;
 }
 
 const PROVIDER_OPTIONS: Option[] = [
-  { label: 'GitHub', value: 'GITHUB' },
-  { label: 'GitLab', value: 'GITLAB' },
-  { label: 'Bitbucket', value: 'BITBUCKET' },
+  { label: 'GitHub', value: RepositoryProvider.GITHUB },
+  { label: 'GitLab', value: RepositoryProvider.GITLAB },
+  { label: 'Bitbucket', value: RepositoryProvider.BITBUCKET },
 ];
 
 interface ModalProps {
@@ -49,6 +47,24 @@ interface ModalProps {
   isCreateMode?: boolean;
 }
 
+// Form styling constants
+const formStyles = {
+  input: {
+    base: 'w-full rounded-md border px-3 py-2 text-gray-700 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500',
+    error: 'border-red-300 focus:border-red-500 focus:ring-red-500',
+    normal: 'border-gray-300',
+    password: 'pr-10 placeholder-gray-400',
+  },
+  label: 'mb-2 block text-sm font-medium text-gray-700',
+  error: 'mt-1 text-sm text-red-600',
+  helper: 'mt-1 text-xs text-gray-500',
+  required: 'text-red-500',
+  button: {
+    toggle:
+      'absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600',
+  },
+};
+
 const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -59,6 +75,117 @@ const Modal: React.FC<ModalProps> = ({
   isCreateMode = false,
 }) => {
   const { t } = useTranslation('common');
+  const [showToken, setShowToken] = useState(false);
+
+  // Reusable field components
+  const FormField = ({
+    label,
+    name,
+    value,
+    onChange,
+    onBlur,
+    error,
+    placeholder,
+    required = false,
+    type = 'text',
+    autoComplete = 'off',
+  }: any) => (
+    <div>
+      <label className={formStyles.label}>
+        {label} {required && <span className={formStyles.required}>*</span>}
+      </label>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className={`${formStyles.input.base} ${error ? formStyles.input.error : formStyles.input.normal}`}
+      />
+      {error && (
+        <p className={formStyles.error} role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+
+  const SelectField = ({
+    label,
+    name,
+    value,
+    onChange,
+    onBlur,
+    error,
+    required = false,
+    children,
+  }: any) => (
+    <div>
+      <label className={formStyles.label}>
+        {label} {required && <span className={formStyles.required}>*</span>}
+      </label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        className={`${formStyles.input.base} ${error ? formStyles.input.error : formStyles.input.normal}`}
+      >
+        {children}
+      </select>
+      {error && (
+        <p className={formStyles.error} role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+
+  const PasswordField = ({
+    label,
+    name,
+    value,
+    onChange,
+    onBlur,
+    error,
+    placeholder,
+    required = false,
+    helperText,
+  }: any) => (
+    <div>
+      <label className={formStyles.label}>
+        {label} {required && <span className={formStyles.required}>*</span>}
+      </label>
+      <div className="relative">
+        <input
+          type={showToken ? 'text' : 'password'}
+          name={name}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          autoComplete="off"
+          className={`${formStyles.input.base} ${formStyles.input.password} ${error ? formStyles.input.error : formStyles.input.normal}`}
+        />
+        <button
+          type="button"
+          onClick={() => setShowToken(!showToken)}
+          className={formStyles.button.toggle}
+        >
+          {showToken ? <IoEyeOff size={16} /> : <IoEye size={16} />}
+        </button>
+      </div>
+      {error && (
+        <p className={formStyles.error} role="alert">
+          {error}
+        </p>
+      )}
+      {helperText && <p className={formStyles.helper}>{helperText}</p>}
+    </div>
+  );
+
   const { updateRepository } = useOscratRepositoryDetail(
     teamId,
     projectId,
@@ -76,264 +203,284 @@ const Modal: React.FC<ModalProps> = ({
   const { project } = useOscratProject(teamId, projectId);
   const { version } = useOscratVersion(teamId, projectId, versionId);
 
-  const selectedProvider = PROVIDER_OPTIONS.find(
-    (option) => option.value === repository?.provider
-  );
+  const formik = useFormik<RepositoryCreateInput>({
+    initialValues: {
+      name: repository?.name || '',
+      provider: repository?.provider || RepositoryProvider.GITHUB,
+      user: repository?.user || '',
+      targetBranch: repository?.targetBranch || null,
+      targetTag: repository?.targetTag || null,
+      targetCommit: repository?.targetCommit || null,
+      accessToken: repository?.accessToken || '',
+    },
+    validationSchema: createRepositoryCreateSchema(t),
+    validateOnBlur: true,
+    validateOnChange: false,
+    onSubmit: async (values) => {
+      try {
+        const repositoryUrl = generateRepositoryUrl(
+          values.provider,
+          values.user,
+          values.name
+        );
 
-  const defaultValues = {
-    name: repository?.name || '',
-    user: repository?.user || '',
-    targetBranch: repository?.targetBranch || '',
-    targetTag: repository?.targetTag || '',
-    targetCommit: repository?.targetCommit || '',
-    accessToken: repository?.accessToken || '',
-  };
+        const repositoryData = {
+          name: values.name,
+          provider: values.provider,
+          repositoryUrl,
+          user: values.user,
+          authType: AuthType.PERSONAL_ACCESS_TOKEN,
+          accessToken: values.accessToken,
+          targetBranch: values.targetBranch || undefined,
+          targetTag: values.targetTag || undefined,
+          targetCommit: values.targetCommit || undefined,
+        };
 
-  const generateRepositoryUrl = (
-    provider: string,
-    user: string,
-    name: string
-  ): string => {
-    switch (provider) {
-      case 'GITHUB':
-        return `https://github.com/${user}/${name}`;
-      case 'GITLAB':
-        return `https://gitlab.com/${user}/${name}`;
-      case 'BITBUCKET':
-        return `https://bitbucket.org/${user}/${name}`;
-      default:
-        return '';
-    }
-  };
+        if (isCreateMode) {
+          await createRepository(repositoryData);
+          toast.success(t('oscrat.ui.repository-created'));
+        } else {
+          await updateRepository(repositoryData);
+          toast.success(t('oscrat.ui.repository-updated'));
+        }
+        onClose();
+      } catch (err: unknown) {
+        const errorKey = isCreateMode
+          ? 'oscrat.ui.repository.errors.create-repository'
+          : 'oscrat.ui.repository.errors.update-repository';
+        toast.error(extractErrorMessage(err, t(errorKey)));
+      }
+    },
+  });
+
+  // Live URL preview
+  const previewUrl =
+    formik.values.name && formik.values.user
+      ? generateRepositoryUrl(
+          formik.values.provider,
+          formik.values.user,
+          formik.values.name
+        )
+      : '';
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
       <div className="animate-fade-in-up flex max-h-[90vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-2xl">
-        <Form<FormData>
-          onSubmit={async (data) => {
-            const {
-              name,
-              provider,
-              user,
-              targetBranch,
-              targetTag,
-              targetCommit,
-              accessToken,
-            } = data;
+        <form onSubmit={formik.handleSubmit} className="flex flex-col">
+          {/* Fixed Header */}
+          <header className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-4">
+            <div>
+              <h2 className="text-sm font-bold text-gray-900">
+                {isCreateMode
+                  ? t('oscrat.ui.add-new-repo')
+                  : t('oscrat.ui.repository.labels.edit-repository')}
+              </h2>
+              {project?.name && version?.version && (
+                <p className="mt-1 text-xs text-gray-500">
+                  {project.name} • {version.version}
+                </p>
+              )}
+            </div>
 
-            try {
-              const repositoryUrl = generateRepositoryUrl(
-                provider?.value as string,
-                user,
-                name
-              );
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+              type="button"
+            >
+              <IoClose size={24} />
+            </button>
+          </header>
 
-              const repositoryData = {
-                name,
-                provider: provider?.value as any,
-                repositoryUrl,
-                user,
-                authType: 'PERSONAL_ACCESS_TOKEN' as const,
-                targetBranch: targetBranch || undefined,
-                targetTag: targetTag || undefined,
-                targetCommit: targetCommit || undefined,
-                accessToken,
-              };
+          {/* Scrollable Content */}
+          <div className="overflow-y-auto">
+            <main className="space-y-6 p-6">
+              {/* Repository Information Section */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-gray-700">
+                  {t('oscrat.ui.repository.sections.information')}
+                </h3>
 
-              if (isCreateMode) {
-                await createRepository(repositoryData);
-                toast.success(t('repository-created'));
-              } else {
-                await updateRepository(repositoryData);
-                toast.success(t('repository-updated'));
-              }
-              onClose();
-            } catch (err: any) {
-              const action = isCreateMode ? 'create' : 'update';
-              toast.error(
-                extractErrorMessage(
-                  err,
-                  t(`error-${action}-repository`) ||
-                    `Failed to ${action} repository`
-                )
-              );
-            }
-          }}
-        >
-          {({ formProps, submitting }) => (
-            <form {...formProps}>
-              <header className="flex items-center justify-between p-4">
-                <h2 className="text-sm font-bold text-gray-900">
-                  {isCreateMode
-                    ? t('oscrat.ui.add-new-repo')
-                    : 'Edit Repository'}
-                </h2>
+                {/* Two-column grid for main fields */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <SelectField
+                    label={t('oscrat.ui.repository.labels.provider')}
+                    name="provider"
+                    value={formik.values.provider}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.provider && formik.errors.provider
+                        ? formik.errors.provider
+                        : undefined
+                    }
+                    required
+                  >
+                    {PROVIDER_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </SelectField>
 
-                <button
-                  onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600"
-                  type="button"
-                >
-                  <IoClose size={24} />
-                </button>
-              </header>
+                  <FormField
+                    label={t('oscrat.ui.repository.labels.repository-name')}
+                    name="name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.name && formik.errors.name
+                        ? formik.errors.name
+                        : undefined
+                    }
+                    placeholder={t(
+                      'oscrat.ui.repository.placeholders.repository-name'
+                    )}
+                    required
+                  />
 
-              <Divider />
+                  <FormField
+                    label={t('oscrat.ui.repository.labels.user-organization')}
+                    name="user"
+                    value={formik.values.user}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.user && formik.errors.user
+                        ? formik.errors.user
+                        : undefined
+                    }
+                    placeholder={
+                      formik.values.provider === RepositoryProvider.GITHUB
+                        ? t('oscrat.ui.repository.placeholders.github-user')
+                        : t('oscrat.ui.repository.placeholders.user')
+                    }
+                    required
+                  />
 
-              {/* Product and Version Information Table */}
-              <div className="px-6 py-4">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="">
-                      <th className="pb-2 text-left font-normal text-gray-500">
-                        {t('version')}
-                      </th>
-                      <th className="pb-2 text-left font-normal text-gray-500">
-                        {t('product')}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="text-sm font-medium">
-                      <td className="py-2 text-gray-900">{version?.version}</td>
-                      <td className="py-2 text-gray-900">{project?.name}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                  <PasswordField
+                    label={t(
+                      'oscrat.ui.repository.labels.personal-access-token'
+                    )}
+                    name="accessToken"
+                    value={formik.values.accessToken}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.accessToken && formik.errors.accessToken
+                        ? formik.errors.accessToken
+                        : undefined
+                    }
+                    placeholder={t(
+                      'oscrat.ui.repository.placeholders.access-token'
+                    )}
+                    helperText={t(
+                      'oscrat.ui.repository.sections.token-security-notice'
+                    )}
+                    required
+                  />
+                </div>
+
+                {/* URL Preview - Full width */}
+                {previewUrl && (
+                  <div className="rounded-md bg-gray-50 p-3">
+                    <p className="mb-1 text-xs text-gray-600">
+                      {t('oscrat.ui.repository.labels.repository-url-preview')}
+                    </p>
+                    <p className="break-all font-mono text-sm text-blue-600">
+                      {previewUrl}
+                    </p>
+                  </div>
+                )}
               </div>
 
-              <Divider />
+              {/* Target Configuration Section */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    {t('oscrat.ui.repository.sections.target-configuration')}
+                  </h3>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {t(
+                      'oscrat.ui.repository.sections.target-configuration-help'
+                    )}
+                  </p>
+                </div>
 
-              <main className="space-y-4 overflow-y-auto p-6">
-                <Field
-                  aria-required={true}
-                  name="name"
-                  label="Repository Name"
-                  isRequired
-                  defaultValue={defaultValues.name}
-                >
-                  {({ fieldProps }) => (
-                    <Fragment>
-                      <TextField autoComplete="off" {...fieldProps} />
-                    </Fragment>
-                  )}
-                </Field>
+                {/* Two-column grid for target fields */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <FormField
+                    label={t('oscrat.ui.repository.labels.target-branch')}
+                    name="targetBranch"
+                    value={formik.values.targetBranch || ''}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.targetBranch && formik.errors.targetBranch
+                        ? formik.errors.targetBranch
+                        : undefined
+                    }
+                    placeholder={t('oscrat.ui.repository.placeholders.branch')}
+                  />
 
-                <Field<ValueType<Option>>
-                  aria-required={true}
-                  name="provider"
-                  label="Provider"
-                  isRequired
-                  defaultValue={selectedProvider}
-                >
-                  {({ fieldProps: { id, ...rest }, error }) => (
-                    <Fragment>
-                      <WithoutRing>
-                        <Select
-                          inputId={id}
-                          {...rest}
-                          options={PROVIDER_OPTIONS}
-                          placeholder="Select provider"
-                          isInvalid={!!error}
-                        />
-                      </WithoutRing>
-                      {error && <ErrorMessage>{error}</ErrorMessage>}
-                    </Fragment>
-                  )}
-                </Field>
+                  <FormField
+                    label={t('oscrat.ui.repository.labels.target-tag')}
+                    name="targetTag"
+                    value={formik.values.targetTag || ''}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.targetTag && formik.errors.targetTag
+                        ? formik.errors.targetTag
+                        : undefined
+                    }
+                    placeholder={t('oscrat.ui.repository.placeholders.tag')}
+                  />
 
-                <Field
-                  aria-required={true}
-                  name="user"
-                  label="User"
-                  isRequired
-                  defaultValue={defaultValues.user}
-                >
-                  {({ fieldProps }) => (
-                    <Fragment>
-                      <TextField autoComplete="off" {...fieldProps} />
-                    </Fragment>
-                  )}
-                </Field>
+                  {/* Target Commit spans full width */}
+                  <div className="md:col-span-2">
+                    <FormField
+                      label={t('oscrat.ui.repository.labels.target-commit')}
+                      name="targetCommit"
+                      value={formik.values.targetCommit || ''}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched.targetCommit &&
+                        formik.errors.targetCommit
+                          ? formik.errors.targetCommit
+                          : undefined
+                      }
+                      placeholder={t(
+                        'oscrat.ui.repository.placeholders.commit'
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
 
-                <Field
-                  name="targetBranch"
-                  label="Target Branch"
-                  defaultValue={defaultValues.targetBranch}
-                >
-                  {({ fieldProps }) => (
-                    <Fragment>
-                      <TextField autoComplete="off" {...fieldProps} />
-                    </Fragment>
-                  )}
-                </Field>
-
-                <Field
-                  name="targetTag"
-                  label="Target Tag"
-                  defaultValue={defaultValues.targetTag}
-                >
-                  {({ fieldProps }) => (
-                    <Fragment>
-                      <TextField autoComplete="off" {...fieldProps} />
-                    </Fragment>
-                  )}
-                </Field>
-
-                <Field
-                  name="targetCommit"
-                  label="Target Commit"
-                  defaultValue={defaultValues.targetCommit}
-                >
-                  {({ fieldProps }) => (
-                    <Fragment>
-                      <TextField autoComplete="off" {...fieldProps} />
-                    </Fragment>
-                  )}
-                </Field>
-
-                <Field
-                  aria-required={true}
-                  name="accessToken"
-                  label="Personal Access Token"
-                  isRequired
-                  defaultValue={defaultValues.accessToken}
-                >
-                  {({ fieldProps }) => (
-                    <Fragment>
-                      <TextField
-                        autoComplete="off"
-                        type="password"
-                        placeholder="Enter your personal access token"
-                        {...fieldProps}
-                      />
-                    </Fragment>
-                  )}
-                </Field>
-
-                <FormFooter></FormFooter>
-              </main>
-
-              <footer className="flex items-center justify-end space-x-3 rounded-b-lg p-4">
-                <Button
-                  onClick={onClose}
-                  type="button"
-                  variant="ghost"
-                  className="w-auto"
-                  text={t('cancel')}
-                />
-                <Button
-                  type="submit"
-                  text={isCreateMode ? t('add') : t('save')}
-                  variant="primary"
-                  className="w-auto px-[1rem] py-[0.4rem]"
-                />
-              </footer>
-            </form>
-          )}
-        </Form>
+          {/* Fixed Footer */}
+          <footer className="flex flex-shrink-0 items-center justify-end space-x-3 border-t border-gray-200 p-4">
+            <Button
+              onClick={onClose}
+              type="button"
+              variant="ghost"
+              className="w-auto"
+              text={t('cancel')}
+            />
+            <Button
+              type="submit"
+              text={isCreateMode ? t('add') : t('save')}
+              variant="primary"
+              className="w-auto px-[1rem] py-[0.4rem]"
+              disabled={formik.isSubmitting || !formik.isValid}
+            />
+          </footer>
+        </form>
       </div>
     </div>
   );

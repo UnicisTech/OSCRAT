@@ -7,20 +7,26 @@ import toast from 'react-hot-toast';
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (file: File, description?: string) => void;
+  onImportAsJob: (file: File) => void;
 }
 
 const ImportModal: React.FC<ImportModalProps> = ({
   isOpen,
   onClose,
-  onImport,
+  onImportAsJob,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const [name, setName] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('No file chosen');
 
   const { t, ready } = useTranslation('common');
+
+  // Update fileName when translation is ready
+  useEffect(() => {
+    if (ready && fileName === 'No file chosen') {
+      setFileName(t('oscrat.ui.versions.sbom.no-file-chosen'));
+    }
+  }, [ready, t, fileName]);
 
   // Handle closing the modal when clicking outside of it
   useEffect(() => {
@@ -57,7 +63,7 @@ const ImportModal: React.FC<ImportModalProps> = ({
       const validExtensions = ['xml'];
 
       if (!fileExtension || !validExtensions.includes(fileExtension)) {
-        toast.error('Please select a valid CycloneDX SBOM file (.xml)');
+        toast.error(t('oscrat.ui.versions.sbom.select-valid-sbom-file'));
         e.target.value = '';
         return;
       }
@@ -69,18 +75,17 @@ const ImportModal: React.FC<ImportModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !file) {
-      toast.error('Please provide a name and select a file.');
+    if (!file) {
+      toast.error(t('oscrat.ui.versions.sbom.please-select-file'));
       return;
     }
-    onImport(file, `SBOM: ${name}`);
+    onImportAsJob(file);
     handleClose();
   };
 
   const handleClose = () => {
-    setName('');
     setFile(null);
-    setFileName('No file chosen');
+    setFileName(t('oscrat.ui.versions.sbom.no-file-chosen'));
     onClose();
   };
 
@@ -105,22 +110,10 @@ const ImportModal: React.FC<ImportModalProps> = ({
         </header>
         <form onSubmit={handleSubmit}>
           <main className="space-y-4 p-6">
-            <div>
-              <label
-                htmlFor="ssmName"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                {t('name')}
-              </label>
-
-              <input
-                type="text"
-                id="ssmName"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                required
-              />
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">
+                {t('oscrat.ui.versions.sbom.import-description')}
+              </p>
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">

@@ -1,5 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import { getVersionDetail, updateVersion, deleteVersion } from '@oscrat/model/operations';
+import {
+  getVersionDetail,
+  updateVersion,
+  deleteVersion,
+} from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductVersionUpdate } from '@oscrat/model';

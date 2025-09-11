@@ -1,6 +1,7 @@
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import { findAttachmentById } from 'models/attachment';
+import { getAttachmentWithFileById } from '@oscrat/model/operations';
+import { prisma } from '@/lib/prisma';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -28,7 +29,7 @@ const handleGET = async (
   const { attachmentId } = req.query;
 
   try {
-    const attachment = await findAttachmentById(attachmentId as string);
+    const attachment = await getAttachmentWithFileById(prisma, attachmentId as string);
 
     if (!attachment) {
       return res.status(404).json({
@@ -59,7 +60,8 @@ const handleGET = async (
     );
 
     // Stream the file data directly without temporary files
-    res.status(200).send(attachment.file.fileData);
+    const fileBuffer = Buffer.from(attachment.file.fileData);
+    res.status(200).send(fileBuffer);
   } catch (error) {
     console.error('Error downloading attachment:', error);
     res.status(500).json({

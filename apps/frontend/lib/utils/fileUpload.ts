@@ -138,3 +138,39 @@ export const cleanupTempFile = async (filepath: string): Promise<void> => {
     console.warn(`Failed to cleanup temp file ${filepath}:`, error);
   }
 };
+
+/**
+ * Handle formidable errors with specific error codes
+ */
+export const handleFormidableError = async (
+  error: unknown,
+  maxSizeMB?: number
+): Promise<never> => {
+  // Import ApiError dynamically to avoid circular dependencies
+  const { ApiError } = await import('@/lib/errors');
+
+  // Handle specific formidable error codes
+  const errorWithCode = error as { code?: string };
+  switch (errorWithCode.code) {
+    case 'LIMIT_FILE_SIZE': {
+      const sizeMsg = maxSizeMB ? `Maximum size is ${maxSizeMB}MB.` : '';
+      throw new ApiError(400, `File is too large. ${sizeMsg}`.trim());
+    }
+    case 'LIMIT_FILE_COUNT': {
+      throw new ApiError(400, 'Only one file can be uploaded at a time.');
+    }
+    case 'LIMIT_FIELD_COUNT': {
+      throw new ApiError(400, 'Too many form fields.');
+    }
+    case 'ABORTED': {
+      throw new ApiError(400, 'Upload was interrupted.');
+    }
+    case 'PARSER_ERROR': {
+      throw new ApiError(400, 'Invalid file format or corrupted upload.');
+    }
+    default: {
+      console.error('Unknown formidable error:', error);
+      throw new ApiError(500, 'Failed to process file upload.');
+    }
+  }
+};

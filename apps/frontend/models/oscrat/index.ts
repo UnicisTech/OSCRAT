@@ -12,4 +12,3 @@ export {
   saveFileAsVersionAttachment,
   checkExtensionAndMIMEType as checkVersionAttachmentFile,
 } from './versionAttachment';
-

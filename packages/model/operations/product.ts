@@ -71,7 +71,6 @@ const PRODUCT_DETAIL_INCLUDE = {
   },
 };
 
-
 /** Type aliases for better maintainability */
 type ProductSummaryPayload = Prisma.OscratProductGetPayload<{
   include: typeof PRODUCT_SUMMARY_INCLUDE;
@@ -80,7 +79,6 @@ type ProductSummaryPayload = Prisma.OscratProductGetPayload<{
 type ProductDetailPayload = Prisma.OscratProductGetPayload<{
   include: typeof PRODUCT_DETAIL_INCLUDE;
 }>;
-
 
 // Transform functions
 /** Transform Prisma product to ProductSummary (lightweight with counts) */

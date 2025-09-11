@@ -30,7 +30,7 @@ export const createAttachment = async (
 };
 
 export const findAttachmentById = async (id: string) => {
-  return await AttachmentOps.findAttachmentById(prisma, id);
+  return await AttachmentOps.getAttachmentById(prisma, id);
 };
 
 export const deleteAttachment = async (id: string) => {

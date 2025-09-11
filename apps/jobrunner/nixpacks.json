@@ -1,0 +1,7 @@
+{
+  "phases": {
+    "setup": {
+      "nixPkgs": ["...", "syft"]
+    }
+  }
+}

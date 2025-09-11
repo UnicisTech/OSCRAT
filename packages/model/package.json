@@ -16,9 +16,11 @@
     "build": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^6.7.0"
+    "@prisma/client": "^6.7.0",
+    "date-fns": "^3.6.0"
   },
   "devDependencies": {
+    "@types/node": "20.14.0",
     "dotenv-cli": "^10.0.0",
     "prisma": "^6.7.0",
     "tsx": "^4.20.3"

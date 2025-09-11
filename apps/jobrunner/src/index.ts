@@ -2,8 +2,10 @@ import { PrismaClient } from '@oscrat/model/server';
 import { WorkerJobType, WorkerJob } from '@oscrat/model';
 import { popWorkerJob, finishWorkerJob } from '@oscrat/model/operations';
 import { executeSbomGeneration } from './jobs/sbom';
+import { executeSbomImport } from './jobs/sbomImport';
 import * as fs from 'fs';
 import * as path from 'path';
+import { $ } from 'zx';
 
 // Import local config
 import env from './lib/env';
@@ -59,6 +61,18 @@ class JobRunner {
     }
   }
 
+  private async checkSyftAvailability(): Promise<void> {
+    try {
+      console.log('[Job Runner] Checking syft availability...');
+      await $`which syft`;
+      console.log('[Job Runner] syft is available');
+    } catch (error) {
+      throw new Error(
+        'syft is not installed or not available in PATH. SBOM generation requires syft to be installed.'
+      );
+    }
+  }
+
   public getWorkspaceRoot(): string {
     return this.workspaceRoot;
   }
@@ -67,6 +81,7 @@ class JobRunner {
     console.log('[Job Runner] Starting...');
 
     try {
+      await this.checkSyftAvailability();
       await this.ensureWorkspaceRoot();
       await this.prisma.$connect();
       console.log('[Job Runner] Database connected');
@@ -219,6 +234,8 @@ class JobRunner {
             this.prisma,
             this.workspaceRoot
           );
+        case WorkerJobType.FILE_IMPORT_SBOM:
+          return await executeSbomImport(job, this.prisma, this.workspaceRoot);
         default:
           throw new Error(`Unknown job type: ${job.type}`);
       }

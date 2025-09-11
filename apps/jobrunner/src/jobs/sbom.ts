@@ -6,7 +6,11 @@ import type {
 } from '@oscrat/model/types/jobPayloads';
 import type { OscratRepositoryWithRelations } from '@oscrat/model/types/repository';
 import { getRepositoryById } from '@oscrat/model/operations/repository';
-import { createSbomReport } from '@oscrat/model/operations/sbomReport';
+import {
+  createSbomReport,
+  getProductVersionNames,
+  generateSbomFilename,
+} from '@oscrat/model/operations/sbomReport';
 import { withTempDirectory } from '../utils/filesystem';
 import { cloneRepository } from '../utils/git';
 import { generateSbom, analyzeSBOM, SyftSBOM } from '../utils/sbom';
@@ -55,22 +59,50 @@ async function generateSbomForRepository(
 ): Promise<RepoGenerateSbomResult> {
   try {
     console.log(`[SBOM Job] Cloning repository...`);
-    const repoDir = await cloneRepository(repository, tempDir);
+    let repoDir: string;
+    try {
+      repoDir = await cloneRepository(repository, tempDir);
+    } catch (error) {
+      throw new Error('Failed to checkout repository');
+    }
 
     console.log(`[SBOM Job] Generating SBOM files...`);
-    const { syftJsonPath, cycloneDxXmlPath } = await generateSbom(repoDir);
+    let syftJsonPath: string, cycloneDxXmlPath: string;
+    try {
+      ({ syftJsonPath, cycloneDxXmlPath } = await generateSbom(repoDir));
+    } catch (error) {
+      throw new Error('Failed to generate SBOM');
+    }
 
     // Read the generated SBOM files
     console.log(`[SBOM Job] Reading SBOM files...`);
-    const cycloneDxXmlData = fs.readFileSync(cycloneDxXmlPath);
+    let cycloneDxXmlData: Buffer;
+    let syftJsonData: Buffer;
+    let sbomSummary: any;
+    let packageCount: number;
 
-    // create summary from syft json
-    const syftJsonData = fs.readFileSync(syftJsonPath);
-    const syftJsonContent = JSON.parse(syftJsonData.toString());
-    const sbomSummary = analyzeSBOM(syftJsonContent as SyftSBOM);
-    const packageCount = sbomSummary.overview.totalComponents;
+    try {
+      cycloneDxXmlData = fs.readFileSync(cycloneDxXmlPath);
+      syftJsonData = fs.readFileSync(syftJsonPath);
+      const syftJsonContent = JSON.parse(syftJsonData.toString());
+      sbomSummary = analyzeSBOM(syftJsonContent as SyftSBOM);
+      packageCount = sbomSummary.overview.totalComponents;
+    } catch (error) {
+      throw new Error('Failed to process SBOM files');
+    }
 
     console.log(`[SBOM Job] Creating SBOM report...`);
+
+    // Get product and version names for proper filename
+    const names = await getProductVersionNames(
+      prisma,
+      repository.version.product.id,
+      repository.version.id
+    );
+
+    const filename = names
+      ? generateSbomFilename(names.productName, names.versionName)
+      : path.basename(cycloneDxXmlPath); // fallback to original behavior
 
     // Create single SBOM report with JSON data and CycloneDX XML file
     const sbomReport = await createSbomReport(prisma, {
@@ -80,7 +112,7 @@ async function generateSbomForRepository(
       sbomData: sbomSummary,
       createdBy: job.triggeredByUserId,
       sbomFile: {
-        filename: path.basename(cycloneDxXmlPath),
+        filename,
         fileData: cycloneDxXmlData,
         mimeType: 'application/xml',
       },

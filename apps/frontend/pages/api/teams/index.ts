@@ -1,4 +1,4 @@
-import { slugify } from '@/lib/common';
+import { slugify } from '@oscrat/model/utils/slugify';
 import { ApiError } from '@/lib/errors';
 import { createTeam, getTeams, isTeamExists } from 'models/team';
 import {

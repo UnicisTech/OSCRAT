@@ -5,7 +5,9 @@ import {
   saveFileAsAttachment,
 } from 'models/attachment';
 import { checkExtensionAndMIMEType } from 'models/attachment';
+import { handleFormidableError } from '@/lib/utils/fileUpload';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
+import { ApiError } from '@/lib/errors';
 import type { NextApiResponse } from 'next';
 import { getTaskBySlugAndNumber } from 'models/task';
 
@@ -52,10 +54,7 @@ const handleGET = async (
     );
 
     if (!task) {
-      return res.status(404).json({
-        data: null,
-        error: { message: 'Task not found.' },
-      });
+      throw new ApiError(404, 'Task not found');
     }
 
     // Task should have attachments included from the model function
@@ -63,11 +62,16 @@ const handleGET = async (
       data: task.attachments || [],
       error: null,
     });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    console.error('Error handling GET request:', error);
+
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
     res.status(500).json({
       data: null,
-      error: { message: 'Internal server error.' },
+      error: { message: 'Internal server error' },
     });
   }
 };
@@ -84,6 +88,9 @@ const handlePOST = async (
     const { taskId, description } = fields;
 
     const file = Object.values(files)[0] as formidable.File[];
+    if (!file?.[0]) {
+      throw new ApiError(400, 'No file uploaded');
+    }
 
     const isAllowed = checkExtensionAndMIMEType(file[0] as formidable.File);
 
@@ -102,40 +109,48 @@ const handlePOST = async (
         res.status(200).json({ data: { url }, error: null });
       } catch (error) {
         console.error('Failed to save file as attachment:', error);
-        res
-          .status(500)
-          .json({
-            data: null,
-            error: { message: 'Failed to save file as attachment.' },
-          });
+        throw new ApiError(500, 'Failed to save file as attachment');
       }
     } else {
-      res
-        .status(400)
-        .json({
-          data: null,
-          error: { message: 'Not supported type of file.' },
-        });
+      throw new ApiError(400, 'Not supported type of file');
     }
-  } catch (e) {
-    res.status(400).json({
-      data: null,
-      error: { message: 'File is too large. Maximum size of file is 10mb.' },
-    });
+  } catch (error: any) {
+    console.error('File upload error:', error);
+
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    handleFormidableError(error, 10);
   }
 };
 
 // Delete an attachment
-
 const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-
   const { id } = req.query;
 
-  await deleteAttachment(id as string);
+  try {
+    if (!id) {
+      throw new ApiError(400, 'Attachment ID is required');
+    }
 
-  return res.status(200).json({ data: {}, error: null });
+    await deleteAttachment(id as string);
+
+    return res.status(200).json({ data: {}, error: null });
+  } catch (error: any) {
+    console.error('Error deleting attachment:', error);
+
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    res.status(500).json({
+      data: null,
+      error: { message: 'Failed to delete attachment' },
+    });
+  }
 };

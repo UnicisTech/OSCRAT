@@ -6,7 +6,14 @@ import { prisma } from '@/lib/prisma';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratRepositoryCreate } from '@oscrat/model';
+import { OscratRepositoryAuthType } from '@oscrat/model';
 import { ApiError } from '@/lib/errors';
+import {
+  repositoryCreateSchema,
+  generateRepositoryUrl,
+  type RepositoryCreateInput,
+} from '@/lib/validation/repository';
+import * as Yup from 'yup';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -53,20 +60,62 @@ const handlePOST = async (
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-
   const { versionId } = req.query;
-  const repositoryData = req.body as OscratRepositoryCreate;
 
-  const repository = await createRepository(
-    prisma,
-    teamMember.teamId,
-    versionId as string,
-    repositoryData
-  );
+  try {
+    // Validate and get typed data
+    const validatedData: RepositoryCreateInput =
+      await repositoryCreateSchema.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true,
+      });
 
-  console.log(
-    `[OSCRAT] repository created, repositoryId: ${repository.id}, name: ${repositoryData.name}, versionId: ${versionId}`
-  );
+    // Build repository data for database
+    const repositoryData: OscratRepositoryCreate = {
+      name: validatedData.name,
+      provider: validatedData.provider,
+      user: validatedData.user,
+      repositoryUrl: generateRepositoryUrl(
+        validatedData.provider,
+        validatedData.user,
+        validatedData.name
+      ),
+      authType: OscratRepositoryAuthType.PERSONAL_ACCESS_TOKEN,
+      accessToken: validatedData.accessToken,
+      targetBranch: validatedData.targetBranch || undefined,
+      targetTag: validatedData.targetTag || undefined,
+      targetCommit: validatedData.targetCommit || undefined,
+    };
 
-  res.status(201).json({ data: repository });
+    const repository = await createRepository(
+      prisma,
+      teamMember.teamId,
+      versionId as string,
+      repositoryData
+    );
+
+    console.log(
+      `[OSCRAT] repository created, repositoryId: ${repository.id}, name: ${repositoryData.name}, versionId: ${versionId}`
+    );
+
+    res.status(201).json({ data: repository });
+  } catch (error) {
+    if (error instanceof Yup.ValidationError) {
+      const errors = error.inner.reduce((acc: Record<string, string>, err) => {
+        if (err.path) {
+          acc[err.path] = err.message;
+        }
+        return acc;
+      }, {});
+
+      return res.status(400).json({
+        error: {
+          message: 'Validation failed',
+          fields: errors,
+        },
+      });
+    }
+
+    throw error;
+  }
 };

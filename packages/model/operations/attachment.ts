@@ -1,4 +1,4 @@
-import { PrismaClient, Attachment, File } from '@prisma/client';
+import { PrismaClient, Attachment, File, Prisma } from '@prisma/client';
 import { createFileInTransaction } from './file';
 
 // Attachment with file data for downloads
@@ -16,13 +16,58 @@ export interface CreateAttachmentParams {
   mimeType?: string;
   createdBy: string;
 
-  // Only one entity association should be provided
   taskId?: number;
   versionId?: string;
   sbomReportId?: string;
 }
 
-/** Create a new attachment for any entity type */
+/** Create a new attachment within an existing tx */
+export const createAttachmentWithTx = async (
+  tx: Prisma.TransactionClient,
+  params: CreateAttachmentParams
+): Promise<AttachmentWithFile> => {
+  console.log(`[Attachment Operations] Creating attachment with tx:`, {
+    name: params.name,
+    fileSize: params.fileSize,
+    taskId: params.taskId,
+    versionId: params.versionId,
+    sbomReportId: params.sbomReportId,
+  });
+
+  const file = await createFileInTransaction(tx, {
+    fileData: params.fileData,
+    fileSize: params.fileSize,
+    mimeType: params.mimeType,
+  });
+
+  const attachment = await tx.attachment.create({
+    data: {
+      name: params.name,
+      fileSize: params.fileSize,
+      mimeType: params.mimeType || 'application/octet-stream',
+      description: params.description,
+      url: params.url,
+      fileId: file.id,
+      taskId: params.taskId,
+      versionId: params.versionId,
+      sbomReportId: params.sbomReportId,
+      createdBy: params.createdBy,
+    },
+    include: {
+      file: true,
+    },
+  });
+
+  console.log(`[Attachment Operations] Attachment created with tx:`, {
+    id: attachment.id,
+    name: attachment.name,
+    fileId: attachment.fileId,
+  });
+
+  return attachment;
+};
+
+/** Create a new attachment for any entity type with tx */
 export const createAttachment = async (
   prisma: PrismaClient,
   params: CreateAttachmentParams
@@ -36,31 +81,7 @@ export const createAttachment = async (
   });
 
   const result = await prisma.$transaction(async (tx) => {
-    const file = await createFileInTransaction(tx, {
-      fileData: params.fileData,
-      fileSize: params.fileSize,
-      mimeType: params.mimeType,
-    });
-
-    const attachment = await tx.attachment.create({
-      data: {
-        name: params.name,
-        fileSize: params.fileSize,
-        mimeType: params.mimeType || 'application/octet-stream',
-        description: params.description,
-        url: params.url,
-        fileId: file.id,
-        taskId: params.taskId,
-        versionId: params.versionId,
-        sbomReportId: params.sbomReportId,
-        createdBy: params.createdBy,
-      },
-      include: {
-        file: true,
-      },
-    });
-
-    return attachment;
+    return await createAttachmentWithTx(tx, params);
   });
 
   console.log(`[Attachment Operations] Attachment created:`, {
@@ -72,7 +93,6 @@ export const createAttachment = async (
   return result;
 };
 
-/** Get attachment by ID without file data (lightweight) */
 export const getAttachmentById = async (
   prisma: PrismaClient,
   attachmentId: string
@@ -84,7 +104,6 @@ export const getAttachmentById = async (
   });
 };
 
-/** Get attachment by ID with file data (for downloads) */
 export const getAttachmentWithFileById = async (
   prisma: PrismaClient,
   attachmentId: string
@@ -101,7 +120,6 @@ export const getAttachmentWithFileById = async (
   });
 };
 
-/** Get attachments for a task */
 export const getTaskAttachments = async (
   prisma: PrismaClient,
   taskId: number
@@ -126,7 +144,6 @@ export const getTaskAttachments = async (
   return attachments;
 };
 
-/** Get attachments for a version */
 export const getVersionAttachments = async (
   prisma: PrismaClient,
   versionId: string
@@ -151,7 +168,6 @@ export const getVersionAttachments = async (
   return attachments;
 };
 
-/** Get attachment for an SBOM report */
 export const getSbomReportAttachment = async (
   prisma: PrismaClient,
   sbomReportId: string
@@ -165,7 +181,6 @@ export const getSbomReportAttachment = async (
   });
 };
 
-/** Delete an attachment and its associated file */
 export const deleteAttachment = async (
   prisma: PrismaClient,
   attachmentId: string
@@ -190,9 +205,4 @@ export const deleteAttachment = async (
       `[Attachment Operations] Attachment and file deleted: ${attachmentId}`
     );
   });
-};
-
-// Legacy function for backward compatibility
-export const findAttachmentById = async (prisma: PrismaClient, id: string) => {
-  return await getAttachmentWithFileById(prisma, id);
 };

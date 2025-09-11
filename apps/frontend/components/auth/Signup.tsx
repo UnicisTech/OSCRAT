@@ -34,7 +34,6 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
     },
     validationSchema: userSignupSchema,
     onSubmit: async (values) => {
-      
       if (recaptchaSiteKey && !recaptchaToken) {
         toast.error(t('oscrat.ui.catpcha-verification-failed'));
         return;
@@ -49,17 +48,17 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
           password: values.password,
           recaptchaToken,
         });
-        
+
         // Automatically sign in the user
         const result = await signIn('credentials', {
           email: values.email,
           password: values.password,
           redirect: false,
         });
-        
+
         recaptchaRef.current?.reset();
         formik.resetForm();
-        
+
         if (result?.error) {
           const errorMessage = handleAuthError(result.error);
           toast.error(errorMessage);
@@ -86,7 +85,7 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
         <div className="mb-6">
           <div className="space-y-4">
             {/* First Name and Last Name Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <InputWithLabel
                 type="text"
                 name="firstName"
@@ -94,9 +93,7 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
                 value={formik.values.firstName}
                 label={t('first-name')}
                 error={
-                  formik.touched.firstName
-                    ? formik.errors.firstName
-                    : undefined
+                  formik.touched.firstName ? formik.errors.firstName : undefined
                 }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -135,7 +132,7 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
             />
 
             {/* Password and Retype Password Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <InputWithLabel
                 type="password"
                 name="password"
@@ -200,7 +197,9 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {formik.isSubmitting ? t('oscrat.ui.creating') : t('create-account')}
+            {formik.isSubmitting
+              ? t('oscrat.ui.creating')
+              : t('create-account')}
           </button>
         </div>
 

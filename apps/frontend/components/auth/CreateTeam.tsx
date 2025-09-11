@@ -3,12 +3,9 @@ import { OscratOrganizationSize, OscratOrganizationType } from '@oscrat/model';
 import { useFormik } from 'formik';
 import { InputWithLabel } from '@/components/shared';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { teamCreationSchema } from '@/lib/validation/team';
 import { useCreateTeam } from '@/lib/api';
-import { queryClient } from '@/lib/api/hooks';
-import { queryKeys } from '@/lib/api/queryKeys';
 import Select from 'react-select';
 import countryList from 'react-select-country-list';
 import { getCountryCallingCode } from 'libphonenumber-js';
@@ -20,7 +17,6 @@ interface CreateTeamProps {
 }
 
 const CreateTeam = ({ onClose }: CreateTeamProps) => {
-  const router = useRouter();
   const { t, ready } = useTranslation('common');
   const createTeam = useCreateTeam();
 
@@ -42,15 +38,17 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
   );
 
   const countryOptions = useMemo(() => {
-    return countryList().getData().filter((country) => {
-      try {
-        // Only include countries that have valid calling codes
-        getCountryCallingCode(country.value as any);
-        return true;
-      } catch {
-        return false;
-      }
-    });
+    return countryList()
+      .getData()
+      .filter((country) => {
+        try {
+          // Only include countries that have valid calling codes
+          getCountryCallingCode(country.value as any);
+          return true;
+        } catch {
+          return false;
+        }
+      });
   }, []);
 
   const formik = useFormik({
@@ -71,7 +69,8 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
         const teamData = {
           name: values.name,
           type: values.type as OscratOrganizationType,
-          ...((values.type as OscratOrganizationType) === OscratOrganizationType.LIMITED_LIABILITY_COMPANY && {
+          ...((values.type as OscratOrganizationType) ===
+            OscratOrganizationType.LIMITED_LIABILITY_COMPANY && {
             size: values.size as OscratOrganizationSize,
             taxId: values.taxId,
           }),
@@ -81,9 +80,9 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
           contactPhone: values.contactPhone,
           additionalInformation: values.additionalInformation,
         };
-        
+
         await createTeam.mutateAsync(teamData);
-        
+
         toast.success(t('team-created'));
         onClose();
       } catch (error: unknown) {
@@ -126,8 +125,14 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                   type="radio"
                   name="type"
                   value={OscratOrganizationType.NATURAL_PERSON}
-                  checked={formik.values.type === OscratOrganizationType.NATURAL_PERSON}
-                  onChange={() => handlePersonTypeChange(OscratOrganizationType.NATURAL_PERSON)}
+                  checked={
+                    formik.values.type === OscratOrganizationType.NATURAL_PERSON
+                  }
+                  onChange={() =>
+                    handlePersonTypeChange(
+                      OscratOrganizationType.NATURAL_PERSON
+                    )
+                  }
                   className="h-4 w-4 border-gray-300 text-black focus:ring-black"
                 />
                 <span className="ml-2 text-sm text-gray-700">
@@ -139,8 +144,15 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                   type="radio"
                   name="type"
                   value={OscratOrganizationType.LIMITED_LIABILITY_COMPANY}
-                  checked={(formik.values.type as OscratOrganizationType) === OscratOrganizationType.LIMITED_LIABILITY_COMPANY}
-                  onChange={() => handlePersonTypeChange(OscratOrganizationType.LIMITED_LIABILITY_COMPANY)}
+                  checked={
+                    (formik.values.type as OscratOrganizationType) ===
+                    OscratOrganizationType.LIMITED_LIABILITY_COMPANY
+                  }
+                  onChange={() =>
+                    handlePersonTypeChange(
+                      OscratOrganizationType.LIMITED_LIABILITY_COMPANY
+                    )
+                  }
                   className="h-4 w-4 border-gray-300 text-black focus:ring-black"
                 />
                 <span className="ml-2 text-sm text-gray-700">
@@ -151,7 +163,8 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
           </div>
 
           {/* Legal Person Specific Fields */}
-          {(formik.values.type as OscratOrganizationType) === OscratOrganizationType.LIMITED_LIABILITY_COMPANY && (
+          {(formik.values.type as OscratOrganizationType) ===
+            OscratOrganizationType.LIMITED_LIABILITY_COMPANY && (
             <div className="mb-4 space-y-4">
               <InputWithLabel
                 type="text"
@@ -159,11 +172,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 placeholder={t('oscrat.ui.enter-organization-name')}
                 value={formik.values.name}
                 label={t('oscrat.ui.organization-name')}
-                error={
-                  formik.touched.name
-                    ? formik.errors.name
-                    : undefined
-                }
+                error={formik.touched.name ? formik.errors.name : undefined}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 required
@@ -176,11 +185,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 placeholder="XX-XXXXXXX"
                 value={formik.values.taxId}
                 label={`${t('tax-id')} (${t('optional')})`}
-                error={
-                  formik.touched.taxId
-                    ? formik.errors.taxId
-                    : undefined
-                }
+                error={formik.touched.taxId ? formik.errors.taxId : undefined}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
@@ -197,8 +202,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                   onBlur={formik.handleBlur}
                   required
                   className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    formik.touched.size &&
-                    formik.errors.size
+                    formik.touched.size && formik.errors.size
                       ? 'border-red-500'
                       : 'border-gray-300'
                   }`}
@@ -210,18 +214,18 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                     </option>
                   ))}
                 </select>
-                {formik.touched.size &&
-                  formik.errors.size && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {formik.errors.size}
-                    </p>
-                  )}
+                {formik.touched.size && formik.errors.size && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {formik.errors.size}
+                  </p>
+                )}
               </div>
             </div>
           )}
 
           {/* Natural Person Specific Fields */}
-          {(formik.values.type as OscratOrganizationType) === OscratOrganizationType.NATURAL_PERSON && (
+          {(formik.values.type as OscratOrganizationType) ===
+            OscratOrganizationType.NATURAL_PERSON && (
             <div className="mb-4 space-y-4">
               <InputWithLabel
                 type="text"
@@ -229,11 +233,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 placeholder={t('oscrat.ui.enter-team-name')}
                 value={formik.values.name}
                 label={t('oscrat.ui.team-name')}
-                error={
-                  formik.touched.name
-                    ? formik.errors.name
-                    : undefined
-                }
+                error={formik.touched.name ? formik.errors.name : undefined}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 required
@@ -295,18 +295,17 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 placeholder={t('choose')}
                 isSearchable
                 className={
-                  formik.touched.countryCode && formik.errors.countryCode 
-                    ? 'react-select-container [&_.react-select__control]:min-h-[42px] [&_.react-select__control]:border-red-500 [&_.react-select__control:hover]:border-red-500 [&_.react-select__control]:focus-within:border-red-500 [&_.react-select__control]:focus-within:ring-2 [&_.react-select__control]:focus-within:ring-red-500 [&_.react-select__control]:focus-within:ring-opacity-20' 
-                    : 'react-select-container [&_.react-select__control]:min-h-[42px] [&_.react-select__control]:border-gray-300 [&_.react-select__control:hover]:border-gray-400 [&_.react-select__control]:focus-within:border-blue-500 [&_.react-select__control]:focus-within:ring-2 [&_.react-select__control]:focus-within:ring-blue-500 [&_.react-select__control]:focus-within:ring-opacity-20'
+                  formik.touched.countryCode && formik.errors.countryCode
+                    ? 'react-select-container [&_.react-select__control:hover]:border-red-500 [&_.react-select__control]:min-h-[42px] [&_.react-select__control]:border-red-500 [&_.react-select__control]:focus-within:border-red-500 [&_.react-select__control]:focus-within:ring-2 [&_.react-select__control]:focus-within:ring-red-500 [&_.react-select__control]:focus-within:ring-opacity-20'
+                    : 'react-select-container [&_.react-select__control:hover]:border-gray-400 [&_.react-select__control]:min-h-[42px] [&_.react-select__control]:border-gray-300 [&_.react-select__control]:focus-within:border-blue-500 [&_.react-select__control]:focus-within:ring-2 [&_.react-select__control]:focus-within:ring-blue-500 [&_.react-select__control]:focus-within:ring-opacity-20'
                 }
                 classNamePrefix="react-select"
               />
-              {formik.touched.countryCode &&
-                formik.errors.countryCode && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {formik.errors.countryCode}
-                  </p>
-                )}
+              {formik.touched.countryCode && formik.errors.countryCode && (
+                <p className="mt-1 text-xs text-red-500">
+                  {formik.errors.countryCode}
+                </p>
+              )}
             </div>
 
             {/* Phone Number with Country Code Prefix */}
@@ -317,7 +316,9 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               <div className="flex">
                 {/* Country Code Display */}
                 <div className="flex items-center justify-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-sm text-gray-700">
-                   {formik.values.countryCode ? `+${getCountryCallingCode(formik.values.countryCode as any)}` : '+XX'}
+                  {formik.values.countryCode
+                    ? `+${getCountryCallingCode(formik.values.countryCode as any)}`
+                    : '+XX'}
                 </div>
                 {/* Phone Number Input */}
                 <input
@@ -329,19 +330,17 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                   onBlur={formik.handleBlur}
                   required
                   className={`flex-1 rounded-r-md border border-l-0 px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    formik.touched.contactPhone &&
-                    formik.errors.contactPhone
+                    formik.touched.contactPhone && formik.errors.contactPhone
                       ? 'border-red-500'
                       : 'border-gray-300'
                   }`}
                 />
               </div>
-              {formik.touched.contactPhone &&
-                formik.errors.contactPhone && (
-                  <p className="mt-1 text-xs text-red-500">
-                    {formik.errors.contactPhone}
-                  </p>
-                )}
+              {formik.touched.contactPhone && formik.errors.contactPhone && (
+                <p className="mt-1 text-xs text-red-500">
+                  {formik.errors.contactPhone}
+                </p>
+              )}
             </div>
 
             <div>

@@ -1,5 +1,8 @@
 import { prisma } from '@/lib/prisma';
-import { getVersionAssessments, createVersionAssessment } from '@oscrat/model/operations';
+import {
+  getVersionAssessments,
+  createVersionAssessment,
+} from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratAssessmentCreate } from '@oscrat/model';

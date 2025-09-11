@@ -115,9 +115,7 @@ const transformToTeam = (team: PrismaTeam): Team => ({
 });
 
 /** Transform Prisma team to TeamSummary */
-const transformToTeamSummary = (
-  team: TeamSummaryPayload
-): TeamSummary => ({
+const transformToTeamSummary = (team: TeamSummaryPayload): TeamSummary => ({
   id: team.id,
   name: team.name,
   slug: team.slug,
@@ -128,9 +126,7 @@ const transformToTeamSummary = (
 });
 
 /** Transform Prisma team to TeamDetail */
-const transformToTeamDetail = (
-  team: TeamDetailPayload
-): TeamDetail => ({
+const transformToTeamDetail = (team: TeamDetailPayload): TeamDetail => ({
   id: team.id,
   name: team.name,
   slug: team.slug,

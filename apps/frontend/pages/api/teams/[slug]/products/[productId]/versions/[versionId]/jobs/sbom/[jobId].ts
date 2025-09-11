@@ -1,4 +1,4 @@
-import { getSbomWorkerJobs } from '@oscrat/model/operations';
+import { deleteSbomWorkerJob } from '@oscrat/model/operations';
 import { prisma } from '@/lib/prisma';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
@@ -11,31 +11,31 @@ export default function handler(
   const { method } = req;
 
   switch (method) {
-    case 'GET':
-      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
+    case 'DELETE':
+      return withTeamAuth(['team', 'update'])(handleDELETE)(req, res);
     default:
-      res.setHeader('Allow', ['GET']);
+      res.setHeader('Allow', ['DELETE']);
       throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
 
-// Get SBOM jobs for a version (both REPO and FILE types)
-const handleGET = async (
+// Delete SBOM job
+const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-  const { versionId } = req.query;
+  const { jobId } = req.query;
 
-  const jobs = await getSbomWorkerJobs(
-    prisma,
-    teamMember.teamId,
-    versionId as string
-  );
+  if (!jobId) {
+    throw new ApiError(400, 'Job ID is required');
+  }
+
+  await deleteSbomWorkerJob(prisma, teamMember.teamId, jobId as string);
 
   console.log(
-    `[SBOM] jobs listed, teamId: ${teamMember.teamId}, versionId: ${versionId}, count: ${jobs.length}`
+    `[SBOM] job deleted, teamId: ${teamMember.teamId}, jobId: ${jobId}`
   );
 
-  res.status(200).json({ data: jobs });
+  res.status(200).json({ data: {}, error: null });
 };

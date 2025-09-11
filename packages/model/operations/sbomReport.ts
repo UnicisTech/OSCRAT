@@ -1,5 +1,11 @@
 import { PrismaClient, type Prisma } from '@prisma/client';
-import { createAttachment, CreateAttachmentParams } from './attachment';
+import { format } from 'date-fns';
+import {
+  createAttachment,
+  createAttachmentWithTx,
+  CreateAttachmentParams,
+} from './attachment';
+import { slugify } from '../utils/slugify';
 
 export interface CreateSbomReportParams {
   jobId: string;
@@ -117,7 +123,7 @@ export const createSbomReport = async (
     });
 
     // Create the attachment for the SBOM file
-    await createAttachment(prisma, {
+    await createAttachmentWithTx(tx, {
       name: params.sbomFile.filename,
       description: 'SBOM Report File',
       fileData: params.sbomFile.fileData,
@@ -207,7 +213,11 @@ export const getSbomReportById = async (
     include: SBOM_REPORT_SUMMARY_INCLUDE,
   });
 
-  return report ? transformToSbomReportSummary(report) : null;
+  if (!report) {
+    throw new Error(`SBOM report ${reportId} not found or not accessible`);
+  }
+
+  return transformToSbomReportSummary(report);
 };
 
 /** Get SBOM report file data */
@@ -247,7 +257,7 @@ export const getSbomReportFile = async (
     console.log(
       `[SBOM Report Operations] SBOM report not found or not accessible: ${reportId}`
     );
-    return null;
+    throw new Error(`SBOM report ${reportId} not found or not accessible`);
   }
 
   return {
@@ -255,4 +265,40 @@ export const getSbomReportFile = async (
     fileData: Buffer.from(report.attachment.file.fileData),
     mimeType: report.attachment.mimeType ?? undefined,
   };
+};
+
+/** Get product and version names for SBOM filename generation */
+export const getProductVersionNames = async (
+  prisma: PrismaClient,
+  productId: string,
+  versionId: string
+): Promise<{ productName: string; versionName: string } | null> => {
+  const version = await prisma.oscratProductVersion.findUnique({
+    where: { id: versionId },
+    include: {
+      product: {
+        select: { name: true },
+      },
+    },
+  });
+
+  if (!version) {
+    throw new Error(`Version ${versionId} not found`);
+  }
+
+  return {
+    productName: version.product.name,
+    versionName: version.version,
+  };
+};
+
+/** Generate standardized SBOM filename */
+export const generateSbomFilename = (
+  productName: string,
+  versionName: string
+): string => {
+  // Clean timestamp format: YYYYMMDD-HHmmss
+  const timestamp = format(new Date(), 'yyyyMMdd-HHmmss');
+
+  return `sbom-${slugify(productName)}-${slugify(versionName)}-${timestamp}.cyclonedx.xml`;
 };

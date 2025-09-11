@@ -21,17 +21,6 @@ export function generateToken(length = 64) {
   return enc.Base64.stringify(tokenBytes);
 }
 
-export const slugify = (text: string) => {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/[^\w-]+/g, '') // Remove all non-word chars
-    .replace(/--+/g, '-') // Replace multiple - with single -
-    .replace(/^-+/, '') // Trim - from start of text
-    .replace(/-+$/, ''); // Trim - from end of text
-};
-
 // Fetch the auth token from the request headers
 export const extractAuthToken = (req: NextApiRequest): string | null => {
   const authHeader = req.headers.authorization || null;

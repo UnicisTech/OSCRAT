@@ -118,6 +118,7 @@ model Team {
   productVersions             OscratProductVersion[]
   repositories                OscratRepository[]
   reportingOrganizations      OscratReportingOrganization[]
+  workerJobs                  WorkerJob[]
 }
 
 model Task {
@@ -334,6 +335,7 @@ enum OscratRepositoryAuthType {
 
 enum WorkerJobType {
   REPO_GENERATE_SBOM
+  FILE_IMPORT_SBOM
 }
 
 enum WorkerJobStatus {
@@ -372,6 +374,7 @@ model OscratProduct {
   conformityProcedure    OscratConformityProcedure     @default(SELF_ASSESSMENT)
   riskLevel              OscratProductRiskLevel        @default(LOW)
   versions               OscratProductVersion[]
+  workerJobs             WorkerJob[]
   status                 OscratProductStatus           @default(ACTIVE)
 
   createdAt DateTime @default(now())
@@ -401,6 +404,7 @@ model OscratProductVersion {
   repository      OscratRepository?
   sbomReports     SbomReport[]
   attachments     Attachment[]
+  workerJobs      WorkerJob[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -556,6 +560,16 @@ model WorkerJob {
   triggeredByUserId String
   triggeredByUser   User   @relation("WorkerJobTriggeredBy", fields: [triggeredByUserId], references: [id])
 
+  // Context fields - team is mandatory, others optional
+  contextTeamId    String
+  contextTeam      Team @relation(fields: [contextTeamId], references: [id], onDelete: Cascade)
+  
+  contextProductId String?
+  contextProduct   OscratProduct? @relation(fields: [contextProductId], references: [id], onDelete: Cascade)
+  
+  contextVersionId String?
+  contextVersion   OscratProductVersion? @relation(fields: [contextVersionId], references: [id], onDelete: Cascade)
+
   processStartTime DateTime?
   processEndTime   DateTime?
   createdAt        DateTime  @default(now())
@@ -567,6 +581,9 @@ model WorkerJob {
   sbomReport SbomReport?
 
   @@index([status, type])
+  @@index([contextVersionId, type])
+  @@index([contextProductId, type])
+  @@index([contextTeamId, type])
 }
 
 model SbomReport {

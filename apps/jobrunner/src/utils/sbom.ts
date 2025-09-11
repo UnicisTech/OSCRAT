@@ -43,7 +43,7 @@ export async function generateSbom(
       cycloneDxXmlPath,
     };
   } catch (error: any) {
-    throw new Error(`Failed to generate SBOM: ${error.message}`);
+    throw new Error('Failed to generate SBOM');
   } finally {
     // Reset the working directory
     $.cwd = originalCwd;
@@ -67,6 +67,30 @@ export interface SyftSBOM {
     version?: string;
     timestamp?: string;
   };
+}
+
+export async function convertSbomToSyftJson(
+  inputPath: string,
+  outputPath: string
+): Promise<void> {
+  const originalCwd = $.cwd;
+
+  try {
+    console.log(`Converting SBOM from ${inputPath} to ${outputPath}`);
+
+    await $`syft convert ${inputPath} -o syft-json=${outputPath}`;
+
+    if (!fs.existsSync(outputPath)) {
+      throw new Error(`Converted SBOM file was not created at ${outputPath}`);
+    }
+
+    console.log(`SBOM converted successfully to: ${outputPath}`);
+  } catch (error: any) {
+    throw new Error('Failed to convert SBOM file');
+  } finally {
+    // Reset the working directory
+    $.cwd = originalCwd;
+  }
 }
 
 export function analyzeSBOM(sbomJson: SyftSBOM): SBOMSummary {

@@ -7,6 +7,12 @@ import { prisma } from '@/lib/prisma';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratRepositoryUpdate } from '@oscrat/model';
+import {
+  repositoryUpdateSchema,
+  generateRepositoryUrl,
+  type RepositoryUpdateInput,
+} from '@/lib/validation/repository';
+import * as Yup from 'yup';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -59,18 +65,59 @@ const handlePUT = async (
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-
   const { repositoryId } = req.query;
-  const repositoryData = req.body as OscratRepositoryUpdate;
 
-  const repository = await updateRepository(
-    prisma,
-    teamMember.teamId,
-    repositoryId as string,
-    repositoryData
-  );
+  try {
+    // Validate complete update data
+    const validatedData: RepositoryUpdateInput =
+      await repositoryUpdateSchema.validate(req.body, {
+        abortEarly: false,
+        stripUnknown: true,
+      });
 
-  res.status(200).json({ data: repository });
+    // Build complete update data
+    const repositoryData: OscratRepositoryUpdate = {
+      name: validatedData.name,
+      provider: validatedData.provider,
+      user: validatedData.user,
+      repositoryUrl: generateRepositoryUrl(
+        validatedData.provider,
+        validatedData.user,
+        validatedData.name
+      ),
+      accessToken: validatedData.accessToken,
+      targetBranch: validatedData.targetBranch || undefined,
+      targetTag: validatedData.targetTag || undefined,
+      targetCommit: validatedData.targetCommit || undefined,
+    };
+
+    const repository = await updateRepository(
+      prisma,
+      teamMember.teamId,
+      repositoryId as string,
+      repositoryData
+    );
+
+    res.status(200).json({ data: repository });
+  } catch (error) {
+    if (error instanceof Yup.ValidationError) {
+      const errors = error.inner.reduce((acc: Record<string, string>, err) => {
+        if (err.path) {
+          acc[err.path] = err.message;
+        }
+        return acc;
+      }, {});
+
+      return res.status(400).json({
+        error: {
+          message: 'Validation failed',
+          fields: errors,
+        },
+      });
+    }
+
+    throw error;
+  }
 };
 
 // Delete repository

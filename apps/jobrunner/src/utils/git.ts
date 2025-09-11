@@ -157,9 +157,7 @@ export async function cloneRepository(
       repoPath,
       tempDir,
     });
-    throw new Error(
-      `Failed to clone repository ${repository.user}/${repository.name}: ${error.message}`
-    );
+    throw new Error('Failed to clone repository');
   } finally {
     console.log(`[Git Utils] Resetting working directory to: ${originalCwd}`);
     $.cwd = originalCwd;

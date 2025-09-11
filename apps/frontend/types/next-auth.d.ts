@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import type { Role } from '@oscrat/model';
 import type { DefaultSession } from 'next-auth';
 

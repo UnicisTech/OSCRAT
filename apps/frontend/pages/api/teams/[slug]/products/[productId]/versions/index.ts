@@ -31,7 +31,11 @@ const handleGET = async (
 
   const { productId } = req.query;
 
-  const versions = await getVersions(prisma, teamMember.teamId, productId as string);
+  const versions = await getVersions(
+    prisma,
+    teamMember.teamId,
+    productId as string
+  );
 
   res.status(200).json({ data: versions });
 };

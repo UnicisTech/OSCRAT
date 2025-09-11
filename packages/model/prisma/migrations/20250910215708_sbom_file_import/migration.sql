@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "WorkerJobType" ADD VALUE 'FILE_IMPORT_SBOM';

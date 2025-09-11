@@ -5,8 +5,6 @@ import Link from 'next/link';
 import {
   RectangleStackIcon,
   Cog6ToothIcon,
-  CodeBracketIcon,
-  ChatBubbleBottomCenterTextIcon,
   ExclamationCircleIcon,
   UserCircleIcon,
   DocumentCheckIcon,
@@ -14,7 +12,6 @@ import {
 } from '@heroicons/react/24/outline';
 import app from '@/lib/app';
 import TeamDropdown from './TeamDropdown';
-import Icon from './Icon';
 import { useSession } from 'next-auth/react';
 
 interface SidePanelProps {
@@ -163,7 +160,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
 
   return (
     <div
-      className={`flex flex-col shadow-lg shadow-gray-400/50 relative z-10 ${className}`}
+      className={`relative z-10 flex flex-col shadow-lg shadow-gray-400/50 ${className}`}
     >
       {sidebarContent}
     </div>

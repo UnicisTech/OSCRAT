@@ -7,7 +7,8 @@
       "packages/model/**",
       "package.json",
       "pnpm-lock.yaml"
-    ]
+    ],
+    "nixpacksConfigPath": "apps/jobrunner/nixpacks.json"
   },
   "deploy": {
     "preDeployCommand": "pnpm db:migrate:deploy",

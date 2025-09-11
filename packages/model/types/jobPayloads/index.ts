@@ -11,6 +11,19 @@ export interface RepoGenerateSbomResult {
   vulnerabilityCount?: number;
 }
 
-export type WorkerJobPayload = RepoGenerateSbomPayload;
+export interface FileImportSbomPayload {
+  filename: string;
+  fileData: string; // base64 encoded file content
+  mimeType: string;
+}
 
-export type WorkerJobResult = RepoGenerateSbomResult;
+export interface FileImportSbomResult {
+  sbomData: any;
+  generatedAt: string;
+  packageCount?: number;
+  vulnerabilityCount?: number;
+}
+
+export type WorkerJobPayload = RepoGenerateSbomPayload | FileImportSbomPayload;
+
+export type WorkerJobResult = RepoGenerateSbomResult | FileImportSbomResult;
