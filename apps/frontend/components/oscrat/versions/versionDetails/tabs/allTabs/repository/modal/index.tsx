@@ -65,6 +65,116 @@ const formStyles = {
   },
 };
 
+const FormField = ({
+  label,
+  name,
+  value,
+  onChange,
+  onBlur,
+  error,
+  placeholder,
+  required = false,
+  type = 'text',
+  autoComplete = 'off',
+}: any) => (
+  <div>
+    <label className={formStyles.label}>
+      {label} {required && <span className={formStyles.required}>*</span>}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      placeholder={placeholder}
+      autoComplete={autoComplete}
+      className={`${formStyles.input.base} ${error ? formStyles.input.error : formStyles.input.normal}`}
+    />
+    {error && (
+      <p className={formStyles.error} role="alert">
+        {error}
+      </p>
+    )}
+  </div>
+);
+
+const SelectField = ({
+  label,
+  name,
+  value,
+  onChange,
+  onBlur,
+  error,
+  required = false,
+  children,
+}: any) => (
+  <div>
+    <label className={formStyles.label}>
+      {label} {required && <span className={formStyles.required}>*</span>}
+    </label>
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      className={`${formStyles.input.base} ${error ? formStyles.input.error : formStyles.input.normal}`}
+    >
+      {children}
+    </select>
+    {error && (
+      <p className={formStyles.error} role="alert">
+        {error}
+      </p>
+    )}
+  </div>
+);
+
+const PasswordField = ({
+  label,
+  name,
+  value,
+  onChange,
+  onBlur,
+  error,
+  placeholder,
+  required = false,
+  helperText,
+  showToken,
+  onToggleToken,
+}: any) => (
+  <div>
+    <label className={formStyles.label}>
+      {label} {required && <span className={formStyles.required}>*</span>}
+    </label>
+    <div className="relative">
+      <input
+        type={showToken ? 'text' : 'password'}
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        placeholder={placeholder}
+        autoComplete="off"
+        className={`${formStyles.input.base} ${formStyles.input.password} ${error ? formStyles.input.error : formStyles.input.normal}`}
+      />
+      <button
+        type="button"
+        onClick={onToggleToken}
+        className={formStyles.button.toggle}
+      >
+        {showToken ? <IoEyeOff size={16} /> : <IoEye size={16} />}
+      </button>
+    </div>
+    {error && (
+      <p className={formStyles.error} role="alert">
+        {error}
+      </p>
+    )}
+    {helperText && <p className={formStyles.helper}>{helperText}</p>}
+  </div>
+);
+
 const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -76,115 +186,6 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const { t } = useTranslation('common');
   const [showToken, setShowToken] = useState(false);
-
-  // Reusable field components
-  const FormField = ({
-    label,
-    name,
-    value,
-    onChange,
-    onBlur,
-    error,
-    placeholder,
-    required = false,
-    type = 'text',
-    autoComplete = 'off',
-  }: any) => (
-    <div>
-      <label className={formStyles.label}>
-        {label} {required && <span className={formStyles.required}>*</span>}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
-        className={`${formStyles.input.base} ${error ? formStyles.input.error : formStyles.input.normal}`}
-      />
-      {error && (
-        <p className={formStyles.error} role="alert">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-
-  const SelectField = ({
-    label,
-    name,
-    value,
-    onChange,
-    onBlur,
-    error,
-    required = false,
-    children,
-  }: any) => (
-    <div>
-      <label className={formStyles.label}>
-        {label} {required && <span className={formStyles.required}>*</span>}
-      </label>
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        className={`${formStyles.input.base} ${error ? formStyles.input.error : formStyles.input.normal}`}
-      >
-        {children}
-      </select>
-      {error && (
-        <p className={formStyles.error} role="alert">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-
-  const PasswordField = ({
-    label,
-    name,
-    value,
-    onChange,
-    onBlur,
-    error,
-    placeholder,
-    required = false,
-    helperText,
-  }: any) => (
-    <div>
-      <label className={formStyles.label}>
-        {label} {required && <span className={formStyles.required}>*</span>}
-      </label>
-      <div className="relative">
-        <input
-          type={showToken ? 'text' : 'password'}
-          name={name}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          placeholder={placeholder}
-          autoComplete="off"
-          className={`${formStyles.input.base} ${formStyles.input.password} ${error ? formStyles.input.error : formStyles.input.normal}`}
-        />
-        <button
-          type="button"
-          onClick={() => setShowToken(!showToken)}
-          className={formStyles.button.toggle}
-        >
-          {showToken ? <IoEyeOff size={16} /> : <IoEye size={16} />}
-        </button>
-      </div>
-      {error && (
-        <p className={formStyles.error} role="alert">
-          {error}
-        </p>
-      )}
-      {helperText && <p className={formStyles.helper}>{helperText}</p>}
-    </div>
-  );
 
   const { updateRepository } = useOscratRepositoryDetail(
     teamId,
@@ -379,6 +380,8 @@ const Modal: React.FC<ModalProps> = ({
                     helperText={t(
                       'oscrat.ui.repository.sections.token-security-notice'
                     )}
+                    showToken={showToken}
+                    onToggleToken={() => setShowToken(!showToken)}
                     required
                   />
                 </div>

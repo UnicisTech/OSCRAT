@@ -1,4 +1,5 @@
 import { useState, ReactNode } from 'react';
+import { useTranslation } from 'next-i18next';
 
 export type TabConfig = {
   id: string;
@@ -19,6 +20,7 @@ export default function TabsManager({
   buttonText,
   onButtonClick,
 }: TabsManagerProps) {
+  const { t } = useTranslation('common');
   const [activeTab, setActiveTab] = useState(defaultActiveTab || tabs[0]?.id);
 
   const handleTabChange = (tabId: string) => {
@@ -47,7 +49,7 @@ export default function TabsManager({
                 : 'inactive-tab-button'
             } mr-1 cursor-pointer px-4 py-2`}
           >
-            {tab.label}
+            {t(tab.label)}
           </button>
         ))}
 

@@ -7,17 +7,29 @@ import Vulnerabilities from './allTabs/vulnerabilities';
 import Task from './allTabs/task';
 
 const TABS_CONFIG = [
-  { id: 'files', label: 'Files', component: <Files /> },
-  { id: 'sbom', label: 'SBOM', component: <Sbom /> },
+  { id: 'files', label: 'oscrat.ui.versions.tabs.files', component: <Files /> },
+  { id: 'sbom', label: 'oscrat.ui.versions.tabs.sbom', component: <Sbom /> },
   {
     id: 'vulnerabilities',
-    label: 'Vulnerabilities',
+    label: 'oscrat.ui.versions.tabs.vulnerabilities',
     component: <Vulnerabilities />,
   },
-  { id: 'incidents', label: 'Incidents', component: <Incidents /> },
-  { id: 'task', label: 'Task', component: <Task /> },
-  { id: 'version-log', label: 'Version Log', component: <VersionLog /> },
-  { id: 'repository', label: 'Repository', component: <Repository /> },
+  {
+    id: 'incidents',
+    label: 'oscrat.ui.versions.tabs.incidents',
+    component: <Incidents />,
+  },
+  { id: 'task', label: 'oscrat.ui.versions.tabs.task', component: <Task /> },
+  {
+    id: 'version-log',
+    label: 'oscrat.ui.versions.tabs.version-log',
+    component: <VersionLog />,
+  },
+  {
+    id: 'repository',
+    label: 'oscrat.ui.versions.tabs.repository',
+    component: <Repository />,
+  },
 ];
 
 export default TABS_CONFIG;

@@ -129,7 +129,7 @@ const RepositorySection = () => {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div>
               <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Repository Name
+                {t('oscrat.ui.repository.labels.repository-name')}
               </dt>
               <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
                 {repository.name}

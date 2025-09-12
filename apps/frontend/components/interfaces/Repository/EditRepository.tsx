@@ -180,7 +180,7 @@ const EditRepository = ({
                 <Field
                   aria-required={true}
                   name="name"
-                  label="Repository Name"
+                  label={t('oscrat.ui.repository.labels.repository-name')}
                   isRequired
                   defaultValue={defaultValues.name}
                 >

@@ -427,7 +427,6 @@
       "no-description": "No description",
       "unknown": "Unknown",
       "source": "Source",
-      "repository": "Repository",
       "repository-not-configured": "No repository configured for this project",
       "repo-sbom-job-created": "Repository SBOM job created successfully",
       "file-sbom-job-created": "SBOM import job created for \"{{filename}}\"",
@@ -536,6 +535,15 @@
         }
       },
       "versions": {
+        "tabs": {
+          "files": "Files",
+          "sbom": "SBOM",
+          "vulnerabilities": "Vulnerabilities",
+          "incidents": "Incidents",
+          "task": "Task",
+          "version-log": "Version Log",
+          "repository": "Repository"
+        },
         "sbom": {
           "generation-jobs": "SBOM Generation Jobs",
           "files": "SBOM Files",
