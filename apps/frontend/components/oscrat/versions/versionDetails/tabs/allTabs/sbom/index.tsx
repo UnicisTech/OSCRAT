@@ -133,6 +133,11 @@ export default function Sbom() {
                   : undefined
               }
               disabled={!hasRepositoryDefined || isCreatingJob}
+              title={
+                !hasRepositoryDefined
+                  ? t('oscrat.ui.to-generate-sbom')
+                  : undefined
+              }
               className={`rounded-md border px-4 py-2 text-sm font-medium ${
                 hasRepositoryDefined && !isCreatingJob
                   ? 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'
@@ -143,14 +148,6 @@ export default function Sbom() {
             </button>
           </div>
         </div>
-
-        {/* Repository warning if needed */}
-        {!hasRepositoryDefined && (
-          <div className="mb-4 flex items-center text-sm text-red-600">
-            <span className="mr-1">⚠️</span>
-            <span>{t('oscrat.ui.to-generate-sbom')}</span>
-          </div>
-        )}
 
         <Table
           jobs={jobs}

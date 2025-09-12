@@ -54,13 +54,14 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 
 const tableStyles = {
   wrapper: 'overflow-x-auto rounded-lg shadow-sm border border-gray-200',
-  table: 'w-full text-left text-sm text-gray-600',
+  table: 'w-full table-fixed text-left text-sm text-gray-600',
   thead: 'bg-gray-50 border-b border-gray-200',
   th: 'px-6 py-3.5 text-xs font-medium text-gray-700 uppercase tracking-wider',
   tbody: 'divide-y divide-gray-200 bg-white',
   tr: 'hover:bg-gray-50',
-  td: 'px-6 py-4',
-  tdSmall: 'px-6 py-4 text-xs',
+  td: 'px-6 py-4 truncate align-middle',
+  tdSmall: 'px-6 py-4 text-xs truncate align-middle',
+  tdCenter: 'px-6 py-4 text-xs truncate align-middle text-center',
   sectionTitle: 'mb-3 text-sm font-medium text-gray-900',
 };
 
@@ -145,25 +146,25 @@ const Table: React.FC<SsmTableProps> = ({
         <table className={tableStyles.table}>
           <thead className={tableStyles.thead}>
             <tr>
-              <th scope="col" className={tableStyles.th}>
+              <th scope="col" className={`${tableStyles.th} w-28`}>
                 {t('status')}
               </th>
-              <th scope="col" className={tableStyles.th}>
+              <th scope="col" className={`${tableStyles.th} w-20 text-center`}>
                 {t('oscrat.ui.source')}
               </th>
-              <th scope="col" className={tableStyles.th}>
+              <th scope="col" className={`${tableStyles.th} w-28 text-center`}>
                 {t('oscrat.ui.versions.sbom.started')}
               </th>
-              <th scope="col" className={tableStyles.th}>
+              <th scope="col" className={`${tableStyles.th} w-24 text-center`}>
                 {t('oscrat.ui.versions.sbom.triggered-by')}
               </th>
-              <th scope="col" className={tableStyles.th}>
+              <th scope="col" className={`${tableStyles.th} w-16 text-center`}>
                 {t('oscrat.ui.versions.sbom.duration')}
               </th>
-              <th scope="col" className={tableStyles.th}>
+              <th scope="col" className={`${tableStyles.th} w-16 text-center`}>
                 {t('oscrat.ui.versions.sbom.packages')}
               </th>
-              <th scope="col" className={tableStyles.th}>
+              <th scope="col" className={`${tableStyles.th} w-40 text-center`}>
                 {t('actions')}
               </th>
             </tr>
@@ -172,7 +173,7 @@ const Table: React.FC<SsmTableProps> = ({
             {pageData.map((job) => (
               <tr key={job.id} className={tableStyles.tr}>
                 <td className={tableStyles.td}>{getStatusBadge(job.status)}</td>
-                <td className={tableStyles.tdSmall}>
+                <td className={tableStyles.tdCenter}>
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       job.source === 'REPO'
@@ -185,7 +186,7 @@ const Table: React.FC<SsmTableProps> = ({
                       : t('oscrat.ui.versions.sbom.file-import')}
                   </span>
                 </td>
-                <td className={tableStyles.tdSmall}>
+                <td className={tableStyles.tdCenter}>
                   {new Date(job.createdAt).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -193,23 +194,30 @@ const Table: React.FC<SsmTableProps> = ({
                     minute: '2-digit',
                   })}
                 </td>
-                <td className={tableStyles.tdSmall}>
+                <td
+                  className={tableStyles.tdCenter}
+                  title={
+                    job.triggeredByUser?.name ||
+                    job.triggeredByUser?.email ||
+                    '-'
+                  }
+                >
                   {job.triggeredByUser?.name ||
                     job.triggeredByUser?.email ||
                     '-'}
                 </td>
-                <td className={tableStyles.tdSmall}>
+                <td className={tableStyles.tdCenter}>
                   {job.status === WorkerJobStatus.COMPLETED &&
                   job.processStartTime &&
                   job.processEndTime
                     ? formatDuration(job.processStartTime, job.processEndTime)
                     : '-'}
                 </td>
-                <td className={tableStyles.tdSmall}>
+                <td className={tableStyles.tdCenter}>
                   {job.sbomData?.overview?.totalComponents || '-'}
                 </td>
-                <td className={tableStyles.td}>
-                  <div className="flex items-center space-x-2">
+                <td className="px-6 py-4 text-center align-middle">
+                  <div className="flex items-center justify-center space-x-2">
                     <ActionButton
                       onClick={() =>
                         job.attachment &&
