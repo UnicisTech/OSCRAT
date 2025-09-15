@@ -28,6 +28,7 @@ const JoinWithInvitation = ({
     },
     validationSchema: joinOrgWithInvitationSchema,
     enableReinitialize: true,
+    validateOnMount: true,
     onSubmit: async (values) => {
       const response = await fetch('/api/auth/join', {
         method: 'POST',
@@ -64,7 +65,11 @@ const JoinWithInvitation = ({
         name="name"
         placeholder="Your name"
         value={formik.values.name}
-        error={formik.touched.name ? formik.errors.name : undefined}
+        error={
+          formik.touched.name && formik.errors.name 
+            ? t(formik.errors.name) 
+            : undefined
+        }
         onChange={formik.handleChange}
       />
       <InputWithLabel
@@ -73,14 +78,22 @@ const JoinWithInvitation = ({
         name="email"
         placeholder="first.last@name.com"
         value={formik.values.email}
-        error={formik.touched.email ? String(formik.errors.email) : undefined}
+        error={
+          formik.touched.email && formik.errors.email 
+            ? t(String(formik.errors.email)) 
+            : undefined
+        }
         onChange={formik.handleChange}
       />
       <Button
         type="submit"
         color="primary"
         loading={formik.isSubmitting}
-        active={formik.dirty}
+        disabled={
+          formik.isSubmitting || 
+          !formik.isValid || 
+          !formik.dirty
+        }
         fullWidth
       >
         {t('create-account')}

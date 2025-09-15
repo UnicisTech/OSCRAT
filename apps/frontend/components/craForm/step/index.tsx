@@ -5,6 +5,7 @@ import { useTranslation } from 'next-i18next';
 import { isApplicabilityAnswer } from '@/types/craForm';
 import { LuInfo } from 'react-icons/lu';
 import { getStepNumberById } from '@/utils/craForm';
+import Select from '@atlaskit/select';
 
 const Step: React.FC<StepProps> = ({
   step,
@@ -78,6 +79,10 @@ const Step: React.FC<StepProps> = ({
     };
   }, [isDropdown, selectedAnswer, hint, remark, references]);
 
+  const formatQuestion = (text: string) => {
+    return text.replace(/\n-\s*/g, '\n• ');
+  };
+
   const renderHintSection = () => {
     const { hint: displayHint, remark: displayRemark, references: displayReferences } = displayProperties;
     
@@ -125,26 +130,43 @@ const Step: React.FC<StepProps> = ({
 
   const renderAnswerOptions = () => {
     if (isDropdown) {
+      const options = answerOptions.map(answer => ({
+        value: answer.text,
+        label: answer.text,
+        answer: answer
+      }));
+
+      const selectedOption = selectedAnswer ? {
+        value: selectedAnswer.text,
+        label: selectedAnswer.text,
+        answer: selectedAnswer
+      } : null;
       return (
-        <div className="my-4">
-          <select
-            className="w-full p-2 border border-gray-300 rounded-md bg-white"
-            value={selectedAnswer?.text || ''}
-            onChange={(e) => {
-              const answer = answerOptions.find(opt => opt.text === e.target.value);
-              if (answer && e.target.value !== '') {
-                handleAnswerSelect(answer);
+        <div className="my-4" style={{ maxWidth: '400px' }}>
+          <Select
+            inputId="cra-step-select"
+            options={options}
+            value={selectedOption}
+            onChange={(option) => {
+              if (option && option.answer) {
+                handleAnswerSelect(option.answer);
               }
             }}
-            aria-label={question}
-          >
-            <option value="">{t('select')}</option>
-            {answerOptions.map((answer) => (
-              <option key={answer.text} value={answer.text}>
-                {answer.text}
-              </option>
-            ))}
-          </select>
+            placeholder={t('select')}
+            isClearable={false}
+            isSearchable={false}
+            classNamePrefix="react-select"
+            styles={{
+              container: (provided) => ({
+                ...provided,
+                width: '100%'
+              }),
+              control: (provided) => ({
+                ...provided,
+                minHeight: '42px'
+              })
+            }}
+          />
         </div>
       );
     }
@@ -194,8 +216,8 @@ const Step: React.FC<StepProps> = ({
     <div className="rounded-lg border border-gray-300 p-6">
       {renderHintSection()}
 
-      <p className="mb-4 text-lg font-semibold text-gray-900">
-        {activeStep}. {question}
+      <p className="mb-4 text-lg font-semibold text-gray-900 whitespace-pre-line">
+        {activeStep}. {formatQuestion(question)}
       </p>
 
       {renderAnswerOptions()}

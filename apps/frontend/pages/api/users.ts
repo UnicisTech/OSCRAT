@@ -51,13 +51,13 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     typeof req.body.email === 'string' &&
     allowEmailChange
   ) {
-    const user = await getUser({ email: req.body.email.trim() });
+    const user = await getUser({ email: req.body.email.trim().toLowerCase() });
 
     if (user && user.id !== session?.user.id) {
       throw new ApiError(400, 'Email already in use.');
     }
 
-    toUpdate['email'] = req.body.email.trim();
+    toUpdate['email'] = req.body.email.trim().toLowerCase();
   }
 
   if ('image' in req.body && typeof req.body.image === 'string') {

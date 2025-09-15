@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
 import { useResetPassword } from '@/hooks/useResetPassword';
-import { handleApiError } from '@/lib/errorHandler';
 import type { ApiError } from '@/types';
 
 const ResetPassword = () => {
@@ -32,8 +31,8 @@ const ResetPassword = () => {
         toast.success(t('password-updated'));
         router.push('/auth/login');
       } catch (error: unknown) {
-        const errorMessage = handleApiError(error as ApiError);
-        toast.error(errorMessage);
+        const apiError = error as ApiError;
+        toast.error(apiError.message);
       }
     },
   });
@@ -48,7 +47,11 @@ const ResetPassword = () => {
             name="password"
             placeholder={t('new-password')}
             value={formik.values.password}
-            error={formik.touched.password ? formik.errors.password : undefined}
+            error={
+              formik.touched.password && formik.errors.password 
+                ? t(formik.errors.password) 
+                : undefined
+            }
             onChange={formik.handleChange}
           />
           <InputWithLabel
@@ -58,8 +61,8 @@ const ResetPassword = () => {
             placeholder={t('confirm-password')}
             value={formik.values.confirmPassword}
             error={
-              formik.touched.confirmPassword
-                ? formik.errors.confirmPassword
+              formik.touched.confirmPassword && formik.errors.confirmPassword
+                ? t(formik.errors.confirmPassword)
                 : undefined
             }
             onChange={formik.handleChange}

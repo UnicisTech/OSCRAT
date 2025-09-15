@@ -33,18 +33,40 @@ function validateTaxIDAgainstAllCountries(taxID: string): boolean {
 // Common field schemas
 export const nameSchema = Yup.string()
   .trim()
-  .min(1, 'Required')
-  .max(100, 'Too long');
+  .min(1, 'oscrat.ui.validation.name-required')
+  .max(40, 'oscrat.ui.validation.name-too-long')
+  .matches(/^[a-zA-ZÀ-ÿ\s'-]+$/, 'oscrat.ui.validation.name-invalid-chars');
 
-export const organizationNameSchema = nameSchema;
+export const organizationNameSchema = Yup.string()
+  .trim()
+  .min(1, 'oscrat.ui.validation.organization-name-required')
+  .max(30, 'oscrat.ui.validation.organization-name-too-long');
 
 export const emailSchema = Yup.string()
   .trim()
-  .email('Invalid email format')
-  .max(100, 'Too long');
+  .lowercase()
+  .email('oscrat.ui.validation.email-invalid')
+  .test('domain-validation', 'oscrat.ui.validation.email-invalid-domain', function (value) {
+    if (!value) return false;
+
+    const [, domain] = value.split('@');
+    if (!domain || !domain.includes('.')) return false;
+
+    const parts = domain.split('.');
+    // Must have at least 2 parts: e.g. "domain" + "tld"
+    if (parts.length < 2) return false;
+
+    // Each part must be non-empty, and last part (TLD) >= 2 chars
+    if (parts.some(part => part.length === 0)) return false;
+    if (parts[parts.length - 1].length < 2) return false;
+
+    return true;
+  })
+  .max(100, 'oscrat.ui.validation.email-too-long');
+
 
 export const phoneSchema = Yup.string()
-  .test('phone-validation', 'Invalid phone number', function(value) {
+  .test('phone-validation', 'oscrat.ui.validation.phone-invalid', function(value) {
     if (!value) return true; // Allow empty values, use .required() separately if needed
     
     const { parent } = this;
@@ -55,36 +77,44 @@ export const phoneSchema = Yup.string()
     try {
       const phoneNumber = parsePhoneNumberFromString(value, countryCode);
       return phoneNumber ? isValidPhoneNumber(phoneNumber.number, countryCode) : false;
-    } catch (error) {
+    } catch {
       return false;
     }
   });
 
 export const passwordSchema = Yup.string()
-  .required('Password is required')
-  .min(passwordPolicies.minLength, `Password must be at least ${passwordPolicies.minLength} characters`)
-  .max(128, 'Password must be less than 128 characters')
-  .test('password-policy', `Password must be at least ${passwordPolicies.minLength} characters`, function(value) {
+  .required('oscrat.ui.validation.password-required')
+  .min(passwordPolicies.minLength, 'oscrat.ui.validation.password-too-short')
+  .max(128, 'oscrat.ui.validation.password-too-long')
+  .test('password-policy', 'oscrat.ui.validation.password-too-short', function(value) {
     if (!value) return false; 
     return value.length >= passwordPolicies.minLength;
   });
 
-export const postalAddressSchema = Yup.string().trim().min(1, 'Required');
+export const postalAddressSchema = Yup.string()
+  .trim()
+  .min(1, 'oscrat.ui.validation.postal-address-required')
+  .max(100, 'oscrat.ui.validation.postal-address-too-long');
 
 export const taxIdSchema = Yup.string()
   .trim()
-  .test('tax-id-validation', 'Invalid tax ID format', function(value) {
+  .test('tax-id-validation', 'oscrat.ui.validation.tax-id-invalid', function(value) {
     if (!value) return true; // Allow empty values, use .required() separately if needed
     return validateTaxIDAgainstAllCountries(value);
   });
 
 export const additionalInfoSchema = Yup.string()
   .trim()
-  .max(500, 'Too long')
+  .max(500, 'oscrat.ui.validation.additional-info-too-long')
   .transform((value) => {
     if (!value) return value;
     return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
   });
+
+export const productNameSchema = Yup.string()
+  .trim()
+  .min(1, 'oscrat.ui.validation.product-name-required')
+  .max(40, 'oscrat.ui.validation.product-name-too-long');
 
 export function sanitizeString(input: string): string {
   return DOMPurify.sanitize(input);

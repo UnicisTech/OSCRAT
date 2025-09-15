@@ -1,7 +1,6 @@
 import { Card } from '@/components/shared';
 import { Team } from '@oscrat/model';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
@@ -9,18 +8,19 @@ import { useTeam } from '@/hooks/useTeam';
 import { extractErrorMessage } from '@/lib/utils';
 
 import ConfirmationDialog from '../shared/ConfirmationDialog';
+import { useRouter } from 'next/router';
 
 const RemoveTeam = ({ team }: { team: Team }) => {
-  const router = useRouter();
   const { t } = useTranslation('common');
   const [askConfirmation, setAskConfirmation] = useState(false);
   const { deleteTeam, isLoading } = useTeam(team.slug);
+  const router = useRouter();
 
   const removeTeam = async () => {
     try {
       await deleteTeam();
+      router.replace('/teams');
       toast.success(t('team-removed-successfully'));
-      router.push('/teams');
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, t('an-error-occurred')));
     }

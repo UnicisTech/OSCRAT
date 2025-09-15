@@ -77,7 +77,11 @@ const MagicLink = ({ csrfToken }: MagicLinkProps) => {
               placeholder="email@unicis.tech"
               value={formik.values.email}
               descriptionText="We’ll email you a magic link for a password-free sign in."
-              error={formik.touched.email ? formik.errors.email : undefined}
+              error={
+                formik.touched.email && formik.errors.email 
+                  ? t(formik.errors.email) 
+                  : undefined
+              }
               onChange={formik.handleChange}
             />
             <Button

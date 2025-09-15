@@ -32,8 +32,9 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   // Create backend-specific schema without retypePassword
   const backendSignupSchema = userSignupSchema.omit(['retypePassword']);
   
+  let validatedData;
   try {
-    await backendSignupSchema.validate(req.body, { abortEarly: false });
+    validatedData = await backendSignupSchema.validate(req.body, { abortEarly: false });
   } catch (error) {
     if (error instanceof Error && (error as any).errors) {
       const validationErrors = (error as any).errors;
@@ -50,7 +51,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     password,
     inviteToken,
     recaptchaToken,
-  } = req.body;
+  } = validatedData;
   const name = `${firstName} ${lastName}`;
 
   // Validate recaptcha if provided

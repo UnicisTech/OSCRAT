@@ -6,10 +6,9 @@ import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
 import { teamCreationSchema } from '@/lib/validation/team';
 import { useCreateTeam } from '@/lib/api';
-import Select from 'react-select';
+import Select from '@atlaskit/select';
 import countryList from 'react-select-country-list';
 import { getCountryCallingCode } from 'libphonenumber-js';
-import { handleApiError } from '@/lib/errorHandler';
 import type { ApiError } from '@/types';
 
 interface CreateTeamProps {
@@ -86,8 +85,8 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
         toast.success(t('team-created'));
         onClose();
       } catch (error: unknown) {
-        const errorMessage = handleApiError(error as ApiError);
-        toast.error(errorMessage);
+        const apiError = error as ApiError;
+        toast.error(apiError.message);
       }
     },
   });
@@ -172,9 +171,14 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 placeholder={t('oscrat.ui.enter-organization-name')}
                 value={formik.values.name}
                 label={t('oscrat.ui.organization-name')}
-                error={formik.touched.name ? formik.errors.name : undefined}
+                error={
+                  formik.touched.name && formik.errors.name 
+                    ? t(formik.errors.name) 
+                    : undefined
+                }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                maxLength={30}
                 required
               />
 
@@ -185,7 +189,11 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 placeholder="XX-XXXXXXX"
                 value={formik.values.taxId}
                 label={`${t('tax-id')} (${t('optional')})`}
-                error={formik.touched.taxId ? formik.errors.taxId : undefined}
+                error={
+                  formik.touched.taxId && formik.errors.taxId 
+                    ? t(formik.errors.taxId) 
+                    : undefined
+                }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
@@ -216,7 +224,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 </select>
                 {formik.touched.size && formik.errors.size && (
                   <p className="mt-1 text-xs text-red-500">
-                    {formik.errors.size}
+                    {t(formik.errors.size)}
                   </p>
                 )}
               </div>
@@ -233,7 +241,11 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 placeholder={t('oscrat.ui.enter-team-name')}
                 value={formik.values.name}
                 label={t('oscrat.ui.team-name')}
-                error={formik.touched.name ? formik.errors.name : undefined}
+                error={
+                  formik.touched.name && formik.errors.name 
+                    ? t(formik.errors.name) 
+                    : undefined
+                }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 required
@@ -250,12 +262,13 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               value={formik.values.postalAddress}
               label={t('oscrat.ui.postal-address')}
               error={
-                formik.touched.postalAddress
-                  ? formik.errors.postalAddress
+                formik.touched.postalAddress && formik.errors.postalAddress
+                  ? t(formik.errors.postalAddress)
                   : undefined
               }
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              maxLength={100}
               required
             />
 
@@ -266,8 +279,8 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               value={formik.values.contactEmail}
               label={t('oscrat.ui.contact-email')}
               error={
-                formik.touched.contactEmail
-                  ? formik.errors.contactEmail
+                formik.touched.contactEmail && formik.errors.contactEmail
+                  ? t(formik.errors.contactEmail)
                   : undefined
               }
               onChange={formik.handleChange}
@@ -281,6 +294,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 {t('oscrat.ui.country')}
               </label>
               <Select
+                inputId="country-select"
                 options={countryOptions}
                 value={countryOptions.find(
                   (option) => option.value === formik.values.countryCode
@@ -303,7 +317,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               />
               {formik.touched.countryCode && formik.errors.countryCode && (
                 <p className="mt-1 text-xs text-red-500">
-                  {formik.errors.countryCode}
+                  {t(formik.errors.countryCode)}
                 </p>
               )}
             </div>
@@ -338,7 +352,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               </div>
               {formik.touched.contactPhone && formik.errors.contactPhone && (
                 <p className="mt-1 text-xs text-red-500">
-                  {formik.errors.contactPhone}
+                  {t(formik.errors.contactPhone)}
                 </p>
               )}
             </div>
@@ -351,10 +365,24 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 name="additionalInformation"
                 value={formik.values.additionalInformation}
                 onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder={t('oscrat.ui.type-here')}
                 rows={3}
+                maxLength={500}
                 className="w-full resize-none rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              <div className="mt-1 flex justify-between">
+                <div>
+                  {formik.touched.additionalInformation && formik.errors.additionalInformation && (
+                    <p className="text-sm text-red-600" role="alert">
+                      {t(formik.errors.additionalInformation)}
+                    </p>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500">
+                  {formik.values.additionalInformation.length}/500
+                </p>
+              </div>
             </div>
           </div>
         </div>

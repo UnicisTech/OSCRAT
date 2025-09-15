@@ -9,15 +9,14 @@ import GoogleReCAPTCHA from '../shared/GoogleReCAPTCHA';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { userSignupSchema } from '@/lib/validation/signup';
 import { useJoin } from '@/hooks/useJoin';
-import { handleApiError, handleAuthError } from '@/lib/errorHandler';
+import { handleAuthError } from '@/lib/errorHandler';
 import type { ApiError } from '@/types';
 
 interface SignupProps {
   recaptchaSiteKey: string | null;
-  onClose?: () => void;
 }
 
-const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
+const Signup = ({ recaptchaSiteKey }: SignupProps) => {
   const router = useRouter();
   const { t, ready } = useTranslation('common');
   const { join } = useJoin();
@@ -33,6 +32,7 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
       retypePassword: '',
     },
     validationSchema: userSignupSchema,
+    validateOnMount: true,
     onSubmit: async (values) => {
       if (recaptchaSiteKey && !recaptchaToken) {
         toast.error(t('oscrat.ui.catpcha-verification-failed'));
@@ -68,8 +68,8 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
           router.push('/teams');
         }
       } catch (error: unknown) {
-        const errorMessage = handleApiError(error as ApiError);
-        toast.error(errorMessage);
+        const apiError = error as ApiError;
+        toast.error(apiError.message);
         recaptchaRef.current?.reset();
       }
     },
@@ -93,7 +93,9 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
                 value={formik.values.firstName}
                 label={t('first-name')}
                 error={
-                  formik.touched.firstName ? formik.errors.firstName : undefined
+                  formik.touched.firstName && formik.errors.firstName 
+                    ? t(formik.errors.firstName) 
+                    : undefined
                 }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -108,7 +110,9 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
                 value={formik.values.lastName}
                 label={t('last-name')}
                 error={
-                  formik.touched.lastName ? formik.errors.lastName : undefined
+                  formik.touched.lastName && formik.errors.lastName 
+                    ? t(formik.errors.lastName) 
+                    : undefined
                 }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -124,7 +128,11 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
               placeholder={t('email-placeholder')}
               value={formik.values.email}
               label={t('email')}
-              error={formik.touched.email ? formik.errors.email : undefined}
+              error={
+                formik.touched.email && formik.errors.email 
+                  ? t(formik.errors.email) 
+                  : undefined
+              }
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               required
@@ -140,7 +148,9 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
                 value={formik.values.password}
                 label={t('password')}
                 error={
-                  formik.touched.password ? formik.errors.password : undefined
+                  formik.touched.password && formik.errors.password 
+                    ? t(formik.errors.password)
+                    : undefined
                 }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -153,10 +163,10 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
                 name="retypePassword"
                 placeholder="••••••••••••"
                 value={formik.values.retypePassword}
-                label={t('retype-password')}
+                label={t('confirm-password')}
                 error={
-                  formik.touched.retypePassword
-                    ? formik.errors.retypePassword
+                  formik.touched.retypePassword && formik.errors.retypePassword 
+                    ? t(formik.errors.retypePassword) 
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -192,7 +202,7 @@ const Signup = ({ recaptchaSiteKey, onClose }: SignupProps) => {
             type="submit"
             disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
             className={`rounded-md px-6 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-              formik.isSubmitting || !formik.isValid
+              formik.isSubmitting || !formik.isValid || !formik.dirty
                 ? 'cursor-not-allowed bg-gray-400'
                 : 'bg-blue-600 hover:bg-blue-700'
             }`}

@@ -170,7 +170,11 @@ const Login: NextPageWithLayout<
                 name="email"
                 placeholder="Email"
                 value={formik.values.email}
-                error={formik.touched.email ? formik.errors.email : undefined}
+                error={
+                  formik.touched.email && formik.errors.email 
+                    ? t(formik.errors.email) 
+                    : undefined
+                }
                 onChange={formik.handleChange}
               />
               <div className="relative flex">
@@ -195,7 +199,9 @@ const Login: NextPageWithLayout<
                     </label>
                   }
                   error={
-                    formik.touched.password ? formik.errors.password : undefined
+                    formik.touched.password && formik.errors.password 
+                      ? t(formik.errors.password) 
+                      : undefined
                   }
                   onChange={formik.handleChange}
                 />

@@ -103,9 +103,15 @@ class ApiClient {
 
   private transformError(error: unknown): ApiError {
     if (axios.isAxiosError(error)) {
+      // Handle nested error objects
+      const errorMessage = 
+        error.response?.data?.error?.message ||
+        error.response?.data?.message || 
+        error.message || 
+        'An error occurred';
+        
       return {
-        message:
-          error.response?.data?.message || error.message || 'An error occurred',
+        message: errorMessage,
         code: error.response?.status?.toString(),
         values: {},
       };

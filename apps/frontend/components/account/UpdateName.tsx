@@ -49,7 +49,9 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
             placeholder={t('your-first-name')}
             value={formik.values.firstName}
             error={
-              formik.touched.firstName ? formik.errors.firstName : undefined
+              formik.touched.firstName && formik.errors.firstName 
+                ? t(formik.errors.firstName) 
+                : undefined
             }
             onChange={formik.handleChange}
             required
@@ -60,7 +62,11 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
             name="lastName"
             placeholder={t('your-last-name')}
             value={formik.values.lastName}
-            error={formik.touched.lastName ? formik.errors.lastName : undefined}
+            error={
+              formik.touched.lastName && formik.errors.lastName 
+                ? t(formik.errors.lastName) 
+                : undefined
+            }
             onChange={formik.handleChange}
             required
           />

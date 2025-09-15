@@ -11,7 +11,7 @@ const AllTeams: NextPageWithLayout = () => {
 };
 
 AllTeams.getLayout = function getLayout(page: React.ReactNode) {
-  return <AccountLayout>{page}</AccountLayout>;
+  return <AccountLayout showSidePanel={true}>{page}</AccountLayout>;
 };
 
 export async function getStaticProps({ locale }: GetStaticPropsContext) {

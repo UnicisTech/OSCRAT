@@ -23,7 +23,7 @@ export const getStepNumberById = (
   return index + 1;
 };
 
-/**
+/** 
  * Compare two risk levels and return the higher priority one
  */
 export const compareRiskLevels = (level1: string | null, level2: string): string => {
@@ -84,7 +84,8 @@ export const loadFormState = (): Partial<FormState> | null => {
       answers: parsed.answers || {},
       activeStep: parsed.activeStep || 1,
       skippedQuestions: parsed.skippedQuestions || [],
-      highestRiskLevel: parsed.highestRiskLevel || null
+      highestRiskLevel: parsed.highestRiskLevel || null,
+      completed: parsed.completed || false
     };
   } catch (error) {
     console.error('Failed to load form state:', error);

@@ -57,7 +57,12 @@ export const useCraForm = ({ questions, onHighestRiskChange }: UseCraFormProps):
   // Load saved state on mount
   useEffect(() => {
     const savedState = loadFormState();
-    if (savedState) {
+    
+    if (savedState && savedState.completed) {
+      // Form was completed, clear all progress and start fresh
+      clearFormState();
+    } else if (savedState) {
+      // Load saved progress if form wasn't completed
       if (savedState.answers) {
         setAnswers(savedState.answers);
         const recalculatedRisk = calculateHighestRiskFromAnswers(savedState.answers);
@@ -117,11 +122,25 @@ export const useCraForm = ({ questions, onHighestRiskChange }: UseCraFormProps):
     
     setAnswers(newAnswers);
 
+    // Clear any skipped questions that come after this question
+    // since the new answer might not cause the same skips
+    const currentStepIndex = questions.findIndex(q => q.id === question.id);
+    const currentStep = currentStepIndex + 1;
+    
+    const newSkippedQuestions = new Set<number>();
+    skippedQuestions.forEach(skippedStep => {
+      // Only keep skipped questions that come before the current question
+      if (skippedStep < currentStep) {
+        newSkippedQuestions.add(skippedStep);
+      }
+    });
+    setSkippedQuestions(newSkippedQuestions);
+
     // Recalculate highest risk level
     const newHighestRisk = calculateHighestRiskFromAnswers(newAnswers);
     setHighestRiskLevel(newHighestRisk);
     onHighestRiskChangeRef.current?.(newHighestRisk);
-  }, [answers]);
+  }, [answers, questions, skippedQuestions]);
 
   const handleSkip = useCallback((fromStep: number, toStep: number) => {
     const newSkippedQuestions = getSkippedQuestions(fromStep, toStep, skippedQuestions);

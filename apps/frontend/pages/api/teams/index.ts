@@ -1,10 +1,8 @@
 import { slugify } from '@oscrat/model/utils/slugify';
 import { ApiError } from '@/lib/errors';
-import { createTeam, getTeams, isTeamExists } from 'models/team';
+import { createTeam, getTeams } from 'models/team';
 import {
-  withTeamAuth,
   withUserAuth,
-  type AuthenticatedTeamRequest,
   type AuthenticatedUserRequest,
 } from '@/lib/middleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -70,7 +68,15 @@ const handlePOST = async (
     additionalInformation: requestData.additionalInformation,
   };
 
-  const team = await createTeam(teamData);
+  let team;
+  try {
+    team = await createTeam(teamData);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Unique constraint failed on the fields: (`slug`)')) {
+      throw new ApiError(400, 'This team name is already taken. Please choose a different name.');
+    }
+    throw error;
+  }
 
   console.log(
     `[Team] created, teamId: ${team.id}, name: ${requestData.name}, slug: ${slug}, ownerId: ${user.id}`

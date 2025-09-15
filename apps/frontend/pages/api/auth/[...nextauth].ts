@@ -56,7 +56,7 @@ if (isAuthProviderEnabled('credentials')) {
           return null;
         }
 
-        const user = await getUser({ email });
+        const user = await getUser({ email: email.toLowerCase().trim() });
 
         if (!user) {
           throw new Error('invalid-credentials');
@@ -190,7 +190,7 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
 
-      const existingUser = await getUser({ email: user.email });
+      const existingUser = await getUser({ email: user.email.toLowerCase().trim() });
 
       // Login via email (Magic Link)
       if (account?.provider === 'email') {
@@ -205,7 +205,7 @@ export const authOptions: NextAuthOptions = {
           name: `${user.name}`,
           firstName: firstName,
           lastName: lastName,
-          email: `${user.email}`,
+          email: user.email.toLowerCase().trim(),
         });
 
         await linkAccount(newUser, account);

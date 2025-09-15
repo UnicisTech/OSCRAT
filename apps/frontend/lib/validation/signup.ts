@@ -9,13 +9,13 @@ import {
  * User signup schema
  */
 export const userSignupSchema = Yup.object({
-  firstName: nameSchema.required('First name is required'),
-  lastName: nameSchema.required('Last name is required'),
-  email: emailSchema.required('Email is required'),
-  password: passwordSchema.required('Password is required'),
+  firstName: nameSchema.required('oscrat.ui.validation.first-name-required'),
+  lastName: nameSchema.required('oscrat.ui.validation.last-name-required'),
+  email: emailSchema.required('oscrat.ui.validation.email-required'),
+  password: passwordSchema.required('oscrat.ui.validation.password-required'),
   retypePassword: Yup.string()
-    .required('Please confirm your password')
-    .oneOf([Yup.ref('password')], 'Passwords must match'),
+    .required('oscrat.ui.validation.password-confirm-required')
+    .oneOf([Yup.ref('password')], 'oscrat.ui.validation.password-confirm-match'),
   recaptchaToken: Yup.string().notRequired(),
 });
 

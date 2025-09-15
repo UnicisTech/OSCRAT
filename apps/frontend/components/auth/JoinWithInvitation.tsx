@@ -48,6 +48,7 @@ const JoinWithInvitation = ({
     },
     validationSchema: joinWithInvitationSchema,
     enableReinitialize: true,
+    validateOnMount: true,
     onSubmit: async (values) => {
       try {
         if (!invitation) {
@@ -99,7 +100,11 @@ const JoinWithInvitation = ({
           name="firstName"
           placeholder={t('your-first-name')}
           value={formik.values.firstName}
-          error={formik.touched.firstName ? formik.errors.firstName : undefined}
+          error={
+            formik.touched.firstName && formik.errors.firstName 
+              ? t(formik.errors.firstName) 
+              : undefined
+          }
           onChange={formik.handleChange}
         />
         <InputWithLabel
@@ -108,7 +113,11 @@ const JoinWithInvitation = ({
           name="lastName"
           placeholder={t('your-last-name')}
           value={formik.values.lastName}
-          error={formik.touched.lastName ? formik.errors.lastName : undefined}
+          error={
+            formik.touched.lastName && formik.errors.lastName 
+              ? t(formik.errors.lastName) 
+              : undefined
+          }
           onChange={formik.handleChange}
         />
         <InputWithLabel
@@ -125,7 +134,11 @@ const JoinWithInvitation = ({
             name="password"
             placeholder={t('password')}
             value={formik.values.password}
-            error={formik.touched.password ? formik.errors.password : undefined}
+            error={
+              formik.touched.password && formik.errors.password 
+                ? t(formik.errors.password) 
+                : undefined
+            }
             onChange={formik.handleChange}
           />
           <TogglePasswordVisibility
@@ -143,7 +156,11 @@ const JoinWithInvitation = ({
             type="submit"
             color="primary"
             loading={formik.isSubmitting}
-            active={formik.dirty}
+            disabled={
+              formik.isSubmitting || 
+              !formik.isValid || 
+              !formik.dirty
+            }
             fullWidth
             size="md"
           >

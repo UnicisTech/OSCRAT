@@ -100,5 +100,6 @@ export function filterProducts(
     .filter((product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .filter((product) => matchesFilters(product, filters));
+    .filter((product) => matchesFilters(product, filters))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }

@@ -49,8 +49,8 @@ const UpdatePassword = () => {
                 placeholder={t('current-password')}
                 value={formik.values.currentPassword}
                 error={
-                  formik.touched.currentPassword
-                    ? formik.errors.currentPassword
+                  formik.touched.currentPassword && formik.errors.currentPassword
+                    ? t(formik.errors.currentPassword)
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -62,8 +62,8 @@ const UpdatePassword = () => {
                 placeholder={t('new-password')}
                 value={formik.values.newPassword}
                 error={
-                  formik.touched.newPassword
-                    ? formik.errors.newPassword
+                  formik.touched.newPassword && formik.errors.newPassword
+                    ? t(formik.errors.newPassword)
                     : undefined
                 }
                 onChange={formik.handleChange}

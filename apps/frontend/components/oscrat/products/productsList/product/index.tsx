@@ -61,7 +61,7 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
       <header className="flex items-center justify-between">
         <h3
           id={`product-${project.id}-title`}
-          className="text-sm font-semibold uppercase text-black dark:text-gray-100"
+          className="text-sm font-semibold text-black dark:text-gray-100"
         >
           {project.name}
         </h3>

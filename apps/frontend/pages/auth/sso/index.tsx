@@ -70,7 +70,11 @@ const SSO: NextPageWithLayout = () => {
               placeholder="boxyhq"
               value={formik.values.slug}
               descriptionText="Contact your administrator to get your team slug"
-              error={formik.touched.slug ? formik.errors.slug : undefined}
+              error={
+                formik.touched.slug && formik.errors.slug 
+                  ? t(formik.errors.slug) 
+                  : undefined
+              }
               onChange={formik.handleChange}
             />
             <Button

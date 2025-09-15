@@ -15,27 +15,27 @@ import { availableRoles } from '@/lib/permissions';
  * Team creation schema
  */
 export const teamCreationSchema = Yup.object({
-  name: organizationNameSchema.required('Team name is required'),
+  name: organizationNameSchema.required('oscrat.ui.validation.team-name-required'),
   type: Yup.mixed()
     .oneOf([
       OscratOrganizationType.NATURAL_PERSON,
       OscratOrganizationType.LIMITED_LIABILITY_COMPANY
-    ], 'Type must be one of the following values: natural, legal')
-    .required('Person type is required'),
+    ], 'oscrat.ui.validation.organization-type-invalid')
+    .required('oscrat.ui.validation.organization-type-required'),
   size: Yup.string().when('type', {
     is: (val: OscratOrganizationType) => val === OscratOrganizationType.LIMITED_LIABILITY_COMPANY,
-    then: (schema) => schema.required('Organization size is required'),
+    then: (schema) => schema.required('oscrat.ui.validation.organization-size-required'),
     otherwise: (schema) => schema.notRequired(),
   }),
   taxId: Yup.string().when('type', {
     is: (val: OscratOrganizationType) => val === OscratOrganizationType.LIMITED_LIABILITY_COMPANY,
-    then: (schema) => taxIdSchema.notRequired(),
-    otherwise: (schema) => schema.notRequired(),
+    then: (_schema) => taxIdSchema.notRequired(),
+    otherwise: (_schema) => _schema.notRequired(),
   }),
-  postalAddress: postalAddressSchema.required('Postal address is required'),
-  contactEmail: emailSchema.required('Contact email is required'),
-  contactPhone: phoneSchema.required('Contact phone is required'),
-  countryCode: Yup.string().required('Country is required'),
+  postalAddress: postalAddressSchema.required('oscrat.ui.validation.postal-address-required'),
+  contactEmail: emailSchema.required('oscrat.ui.validation.contact-email-required'),
+  contactPhone: phoneSchema.required('oscrat.ui.validation.contact-phone-required'),
+  countryCode: Yup.string().required('oscrat.ui.validation.country-required'),
   additionalInformation: additionalInfoSchema.notRequired(),
 });
 
@@ -43,10 +43,10 @@ export const teamCreationSchema = Yup.object({
  * Team settings update schema
  */
 export const teamSettingsSchema = Yup.object({
-  name: Yup.string().required('Name is required'),
-  slug: Yup.string().required('Slug is required'),
+  name: Yup.string().required('oscrat.ui.validation.name-required-generic'),
+  slug: Yup.string().required('oscrat.ui.validation.slug-required'),
   domain: Yup.string().nullable().matches(domainRegex, {
-    message: 'Invalid domain: ${value}',
+    message: 'oscrat.ui.validation.domain-invalid',
   }),
 });
 
@@ -54,10 +54,10 @@ export const teamSettingsSchema = Yup.object({
  * Team member invitation schema
  */
 export const inviteMemberSchema = Yup.object({
-  email: emailSchema.required('Email is required'),
+  email: emailSchema.required('oscrat.ui.validation.email-required'),
   role: Yup.string()
-    .required('Role is required')
-    .oneOf(availableRoles.map((r) => r.id), 'Invalid role selected'),
+    .required('oscrat.ui.validation.role-required')
+    .oneOf(availableRoles.map((r) => r.id), 'oscrat.ui.validation.role-invalid'),
 });
 
 /**
@@ -65,8 +65,8 @@ export const inviteMemberSchema = Yup.object({
  */
 export const inviteTokenSchema = Yup.object({
   token: Yup.string()
-    .required('Invite token is required')
-    .uuid('Invalid invite token format'),
+    .required('oscrat.ui.validation.invite-token-required')
+    .uuid('oscrat.ui.validation.invite-token-invalid'),
 });
 
 // Type exports

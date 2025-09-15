@@ -26,6 +26,7 @@ const CraForm: React.FC<CraFormProps> = ({
     activeStep,
     selectedAnswer,
     highestRiskLevel,
+    skippedQuestions,
     handleAnswerChange,
     setActiveStep,
     handleSkip,
@@ -54,6 +55,15 @@ const CraForm: React.FC<CraFormProps> = ({
       setIsNotEligible(false);
       setHighestRisk(highestRiskLevel);
       setShowResult(true);
+    
+      const completedState = {
+        answers,
+        activeStep,
+        skippedQuestions: Array.from(skippedQuestions),
+        highestRiskLevel,
+        completed: true
+      };
+      localStorage.setItem('craFormState', JSON.stringify(completedState));
     } else {
       setActiveStep(activeStep + 1);
     }
@@ -62,6 +72,7 @@ const CraForm: React.FC<CraFormProps> = ({
     allQuestions,
     answers,
     highestRiskLevel,
+    skippedQuestions,
     setActiveStep,
     setIsNotEligible,
     setShowResult,

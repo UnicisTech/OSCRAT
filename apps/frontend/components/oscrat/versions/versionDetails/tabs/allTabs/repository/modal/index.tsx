@@ -313,7 +313,7 @@ const Modal: React.FC<ModalProps> = ({
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched.provider && formik.errors.provider
-                        ? formik.errors.provider
+                        ? t(formik.errors.provider)
                         : undefined
                     }
                     required
@@ -333,7 +333,7 @@ const Modal: React.FC<ModalProps> = ({
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched.name && formik.errors.name
-                        ? formik.errors.name
+                        ? t(formik.errors.name)
                         : undefined
                     }
                     placeholder={t(
@@ -350,7 +350,7 @@ const Modal: React.FC<ModalProps> = ({
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched.user && formik.errors.user
-                        ? formik.errors.user
+                        ? t(formik.errors.user)
                         : undefined
                     }
                     placeholder={
@@ -371,7 +371,7 @@ const Modal: React.FC<ModalProps> = ({
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched.accessToken && formik.errors.accessToken
-                        ? formik.errors.accessToken
+                        ? t(formik.errors.accessToken)
                         : undefined
                     }
                     placeholder={t(
@@ -422,7 +422,7 @@ const Modal: React.FC<ModalProps> = ({
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched.targetBranch && formik.errors.targetBranch
-                        ? formik.errors.targetBranch
+                        ? t(formik.errors.targetBranch)
                         : undefined
                     }
                     placeholder={t('oscrat.ui.repository.placeholders.branch')}
@@ -436,7 +436,7 @@ const Modal: React.FC<ModalProps> = ({
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched.targetTag && formik.errors.targetTag
-                        ? formik.errors.targetTag
+                        ? t(formik.errors.targetTag)
                         : undefined
                     }
                     placeholder={t('oscrat.ui.repository.placeholders.tag')}
@@ -453,7 +453,7 @@ const Modal: React.FC<ModalProps> = ({
                       error={
                         formik.touched.targetCommit &&
                         formik.errors.targetCommit
-                          ? formik.errors.targetCommit
+                          ? t(formik.errors.targetCommit)
                           : undefined
                       }
                       placeholder={t(

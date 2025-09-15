@@ -56,7 +56,7 @@ const Form = ({
               onChange={formik.handleChange}
               value={formik.values.name}
               placeholder="Description of what this endpoint is used for."
-              error={formik.errors.name}
+              error={formik.errors.name ? t(formik.errors.name) : undefined}
             />
             <InputWithLabel
               name="url"
@@ -64,7 +64,7 @@ const Form = ({
               onChange={formik.handleChange}
               value={formik.values.url}
               placeholder="https://api.example.com/svix-webhooks"
-              error={formik.errors.url}
+              error={formik.errors.url ? t(formik.errors.url) : undefined}
               descriptionText="The endpoint URL must be HTTPS"
             />
             <div className="divider"></div>
@@ -79,7 +79,7 @@ const Form = ({
                 <EventTypes
                   onChange={formik.handleChange}
                   values={initialValues['eventTypes']}
-                  error={formik.errors.eventTypes}
+                  error={formik.errors.eventTypes ? t(formik.errors.eventTypes) : undefined}
                 />
               </div>
             </div>

@@ -78,7 +78,7 @@ const TeamDropdown = () => {
         tabIndex={0}
         className="flex h-10 cursor-pointer items-center justify-between rounded border border-gray-300 px-4 text-sm text-black dark:border-gray-600"
       >
-        {currentTeam?.name || data?.user?.name}
+        <span className="truncate">{currentTeam?.name || data?.user?.name}</span>
         <ChevronUpDownIcon className="h-5 w-5" />
       </div>
       <ul
@@ -107,7 +107,8 @@ const TeamDropdown = () => {
                 >
                   <Link href={item.href}>
                     <div className="flex items-center gap-2 rounded px-2 py-2 text-sm font-medium hover:bg-gray-100 focus:bg-gray-100 focus:outline-none hover:dark:text-black">
-                      <item.icon className="h-5 w-5" /> {item.name}
+                      <item.icon className="h-5 w-5 shrink-0" /> 
+                      <span className="truncate">{item.name}</span>
                     </div>
                   </Link>
                 </li>

@@ -17,7 +17,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const { session, ...props } = pageProps;
 
   const getLayout =
-    Component.getLayout || ((page) => <AccountLayout>{page}</AccountLayout>);
+    Component.getLayout || ((page) => {
+      return <AccountLayout>{page}</AccountLayout>;
+    });
 
   const pageWithLayout = getLayout(<Component {...props} />);
 

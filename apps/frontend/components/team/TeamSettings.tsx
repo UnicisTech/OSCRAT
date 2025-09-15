@@ -55,21 +55,21 @@ const TeamSettings = ({ team }: { team: Team }) => {
                 label={t('team-name')}
                 value={formik.values.name}
                 onChange={formik.handleChange}
-                error={formik.errors.name}
+                error={formik.errors.name ? t(formik.errors.name) : undefined}
               />
               <InputWithLabel
                 name="slug"
                 label={t('team-slug')}
                 value={formik.values.slug}
                 onChange={formik.handleChange}
-                error={formik.errors.slug}
+                error={formik.errors.slug ? t(formik.errors.slug) : undefined}
               />
               <InputWithLabel
                 name="domain"
                 label={t('team-domain')}
                 value={formik.values.domain ? formik.values.domain : ''}
                 onChange={formik.handleChange}
-                error={formik.errors.domain}
+                error={formik.errors.domain ? t(formik.errors.domain) : undefined}
               />
             </div>
           </Card.Body>
