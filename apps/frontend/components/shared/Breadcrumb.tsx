@@ -24,7 +24,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
               {item.href && !isCurrent ? (
                 <Link
                   href={item.href}
-                  className="text-sm font-medium text-gray-500 transition-colors duration-200 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-sm font-medium text-gray-500 transition-colors duration-200 hover:text-gray-700"
                 >
                   {item.label}
                 </Link>
@@ -32,8 +32,8 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
                 <span
                   className={`text-sm font-medium ${
                     isCurrent
-                      ? 'text-gray-900 dark:text-gray-100'
-                      : 'text-gray-500 dark:text-gray-400'
+                      ? 'text-gray-900'
+                      : 'text-gray-500'
                   }`}
                 >
                   {item.label}

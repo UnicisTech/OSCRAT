@@ -1,35 +1,16 @@
-import React, { Fragment } from 'react';
+import React, { useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { Modal } from 'react-daisyui';
+import Modal from '@/components/shared/Modal';
+import { Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
-import { DatePicker } from '@atlaskit/datetime-picker';
-import TextField from '@atlaskit/textfield';
-import Select, { ValueType } from '@atlaskit/select';
+import InputWithLabel from '@/components/shared/InputWithLabel';
+import SelectWithLabel from '@/components/shared/SelectWithLabel';
 import type { Task, Team } from '@oscrat/model';
-import Button, { LoadingButton } from '@atlaskit/button';
 import statuses from '@/components/defaultLanding/data/statuses.json';
-import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
-import { WithoutRing } from 'sharedStyles';
 import { useTask } from 'hooks/useTask';
-import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
-
-import 'react-quill/dist/quill.snow.css';
-import dynamic from 'next/dynamic';
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-
-interface FormData {
-  title: string;
-  status: ValueType<Option>;
-  team: ValueType<Option>;
-  duedate: string;
-  description: string;
-  [key: string]: string | ValueType<Option>;
-}
-
-interface Option {
-  label: string;
-  value: string;
-}
+import { useFormik } from 'formik';
+import { taskUpdateSchema, type TaskUpdateData } from '@/lib/validation/task';
+import type { ApiError } from '@/types';
 
 const EditTask = ({
   visible,
@@ -42,151 +23,135 @@ const EditTask = ({
   task: Task;
   team: Team;
 }) => {
-  const { t } = useTranslation('common');
+  const { t, ready } = useTranslation('common');
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
+  
+  const initialValues: TaskUpdateData = useMemo(() => ({
+    title: task?.title || '',
+    status: task?.status || '',
+    duedate: task?.duedate ? new Date(task.duedate) : undefined,
+    description: task?.description || '',
+  }), [task]);
+  
+  const formik = useFormik<TaskUpdateData>({
+    initialValues,
+    validationSchema: taskUpdateSchema,
+    enableReinitialize: true,
+    validateOnBlur: false,
+    onSubmit: async (values) => {
+      try {
+        const updateData: TaskUpdateData = {
+          title: values.title?.trim(),
+          status: values.status,
+          duedate: values.duedate,
+          description: values.description?.trim() || '',
+        };
+        
+        await updateTask(updateData);
+        toast.success(t('task-updated'));
+        setVisible(false);
+      } catch (error: unknown) {
+        const apiError = error as ApiError;
+        toast.error(apiError.message);
+      }
+    },
+  });
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateValue = e.target.value ? new Date(e.target.value) : undefined;
+    formik.setFieldValue('duedate', dateValue);
+  };
+
+  const handleClose = () => {
+    formik.resetForm();
+    setVisible(false);
+  };
+
+  if (!ready) return null;
+  
   return (
-    <Modal open={visible}>
-      <Form<FormData>
-        onSubmit={async (data) => {
-          const { title, status, duedate, description } = data;
-
-          try {
-            const updateData: UpdateTaskData = {
-              title,
-              status: status?.value,
-              description: description || '',
-              duedate: duedate ? new Date(duedate) : undefined,
-            };
-
-            await updateTask(updateData);
-            toast.success(t('task-updated'));
-            setVisible(false);
-          } catch (err: any) {
-            toast.error(err.message || t('error-updating-task'));
-          }
-        }}
-      >
-        {({ formProps, submitting }) => (
-          <form {...formProps}>
-            <Modal.Header className="font-bold">Edit Task</Modal.Header>
-            <Modal.Body>
-              <div
-                style={{
-                  display: 'flex',
-                  width: '100%',
-                  margin: '0 auto',
-                  flexDirection: 'column',
-                }}
+    <Modal open={visible} close={handleClose}>
+      <Modal.Header>{t('edit-task')}</Modal.Header>
+      
+      <form onSubmit={formik.handleSubmit} method="POST">
+        <Modal.Body>
+          <div className="space-y-4">
+            <InputWithLabel
+              name="title"
+              label={t('title')}
+              value={formik.values.title || ''}
+              onChange={formik.handleChange}
+              error={formik.errors.title ? t(formik.errors.title) : undefined}
+              required
+              placeholder={t('task-title-placeholder')}
+            />
+            
+            <SelectWithLabel
+              name="status"
+              label={t('status')}
+              value={formik.values.status || ''}
+              onChange={formik.handleChange}
+              options={statuses.map(status => ({
+                value: status.value,
+                label: status.label,
+              }))}
+              error={formik.errors.status ? t(formik.errors.status) : undefined}
+              required
+            />
+            
+            <InputWithLabel
+              type="date"
+              name="duedate"
+              label={t('due-date')}
+              value={formik.values.duedate instanceof Date ? formik.values.duedate.toISOString().split('T')[0] : ''}
+              onChange={handleDateChange}
+              error={formik.errors.duedate ? t(formik.errors.duedate) : undefined}
+              required
+            />
+            
+            <div className="w-full">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
-                <Field
-                  aria-required={true}
-                  name="title"
-                  label="Title"
-                  isRequired
-                  defaultValue={task?.title}
-                >
-                  {({ fieldProps }) => (
-                    <Fragment>
-                      <TextField autoComplete="off" {...fieldProps} />
-                    </Fragment>
-                  )}
-                </Field>
-                <Field<ValueType<Option>>
-                  name="status"
-                  label="Status"
-                  aria-required={true}
-                  isRequired
-                  defaultValue={statuses.find(
-                    ({ value }) => value === task.status
-                  )}
-                  validate={async (value) => {
-                    if (value) {
-                      return undefined;
-                    }
-
-                    return new Promise((resolve) =>
-                      setTimeout(resolve, 300)
-                    ).then(() => 'Please select a status');
-                  }}
-                >
-                  {({ fieldProps: { id, ...rest }, error }) => (
-                    <Fragment>
-                      <WithoutRing>
-                        <Select
-                          inputId={id}
-                          {...rest}
-                          options={statuses}
-                          validationState={error ? 'error' : 'default'}
-                        />
-                        {error && <ErrorMessage>{error}</ErrorMessage>}
-                      </WithoutRing>
-                    </Fragment>
-                  )}
-                </Field>
-                <Field
-                  name="duedate"
-                  label="Due date"
-                  defaultValue={task.duedate}
-                  isRequired
-                  aria-required={true}
-                  validate={async (value) => {
-                    if (value) {
-                      return undefined;
-                    }
-
-                    return new Promise((resolve) =>
-                      setTimeout(resolve, 300)
-                    ).then(() => 'Please select a due date');
-                  }}
-                >
-                  {({ fieldProps: { id, ...rest }, error }) => (
-                    <Fragment>
-                      <WithoutRing>
-                        <DatePicker
-                          selectProps={{ inputId: id }}
-                          {...rest}
-                          locale="en-GB"
-                        />
-                      </WithoutRing>
-                      {error && <ErrorMessage>{error}</ErrorMessage>}
-                    </Fragment>
-                  )}
-                </Field>
-                <Field
-                  label="Description"
-                  name="description"
-                  defaultValue={task.description || ''}
-                >
-                  {({ fieldProps }: any) => (
-                    <Fragment>
-                      <ReactQuill theme="snow" {...fieldProps} />
-                    </Fragment>
-                  )}
-                </Field>
-                <FormFooter></FormFooter>
-              </div>
-            </Modal.Body>
-            <Modal.Actions>
-              <Button
-                appearance="default"
-                onClick={() => {
-                  setVisible(!visible);
-                }}
-              >
-                {t('close')}
-              </Button>
-              <LoadingButton
-                type="submit"
-                appearance="primary"
-                isLoading={submitting}
-              >
-                {t('save-changes')}
-              </LoadingButton>
-            </Modal.Actions>
-          </form>
-        )}
-      </Form>
+                {t('description')}
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formik.values.description || ''}
+                onChange={formik.handleChange}
+                rows={4}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 placeholder-gray-400 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder={t('task-description-placeholder')}
+              />
+              {formik.errors.description && (
+                <p className="mt-1 text-sm text-red-600">{t(formik.errors.description)}</p>
+              )}
+            </div>
+          </div>
+        </Modal.Body>
+        
+        <Modal.Footer>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClose}
+            disabled={formik.isSubmitting}
+            className="text-gray-800 border-gray-300 hover:bg-gray-50"
+          >
+            {t('close')}
+          </Button>
+          <Button
+            type="submit"
+            loading={formik.isSubmitting}
+            disabled={formik.isSubmitting}
+            className="bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 border-0"
+          >
+            {t('save-changes')}
+          </Button>
+        </Modal.Footer>
+      </form>
     </Modal>
   );
 };

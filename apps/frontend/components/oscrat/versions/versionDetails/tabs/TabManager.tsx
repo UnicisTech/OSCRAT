@@ -20,12 +20,14 @@ export default function TabsManager({
   buttonText,
   onButtonClick,
 }: TabsManagerProps) {
-  const { t } = useTranslation('common');
+  const { t, ready } = useTranslation('common');
   const [activeTab, setActiveTab] = useState(defaultActiveTab || tabs[0]?.id);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
   };
+
+  if (!ready) return null;
 
   return (
     <div className="mt-6">

@@ -34,7 +34,6 @@ const SelectWithLabel: React.FC<SelectWithLabelProps> = ({
   required = false,
   className = '',
   options,
-  placeholder = 'Select an option',
 }) => {
   const selectId = `select-${name}`;
 
@@ -71,7 +70,6 @@ const SelectWithLabel: React.FC<SelectWithLabelProps> = ({
           .trim()
           .replace(/\s+/g, ' ')}
       >
-        <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
