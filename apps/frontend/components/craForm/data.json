@@ -50,7 +50,7 @@
         },
         {
             "id": "1.3",
-            "question": "Does the product with digital elements was developed as a spare part to replace identical components on the market?",
+            "question": "Was the product with digital elements developed as a spare part to replace identical components on the market?",
             "hint": "This Regulation does not apply to spare parts that are made available on the market to replace identical components in products with digital elements and that are manufactured according to the same specifications as the components that they are intended to replace. In order to ensure that products with digital elements made available on the market can be repaired effectively and their durability extended, an exemption cover both spare parts that have the purpose of repairing legacy products made available before the date of application of CRA and spare parts that have already undergone a conformity assessment procedure pursuant to CRA.",
             "references": [
                 {
@@ -139,7 +139,7 @@
         },
         {
             "id": "1.7",
-            "question": "Does the product with digital elements has the nature of a medical device?",
+            "question": "Does the product with digital elements have the nature of a medical device?",
             "remark": "A product with the nature of a medical device for use in humans and accessories for such devices (Article 1, paragraph 1), including clinical trials on products (Article 1, paragraph 2) or separate groups of products with no intended medical purpose – Annex XVI (Article 1, paragraph 2).",
             "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2017/745, it is a medical device.\n\"Medical device\" means any instrument, apparatus, appliance, software, implant, reagent, material or other article intended by the manufacturer to be used, alone or in combination, for human beings for one or more of the following specific medical purposes:\n- diagnosis, prevention, monitoring, prediction, prognosis, treatment or alleviation of disease,\n- diagnosis, monitoring, treatment, alleviation of, or compensation for, an injury or disability,\n- investigation, replacement or modification of the anatomy or of a physiological or pathological process or state,\n- providing information by means of in vitro examination of specimens derived from the human body, including organ, blood and tissue donations,\nand which does not achieve its principal intended action by pharmacological, immunological or metabolic means, in or on the human body, but which may be assisted in its function by such means.\nThe following products shall also be deemed to be medical devices:\n- devices for the control or support of conception;\n- products specifically intended for the cleaning, disinfection or sterilisation of devices as referred to in Article 1(4) and of those referred to in the first paragraph of this point.",
             "references": [
@@ -161,8 +161,8 @@
         },
         {
             "id": "1.8",
-            "question": "Does the product with digital elements has the nature of a medical device for in vitro diagnostics?",
-            "remark": "a product with the nature of a medical device for in vitro diagnostics used by humans and accessories for such products (Article 1, paragraph 1j).",
+            "question": "Does the product with digital elements have the nature of a medical device for in vitro diagnostics?",
+            "remark": "A product with the nature of a medical device for in vitro diagnostics used by humans and accessories for such products (Article 1, paragraph 1j).",
             "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2017/746, it is a vitro diagnostic medical device.\n\"In vitro diagnostic medical device\" means any medical device which is a reagent, reagent product, calibrator, control material, kit, instrument, apparatus, piece of equipment, software or system, whether used alone or in combination, intended by the manufacturer to be used in vitro for the examination of specimens, including blood and tissue donations, derived from the human body, solely or principally for the purpose of providing information on one or more of the following:\n- concerning a physiological or pathological process or state;\n- concerning congenital physical or mental impairments;\n- concerning the predisposition to a medical condition or a disease;\n- to determine the safety and compatibility with potential recipients;\n- to predict treatment response or reactions;\n- to define or monitoring therapeutic measures.\nSpecimen receptacles shall also be deemed to be in vitro diagnostic medical devices;",
             "references": [
                 {
@@ -183,7 +183,7 @@
         },
         {
             "id": "1.9",
-            "question": "Does the product with digital elements is build for vehicles, where a product is a component for:\n- protection and safety of vehicle occupants and vulnerable road users or,\n- pressure monitoring systems or,\n- fuel efficiency or,\n- CO2 emissions or,\n- tyres.",
+            "question": "Is the product with digital elements built for vehicles, where a product is a component for:\n- protection and safety of vehicle occupants and vulnerable road users or,\n- pressure monitoring systems or,\n- fuel efficiency or,\n- CO2 emissions or,\n- tyres.",
             "remark": "A product built for vehicles, with regard to their general characteristics, safety and the protection and safety of vehicle occupants and vulnerable road users; in the scope of type-approval (Article 1):\n• of vehicles and systems, components and separate technical units, and,\n• of tyre pressure monitoring systems, with regard to their safety, fuel efficiency and CO2 emissions; and,\n• of newly manufactured tyres, with regard to their safety and environmental performance.",
             "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2019/2144, it is a product for protection and safety of vehicle occupants and vulnerable road users, pressure monitoring systems, fuel efficiency and CO2 emissions, tyres.",
             "references": [
@@ -227,7 +227,7 @@
         },
         {
             "id": "1.11",
-            "question": "Does the product with digital elements has a nature of marine equipment intended to be placed on board EU ships?",
+            "question": "Does the product with digital elements have a nature of marine equipment intended to be placed on board EU ships?",
             "remark": "A product of the nature of marine equipment intended to be placed on board EU ships (Article 1).",
             "hint": "A product in the scope of Regulation 2014/90/UE does not apply to CRA.",
             "references": [
@@ -249,7 +249,7 @@
         },
         {
             "id": "1.12",
-            "question": "Does the product with digital elements is developed or modified exclusively for national security, defense, or specifically designed to process classified information?",
+            "question": "Is the product with digital elements developed or modified exclusively for national security, defense, or specifically designed to process classified information?",
             "hint": "Products with digital elements that are developed or modified exclusively for national security or defence purposes or products that are specifically designed to process classified information fall outside the scope of this Regulation.",
             "references": [
                 {
@@ -382,7 +382,7 @@
                 {
                     "text": "Smart meter gateways within smart metering systems as defined in Article 2, point (23) of Directive (EU) 2019/944 of the European Parliament and of the Council (1) and other devices for advanced security purposes, including for secure cryptoprocessing",
                     "riskLevel": "CRITICAL",
-                    "hint": "'smart metering system' means an electronic system that is capable of measuring electricity fed into the grid or electricity consumed from the grid, providing more information than a conventional meter, and that is capable of transmitting and receiving data for information, monitoring and control purposes, using a form of electronic communication This category of products includes: - Smart Metering Gateway - Device or unit within smart metering systems responsible for collecting Meter Data, processing Meter Data, providing communication capabilities for devices in the Local Metering Network, protecting devices in the Local Area Network, and providing cryptographic primitives (in cooperation with a Security Module). [Ref. Protection Profile for the Gateway of a Smart Metering System (Smart Meter Gateway PP), BSI CC PP 0073] - Components which can be used in the environment of smart metering systems by various types of users to support their tasks and communication activities in a secure operating environment [Ref. BSI Technische Richtlinie BSI TR-03109-2.B]",
+                    "hint": "'Smart metering system' means an electronic system that is capable of measuring electricity fed into the grid or electricity consumed from the grid, providing more information than a conventional meter, and that is capable of transmitting and receiving data for information, monitoring and control purposes, using a form of electronic communication This category of products includes: - Smart Metering Gateway - Device or unit within smart metering systems responsible for collecting Meter Data, processing Meter Data, providing communication capabilities for devices in the Local Metering Network, protecting devices in the Local Area Network, and providing cryptographic primitives (in cooperation with a Security Module). [Ref. Protection Profile for the Gateway of a Smart Metering System (Smart Meter Gateway PP), BSI CC PP 0073] - Components which can be used in the environment of smart metering systems by various types of users to support their tasks and communication activities in a secure operating environment [Ref. BSI Technische Richtlinie BSI TR-03109-2.B]",
                     "references": [
                         {
                             "text": "Annex IV point (2)",
