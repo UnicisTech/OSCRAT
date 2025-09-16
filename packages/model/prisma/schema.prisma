@@ -577,6 +577,7 @@ model WorkerJob {
   payload    Json
   result     Json?
   errMessage String?
+  errCode    String?
 
   sbomReport SbomReport?
 

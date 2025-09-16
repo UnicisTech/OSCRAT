@@ -45,6 +45,8 @@ export interface SbomWorkerJob {
   createdAt: Date;
   processStartTime: Date | null;
   processEndTime: Date | null;
+  errCode?: string;
+  errMessage?: string;
   triggeredByUser: {
     id: string;
     name: string | null;
@@ -384,6 +386,8 @@ const transformToSbomWorkerJob = (job: any): SbomWorkerJob => {
     createdAt: job.createdAt,
     processStartTime: job.processStartTime,
     processEndTime: job.processEndTime,
+    errCode: job.errCode || undefined,
+    errMessage: job.errMessage || undefined,
     triggeredByUser: job.triggeredByUser,
     sbomData: job.sbomReport?.sbomData,
     attachment: job.sbomReport?.attachment

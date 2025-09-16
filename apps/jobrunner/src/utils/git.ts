@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { OscratRepositoryProvider } from '@oscrat/model';
 import type { OscratRepositoryWithRelations } from '@oscrat/model/types/repository';
+import { ERROR_CODES } from '@oscrat/model/constants/errorCodes';
+import { translateError } from './errorTranslator';
 
 function getAuthenticatedCloneUrl(
   repository: OscratRepositoryWithRelations
@@ -150,14 +152,20 @@ export async function cloneRepository(
 
     return repoPath;
   } catch (error: any) {
-    console.error(`[Git Utils] Failed to clone repository:`, {
+    const jobError = translateError(
+      'Git Utils',
+      error,
+      ERROR_CODES.REPOSITORY_OPERATION_FAILED,
+      `Failed to clone repository: ${repository.user}/${repository.name}`
+    );
+
+    console.error(`[Git Utils] Repository clone context:`, {
       repository: `${repository.user}/${repository.name}`,
-      error: error.message,
-      stack: error.stack,
       repoPath,
       tempDir,
     });
-    throw new Error('Failed to clone repository');
+
+    throw jobError;
   } finally {
     console.log(`[Git Utils] Resetting working directory to: ${originalCwd}`);
     $.cwd = originalCwd;

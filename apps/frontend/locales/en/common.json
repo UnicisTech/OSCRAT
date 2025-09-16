@@ -743,5 +743,13 @@
         "reporting-complete": "Reporting Complete"
       }
     }
+  },
+  "errorCodes": {
+    "JOB_001": "Invalid job configuration",
+    "SBOM_001": "Failed to generate SBOM",
+    "SBOM_002": "Failed to convert SBOM format",
+    "SBOM_003": "Failed to analyze SBOM data",
+    "REPO_001": "Repository operation failed - check repository access and credentials",
+    "UNKNOWN": "An unexpected error occurred"
   }
 }

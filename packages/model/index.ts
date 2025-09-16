@@ -50,6 +50,9 @@ export * from './types/team';
 export * from './types/craForm/form';
 export * from './types/jobPayloads';
 
+// Export error utilities
+export { ERROR_CODES, type ErrorCode } from './constants/errorCodes';
+
 // Export specific operation types needed by frontend
 export type { SbomWorkerJob } from './operations/workerJob';
 export type { SbomReportSummary } from './operations/sbomReport';

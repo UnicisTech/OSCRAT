@@ -9,6 +9,7 @@ import { useTranslation } from 'next-i18next';
 import type { SbomWorkerJob } from '@oscrat/model';
 import { WorkerJobStatus } from '@oscrat/model';
 import usePagination from '@/hooks/usePagination';
+import { getErrorCodeTranslationKey } from '@/utils/errorCodeTranslation';
 
 const ITEMS_PER_PAGE = 5; // For testing, can be changed to 15 later
 
@@ -95,7 +96,7 @@ const Table: React.FC<SsmTableProps> = ({
     return `${minutes}m ${seconds}s`;
   };
 
-  const getStatusBadge = (status: WorkerJobStatus) => {
+  const getStatusBadge = (job: SbomWorkerJob) => {
     const statusConfig = {
       [WorkerJobStatus.COMPLETED]: {
         color: 'text-green-600',
@@ -119,13 +120,18 @@ const Table: React.FC<SsmTableProps> = ({
       },
     };
 
-    const config = statusConfig[status] || {
+    const config = statusConfig[job.status] || {
       color: 'text-gray-600',
       label: t('oscrat.ui.unknown'),
     };
 
     return (
-      <span className={`flex items-center ${config.color}`}>
+      <span
+        className={`flex items-center ${config.color}`}
+        title={job.status === WorkerJobStatus.FAILED && job.errCode
+          ? `Error ${job.errCode}: ${t(getErrorCodeTranslationKey(job.errCode))}`
+          : undefined}
+      >
         <span className="mr-1">●</span>
         {config.label}
       </span>
@@ -172,7 +178,7 @@ const Table: React.FC<SsmTableProps> = ({
           <tbody className={tableStyles.tbody}>
             {pageData.map((job) => (
               <tr key={job.id} className={tableStyles.tr}>
-                <td className={tableStyles.td}>{getStatusBadge(job.status)}</td>
+                <td className={tableStyles.td}>{getStatusBadge(job)}</td>
                 <td className={tableStyles.tdCenter}>
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${

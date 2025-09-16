@@ -11,82 +11,54 @@ import {
 } from '@oscrat/model/operations/sbomReport';
 import { withTempDirectory } from '../utils/filesystem';
 import { convertSbomToSyftJson, analyzeSBOM, SyftSBOM } from '../utils/sbom';
+import { JobError, saveJobError } from '../utils/JobError';
+import { ERROR_CODES } from '@oscrat/model/constants/errorCodes';
+import { translateError } from '../utils/errorTranslator';
 import * as fs from 'fs';
 import * as path from 'path';
 
 export async function executeSbomImport(
   job: WorkerJob,
   prisma: PrismaClient,
-  workspaceRoot: string
+  _workspaceRoot: string
 ): Promise<FileImportSbomResult> {
-  console.log(
-    `[SBOM Import Job] Starting job ${job.id} (workspace: ${workspaceRoot})`
-  );
+  console.log(`[SBOM Import] Starting job ${job.id}`);
 
-  // Parse the job payload
   const payload = job.payload as unknown as FileImportSbomPayload;
 
   if (!payload.filename || !payload.fileData) {
-    console.error(`[SBOM Import Job] Missing file data in payload`);
-    throw new Error('File data is required in job payload');
+    throw new JobError(
+      ERROR_CODES.INVALID_JOB_PAYLOAD,
+      'File data and filename are required in job payload'
+    );
   }
 
-  console.log(`[SBOM Import Job] Processing file: ${payload.filename}`);
+  console.log(`[SBOM Import] Processing file: ${payload.filename}`);
 
-  // Decode file data from base64
   const fileBuffer = Buffer.from(payload.fileData, 'base64');
-
-  console.log(
-    `[SBOM Import Job] File decoded: ${payload.filename} (${fileBuffer.length} bytes)`
-  );
+  console.log(`[SBOM Import] File size: ${fileBuffer.length} bytes`);
 
   return await withTempDirectory(`sbom-import-${job.id}`, async (tempDir) => {
     try {
-      // Save the file data to temp directory
+      // Save and convert file
+      console.log(`[SBOM Import] Converting SBOM to Syft JSON...`);
       const inputFilePath = path.join(tempDir, payload.filename);
-      fs.writeFileSync(inputFilePath, fileBuffer);
+      fs.writeFileSync(inputFilePath, fileBuffer as any);
 
-      console.log(`[SBOM Import Job] Saved file to: ${inputFilePath}`);
-
-      // Convert CycloneDX XML to Syft JSON format
       const syftJsonPath = path.join(tempDir, 'converted-sbom.syft.json');
+      await convertSbomToSyftJson(inputFilePath, syftJsonPath);
 
-      try {
-        await convertSbomToSyftJson(inputFilePath, syftJsonPath);
-        console.log(
-          `[SBOM Import Job] Converted SBOM to Syft JSON: ${syftJsonPath}`
-        );
-      } catch (conversionError: any) {
-        console.error(
-          `[SBOM Import Job] Failed to convert SBOM:`,
-          conversionError
-        );
-        throw new Error('Failed to convert SBOM file');
-      }
+      // Analyze SBOM
+      console.log(`[SBOM Import] Analyzing SBOM data...`);
+      const syftJsonData = fs.readFileSync(syftJsonPath);
+      const syftJsonContent = JSON.parse(syftJsonData.toString()) as SyftSBOM;
 
-      // Read and analyze the converted SBOM
-      let syftJsonContent: SyftSBOM;
-      let sbomSummary;
-      let packageCount = 0;
+      const sbomSummary = analyzeSBOM(syftJsonContent);
+      const packageCount = sbomSummary.overview.totalComponents;
+      console.log(`[SBOM Import] Found ${packageCount} packages`);
 
-      try {
-        const syftJsonData = fs.readFileSync(syftJsonPath);
-        syftJsonContent = JSON.parse(syftJsonData.toString()) as SyftSBOM;
-        sbomSummary = analyzeSBOM(syftJsonContent);
-        packageCount = sbomSummary.overview.totalComponents;
-        console.log(
-          `[SBOM Import Job] Analyzed SBOM: ${packageCount} packages found`
-        );
-      } catch (analysisError: any) {
-        console.error(
-          `[SBOM Import Job] Failed to analyze SBOM:`,
-          analysisError
-        );
-        throw new Error('Failed to analyze SBOM file');
-      }
-
-      // Create SBOM report using the original file data
-      // Get product and version names for proper filename
+      // Create report
+      console.log(`[SBOM Import] Creating SBOM report...`);
       const names = await getProductVersionNames(
         prisma,
         job.contextProductId!,
@@ -95,7 +67,7 @@ export async function executeSbomImport(
 
       const filename = names
         ? generateSbomFilename(names.productName, names.versionName)
-        : `imported-sbom-${job.id}.cyclonedx.xml`; // fallback to previous behavior
+        : `imported-sbom-${job.id}.cyclonedx.xml`;
 
       const sbomReport = await createSbomReport(prisma, {
         jobId: job.id,
@@ -110,22 +82,17 @@ export async function executeSbomImport(
         },
       });
 
-      const result: FileImportSbomResult = {
+      console.log(`[SBOM Import] Completed successfully. Report ID: ${sbomReport.id}`);
+
+      return {
         sbomData: sbomReport.id,
         generatedAt: new Date().toISOString(),
         packageCount: packageCount,
       };
 
-      console.log(
-        `[SBOM Import Job] Completed: ${packageCount} packages, created report ${sbomReport.id}`
-      );
-      return result;
-    } catch (error: any) {
-      console.error(`[SBOM Import Job] Failed:`, {
-        error: error.message,
-        filename: payload.filename,
-        jobId: job.id,
-      });
+    } catch (error) {
+      console.error(`[SBOM Import] Job ${job.id} failed:`, error);
+      await saveJobError(error, job, prisma);
       throw error;
     }
   });

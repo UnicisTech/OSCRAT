@@ -6,6 +6,7 @@ import {
   useInvalidateSbomJobs,
 } from '@/lib/api/hooks/oscrat/jobs';
 import type { CreateSbomJobRequest } from '@/lib/api/endpoints/oscrat/jobs';
+import type { SbomWorkerJob } from '@oscrat/model';
 
 /**
  * Hook specifically for SBOM jobs for a version (both REPO and FILE types)

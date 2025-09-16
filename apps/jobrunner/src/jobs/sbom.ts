@@ -14,6 +14,9 @@ import {
 import { withTempDirectory } from '../utils/filesystem';
 import { cloneRepository } from '../utils/git';
 import { generateSbom, analyzeSBOM, SyftSBOM } from '../utils/sbom';
+import { JobError, saveJobError } from '../utils/JobError';
+import { ERROR_CODES } from '@oscrat/model/constants/errorCodes';
+import { translateError } from '../utils/errorTranslator';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -58,42 +61,37 @@ async function generateSbomForRepository(
   prisma: PrismaClient
 ): Promise<RepoGenerateSbomResult> {
   try {
-    console.log(`[SBOM Job] Cloning repository...`);
+    // Clone repository
+    console.log(`[SBOM Job] Cloning repository ${repository.name}...`);
     let repoDir: string;
     try {
       repoDir = await cloneRepository(repository, tempDir);
     } catch (error) {
-      throw new Error('Failed to checkout repository');
+      const jobError = translateError(
+        'SBOM Job',
+        error,
+        ERROR_CODES.SBOM_GENERATION_FAILED,
+        'Repository operation failed'
+      );
+      throw jobError;
     }
 
+    // Generate SBOM
     console.log(`[SBOM Job] Generating SBOM files...`);
-    let syftJsonPath: string, cycloneDxXmlPath: string;
-    try {
-      ({ syftJsonPath, cycloneDxXmlPath } = await generateSbom(repoDir));
-    } catch (error) {
-      throw new Error('Failed to generate SBOM');
-    }
+    const { syftJsonPath, cycloneDxXmlPath } = await generateSbom(repoDir);
 
-    // Read the generated SBOM files
-    console.log(`[SBOM Job] Reading SBOM files...`);
-    let cycloneDxXmlData: Buffer;
-    let syftJsonData: Buffer;
-    let sbomSummary: any;
-    let packageCount: number;
+    // Analyze SBOM
+    console.log(`[SBOM Job] Analyzing SBOM data...`);
+    const cycloneDxXmlData = fs.readFileSync(cycloneDxXmlPath);
+    const syftJsonData = fs.readFileSync(syftJsonPath);
+    const syftJsonContent = JSON.parse(syftJsonData.toString()) as SyftSBOM;
 
-    try {
-      cycloneDxXmlData = fs.readFileSync(cycloneDxXmlPath);
-      syftJsonData = fs.readFileSync(syftJsonPath);
-      const syftJsonContent = JSON.parse(syftJsonData.toString());
-      sbomSummary = analyzeSBOM(syftJsonContent as SyftSBOM);
-      packageCount = sbomSummary.overview.totalComponents;
-    } catch (error) {
-      throw new Error('Failed to process SBOM files');
-    }
+    const sbomSummary = analyzeSBOM(syftJsonContent);
+    const packageCount = sbomSummary.overview.totalComponents;
+    console.log(`[SBOM Job] Found ${packageCount} packages`);
 
+    // Create report
     console.log(`[SBOM Job] Creating SBOM report...`);
-
-    // Get product and version names for proper filename
     const names = await getProductVersionNames(
       prisma,
       repository.version.product.id,
@@ -102,9 +100,8 @@ async function generateSbomForRepository(
 
     const filename = names
       ? generateSbomFilename(names.productName, names.versionName)
-      : path.basename(cycloneDxXmlPath); // fallback to original behavior
+      : path.basename(cycloneDxXmlPath);
 
-    // Create single SBOM report with JSON data and CycloneDX XML file
     const sbomReport = await createSbomReport(prisma, {
       jobId: job.id,
       versionId: repository.version.id,
@@ -118,22 +115,17 @@ async function generateSbomForRepository(
       },
     });
 
-    const result: RepoGenerateSbomResult = {
+    console.log(`[SBOM Job] Completed successfully. Report ID: ${sbomReport.id}`);
+
+    return {
       repositoryId: repository.id,
       sbomData: sbomReport.id,
       generatedAt: new Date().toISOString(),
     };
 
-    console.log(
-      `[SBOM Job] Completed: ${packageCount} packages, created report ${sbomReport.id}`
-    );
-    return result;
-  } catch (error: any) {
-    console.error(`[SBOM Job] Failed:`, {
-      error: error.message,
-      repository: repository.name,
-      jobId: job.id,
-    });
+  } catch (error) {
+    console.error(`[SBOM Job] Job ${job.id} failed:`, error);
+    await saveJobError(error, job, prisma);
     throw error;
   }
 }
@@ -143,36 +135,29 @@ export async function executeSbomGeneration(
   prisma: PrismaClient,
   workspaceRoot: string
 ): Promise<RepoGenerateSbomResult | string> {
-  console.log(
-    `[SBOM Job] Starting job ${job.id} (workspace: ${workspaceRoot})`
-  );
+  console.log(`[SBOM Job] Starting job ${job.id}`);
 
-  // Parse the job payload
   const payload = job.payload as unknown as RepoGenerateSbomPayload;
 
   if (!payload.repositoryId) {
-    console.error(`[SBOM Job] Missing repository ID in payload`);
-    throw new Error('Repository ID is required in job payload');
+    throw new JobError(
+      ERROR_CODES.INVALID_JOB_PAYLOAD,
+      'Repository ID is required in job payload'
+    );
   }
 
-  console.log(`[SBOM Job] Fetching repository ${payload.repositoryId}`);
-
-  // Get repository details from database
   const repository = await getRepositoryById(prisma, payload.repositoryId);
-
   if (!repository) {
-    console.error(`[SBOM Job] Repository ${payload.repositoryId} not found`);
-    throw new Error(`Repository with ID ${payload.repositoryId} not found`);
+    throw new JobError(
+      ERROR_CODES.INVALID_JOB_PAYLOAD,
+      `Repository with ID ${payload.repositoryId} not found`
+    );
   }
 
-  console.log(
-    `[SBOM Job] Found repository: ${repository.name} (${repository.provider})`
-  );
+  console.log(`[SBOM Job] Processing: ${repository.name} (${repository.provider})`);
 
   return await withTempDirectory(
     `sbom-${job.id}`,
-    (
-      tempDir //simulateSbomGeneration(repository, job, tempDir)
-    ) => generateSbomForRepository(repository, job, tempDir, prisma)
+    (tempDir) => generateSbomForRepository(repository, job, tempDir, prisma)
   );
 }
