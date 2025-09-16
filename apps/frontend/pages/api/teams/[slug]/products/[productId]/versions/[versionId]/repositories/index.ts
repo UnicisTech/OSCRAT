@@ -82,9 +82,9 @@ const handlePOST = async (
       ),
       authType: OscratRepositoryAuthType.PERSONAL_ACCESS_TOKEN,
       accessToken: validatedData.accessToken,
-      targetBranch: validatedData.targetBranch || undefined,
-      targetTag: validatedData.targetTag || undefined,
-      targetCommit: validatedData.targetCommit || undefined,
+      targetBranch: validatedData.targetBranch,
+      targetTag: validatedData.targetTag,
+      targetCommit: validatedData.targetCommit,
     };
 
     const repository = await createRepository(

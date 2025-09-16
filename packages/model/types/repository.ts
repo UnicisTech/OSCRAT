@@ -10,9 +10,9 @@ export interface OscratRepositoryBase {
   provider: OscratRepositoryProvider;
   repositoryUrl: string;
   user: string;
-  targetBranch?: string;
-  targetTag?: string;
-  targetCommit?: string;
+  targetBranch?: string | null;
+  targetTag?: string | null;
+  targetCommit?: string | null;
   authType: OscratRepositoryAuthType;
   accessToken?: string;
 }

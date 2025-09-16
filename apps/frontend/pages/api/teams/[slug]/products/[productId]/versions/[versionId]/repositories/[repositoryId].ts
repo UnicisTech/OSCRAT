@@ -86,9 +86,9 @@ const handlePUT = async (
         validatedData.name
       ),
       accessToken: validatedData.accessToken,
-      targetBranch: validatedData.targetBranch || undefined,
-      targetTag: validatedData.targetTag || undefined,
-      targetCommit: validatedData.targetCommit || undefined,
+      targetBranch: validatedData.targetBranch,
+      targetTag: validatedData.targetTag,
+      targetCommit: validatedData.targetCommit,
     };
 
     const repository = await updateRepository(

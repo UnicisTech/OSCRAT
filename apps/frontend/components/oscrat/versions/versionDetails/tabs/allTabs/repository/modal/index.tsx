@@ -232,9 +232,9 @@ const Modal: React.FC<ModalProps> = ({
           user: values.user,
           authType: AuthType.PERSONAL_ACCESS_TOKEN,
           accessToken: values.accessToken,
-          targetBranch: values.targetBranch || undefined,
-          targetTag: values.targetTag || undefined,
-          targetCommit: values.targetCommit || undefined,
+          targetBranch: values.targetBranch,
+          targetTag: values.targetTag,
+          targetCommit: values.targetCommit,
         };
 
         if (isCreateMode) {

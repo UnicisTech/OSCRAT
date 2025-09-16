@@ -35,14 +35,17 @@ export const createRepositoryCreateSchema = (t: (key: string) => string) =>
 
     targetBranch: Yup.string()
       .trim()
+      .transform((value) => value === '' ? null : value)
       .max(100, t('oscrat.ui.repository.validation.branch-too-long'))
       .nullable(),
     targetTag: Yup.string()
       .trim()
+      .transform((value) => value === '' ? null : value)
       .max(100, t('oscrat.ui.repository.validation.tag-too-long'))
       .nullable(),
     targetCommit: Yup.string()
       .trim()
+      .transform((value) => value === '' ? null : value)
       .matches(
         /^[a-f0-9]{40}$/i,
         t('oscrat.ui.repository.validation.commit-invalid-format')
@@ -84,14 +87,17 @@ export const repositoryCreateSchema = Yup.object().shape({
 
   targetBranch: Yup.string()
     .trim()
+    .transform((value) => value === '' ? null : value)
     .max(100, 'oscrat.ui.repository.validation.branch-too-long')
     .nullable(),
   targetTag: Yup.string()
     .trim()
+    .transform((value) => value === '' ? null : value)
     .max(100, 'oscrat.ui.repository.validation.tag-too-long')
     .nullable(),
   targetCommit: Yup.string()
     .trim()
+    .transform((value) => value === '' ? null : value)
     .matches(
       /^[a-f0-9]{40}$/i,
       'oscrat.ui.repository.validation.commit-invalid-format'
