@@ -9,7 +9,12 @@ import {
   GitCommit,
   User,
   Globe,
+  Lock,
 } from 'lucide-react';
+import {
+  OscratRepositoryProvider,
+  OscratRepositoryAuthType,
+} from '@oscrat/model';
 import { useVersionContext } from '@/context/VersionContext';
 import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
 import { Divider } from '@/components/shared';
@@ -171,7 +176,9 @@ export default function Repository() {
             <label className="mb-1 block text-xs font-medium text-gray-500">
               {t('oscrat.ui.repository.labels.provider')}
             </label>
-            <p className="text-sm text-gray-900">{repository.provider}</p>
+            <p className="text-sm text-gray-900">
+              {t(`oscrat.ui.repository.providers.${repository.provider}`)}
+            </p>
           </div>
 
           <div>
@@ -199,6 +206,24 @@ export default function Repository() {
                 {repository.repositoryUrl}
                 <ExternalLink className="ml-1 h-3 w-3" />
               </Link>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-500">
+              {t('oscrat.ui.repository.labels.auth-type')}
+            </label>
+            <div className="flex items-center">
+              {repository.authType === OscratRepositoryAuthType.PUBLIC ? (
+                <Globe className="mr-2 h-4 w-4 text-gray-400" />
+              ) : (
+                <Lock className="mr-2 h-4 w-4 text-gray-400" />
+              )}
+              <p className="text-sm text-gray-900">
+                {repository.authType === OscratRepositoryAuthType.PUBLIC
+                  ? t('oscrat.ui.repository.labels.auth-public')
+                  : t('oscrat.ui.repository.labels.auth-token')}
+              </p>
             </div>
           </div>
         </div>

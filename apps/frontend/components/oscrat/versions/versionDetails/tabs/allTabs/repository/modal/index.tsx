@@ -32,9 +32,19 @@ interface Option {
 }
 
 const PROVIDER_OPTIONS: Option[] = [
-  { label: 'GitHub', value: RepositoryProvider.GITHUB },
-  { label: 'GitLab', value: RepositoryProvider.GITLAB },
-  { label: 'Bitbucket', value: RepositoryProvider.BITBUCKET },
+  { label: 'oscrat.ui.repository.providers.GITHUB', value: RepositoryProvider.GITHUB },
+  { label: 'oscrat.ui.repository.providers.GITLAB', value: RepositoryProvider.GITLAB },
+  { label: 'oscrat.ui.repository.providers.BITBUCKET', value: RepositoryProvider.BITBUCKET },
+];
+
+interface AuthOption {
+  label: string;
+  value: OscratRepositoryAuthType;
+}
+
+const AUTH_TYPE_OPTIONS: AuthOption[] = [
+  { label: 'oscrat.ui.repository.labels.auth-public', value: AuthType.PUBLIC },
+  { label: 'oscrat.ui.repository.labels.auth-token', value: AuthType.PERSONAL_ACCESS_TOKEN },
 ];
 
 interface ModalProps {
@@ -209,6 +219,7 @@ const Modal: React.FC<ModalProps> = ({
       name: repository?.name || '',
       provider: repository?.provider || RepositoryProvider.GITHUB,
       user: repository?.user || '',
+      authType: repository?.authType || AuthType.PERSONAL_ACCESS_TOKEN,
       targetBranch: repository?.targetBranch || null,
       targetTag: repository?.targetTag || null,
       targetCommit: repository?.targetCommit || null,
@@ -230,8 +241,8 @@ const Modal: React.FC<ModalProps> = ({
           provider: values.provider,
           repositoryUrl,
           user: values.user,
-          authType: AuthType.PERSONAL_ACCESS_TOKEN,
-          accessToken: values.accessToken,
+          authType: values.authType,
+          accessToken: values.authType === AuthType.PUBLIC ? undefined : values.accessToken,
           targetBranch: values.targetBranch,
           targetTag: values.targetTag,
           targetCommit: values.targetCommit,
@@ -320,7 +331,7 @@ const Modal: React.FC<ModalProps> = ({
                   >
                     {PROVIDER_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </SelectField>
@@ -361,6 +372,48 @@ const Modal: React.FC<ModalProps> = ({
                     required
                   />
 
+                </div>
+
+                {/* URL Preview - Full width */}
+                {previewUrl && (
+                  <div className="rounded-md bg-gray-50 p-3">
+                    <p className="mb-1 text-xs text-gray-600">
+                      {t('oscrat.ui.repository.labels.repository-url-preview')}
+                    </p>
+                    <p className="break-all font-mono text-sm text-blue-600">
+                      {previewUrl}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Authentication Section */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-gray-700">
+                  {t('oscrat.ui.repository.sections.authentication')}
+                </h3>
+
+                <SelectField
+                  label={t('oscrat.ui.repository.labels.auth-type')}
+                  name="authType"
+                  value={formik.values.authType}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.authType && formik.errors.authType
+                      ? t(formik.errors.authType)
+                      : undefined
+                  }
+                  required
+                >
+                  {AUTH_TYPE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.label)}
+                    </option>
+                  ))}
+                </SelectField>
+
+                {formik.values.authType === AuthType.PERSONAL_ACCESS_TOKEN && (
                   <PasswordField
                     label={t(
                       'oscrat.ui.repository.labels.personal-access-token'
@@ -384,16 +437,12 @@ const Modal: React.FC<ModalProps> = ({
                     onToggleToken={() => setShowToken(!showToken)}
                     required
                   />
-                </div>
+                )}
 
-                {/* URL Preview - Full width */}
-                {previewUrl && (
-                  <div className="rounded-md bg-gray-50 p-3">
-                    <p className="mb-1 text-xs text-gray-600">
-                      {t('oscrat.ui.repository.labels.repository-url-preview')}
-                    </p>
-                    <p className="break-all font-mono text-sm text-blue-600">
-                      {previewUrl}
+                {formik.values.authType === AuthType.PUBLIC && (
+                  <div className="rounded-md bg-blue-50 p-3">
+                    <p className="text-sm text-blue-700">
+                      {t('oscrat.ui.repository.sections.public-repo-notice')}
                     </p>
                   </div>
                 )}

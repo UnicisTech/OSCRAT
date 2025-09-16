@@ -499,6 +499,8 @@
           "branch-too-long": "Branch name is too long",
           "tag-too-long": "Tag name is too long",
           "commit-invalid-format": "Commit must be a 40-character SHA hash",
+          "auth-type-required": "Authentication type is required",
+          "auth-type-invalid": "Invalid authentication type",
           "access-token-required": "Access token is required",
           "access-token-too-long": "Access token is too long"
         },
@@ -511,16 +513,25 @@
           "target-branch": "Target Branch",
           "target-tag": "Target Tag",
           "target-commit": "Target Commit",
+          "auth-type": "Authentication Type",
+          "auth-public": "Public",
+          "auth-token": "Personal Access Token",
           "personal-access-token": "Personal Access Token",
           "edit-repository": "Edit Repository",
           "title": "Repository"
+        },
+        "providers": {
+          "GITHUB": "GitHub",
+          "GITLAB": "GitLab",
+          "BITBUCKET": "Bitbucket"
         },
         "sections": {
           "information": "Repository Information",
           "target-configuration": "Target Configuration",
           "target-configuration-help": "Specify a branch, tag, or commit to sync (optional)",
           "authentication": "Authentication",
-          "token-security-notice": "Token is encrypted and never exposed in API responses"
+          "token-security-notice": "Token is encrypted and never exposed in API responses",
+          "public-repo-notice": "This is a public repository and does not require authentication"
         },
         "placeholders": {
           "repository-name": "my-repository",
@@ -529,7 +540,8 @@
           "branch": "main",
           "tag": "v1.0.0",
           "commit": "40-character SHA hash",
-          "access-token": "Enter your personal access token"
+          "access-token": "Enter your personal access token",
+          "select-auth-type": "Select authentication type"
         },
         "errors": {
           "create-repository": "Failed to create repository",

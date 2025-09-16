@@ -85,6 +85,7 @@ const handlePUT = async (
         validatedData.user,
         validatedData.name
       ),
+      authType: validatedData.authType,
       accessToken: validatedData.accessToken,
       targetBranch: validatedData.targetBranch,
       targetTag: validatedData.targetTag,

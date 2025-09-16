@@ -5,6 +5,7 @@ import {
 } from '@oscrat/model';
 
 const PROVIDERS = Object.values(OscratRepositoryProvider);
+const AUTH_TYPES = Object.values(OscratRepositoryAuthType);
 
 // Validation schema factory that takes translation function
 export const createRepositoryCreateSchema = (t: (key: string) => string) =>
@@ -22,6 +23,10 @@ export const createRepositoryCreateSchema = (t: (key: string) => string) =>
     provider: Yup.mixed<OscratRepositoryProvider>()
       .oneOf(PROVIDERS, t('oscrat.ui.repository.validation.provider-invalid'))
       .required(t('oscrat.ui.repository.validation.provider-required')),
+
+    authType: Yup.mixed<OscratRepositoryAuthType>()
+      .oneOf(AUTH_TYPES, t('oscrat.ui.repository.validation.auth-type-invalid'))
+      .required(t('oscrat.ui.repository.validation.auth-type-required')),
 
     user: Yup.string()
       .trim()
@@ -54,9 +59,14 @@ export const createRepositoryCreateSchema = (t: (key: string) => string) =>
 
     accessToken: Yup.string()
       .trim()
-      .required(t('oscrat.ui.repository.validation.access-token-required'))
-      .min(1, t('oscrat.ui.repository.validation.access-token-required'))
-      .max(500, t('oscrat.ui.repository.validation.access-token-too-long')),
+      .when('authType', {
+        is: OscratRepositoryAuthType.PERSONAL_ACCESS_TOKEN,
+        then: (schema) => schema
+          .required(t('oscrat.ui.repository.validation.access-token-required'))
+          .min(1, t('oscrat.ui.repository.validation.access-token-required'))
+          .max(500, t('oscrat.ui.repository.validation.access-token-too-long')),
+        otherwise: (schema) => schema.nullable()
+      }),
   });
 
 // Default schema without translations (for API usage)
@@ -74,6 +84,10 @@ export const repositoryCreateSchema = Yup.object().shape({
   provider: Yup.mixed<OscratRepositoryProvider>()
     .oneOf(PROVIDERS, 'oscrat.ui.repository.validation.provider-invalid')
     .required('oscrat.ui.repository.validation.provider-required'),
+
+  authType: Yup.mixed<OscratRepositoryAuthType>()
+    .oneOf(AUTH_TYPES, 'oscrat.ui.repository.validation.auth-type-invalid')
+    .required('oscrat.ui.repository.validation.auth-type-required'),
 
   user: Yup.string()
     .trim()
@@ -106,9 +120,14 @@ export const repositoryCreateSchema = Yup.object().shape({
 
   accessToken: Yup.string()
     .trim()
-    .required('oscrat.ui.repository.validation.access-token-required')
-    .min(1, 'oscrat.ui.repository.validation.access-token-required')
-    .max(500, 'oscrat.ui.repository.validation.access-token-too-long'),
+    .when('authType', {
+      is: OscratRepositoryAuthType.PERSONAL_ACCESS_TOKEN,
+      then: (schema) => schema
+        .required('oscrat.ui.repository.validation.access-token-required')
+        .min(1, 'oscrat.ui.repository.validation.access-token-required')
+        .max(500, 'oscrat.ui.repository.validation.access-token-too-long'),
+      otherwise: (schema) => schema.nullable()
+    }),
 });
 
 export const repositoryUpdateSchema = repositoryCreateSchema;

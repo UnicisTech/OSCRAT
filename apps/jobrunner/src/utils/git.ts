@@ -9,17 +9,26 @@ import { translateError } from './errorTranslator';
 function getAuthenticatedCloneUrl(
   repository: OscratRepositoryWithRelations
 ): string {
-  const { provider, user, name, accessToken } = repository;
+  const { provider, user, name, accessToken, authType } = repository;
 
   console.log(
-    `[Git Utils] Generating authenticated clone URL for ${provider} repository: ${user}/${name}`
+    `[Git Utils] Generating authenticated clone URL for ${provider} repository: ${user}/${name} (auth: ${authType})`
   );
 
-  if (!accessToken) {
-    console.error(
-      `[Git Utils] Access token is missing for repository: ${user}/${name}`
-    );
-    throw new Error('Access token is required for repository cloning');
+  // For public repositories, return standard HTTPS URL without authentication
+  if (authType === 'PUBLIC' || !accessToken) {
+    console.log(`[Git Utils] Using public repository URL (no authentication)`);
+    switch (provider) {
+      case OscratRepositoryProvider.GITHUB:
+        return `https://github.com/${user}/${name}.git`;
+      case OscratRepositoryProvider.GITLAB:
+        return `https://gitlab.com/${user}/${name}.git`;
+      case OscratRepositoryProvider.BITBUCKET:
+        return `https://bitbucket.org/${user}/${name}.git`;
+      default:
+        console.error(`[Git Utils] Unsupported repository provider: ${provider}`);
+        throw new Error(`Unsupported repository provider: ${provider}`);
+    }
   }
 
   console.log(

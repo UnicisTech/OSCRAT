@@ -80,7 +80,7 @@ const handlePOST = async (
         validatedData.user,
         validatedData.name
       ),
-      authType: OscratRepositoryAuthType.PERSONAL_ACCESS_TOKEN,
+      authType: validatedData.authType,
       accessToken: validatedData.accessToken,
       targetBranch: validatedData.targetBranch,
       targetTag: validatedData.targetTag,

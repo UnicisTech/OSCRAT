@@ -313,6 +313,7 @@ export const updateRepository = async (
       targetBranch: data.targetBranch,
       targetTag: data.targetTag,
       targetCommit: data.targetCommit,
+      authType: data.authType,
       accessToken: data.accessToken,
     },
     include: REPOSITORY_DETAIL_INCLUDE,
