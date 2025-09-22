@@ -101,6 +101,16 @@ export const clearFormState = (): void => {
 };
 
 /**
+ * Format risk level for display
+ * Converts underscore-separated strings to readable format
+ * e.g., "important_class_i" -> "IMPORTANT CLASS I"
+ */
+export const formatRiskLevel = (level: string | null): string => {
+  if (!level) return 'Unknown';
+  return level.replace(/_/g, ' ').toUpperCase();
+};
+
+/**
  * Get skipped questions between two steps
  */
 export const getSkippedQuestions = (

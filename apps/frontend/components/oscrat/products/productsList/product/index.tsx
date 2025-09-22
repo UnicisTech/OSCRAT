@@ -73,17 +73,6 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
         >
           <ActiveBadge status={project.status} />
 
-          <Link
-            href={formPathName}
-            aria-label={`Go to form for ${project.name}`}
-          >
-            <button
-              type="button"
-              className="h-9 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              {t('go-to-form')}
-            </button>
-          </Link>
           {onShowMore && (
             <button
               onClick={onShowMore}

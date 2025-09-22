@@ -6,6 +6,7 @@ import { ResultProps } from '@oscrat/model';
 import { useTranslation } from 'next-i18next';
 import { useSession } from 'next-auth/react';
 import { Divider } from '@/components/shared';
+import { formatRiskLevel } from '@/utils/craForm';
 
 const Result: React.FC<ResultProps> = ({
   isEligible,
@@ -33,49 +34,6 @@ const Result: React.FC<ResultProps> = ({
     router.push('/');
   };
 
-  const formatRiskLevel = (level: string ) => {
-    return level.replace(/_/g, ' ').toUpperCase();
-  };
-
-  // Render buttons based on authentication status
-  const renderAuthButtons = () => {
-    if (isAuthenticated) {
-      return (
-        <>
-          <Button
-            onClick={handleBackToHome}
-            className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
-            text={t('oscrat.ui.go-home')}
-            variant="normal"
-          />
-          <Button
-            onClick={handleTryAgain}
-            className="hover:bg-pri w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
-            text={t('oscrat.ui.try-again')}
-            variant="primary"
-          />
-        </>
-      );
-    }
-
-    return (
-      <>
-        <Button
-          onClick={handleLogin}
-          className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
-          text={t('oscrat.ui.go-home')}
-          variant="normal"
-        />
-        <Button
-          onClick={handleTryAgain}
-          className="hover:bg-pri w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
-          text={t('oscrat.ui.try-again')}
-          variant="primary"
-        />
-      </>
-    );
-  };
-
   // Render buttons based on eligibility
   const renderEligibleButtons = () => {
     if (isAuthenticated) {
@@ -90,7 +48,7 @@ const Result: React.FC<ResultProps> = ({
           <Button
             onClick={handleTryAgain}
             className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
-            text={t('oscrat.ui.check-eligibility')}
+            text={t('oscrat.ui.try-again')}
             variant="primary"
           />
         </>
@@ -99,19 +57,19 @@ const Result: React.FC<ResultProps> = ({
 
     return (
       <>
-        <Button
-          onClick={handleRegister}
-          className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
-          text={t('register')}
-          variant="normal"
-        />
-        <Button
-          onClick={handleLogin}
-          className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
-          text={t('log-in')}
-          variant="primary"
-        />
-      </>
+      <Button
+        onClick={handleLogin}
+        className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
+        text={t('register')}
+        variant="normal"
+      />
+      <Button
+        onClick={handleRegister}
+        className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
+        text={t('log-in')}
+        variant="primary"
+      />
+    </>
     );
   };
 
@@ -134,7 +92,20 @@ const Result: React.FC<ResultProps> = ({
           </p>
           
           <div className="mb-8 flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-            {renderAuthButtons()}
+          <>
+    <Button
+      onClick={handleLogin}
+      className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
+      text={t('oscrat.ui.go-home')}
+      variant="normal"
+    />
+    <Button
+      onClick={handleTryAgain}
+      className="hover:bg-pri w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
+      text={t('oscrat.ui.try-again')}
+      variant="primary"
+    />
+  </>
           </div>
         </div>
         

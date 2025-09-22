@@ -75,7 +75,7 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
         onEdit={handleEdit}
       />
       {tabs && tabs.length > 0 && (
-        <TabsManager buttonText={t('oscrat.ui.new-assesment')} tabs={tabs} />
+        <TabsManager buttonText={t('oscrat.ui.add-version')} tabs={tabs} />
       )}
     </>
   );

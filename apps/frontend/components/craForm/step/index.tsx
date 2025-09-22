@@ -6,6 +6,7 @@ import { isApplicabilityAnswer } from '@/types/craForm';
 import { LuInfo } from 'react-icons/lu';
 import { getStepNumberById } from '@/utils/craForm';
 import Select from '@atlaskit/select';
+import { useRouter } from 'next/router';
 
 const Step: React.FC<StepProps> = ({
   step,
@@ -20,7 +21,7 @@ const Step: React.FC<StepProps> = ({
   findPreviousNonSkippedStep,
 }) => {
   const { t, ready } = useTranslation('common');
-  
+  const router = useRouter();
   const { id, question, answerOptions, references } = step;
   const hint = (step as ApplicabilityQuestion).hint;
   const remark = (step as ApplicabilityQuestion).remark;
@@ -28,6 +29,10 @@ const Step: React.FC<StepProps> = ({
   const isDropdown = answerType === 'DROPDOWN';
 
   if (!ready) return null;
+
+  const handleClose = useCallback(() => {
+    router.push('/auth/login');
+  }, [setStep]);
 
   const handleNext = useCallback((selectedAnswer: CraAnswer | null) => {
     if (!selectedAnswer) return;
@@ -54,6 +59,9 @@ const Step: React.FC<StepProps> = ({
   }, [activeStep, allSteps, onNext, onSkip, setStep, total]);
 
   const handleBack = useCallback(() => {
+    if (activeStep === 1) {
+      handleClose();
+    }
     const previousStep = findPreviousNonSkippedStep ? 
       findPreviousNonSkippedStep(activeStep) : 
       activeStep - 1;

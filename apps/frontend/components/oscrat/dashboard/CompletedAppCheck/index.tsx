@@ -1,7 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
+import { formatRiskLevel } from '@/utils/craForm';
 
-export default function App() {
+interface CompletedAppCheckProps {
+  riskLevel: string;
+}
+
+export default function CompletedAppCheck({ riskLevel }: CompletedAppCheckProps) {
   const { t, ready } = useTranslation('common');
 
   const handleAddProduct = () => {
@@ -10,8 +15,7 @@ export default function App() {
 
   if (!ready) return null;
 
-  // TODO: Get from form inside localstorage
-  const classification = 'Important - Class I';
+  const classification = formatRiskLevel(riskLevel);
 
   return (
     <div className="flex w-full justify-center">
