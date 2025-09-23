@@ -31,7 +31,7 @@ const Result: React.FC<ResultProps> = ({
     onTryAgain?.();
   };
   const handleBackToHome = () => {
-    router.push('/');
+    router.push('/teams');
   };
 
   // Render buttons based on eligibility
@@ -58,13 +58,13 @@ const Result: React.FC<ResultProps> = ({
     return (
       <>
       <Button
-        onClick={handleLogin}
+        onClick={handleRegister}
         className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
         text={t('register')}
         variant="normal"
       />
       <Button
-        onClick={handleRegister}
+        onClick={handleLogin}
         className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
         text={t('log-in')}
         variant="primary"
