@@ -116,6 +116,24 @@ export const productNameSchema = Yup.string()
   .min(1, 'oscrat.ui.validation.product-name-required')
   .max(40, 'oscrat.ui.validation.product-name-too-long');
 
+export const versionNameSchema = Yup.string()
+  .trim()
+  .min(1, 'oscrat.ui.validation.version-required')
+  .max(20, 'oscrat.ui.validation.version-max-length');
+
+export const acronymSchema = Yup.string()
+  .trim()
+  .min(2, 'oscrat.ui.validation.acronym-min-length')
+  .max(10, 'oscrat.ui.validation.acronym-max-length');
+
+export const productDescriptionSchema = Yup.string()
+  .trim()
+  .max(500, 'oscrat.ui.validation.description-max-length')
+  .transform((value) => {
+    if (!value) return value;
+    return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+  });
+
 export function sanitizeString(input: string): string {
   return DOMPurify.sanitize(input);
 }

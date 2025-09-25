@@ -61,7 +61,8 @@ const CraForm: React.FC<CraFormProps> = ({
         activeStep,
         skippedQuestions: Array.from(skippedQuestions),
         highestRiskLevel,
-        completed: true
+        completed: true,
+        completedAt: new Date().toISOString()
       };
       localStorage.setItem('craFormState', JSON.stringify(completedState));
     } else {

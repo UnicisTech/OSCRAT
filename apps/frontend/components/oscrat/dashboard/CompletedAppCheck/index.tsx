@@ -1,5 +1,7 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
+import { useTeamContext } from '@/context/TeamContext';
 import { formatRiskLevel } from '@/utils/craForm';
 
 interface CompletedAppCheckProps {
@@ -8,9 +10,11 @@ interface CompletedAppCheckProps {
 
 export default function CompletedAppCheck({ riskLevel }: CompletedAppCheckProps) {
   const { t, ready } = useTranslation('common');
+  const { slug: teamId } = useTeamContext();
+  const router = useRouter();
 
   const handleAddProduct = () => {
-    return null;
+    router.push(`/teams/${teamId}/products/add-product/cache`);
   };
 
   if (!ready) return null;

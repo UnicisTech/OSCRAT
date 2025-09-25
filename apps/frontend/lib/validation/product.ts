@@ -1,5 +1,10 @@
 import * as Yup from 'yup';
-import { productNameSchema } from '@/lib/validation/inputs';
+import { 
+  productNameSchema, 
+  versionNameSchema, 
+  acronymSchema, 
+  productDescriptionSchema 
+} from '@/lib/validation/inputs';
 import { OscratProductType, OscratProductCategory } from '@oscrat/model';
 
 /**
@@ -15,5 +20,28 @@ export const productCreateSchema = Yup.object({
     .required('oscrat.ui.validation.product-category-required'),
 });
 
+/**
+ * Product creation schema (from existing product)
+ */
+export const existingProductSchema = Yup.object({
+  sourceProductId: Yup.string().required('oscrat.ui.validation.source-product-required'),
+  acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
+  name: productNameSchema.required('oscrat.ui.validation.product-name-required'),
+  version: versionNameSchema.required('oscrat.ui.validation.version-required'),
+  description: productDescriptionSchema.optional(),
+});
+
+/**
+ * Product creation schema (from cache)
+ */
+export const cacheProductSchema = Yup.object({
+  acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
+  name: productNameSchema.required('oscrat.ui.validation.product-name-required'),
+  version: versionNameSchema.required('oscrat.ui.validation.version-required'),
+  description: productDescriptionSchema.optional(),
+});
+
 // Type exports
 export type ProductCreateData = Yup.InferType<typeof productCreateSchema>;
+export type ExistingProductData = Yup.InferType<typeof existingProductSchema>;
+export type CacheProductData = Yup.InferType<typeof cacheProductSchema>;

@@ -17,6 +17,7 @@ export interface FormState {
   skippedQuestions: number[];
   highestRiskLevel: string | null;
   completed?: boolean;
+  completedAt?: string;
 }
 
 export interface CraFormProps {

@@ -29,7 +29,7 @@ export function ProductListContent() {
   } = useProductFiltering(productsList);
 
   const navigateToAddPage = () => {
-    router.push(`${pathname}/new`);
+    router.push(`${pathname}/add-product`);
   };
 
   const handleShowMore = (productId: string) => {

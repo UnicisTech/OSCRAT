@@ -1,7 +1,8 @@
 import { 
   ApplicabilityQuestion, 
   RiskQuestion,
-  CraQuestion
+  CraQuestion,
+  OscratProductCategory
 } from '@oscrat/model';
 import { 
   FormAnswers, 
@@ -85,7 +86,8 @@ export const loadFormState = (): Partial<FormState> | null => {
       activeStep: parsed.activeStep || 1,
       skippedQuestions: parsed.skippedQuestions || [],
       highestRiskLevel: parsed.highestRiskLevel || null,
-      completed: parsed.completed || false
+      completed: parsed.completed || false,
+      completedAt: parsed.completedAt || null
     };
   } catch (error) {
     console.error('Failed to load form state:', error);
@@ -138,4 +140,20 @@ export const findPreviousNonSkippedStep = (
     }
   }
   return 1; 
+};
+
+/**
+ * Map CRA risk level to product category
+ */
+export const getProductCategoryFromRisk = (riskLevel: string): OscratProductCategory => {
+  switch (riskLevel) {
+    case 'CRITICAL':
+      return OscratProductCategory.CRITICAL;
+    case 'IMPORTANT_CLASS_I':
+      return OscratProductCategory.IMPORTANT_CLASS_I;
+    case 'IMPORTANT_CLASS_II':
+      return OscratProductCategory.IMPORTANT_CLASS_II;
+    default:
+      return OscratProductCategory.DEFAULT;
+  }
 };

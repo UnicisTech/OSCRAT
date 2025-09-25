@@ -12,6 +12,7 @@ const Result: React.FC<ResultProps> = ({
   isEligible,
   onTryAgain,
   highestRiskLevel,
+  teamSlug,
 }) => {
   const router = useRouter();
   const { t, ready } = useTranslation('common');
@@ -30,8 +31,10 @@ const Result: React.FC<ResultProps> = ({
   const handleTryAgain = () => {
     onTryAgain?.();
   };
-  const handleBackToHome = () => {
-    router.push('/teams');
+  const handleAddProduct = () => {
+    if (teamSlug) {
+      router.push(`/teams/${teamSlug}/products/add-product/cache`);
+    }
   };
 
   // Render buttons based on eligibility
@@ -40,9 +43,9 @@ const Result: React.FC<ResultProps> = ({
       return (
         <>
           <Button
-            onClick={handleBackToHome}
+            onClick={handleAddProduct}
             className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
-            text={t('oscrat.ui.back-to-home')}
+            text={t('oscrat.ui.add-product')}
             variant="normal"
           />
           <Button

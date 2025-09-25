@@ -57,6 +57,7 @@ export type ResultProps = {
   isEligible: boolean;
   onTryAgain?: () => void;
   highestRiskLevel?: string | null;
+  teamSlug?: string;
 };
 
 export type CraFormProps = {

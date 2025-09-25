@@ -4,9 +4,19 @@ import CraForm from '@/components/craForm';
 import Result from '@/components/craForm/result';
 import { FormPageState } from '@/types/craForm';
 import { clearFormState } from '@/utils/craForm';
+import { useTeamContext } from '@/context/TeamContext';
 
 const FormPage: React.FC = () => {
   const router = useRouter();
+  
+  // Try to get team context if available
+  let teamSlug: string | undefined;
+  try {
+    const teamContext = useTeamContext();
+    teamSlug = teamContext?.slug;
+  } catch {
+    teamSlug = undefined;
+  }
 
   const [state, setState] = useState<FormPageState>({
     showResult: false,
@@ -37,8 +47,9 @@ const FormPage: React.FC = () => {
       isNotEligible: false,
       highestRisk: null,
     });
-    
-    router.push('/form');
+  
+    const formPath = teamSlug ? `/teams/${teamSlug}/form` : '/form';
+    router.push(formPath);
   };
 
   const setIsNotEligible = (value: boolean) => {
@@ -59,6 +70,7 @@ const FormPage: React.FC = () => {
         isEligible={!state.isNotEligible}
         onTryAgain={handleTryAgain}
         highestRiskLevel={state.highestRisk}
+        teamSlug={teamSlug}
       />
     );
   }
