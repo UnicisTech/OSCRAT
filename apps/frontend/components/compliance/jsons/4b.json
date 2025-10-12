@@ -1,0 +1,380 @@
+[
+  {
+    "id": 1,
+    "areaOfRequirements": "Product compliance",
+    "content": [
+      {
+        "reqId": "IP1",
+        "requirement": "CRA Product Compliance",
+        "craReference": "Article 19 (1)",
+        "hint": "You should check if the manufacturer draw up the EU declaration of conformity in accordance with Article 28, and he claims a conformity with the CRA Annex I part I requirements.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP1-Q1",
+            "questionText": "Does the product with digital elements placed on the market meet the essential cybersecurity requirements specified in Annex I, Part I?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": true
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": true
+            }
+          },
+          {
+            "questionId": "IP1-Q2",
+            "questionText": "Are the procedures implemented by the manufacturer for the product with digital elements in line with the essential cybersecurity requirements regarding vulnerability handling, outlined in Annex I, Part II?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP1-Q3",
+            "questionText": "Before placing a product with digital elements on the market, was it ensured that the manufacturer has carried out the appropriate conformity assessment procedures as mentioned in Article 32 (see hint)?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP1-Q4",
+            "questionText": "Is the importer, upon a reasoned request from a market surveillance authority, able to provide all necessary information and documentation demonstrating the product with digital elements's compliance with the cybersecurity requirements in Annex I?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "IP2",
+        "requirement": "Technical documentation",
+        "craReference": "Article 19 (2)(b)",
+        "hint": "You should ensure that the manufacturer has prepared the technical documentation and that it can be made available to market surveillance authorities upon request. This obligation applies for at least 10 years after the product with digital elements has been placed on the market, or for the entire support period, whichever is longer.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP2-Q1",
+            "questionText": "Before placing the product with digital elements on the market, was it ensured that the manufacturer has prepared the technical documentation?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP2-Q2",
+            "questionText": "Is the technical documentation of the product with digital elements made available to market surveillance authorities upon request for at least 10 years after the product has been placed on the market?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "IP3",
+        "requirement": "CE marking",
+        "craReference": "Article 19 (2)(c)",
+        "hint": "You should check whether the product with digital elements bears the CE marking. CE marking must be clearly visible, readable, and permanent on the product with digital elements. If this isn’t possible due to the product’s nature, it should be placed on the packaging and in the EU declaration of conformity. For software products, the CE marking should appear either on the EU declaration of conformity or on a website that accompanies the software, where it must be easy for users to find.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP3-Q1",
+            "questionText": "Does the product with digital elements bear the CE marking?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "IP4",
+        "requirement": "EU declaration of conformity",
+        "craReference": "Article 19 (2)(c)",
+        "hint": "You must ensure that manufacturers provide either a full copy of the EU declaration of conformity or a simplified version along with the product with digital elements. If a simplified declaration is provided, it must include the exact internet address where the full EU declaration of conformity can be accessed.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP4-Q1",
+            "questionText": "Does the product with digital elements have the EU declaration of conformity?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP4-Q2",
+            "questionText": "Does the importer keep a copy of the EU declaration of conformity for at least 10 years after the product with digital elements has been placed on the market or for the support period, whichever is longer?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "IP5",
+        "requirement": "Accompanying Information",
+        "craReference": "Article 19 (2)(c)",
+        "hint": "You must ensure that the product with digital elements includes the information and user instructions specified in Annex II, provided in a language easily understood by users and market surveillance authorities. The product must be marked with a type, batch, or serial number to allow identification. If this is not possible, the identification details should be provided on the packaging or in a document accompanying the product. The manufacturer’s name, registered trade name or trademark, postal address, email address, other contact details, and, if applicable, the website for contacting the manufacturer must be included on the product, its packaging, or in accompanying documentation. Similarly, the importer’s name, registered trade name or trademark, postal address, email address, other digital contact details, and, if applicable, the website for contacting the importer must be provided on the product, its packaging, or in accompanying documentation. All contact details must be presented in a language easily understood by users and market surveillance authorities.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP5-Q1",
+            "questionText": "Is the product with digital elements accompanied by user information and instructions, as outlined in Annex II, provided in a language that is easily understandable by users and market surveillance authorities?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP5-Q2",
+            "questionText": "Is the product with digital elements marked for identification, and if not, are these details provided on the packaging or in a document accompanying the product by the manufacturer? (for detailed information, see the hint)?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP5-Q3",
+            "questionText": "Does the product with digital elements, its packaging, or a document accompanying the product include the manufacturer’s contact details? (for detailed information, see the hint)",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP5-Q4",
+            "questionText": "Does the product with digital elements or its packaging include the importer’s contact details, in a language easily understood by users and market surveillance authorities? (scope of detailed information in hint)",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "IP6",
+        "requirement": "Support period",
+        "craReference": "Article 19 (2)(d) Article 13 (19)",
+        "hint": "You shall ensure that the manufacturer has defined the support period. The end date of this support period, including at least the month and year, must be clearly and understandably specified at the time of purchase in an easily accessible way, and where applicable, on the product, its packaging, or by digital means.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP6-Q1",
+            "questionText": "Does the product with digital elements have a clearly stated end of support date?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "areaOfRequirements": "Procedures compliance",
+    "content": [
+      {
+        "reqId": "IO1",
+        "requirement": "Product Compliance Assurance Procedures",
+        "craReference": "Article 19(3)",
+        "hint": "If you consider or have reason to believe—based on information in your possession—that a product with digital elements or the processes implemented by the manufacturer do not comply with the essential cybersecurity requirements set out in Annex I, you shall not place the product on the market until the product or the manufacturer's processes have been brought into conformity with this Regulation.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IO1-Q1",
+            "questionText": "Is there a procedure in place to prevent the placement of non-compliant products on the market until conformity with the Regulation is ensured?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO1-Q2",
+            "questionText": "Does the importer have a procedure for taking immediate corrective measures to bring a non-compliant product with digital elements into conformity, or for withdrawing or recalling the product from the market if necessary?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "IO2",
+        "requirement": "Informing procedures",
+        "craReference": "Article 19(3)",
+        "hint": "Importers of products with digital elements shall have clear procedures in place for informing relevant parties when cybersecurity risks or regulatory non-compliance are identified. Specifically: If a product presents a significant cybersecurity risk, the importer shall inform both the manufacturer and the market surveillance authorities without undue delay. Where risks arise from non-technical factors, the importer shall inform the market surveillance authorities accordingly. Upon becoming aware of a vulnerability, the importer shall promptly inform the manufacturer. If the product presents a significant cybersecurity risk in one or more Member States, the importer shall immediately inform the market surveillance authorities in all affected Member States, providing full details, including any corrective actions taken. If the importer becomes aware that the manufacturer has ceased operations and is unable to fulfill its regulatory obligations, the importer shall notify the competent market surveillance authorities. Additionally, the importer shall, by any available means and to the extent possible, inform users of the situation and of any related risks.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IO2-Q1",
+            "questionText": "Does the importer have a procedure for informing the manufacturer and market surveillance authorities if a product with digital elements is found to pose significant risks in cyberspace?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q2",
+            "questionText": "Does the importer have a procedure for informing market surveillance authorities when it believes that a product with digital elements may pose a risk due to non-technical factors?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q3",
+            "questionText": "Does the organization have a procedure for promptly informing the manufacturer upon becoming aware of a vulnerability in a product with digital elements?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q4",
+            "questionText": "Does the importer have a procedure for informing the market surveillance authorities of the Member States in which the product was placed on the market, if the product presents a significant cybersecurity risk?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q5",
+            "questionText": "Does the importer have a procedure for informing market surveillance authorities if it becomes aware that the manufacturer of a product with digital elements has ceased operations and is unable to comply with regulatory requirements?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q6",
+            "questionText": "Does the importer have procedures to inform users if the manufacturer of a product with digital elements has ceased operations and cannot fulfill its obligations under the Regulation?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

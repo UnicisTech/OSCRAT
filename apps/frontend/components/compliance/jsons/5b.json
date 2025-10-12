@@ -1,0 +1,306 @@
+[
+  {
+    "id": 1,
+    "areaOfRequirements": "Product compliance",
+    "content": [
+      {
+        "reqId": "DP1",
+        "requirement": "CE marking",
+        "craReference": "Article 20 (2)(a)",
+        "hint": "Verify that the product with digital elements bears the CE marking. The CE marking should be placed on the product (or, where not possible, on the packaging or in a document accompanying the product / EU Declaration of Conformity).",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "DP1-Q1",
+            "questionText": "Does the product with digital elements bear the CE marking?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "DP2",
+        "requirement": "EU declaration of conformity",
+        "craReference": "Article 20 (2)(b); Article 13 (19)",
+        "hint": "Confirm that an EU Declaration of Conformity exists and is accessible (paper or electronic, or an internet address where it can be accessed).",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "DP2-Q1",
+            "questionText": "Does the product with digital elements have the EU declaration of conformity?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "DP3",
+        "requirement": "Accompanying information",
+        "craReference": "Article 20 (2)(b); Article 13 (18); Article 19 (4)",
+        "hint": "Ensure the product is marked with a type, batch or serial number, or another identification element. If that is not possible, include it on the packaging or in a document accompanying the product. The manufacturer’s name, registered trade name/mark, postal address, email/digital contact and website should be provided on the product, its packaging, or in a document. Contact details must be presented in a language easily understood by users and market surveillance authorities.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "DP3-Q1",
+            "questionText": "Is the product with digital elements marked (or is the marking present on the packaging or in an accompanying document)?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DP3-Q2",
+            "questionText": "Does the product with digital elements, its packaging, or a document accompanying the product include the manufacturer's contact details (in a language easily understood by users and market surveillance authorities)?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DP3-Q3",
+            "questionText": "Does the product with digital elements or its packaging include the importer’s contact details (in a language easily understood by users and market surveillance authorities)?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "DP4",
+        "requirement": "Support period",
+        "craReference": "Article 20 (2)(b); Article 13 (2); Article 13 (19)",
+        "hint": "Check that users are clearly informed of the support period (e.g., start and end date/year) and how security updates are provided throughout the period.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "DP4-Q1",
+            "questionText": "Does the product with digital elements include a clear statement of the support period (e.g., end date or year), including what is supported and how security updates are provided during the period?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "areaOfRequirements": "Procedures compliance",
+    "content": [
+      {
+        "reqId": "DO1",
+        "requirement": "Product Compliance Assurance Procedures",
+        "craReference": "Article 20 (3); Article 20 (4); Article 20 (5)",
+        "hint": "Distributors should have procedures to ensure products comply with CRA before market release, prevent distribution of non-compliant products, take corrective actions (withdrawal/recall) where non-compliance is suspected, promptly notify the manufacturer and market surveillance authorities of significant cybersecurity risks and corrective measures, and fully cooperate with authorities by providing requested documentation.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "DO1-Q1",
+            "questionText": "Is there a procedure to prevent distribution of non-compliant products until regulatory compliance is ensured?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO1-Q2",
+            "questionText": "Does the distributor have a procedure for taking corrective measures (e.g., withdrawing or recalling the product) when information suggests non-compliance?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO1-Q3",
+            "questionText": "Is there a procedure to notify market surveillance authorities about significant cybersecurity risks, non-compliance and corrective measures taken?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO1-Q4",
+            "questionText": "Upon reasoned request from a market surveillance authority, can the distributor provide all necessary information and documentation to demonstrate compliance with Annex I?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "DO2",
+        "requirement": "Informing procedures",
+        "craReference": "Article 20 (3); Article 20 (4); Article 20 (6)",
+        "hint": "Distributors should have procedures to inform the manufacturer and market surveillance authorities of significant risks or discovered vulnerabilities, notify authorities immediately if the manufacturer ceases operations and cannot meet obligations, and inform users when the manufacturer cannot fulfill regulatory responsibilities.",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "DO2-Q1",
+            "questionText": "Does the distributor have a procedure for informing the manufacturer and market surveillance authorities if a product is found to pose significant cybersecurity risks?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO2-Q2",
+            "questionText": "Does the distributor have a procedure for promptly informing the manufacturer upon becoming aware of a vulnerability in a product with digital elements?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO2-Q3",
+            "questionText": "Does the distributor have a procedure for informing market surveillance authorities if it becomes aware that the manufacturer has ceased operations and cannot meet regulatory obligations?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO2-Q4",
+            "questionText": "Does the distributor have procedures to inform users if the manufacturer has ceased operations and cannot fulfill regulatory responsibilities?",
+            "answerType": "boolean",
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
