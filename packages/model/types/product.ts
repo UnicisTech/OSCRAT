@@ -3,6 +3,7 @@ import {
   OscratProductCategory,
   OscratProductStatus,
   OscratProductComplianceStatus,
+  OscratProductVersionStatus,
   OscratReportingOrganization,
 } from '@prisma/client';
 import { OscratProductVersionSummary } from './version';
@@ -48,6 +49,10 @@ export interface OscratProductCreate {
   type: OscratProductType;
   productCategory: OscratProductCategory;
   createdBy: string;
+  initialVersion?: {
+    version: string;
+    status: OscratProductVersionStatus;
+  };
 }
 
 export interface OscratProductUpdate {

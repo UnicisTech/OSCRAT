@@ -2,21 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import CraForm from '@/components/craForm';
 import Result from '@/components/craForm/result';
-import { FormPageState } from '@/types/craForm';
+import { FormPageState, RiskLevel } from '@/types/craForm';
 import { clearFormState } from '@/utils/craForm';
-import { useTeamContext } from '@/context/TeamContext';
 
-const FormPage: React.FC = () => {
+interface FormPageProps {
+  teamSlug?: string;
+}
+
+const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
   const router = useRouter();
-  
-  // Try to get team context if available
-  let teamSlug: string | undefined;
-  try {
-    const teamContext = useTeamContext();
-    teamSlug = teamContext?.slug;
-  } catch {
-    teamSlug = undefined;
-  }
 
   const [state, setState] = useState<FormPageState>({
     showResult: false,
@@ -60,7 +54,7 @@ const FormPage: React.FC = () => {
     setState(prev => ({ ...prev, showResult: value }));
   };
 
-  const setHighestRisk = (value: string | null) => {
+  const setHighestRisk = (value: RiskLevel | null) => {
     setState(prev => ({ ...prev, highestRisk: value }));
   };
 

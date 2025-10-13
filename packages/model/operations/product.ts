@@ -204,6 +204,17 @@ export const createProduct = async (
       teamId: teamId,
       createdBy: data.createdBy,
       updatedBy: data.createdBy,
+      ...(data.initialVersion && {
+        versions: {
+          create: {
+            version: data.initialVersion.version,
+            status: data.initialVersion.status || OscratProductVersionStatus.ACTIVE,
+            teamId: teamId,
+            createdBy: data.createdBy,
+            updatedBy: data.createdBy,
+          },
+        },
+      }),
     },
     include: PRODUCT_DETAIL_INCLUDE,
   });

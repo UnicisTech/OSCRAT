@@ -15,7 +15,7 @@ export interface FormState {
   answers: FormAnswers;
   activeStep: number;
   skippedQuestions: number[];
-  highestRiskLevel: string | null;
+  highestRiskLevel: RiskLevel | null;
   completed?: boolean;
   completedAt?: string;
 }
@@ -23,13 +23,13 @@ export interface FormState {
 export interface CraFormProps {
   setIsNotEligible: (value: boolean) => void;
   setShowResult: (value: boolean) => void;
-  setHighestRisk: (value: string | null) => void;
+  setHighestRisk: (value: RiskLevel | null) => void;
 }
 
 export interface FormPageState {
   showResult: boolean;
   isNotEligible: boolean;
-  highestRisk: string | null;
+  highestRisk: RiskLevel | null;
 }
 
 export enum RiskLevel {

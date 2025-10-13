@@ -5,7 +5,8 @@ import {
 } from '@oscrat/model';
 import { 
   FormAnswers, 
-  FormState 
+  FormState,
+  RiskLevel
 } from '@/types/craForm';
 import {
   calculateHighestRiskFromAnswers,
@@ -18,7 +19,7 @@ import {
 
 interface UseCraFormProps {
   questions: (CraQuestion)[];
-  onHighestRiskChange?: (risk: string | null) => void;
+  onHighestRiskChange?: (risk: RiskLevel | null) => void;
 }
 
 interface UseCraFormReturn {
@@ -27,7 +28,7 @@ interface UseCraFormReturn {
   activeStep: number;
   skippedQuestions: Set<number>;
   selectedAnswer: CraAnswer | null;
-  highestRiskLevel: string | null;
+  highestRiskLevel: RiskLevel | null;
   
   // Actions
   handleAnswerChange: (
@@ -45,7 +46,7 @@ export const useCraForm = ({ questions, onHighestRiskChange }: UseCraFormProps):
   const [answers, setAnswers] = useState<FormAnswers>({});
   const [activeStep, setActiveStep] = useState(1);
   const [skippedQuestions, setSkippedQuestions] = useState<Set<number>>(new Set());
-  const [highestRiskLevel, setHighestRiskLevel] = useState<string | null>(null);
+  const [highestRiskLevel, setHighestRiskLevel] = useState<RiskLevel | null>(null);
   const isInitialLoadRef = useRef(true);
   const onHighestRiskChangeRef = useRef(onHighestRiskChange);
 

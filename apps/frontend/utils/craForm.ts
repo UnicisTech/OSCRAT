@@ -8,7 +8,8 @@ import {
   FormAnswers, 
   FormState, 
   RISK_LEVEL_PRIORITY,
-  isRiskAnswer 
+  isRiskAnswer,
+  RiskLevel
 } from '@/types/craForm';
 
 const LOCALSTORAGE_KEY = 'craFormState';
@@ -27,7 +28,7 @@ export const getStepNumberById = (
 /** 
  * Compare two risk levels and return the higher priority one
  */
-export const compareRiskLevels = (level1: string | null, level2: string): string => {
+export const compareRiskLevels = (level1: RiskLevel | null, level2: RiskLevel): RiskLevel => {
   if (!level1) return level2;
   const priority1 = RISK_LEVEL_PRIORITY[level1];
   const priority2 = RISK_LEVEL_PRIORITY[level2];
@@ -37,12 +38,12 @@ export const compareRiskLevels = (level1: string | null, level2: string): string
 /**
  * Calculate the highest risk level from all answers
  */
-export const calculateHighestRiskFromAnswers = (answers: FormAnswers): string | null => {
-  let highest: string | null = null;
+export const calculateHighestRiskFromAnswers = (answers: FormAnswers): RiskLevel | null => {
+  let highest: RiskLevel | null = null;
   
   Object.values(answers).forEach(({ answer }) => {
     if (isRiskAnswer(answer) && answer.riskLevel) {
-      highest = compareRiskLevels(highest, answer.riskLevel);
+      highest = compareRiskLevels(highest, answer.riskLevel as RiskLevel);
     }
   });
   
@@ -145,13 +146,13 @@ export const findPreviousNonSkippedStep = (
 /**
  * Map CRA risk level to product category
  */
-export const getProductCategoryFromRisk = (riskLevel: string): OscratProductCategory => {
+export const getProductCategoryFromRisk = (riskLevel: RiskLevel): OscratProductCategory => {
   switch (riskLevel) {
-    case 'CRITICAL':
+    case RiskLevel.CRITICAL:
       return OscratProductCategory.CRITICAL;
-    case 'IMPORTANT_CLASS_I':
+    case RiskLevel.IMPORTANT_CLASS_I:
       return OscratProductCategory.IMPORTANT_CLASS_I;
-    case 'IMPORTANT_CLASS_II':
+    case RiskLevel.IMPORTANT_CLASS_II:
       return OscratProductCategory.IMPORTANT_CLASS_II;
     default:
       return OscratProductCategory.DEFAULT;
