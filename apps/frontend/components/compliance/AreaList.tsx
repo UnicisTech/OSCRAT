@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
-import { ComplianceArea } from '@/types/compliance';
-import { FaPlay, FaCheckCircle } from 'react-icons/fa';
+import { ComplianceArea, ComplianceState } from '@/types/compliance';
+import { FaPlay, FaCheckCircle, FaChartPie, FaList } from 'react-icons/fa';
+import ComplianceDashboard from './ComplianceDashboard';
+import { exportComplianceToPDF } from './CompliancePDFExport';
 
 interface AreaListProps {
   areas: ComplianceArea[];
   completedAreas: Array<{ id: number; text: string }>;
   onAreaSelect: (areaIndex: number) => void;
   getAreaProgress: (areaId: number) => number;
+  complianceState: ComplianceState;
+  productId: string;
+  teamName: string;
+  productName: string;
 }
 
 const AreaList: React.FC<AreaListProps> = ({
@@ -15,16 +21,101 @@ const AreaList: React.FC<AreaListProps> = ({
   completedAreas,
   onAreaSelect,
   getAreaProgress,
+  complianceState,
+  productId,
+  teamName,
+  productName,
 }) => { 
   const { t, ready } = useTranslation('common');
+  const [showDashboard, setShowDashboard] = useState(false);
+
+  const handleExportPDF = async () => {
+    const pdfTranslations = {
+      reportTitle: t('oscrat.ui.dashboard.pdf.report-title'),
+      product: t('oscrat.ui.dashboard.pdf.product'),
+      organization: t('oscrat.ui.dashboard.pdf.organization'),
+      generated: t('oscrat.ui.dashboard.pdf.generated'),
+      overallProgress: t('oscrat.ui.dashboard.overall-progress'),
+      complete: t('oscrat.ui.dashboard.pdf.complete'),
+      of: t('oscrat.ui.dashboard.pdf.of'),
+      requirementsEvaluated: t('oscrat.ui.dashboard.requirements-evaluated'),
+      summaryStatistics: t('oscrat.ui.dashboard.pdf.summary-statistics'),
+      evaluated: t('oscrat.ui.dashboard.evaluated'),
+      notEvaluated: t('oscrat.ui.dashboard.not-evaluated'),
+      compliant: t('oscrat.ui.dashboard.compliant'),
+      partiallyCompliant: t('oscrat.ui.dashboard.partially-compliant'),
+      notCompliant: t('oscrat.ui.dashboard.not-compliant'),
+      notApplicable: t('oscrat.ui.dashboard.not-applicable'),
+      requirementsStatusSummary: t('oscrat.ui.dashboard.pdf.requirements-status-summary'),
+      id: t('oscrat.ui.dashboard.pdf.id'),
+      requirement: t('oscrat.ui.dashboard.pdf.requirement'),
+      status: t('oscrat.ui.dashboard.pdf.status'),
+      conformity: t('oscrat.ui.dashboard.pdf.conformity'),
+      page: t('oscrat.ui.dashboard.pdf.page'),
+      craReference: t('oscrat.ui.dashboard.pdf.cra-reference'),
+      hint: t('oscrat.ui.dashboard.pdf.hint'),
+      questionsAndAnswers: t('oscrat.ui.dashboard.pdf.questions-and-answers'),
+      answer: t('oscrat.ui.dashboard.pdf.answer'),
+      yes: t('oscrat.ui.dashboard.pdf.yes'),
+      no: t('oscrat.ui.dashboard.pdf.no'),
+      additionalInfo: t('oscrat.ui.dashboard.pdf.additional-info'),
+      evidence: t('oscrat.ui.dashboard.pdf.evidence'),
+      evidenceAttached: t('oscrat.ui.dashboard.pdf.evidence-attached'),
+      noAnswerProvided: t('oscrat.ui.dashboard.pdf.no-answer-provided'),
+      detailedAssessment: t('oscrat.ui.dashboard.pdf.detailed-assessment'),
+      area: t('oscrat.ui.dashboard.area'),
+    };
+    
+    await exportComplianceToPDF(
+      areas, 
+      complianceState, 
+      productId, 
+      teamName, 
+      productName,
+      pdfTranslations
+    );
+  };
   
   if (!ready) return null;
 
+  if (showDashboard) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-gray-800">
+            {t('oscrat.ui.areas-of-requirements')}
+          </h2>
+          <button
+            onClick={() => setShowDashboard(false)}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <FaList />
+            {t('oscrat.ui.dashboard.view-list')}
+          </button>
+        </div>
+        <ComplianceDashboard
+          complianceData={areas}
+          state={complianceState}
+          onExportPDF={handleExportPDF}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">
-        {t('oscrat.ui.areas-of-requirements')}
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-800">
+          {t('oscrat.ui.areas-of-requirements')}
+        </h2>
+        <button
+          onClick={() => setShowDashboard(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <FaChartPie />
+          {t('oscrat.ui.dashboard.view-dashboard')}
+        </button>
+      </div>
       
       <div className="grid gap-4">
         {areas.map((area, index) => {

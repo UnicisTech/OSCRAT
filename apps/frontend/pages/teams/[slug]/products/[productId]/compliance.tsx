@@ -63,7 +63,9 @@ const CompliancePage = () => {
       <ComplianceForm
         complianceData={complianceData}
         productId={productId}
-        teamRole={team?.orgRoles?.[0]}
+        teamRole={team.orgRoles?.[0]}
+        teamName={team.name}
+        productName={product.name}
       />
     </div>
   );

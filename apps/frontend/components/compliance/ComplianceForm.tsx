@@ -9,12 +9,16 @@ interface ComplianceFormProps {
   complianceData: ComplianceArea[];
   productId: string;
   teamRole: OscratOrganizationRole;
+  teamName: string;
+  productName: string;
 }
 
 const ComplianceForm: React.FC<ComplianceFormProps> = ({
   complianceData,
   productId,
-  teamRole, 
+  teamRole,
+  teamName,
+  productName, 
 }) => {
   const { t, ready } = useTranslation('common');
   const [state, setState] = useState<ComplianceState>(() => {
@@ -25,8 +29,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     if (saved) {
       try {
         return JSON.parse(saved);
-      } catch (e) {
-        console.error('Error parsing saved compliance state:', e);
+      } catch {
+        // Error parsing saved state, will create new state
       }
     }
 
@@ -193,6 +197,10 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       completedAreas={state.completedAreas}
       onAreaSelect={handleAreaSelect}
       getAreaProgress={getAreaProgress}
+      complianceState={state}
+      productId={productId}
+      teamName={teamName}
+      productName={productName}
     />
   );
 };
