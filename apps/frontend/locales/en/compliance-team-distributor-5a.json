@@ -1,0 +1,17 @@
+{
+  "common.yes": "Yes",
+  "common.no": "No",
+  "area-1.name": "Procedures compliance",
+  "area-1.DO1.requirement": "Product Compliance Assurance Procedures",
+  "area-1.DO1.hint": "Distributors should have clear procedures to ensure products comply with CRA regulations before market release. These should include: preventing distribution of non‐compliant products until resolved; taking corrective actions (withdrawal/recall) when non‐compliance is suspected; promptly notifying the manufacturer and market surveillance authorities of significant cybersecurity risks and corrective measures; fully cooperating with authorities by providing requested documentation in an understandable language and in paper or electronic form.",
+  "area-1.DO1.questions.Q1.text": "Is there a procedure to prevent distribution of non‐compliant products until regulatory compliance is ensured?",
+  "area-1.DO1.questions.Q2.text": "Does the distributor have a procedure for taking corrective measures, such as withdrawing a product from the market when available information suggests the product or the manufacturer's procedures do not comply with the Regulation?",
+  "area-1.DO1.questions.Q3.text": "Is there a procedure to notify market surveillance authorities about significant cybersecurity risks, including non‐compliance and corrective measures taken?",
+  "area-1.DO1.questions.Q4.text": "Is the distributor, upon a reasoned request from a market surveillance authority, able to provide all necessary information and documentation demonstrating the product's compliance with the cybersecurity requirements in Annex I?",
+  "area-1.DO2.requirement": "Informing procedures",
+  "area-1.DO2.hint": "Distributors should have clear procedures to: inform the manufacturer and market surveillance authorities promptly if a product with digital elements poses significant cybersecurity risks or if a vulnerability is discovered; notify market surveillance authorities immediately if the manufacturer ceases operations and cannot meet regulatory obligations; and inform users, to the extent possible, if the manufacturer cannot fulfill regulatory responsibilities.",
+  "area-1.DO2.questions.Q1.text": "Does the distributor have a procedure for informing the manufacturer and market surveillance authorities if a product with digital elements is found to pose significant cybersecurity risks?",
+  "area-1.DO2.questions.Q2.text": "Does the distributor have a procedure for promptly informing the manufacturer upon becoming aware of a vulnerability in a product with digital elements?",
+  "area-1.DO2.questions.Q3.text": "Does the distributor have a procedure for informing market surveillance authorities if it becomes aware that the manufacturer of a product with digital elements has ceased operations and cannot fulfill regulatory requirements?",
+  "area-1.DO2.questions.Q4.text": "Does the distributor have procedures to inform users if the manufacturer of a product with digital elements has ceased operations and cannot fulfill its regulatory responsibilities?"
+}

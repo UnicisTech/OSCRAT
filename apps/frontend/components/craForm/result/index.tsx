@@ -1,7 +1,7 @@
 import React from 'react';
 import { LuFileWarning, LuCheckCircle } from 'react-icons/lu';
 import Button from '@/components/button';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { ResultProps } from '@oscrat/model';
 import { useTranslation } from 'next-i18next';
 import { useSession } from 'next-auth/react';
@@ -32,9 +32,7 @@ const Result: React.FC<ResultProps> = ({
     onTryAgain?.();
   };
   const handleAddProduct = () => {
-    if (teamSlug) {
       router.push(`/teams/${teamSlug}/products/add-product/cache`);
-    }
   };
 
   // Render buttons based on eligibility
@@ -127,7 +125,7 @@ const Result: React.FC<ResultProps> = ({
         </div>
         
         <h1 className="mb-4 text-2xl font-semibold text-gray-800 md:text-3xl">
-          {t('oscrat.ui.continue-eligibility-check')}
+          { isAuthenticated ? t('oscrat.ui.product-requires-assessment') : t('oscrat.ui.continue-eligibility-check')}
         </h1>
         
         <p className="mb-6 text-sm text-gray-600 md:text-base">
@@ -138,7 +136,7 @@ const Result: React.FC<ResultProps> = ({
             </span>
           )}.
           <br />
-          {t('oscrat.ui.log-in-or-register')}
+          {!isAuthenticated && t('oscrat.ui.log-in-or-register')}
         </p>
         
         <div className="mb-8 flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">

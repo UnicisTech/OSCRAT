@@ -26,3 +26,4 @@ export * from './password';
 export * from './tasks';
 export * from './webhooks';
 export * from './comments';
+export * from './compliance';

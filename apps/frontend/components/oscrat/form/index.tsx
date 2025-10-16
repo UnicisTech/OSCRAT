@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import CraForm from '@/components/craForm';
 import Result from '@/components/craForm/result';
 import { FormPageState, RiskLevel } from '@/types/craForm';

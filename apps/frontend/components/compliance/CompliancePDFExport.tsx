@@ -203,6 +203,7 @@ interface CompliancePDFDocumentProps {
   organizationName: string;
   productName: string;
   translations: PDFTranslations;
+  translateComplianceFn: (key: string) => string;
 }
 
 const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
@@ -212,6 +213,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
   organizationName,
   productName,
   translations: t,
+  translateComplianceFn: tc,
 }) => {
   const allRequirements = complianceData.flatMap(area =>
     area.content.map(req => {
@@ -232,8 +234,8 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
 
       return {
         id: req.reqId,
-        name: req.requirement,
-        areaName: area.areaOfRequirements,
+        name: tc(req.requirement),
+        areaName: tc(area.areaOfRequirements),
         isEvaluated,
         conformityStatus,
         completionPercentage,
@@ -372,7 +374,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
             {req.requirement.hint && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>{t.hint}</Text>
-                <Text style={styles.answer}>{req.requirement.hint}</Text>
+                <Text style={styles.answer}>{tc(req.requirement.hint)}</Text>
               </View>
             )}
 
@@ -383,7 +385,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
                 return (
                   <View key={qIndex} style={styles.questionSection}>
                     <Text style={styles.question}>
-                      Q{qIndex + 1}: {question.questionText}
+                      Q{qIndex + 1}: {tc(question.questionText)}
                     </Text>
                     {answer && (
                       <>
@@ -427,7 +429,8 @@ export const exportComplianceToPDF = async (
   productId: string,
   organizationName: string,
   productName: string,
-  translations: PDFTranslations
+  translations: PDFTranslations,
+  translateComplianceFn: (key: string) => string
 ) => {
   const blob = await pdf(
     <CompliancePDFDocument
@@ -437,6 +440,7 @@ export const exportComplianceToPDF = async (
       organizationName={organizationName}
       productName={productName}
       translations={translations}
+      translateComplianceFn={translateComplianceFn}
     />
   ).toBlob();
 

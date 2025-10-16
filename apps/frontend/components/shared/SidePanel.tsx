@@ -9,6 +9,7 @@ import {
   UserCircleIcon,
   DocumentCheckIcon,
   ChartBarIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
 import app from '@/lib/app';
 import TeamDropdown from './TeamDropdown';
@@ -75,6 +76,14 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
       name: t('Reports'),
       href: '#',
       icon: ExclamationCircleIcon,
+    },
+    {
+      name: t('Compliance'),
+      href: `/teams/${slug}/compliance`,
+      icon: ClipboardDocumentCheckIcon,
+      className: 'stroke-blue-600',
+      active:
+        activePathname?.startsWith(`/teams/${slug}/compliance`)
     },
   ];
 

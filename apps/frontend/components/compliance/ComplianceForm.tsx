@@ -4,6 +4,7 @@ import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/
 import { OscratOrganizationRole } from '@oscrat/model';
 import { AreaList, RequirementQuestionnaire } from '@/components/compliance';
 import toast from 'react-hot-toast';
+import { getComplianceNamespace } from '@/lib/compliance/translations';
 
 interface ComplianceFormProps {
   complianceData: ComplianceArea[];
@@ -11,62 +12,103 @@ interface ComplianceFormProps {
   teamRole: OscratOrganizationRole;
   teamName: string;
   productName: string;
+  storageKeyPrefix?: string;
 }
+
+const createInitialState = (
+  productId: string,
+  teamRole: OscratOrganizationRole
+): ComplianceState => ({
+  productId,
+  teamRole,
+  assessments: [],
+  currentAreaIndex: null,
+  currentRequirementIndex: null,
+  completedAreas: [],
+  completedRequirements: [],
+  startedAt: new Date().toISOString(),
+  lastUpdatedAt: new Date().toISOString(),
+  completed: false,
+  started: false,
+});
 
 const ComplianceForm: React.FC<ComplianceFormProps> = ({
   complianceData,
   productId,
   teamRole,
   teamName,
-  productName, 
+  productName,
+  storageKeyPrefix = 'compliance',
 }) => {
-  const { t, ready } = useTranslation('common');
+  // Determine compliance namespace based on storage key prefix
+  const complianceType = storageKeyPrefix === 'team_compliance' ? 'team' : 'version';
+  const complianceNamespace = getComplianceNamespace(teamRole, complianceType);
+  
+  const { t, ready } = useTranslation(['common', complianceNamespace]);
+  const storageKey = `${storageKeyPrefix}_${productId}`;
+  
   const [state, setState] = useState<ComplianceState>(() => {
     // Load from localStorage or create new state
-    const storageKey = `compliance_${productId}`;
     const saved = localStorage.getItem(storageKey);
     
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const savedState = JSON.parse(saved) as ComplianceState;
+        // Continue with saved state regardless of completion status
+        // User can explicitly reset if they want to start over
+        return savedState;
       } catch {
         // Error parsing saved state, will create new state
       }
     }
 
-    return {
-      productId,
-      teamRole,
-      assessments: [],
-      currentAreaIndex: -1,
-      currentRequirementIndex: -1,
-      completedAreas: [],
-      completedRequirements: [],
-      startedAt: new Date().toISOString(),
-      lastUpdatedAt: new Date().toISOString(),
-    };
+    return createInitialState(productId, teamRole);
   });
 
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
-    const storageKey = `compliance_${productId}`;
     localStorage.setItem(storageKey, JSON.stringify(state));
-  }, [state, productId]);
+  }, [state, storageKey]);
 
   const handleAreaSelect = useCallback((areaIndex: number) => {
-    setState(prev => ({
-      ...prev,
-      currentAreaIndex: areaIndex,
-      currentRequirementIndex: 0,
-      lastUpdatedAt: new Date().toISOString(),
-    }));
+    setState(prev => {
+      const area = complianceData[areaIndex];
+      
+      // Find the first incomplete requirement in this area
+      let firstIncompleteIndex = 0;
+      for (let i = 0; i < area.content.length; i++) {
+        const req = area.content[i];
+        const isCompleted = prev.completedRequirements.some(cr => cr.id === req.reqId);
+        if (!isCompleted) {
+          firstIncompleteIndex = i;
+          break;
+        }
+      }
+      
+      return {
+        ...prev,
+        currentAreaIndex: areaIndex,
+        currentRequirementIndex: firstIncompleteIndex,
+        lastUpdatedAt: new Date().toISOString(),
+      };
+    });
     setShowQuestionnaire(true);
-  }, []);
+  }, [complianceData]);
 
   const handleRequirementComplete = useCallback((assessment: RequirementAssessment) => {
+    if (state.currentAreaIndex === null || state.currentRequirementIndex === null) {
+      return;
+    }
+
+    let allAreasComplete = false;
+    
     setState(prev => {
+      if (prev.currentAreaIndex === null || prev.currentRequirementIndex === null) {
+        return prev;
+      }
+
       const newAssessments = [...prev.assessments];
       const existingIndex = newAssessments.findIndex(
         a => a.requirementId === assessment.requirementId
@@ -102,6 +144,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         });
       }
 
+      allAreasComplete = completedAreas.length === complianceData.length;
+
       // Move to next requirement or complete area
       const nextRequirementIndex = prev.currentRequirementIndex + 1;
 
@@ -112,6 +156,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         completedAreas,
         currentRequirementIndex: nextRequirementIndex,
         lastUpdatedAt: new Date().toISOString(),
+        completed: allAreasComplete,
+        started: true,
       };
     });
 
@@ -125,8 +171,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         area: currentArea.areaOfRequirements 
       }));
       
-      // Check if all areas are completed
-      if (state.completedAreas.length + 1 === complianceData.length) {
+ 
+      if (allAreasComplete) {
         toast.success(t('oscrat.ui.compliance-assessment-complete'));
         // TODO: Save to productCompliance in DB, once specs logic is more clear
         alert('Done! All compliance areas have been assessed.');
@@ -137,13 +183,13 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     }
     // If there are more requirements in the current area, the component will automatically
     // show the next one because currentRequirementIndex was updated
-  }, [complianceData, state.completedAreas.length, state.currentAreaIndex, state.currentRequirementIndex, t]);
+  }, [complianceData, state.currentAreaIndex, state.currentRequirementIndex, t]);
 
   const handleBack = useCallback(() => {
-    if (state.currentRequirementIndex > 0) {
+    if (state.currentRequirementIndex !== null && state.currentRequirementIndex > 0) {
       setState(prev => ({
         ...prev,
-        currentRequirementIndex: prev.currentRequirementIndex - 1,
+        currentRequirementIndex: prev.currentRequirementIndex! - 1,
         lastUpdatedAt: new Date().toISOString(),
       }));
     } else {
@@ -167,7 +213,12 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     return state.assessments.find(a => a.requirementId === requirementId);
   }, [state.assessments]);
 
-  if (showQuestionnaire && state.currentAreaIndex >= 0) {
+  const handleReset = useCallback(() => {
+    localStorage.removeItem(storageKey);
+    setState(createInitialState(productId, teamRole));
+  }, [storageKey, productId, teamRole]);
+
+  if (showQuestionnaire && state.currentAreaIndex !== null && state.currentRequirementIndex !== null) {
     const currentArea = complianceData[state.currentAreaIndex];
     const currentRequirement = currentArea.content[state.currentRequirementIndex];
 
@@ -187,6 +238,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         existingAssessment={getRequirementAssessment(currentRequirement.reqId)}
         onComplete={handleRequirementComplete}
         onBack={handleBack}
+        complianceNamespace={complianceNamespace}
       />
     );
   }
@@ -201,6 +253,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       productId={productId}
       teamName={teamName}
       productName={productName}
+      onReset={handleReset}
+      complianceNamespace={complianceNamespace}
     />
   );
 };

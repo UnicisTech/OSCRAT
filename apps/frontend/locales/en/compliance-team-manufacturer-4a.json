@@ -1,0 +1,17 @@
+{
+  "area-1.IO1.hint": "If you consider or have reason to believe—based on information in your possession—that a product with digital elements or the processes implemented by the manufacturer do not comply with the essential cybersecurity requirements set out in Annex I, you shall not place the product on the market until the product and the manufacturer’s processes have been brought into conformity with this Regulation.",
+  "area-1.IO1.questions.Q1.text": "Is there a procedure in place to prevent the placement of non-compliant products on the market until conformity with the Regulation is ensured?",
+  "area-1.IO1.questions.Q2.text": "Does the importer have a procedure for taking immediate corrective measures to bring a non-compliant product with digital elements into conformity, or for withdrawing or recalling the product from the market if necessary?",
+  "area-1.IO1.requirement": "Product Compliance Assurance Procedures",
+  "area-1.IO2.hint": "Importers of products with digital elements shall have clear procedures in place for informing relevant parties when cybersecurity risks or regulatory non-compliance are identified. Specifically: ...",
+  "area-1.IO2.questions.Q1.text": "Does the importer have a procedure for informing the manufacturer and market surveillance authorities if a product with digital elements is found to pose significant risks?",
+  "area-1.IO2.questions.Q2.text": "Does the importer have a procedure for informing market surveillance authorities when it believes that a product with digital elements may pose a risk due to non-technical factors?",
+  "area-1.IO2.questions.Q3.text": "Does the organization have a procedure for promptly informing the manufacturer upon becoming aware of a vulnerability in a product with digital elements?",
+  "area-1.IO2.questions.Q4.text": "Does the importer have a procedure for notifying the market surveillance authorities of the Member States in which the product was placed on the market, if the product presents a significant cybersecurity risk?",
+  "area-1.IO2.questions.Q5.text": "Does the importer have a procedure for informing the market surveillance authorities if it becomes aware that the manufacturer of a product with digital elements has ceased operations and cannot comply with regulatory requirements?",
+  "area-1.IO2.questions.Q6.text": "Does the importer have procedures to inform users if the manufacturer of a product with digital elements has ceased operations and cannot fulfil its obligations under the Regulation?",
+  "area-1.IO2.requirement": "Informing procedures",
+  "area-1.name": "Procedures compliance",
+  "common.no": "No",
+  "common.yes": "Yes"
+}

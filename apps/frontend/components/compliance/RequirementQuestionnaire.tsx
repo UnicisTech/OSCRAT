@@ -7,6 +7,7 @@ import {
   ComplianceAnswer,
   ComplianceStatus
 } from '@/types/compliance';
+import { ComplianceNamespace } from '@/lib/compliance/translations';
 import { QuestionStep, ComplianceStatusSelector } from '@/components/compliance';
 import { LuInfo } from 'react-icons/lu';
 
@@ -18,6 +19,7 @@ interface RequirementQuestionnaireProps {
   existingAssessment?: RequirementAssessment;
   onComplete: (assessment: RequirementAssessment) => void;
   onBack: () => void;
+  complianceNamespace: ComplianceNamespace;
 }
 
 const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
@@ -28,8 +30,9 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
   existingAssessment,
   onComplete,
   onBack,
+  complianceNamespace,
 }) => {
-  const { t, ready } = useTranslation('common');
+  const { t, ready } = useTranslation(['common', complianceNamespace]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<ComplianceAnswer[]>(() => 
     existingAssessment?.requirementId === requirement.reqId 
@@ -98,9 +101,9 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
   const handleStatusSelect = (status: ComplianceStatus) => {
     const assessment: RequirementAssessment = {
       requirementId: requirement.reqId,
-      requirementText: requirement.requirement,
+      requirementText: t(requirement.requirement, { ns: complianceNamespace }),
       areaId: area.id,
-      areaText: area.areaOfRequirements,
+      areaText: t(area.areaOfRequirements, { ns: complianceNamespace }),
       answers,
       complianceStatus: status,
       assessedAt: new Date().toISOString(),
@@ -124,7 +127,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
           </h2>
           
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium text-gray-700 mb-2">{requirement.requirement}</h3>
+            <h3 className="font-medium text-gray-700 mb-2">{t(requirement.requirement, { ns: complianceNamespace })}</h3>
             <p className="text-sm text-gray-600">
               {t('oscrat.ui.answered-all-questions', { count: requirement.questions.length })}
             </p>
@@ -145,7 +148,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-xl font-semibold text-gray-800">
-            {area.areaOfRequirements}
+            {t(area.areaOfRequirements, { ns: complianceNamespace })}
           </h2>
           <span className="text-sm text-gray-600">
             {t('oscrat.ui.requirement-n-of-m', { 
@@ -169,7 +172,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {requirement.requirement}
+              {t(requirement.requirement, { ns: complianceNamespace })}
             </h3>
             <p className="text-sm text-gray-500">
               {t('oscrat.ui.cra-reference')}: {requirement.craReference}
@@ -189,7 +192,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
             {requirement.hint && (
               <>
                 <h4 className="font-medium text-blue-900 mb-2">{t('oscrat.ui.hint')}</h4>
-                <p className="text-sm text-blue-800 leading-relaxed">{requirement.hint}</p>
+                <p className="text-sm text-blue-800 leading-relaxed">{t(requirement.hint, { ns: complianceNamespace })}</p>
               </>
             )}
             {requirement.genericTask && (
@@ -217,6 +220,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
         onPrevious={handlePreviousQuestion}
         isFirst={currentQuestionIndex === 0}
         isLast={isLastQuestion}
+        complianceNamespace={complianceNamespace}
       />
     </div>
   );

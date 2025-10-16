@@ -2,9 +2,12 @@ import React from 'react';
 import type { NextPage } from 'next';
 import FormComponent from '@/components/oscrat/form';
 import { withTeamLayout } from '@/lib/layout-helpers';
+import { useTeamContext } from '@/context/TeamContext';
 
 const TeamFormPage: NextPage & { getLayout?: typeof withTeamLayout } = () => {
-  return <FormComponent />;
+  const { slug } = useTeamContext();
+  
+  return <FormComponent teamSlug={slug} />;
 };
 
 TeamFormPage.getLayout = withTeamLayout;

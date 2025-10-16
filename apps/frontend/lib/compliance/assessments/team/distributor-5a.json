@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "areaOfRequirements": "area-1.name",
+    "content": [
+      {
+        "reqId": "DO1",
+        "requirement": "area-1.DO1.requirement",
+        "craReference": "Article 20(3); Article 20(4); Article 20(5)",
+        "hint": "area-1.DO1.hint",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "DO1-Q1",
+            "questionText": "area-1.DO1.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "uploadOption": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO1-Q2",
+            "questionText": "area-1.DO1.questions.Q2.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "uploadOption": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO1-Q3",
+            "questionText": "area-1.DO1.questions.Q3.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "uploadOption": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO1-Q4",
+            "questionText": "area-1.DO1.questions.Q4.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "uploadOption": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      },
+      {
+        "reqId": "DO2",
+        "requirement": "area-1.DO2.requirement",
+        "craReference": "Article 20(3); Article 20(4); Article 20(6)",
+        "hint": "area-1.DO2.hint",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "DO2-Q1",
+            "questionText": "area-1.DO2.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "uploadOption": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO2-Q2",
+            "questionText": "area-1.DO2.questions.Q2.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "uploadOption": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO2-Q3",
+            "questionText": "area-1.DO2.questions.Q3.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "uploadOption": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "DO2-Q4",
+            "questionText": "area-1.DO2.questions.Q4.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "uploadOption": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

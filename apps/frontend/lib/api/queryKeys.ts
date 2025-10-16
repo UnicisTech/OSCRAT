@@ -207,4 +207,12 @@ export const queryKeys = {
   scim: {
     v2: (directory: string[]) => ['scim', 'v2.0', ...directory] as const,
   },
+  compliance: {
+    data: (teamSlug: string, params: { role: string }) => 
+      ['teams', teamSlug, 'compliance', 'data', params.role] as const,
+  },
+  teamCompliance: {
+    data: (teamSlug: string, params: { role: string }) => 
+      ['teams', teamSlug, 'team-compliance', 'data', params.role] as const,
+  },
 } as const;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ComplianceQuestion, ComplianceAnswer } from '@/types/compliance';
+import { ComplianceNamespace } from '@/lib/compliance/translations';
 import { FaUpload, FaFile, FaTimes } from 'react-icons/fa';
 
 interface QuestionStepProps {
@@ -12,6 +13,7 @@ interface QuestionStepProps {
   onPrevious: () => void;
   isFirst: boolean;
   isLast: boolean;
+  complianceNamespace: ComplianceNamespace;
 }
 
 const QuestionStep: React.FC<QuestionStepProps> = ({
@@ -23,11 +25,18 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
   onPrevious,
   isFirst,
   isLast,
+  complianceNamespace,
 }) => {
-  const { t, ready } = useTranslation('common');
-  const [answer, setAnswer] = useState<string | boolean>(
-    existingAnswer?.answer ?? ''
-  );
+  const { t, ready } = useTranslation(['common', complianceNamespace]);
+  
+  const getInitialAnswer = () => {
+    if (existingAnswer?.answer !== undefined) {
+      return existingAnswer.answer;
+    }
+    return question.answerType === 'boolean' ? null : '';
+  };
+
+  const [answer, setAnswer] = useState<string | boolean | null>(getInitialAnswer());
   const [additionalInformation, setAdditionalInformation] = useState<string>(
     existingAnswer?.additionalInformation || ''
   );
@@ -43,7 +52,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
       setAdditionalInformation(existingAnswer.additionalInformation || '');
       setHasExistingEvidence(!!existingAnswer.evidence);
     } else {
-      setAnswer('');
+      setAnswer(question.answerType === 'boolean' ? null : '');
       setAdditionalInformation('');
       setEvidenceFile(null);
       setHasExistingEvidence(false);
@@ -82,22 +91,25 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
     if (question.answerType === 'boolean' && question.options) {
       return (
         <div className="space-y-3">
-          {question.options.map((option) => (
-            <label
-              key={option}
-              className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <input
-                type="radio"
-                name={`question-${question.questionId}`}
-                value={option}
-                checked={answer === (option === 'Yes')}
-                onChange={() => setAnswer(option === 'Yes')}
-                className="mr-3 text-blue-600 "
-              />
-              <span className="text-gray-700">{option}</span>
-            </label>
-          ))}
+          {question.options.map((option, index) => {
+            const booleanValue = index === 0;
+            return (
+              <label
+                key={option}
+                className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+              >
+                <input
+                  type="radio"
+                  name={`question-${question.questionId}`}
+                  value={String(booleanValue)}
+                  checked={answer === booleanValue}
+                  onChange={() => setAnswer(booleanValue)}
+                  className="mr-3 text-blue-600 "
+                />
+                <span className="text-gray-700">{t(option, { ns: complianceNamespace })}</span>
+              </label>
+            );
+          })}
         </div>
       );
     }
@@ -120,7 +132,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
   const isAnswerValid = () => {
     // Check main answer
     const hasValidAnswer = question.answerType === 'boolean'
-      ? answer !== '' && answer !== null && answer !== undefined
+      ? answer === true || answer === false
       : answer && typeof answer === 'string' && answer.trim().length > 0;
     
     if (!hasValidAnswer) return false;
@@ -154,7 +166,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
           </span>
         </div>
         <h3 className="text-lg font-medium text-gray-900">
-          {question.questionText}
+          {t(question.questionText, { ns: complianceNamespace })}
         </h3>
       </div>
 

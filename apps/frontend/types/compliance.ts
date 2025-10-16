@@ -59,10 +59,12 @@ export interface ComplianceState {
   productId: string;
   teamRole: string;
   assessments: RequirementAssessment[];
-  currentAreaIndex: number;
-  currentRequirementIndex: number;
+  currentAreaIndex: number | null;
+  currentRequirementIndex: number | null;
   completedAreas: Array<{ id: number; text: string }>;
   completedRequirements: Array<{ id: string; text: string }>;
   startedAt: string;
   lastUpdatedAt: string;
+  completed: boolean;
+  started: boolean;
 }

@@ -1,0 +1,380 @@
+[
+  {
+    "id": 1,
+    "areaOfRequirements": "area-1.name",
+    "content": [
+      {
+        "reqId": "IP1",
+        "requirement": "area-1.IP1.requirement",
+        "craReference": "Article 19 (1)",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP1-Q1",
+            "questionText": "area-1.IP1.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": true
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": true
+            }
+          },
+          {
+            "questionId": "IP1-Q2",
+            "questionText": "area-1.IP1.questions.Q2.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP1-Q3",
+            "questionText": "area-1.IP1.questions.Q3.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP1-Q4",
+            "questionText": "area-1.IP1.questions.Q4.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-1.IP1.hint"
+      },
+      {
+        "reqId": "IP2",
+        "requirement": "area-1.IP2.requirement",
+        "craReference": "Article 19 (2)(b)",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP2-Q1",
+            "questionText": "area-1.IP2.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP2-Q2",
+            "questionText": "area-1.IP2.questions.Q2.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-1.IP2.hint"
+      },
+      {
+        "reqId": "IP3",
+        "requirement": "area-1.IP3.requirement",
+        "craReference": "Article 19 (2)(c)",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP3-Q1",
+            "questionText": "area-1.IP3.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-1.IP3.hint"
+      },
+      {
+        "reqId": "IP4",
+        "requirement": "area-1.IP4.requirement",
+        "craReference": "Article 19 (2)(c)",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP4-Q1",
+            "questionText": "area-1.IP4.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP4-Q2",
+            "questionText": "area-1.IP4.questions.Q2.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-1.IP4.hint"
+      },
+      {
+        "reqId": "IP5",
+        "requirement": "area-1.IP5.requirement",
+        "craReference": "Article 19 (2)(c)",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP5-Q1",
+            "questionText": "area-1.IP5.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP5-Q2",
+            "questionText": "area-1.IP5.questions.Q2.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP5-Q3",
+            "questionText": "area-1.IP5.questions.Q3.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IP5-Q4",
+            "questionText": "area-1.IP5.questions.Q4.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-1.IP5.hint"
+      },
+      {
+        "reqId": "IP6",
+        "requirement": "area-1.IP6.requirement",
+        "craReference": "Article 19 (2)(d) Article 13 (19)",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IP6-Q1",
+            "questionText": "area-1.IP6.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-1.IP6.hint"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "areaOfRequirements": "area-2.name",
+    "content": [
+      {
+        "reqId": "IO1",
+        "requirement": "area-2.IO1.requirement",
+        "craReference": "Article 19(3)",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IO1-Q1",
+            "questionText": "area-2.IO1.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO1-Q2",
+            "questionText": "area-2.IO1.questions.Q2.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-2.IO1.hint"
+      },
+      {
+        "reqId": "IO2",
+        "requirement": "area-2.IO2.requirement",
+        "craReference": "Article 19(3)",
+        "genericTask": "",
+        "questions": [
+          {
+            "questionId": "IO2-Q1",
+            "questionText": "area-2.IO2.questions.Q1.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q2",
+            "questionText": "area-2.IO2.questions.Q2.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q3",
+            "questionText": "area-2.IO2.questions.Q3.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q4",
+            "questionText": "area-2.IO2.questions.Q4.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q5",
+            "questionText": "area-2.IO2.questions.Q5.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "IO2-Q6",
+            "questionText": "area-2.IO2.questions.Q6.text",
+            "answerType": "boolean",
+            "options": [
+              "common.yes",
+              "common.no"
+            ],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-2.IO2.hint"
+      }
+    ]
+  }
+]
