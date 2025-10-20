@@ -1,24 +1,9 @@
-import { PrismaClient, type Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, WorkerJobStatus, WorkerJobType } from '@prisma/client';
 import { format } from 'date-fns';
-import {
-  createAttachment,
-  createAttachmentWithTx,
-  CreateAttachmentParams,
-} from './attachment';
+import { randomUUID } from 'crypto';
+import { createAttachmentWithTx } from './attachment';
 import { slugify } from '../utils/slugify';
-
-export interface CreateSbomReportParams {
-  jobId: string;
-  versionId: string;
-  productId: string;
-  sbomData: any;
-  createdBy: string; // User ID who triggered the SBOM generation
-  sbomFile: {
-    filename: string;
-    fileData: Buffer;
-    mimeType?: string;
-  };
-}
+import { SbomSource, createWorkerJobWithTx } from './workerJob';
 
 export interface SbomReportSummary {
   id: string;
@@ -44,6 +29,46 @@ export interface SbomReportSummary {
   createdAt: Date;
 }
 
+/** Report-centric aggregated type for SBOM reports */
+export interface SbomReportDetails {
+  id: string;
+  versionId: string;
+  productId: string;
+  status: WorkerJobStatus;
+  sbomData: any | null;
+  createdAt: Date;
+  updatedAt: Date;
+
+  job: {
+    id: string;
+    source: SbomSource;
+    status: WorkerJobStatus;
+    createdAt: Date;
+    processStartTime?: Date;
+    processEndTime?: Date;
+    errCode?: string;
+    errMessage?: string;
+    triggeredByUser: {
+      id: string;
+      name: string | null;
+      email: string;
+    };
+  };
+
+  attachment?: {
+    id: string;
+    name: string;
+    description?: string;
+    fileSize: number;
+    mimeType?: string;
+  };
+
+  latestVulnerabilityScan?: {
+    id: string;
+    status: WorkerJobStatus;
+  };
+}
+
 /** Include for SBOM report summary queries */
 const SBOM_REPORT_SUMMARY_INCLUDE = {
   job: {
@@ -64,6 +89,53 @@ const SBOM_REPORT_SUMMARY_INCLUDE = {
       fileSize: true,
       mimeType: true,
     },
+  },
+} as const;
+
+/** Include for SBOM report details queries */
+const SBOM_REPORT_DETAILS_INCLUDE = {
+  job: {
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      createdAt: true,
+      processStartTime: true,
+      processEndTime: true,
+      errCode: true,
+      errMessage: true,
+      triggeredByUser: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  },
+  attachment: {
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      fileSize: true,
+      mimeType: true,
+    },
+  },
+  vulnerabilityScans: {
+    select: {
+      id: true,
+      job: {
+        select: {
+          status: true,
+        },
+      },
+      createdAt: true,
+    },
+    orderBy: {
+      createdAt: 'desc' as const,
+    },
+    take: 1,
   },
 } as const;
 
@@ -98,62 +170,54 @@ const transformToSbomReportSummary = (
   createdAt: report.createdAt,
 });
 
-/** Create a new SBOM report */
-export const createSbomReport = async (
-  prisma: PrismaClient,
-  params: CreateSbomReportParams
-): Promise<SbomReportSummary> => {
-  console.log(`[SBOM Report Operations] Creating SBOM report:`, {
-    jobId: params.jobId,
-    versionId: params.versionId,
-    productId: params.productId,
-    filename: params.sbomFile.filename,
-    fileSize: params.sbomFile.fileData.length,
-  });
+/** Transform Prisma SBOM report to SbomReportDetails */
+const transformToSbomReportDetails = (
+  report: Prisma.SbomReportGetPayload<{
+    include: typeof SBOM_REPORT_DETAILS_INCLUDE;
+  }>
+): SbomReportDetails => {
+  const source = report.job.type === WorkerJobType.REPO_GENERATE_SBOM ? SbomSource.REPO : SbomSource.FILE;
+  const latestScan = report.vulnerabilityScans?.[0];
 
-  const report = await prisma.$transaction(async (tx) => {
-    // Create the SBOM report first
-    const sbomReport = await tx.sbomReport.create({
-      data: {
-        jobId: params.jobId,
-        versionId: params.versionId,
-        productId: params.productId,
-        sbomData: params.sbomData,
+  return {
+    id: report.id,
+    versionId: report.versionId,
+    productId: report.productId,
+    status: report.job.status,
+    sbomData: report.sbomData,
+    createdAt: report.createdAt,
+    updatedAt: report.updatedAt,
+    job: {
+      id: report.job.id,
+      source,
+      status: report.job.status,
+      createdAt: report.job.createdAt,
+      processStartTime: report.job.processStartTime ?? undefined,
+      processEndTime: report.job.processEndTime ?? undefined,
+      errCode: report.job.errCode ?? undefined,
+      errMessage: report.job.errMessage ?? undefined,
+      triggeredByUser: {
+        id: report.job.triggeredByUser.id,
+        name: report.job.triggeredByUser.name,
+        email: report.job.triggeredByUser.email,
       },
-    });
-
-    // Create the attachment for the SBOM file
-    await createAttachmentWithTx(tx, {
-      name: params.sbomFile.filename,
-      description: 'SBOM Report File',
-      fileData: params.sbomFile.fileData,
-      fileSize: params.sbomFile.fileData.length,
-      mimeType: params.sbomFile.mimeType,
-      sbomReportId: sbomReport.id,
-      createdBy: params.createdBy,
-    });
-
-    // Fetch the complete report with attachment
-    const completeReport = await tx.sbomReport.findUnique({
-      where: { id: sbomReport.id },
-      include: SBOM_REPORT_SUMMARY_INCLUDE,
-    });
-
-    if (!completeReport) {
-      throw new Error(`SBOM report ${sbomReport.id} not found after creation`);
-    }
-
-    console.log(`[SBOM Report Operations] SBOM report created:`, {
-      id: sbomReport.id,
-      jobId: sbomReport.jobId,
-      versionId: sbomReport.versionId,
-      productId: sbomReport.productId,
-    });
-
-    return completeReport;
-  });
-
-  return transformToSbomReportSummary(report);
+    },
+    attachment: report.attachment
+      ? {
+          id: report.attachment.id,
+          name: report.attachment.name,
+          description: report.attachment.description ?? undefined,
+          fileSize: report.attachment.fileSize,
+          mimeType: report.attachment.mimeType ?? undefined,
+        }
+      : undefined,
+    latestVulnerabilityScan: latestScan
+      ? {
+          id: latestScan.id,
+          status: latestScan.job.status,
+        }
+      : undefined,
+  };
 };
 
 /** Get SBOM reports for a specific product */
@@ -270,7 +334,6 @@ export const getSbomReportFile = async (
 /** Get product and version names for SBOM filename generation */
 export const getProductVersionNames = async (
   prisma: PrismaClient,
-  productId: string,
   versionId: string
 ): Promise<{ productName: string; versionName: string } | null> => {
   const version = await prisma.oscratProductVersion.findUnique({
@@ -301,4 +364,228 @@ export const generateSbomFilename = (
   const timestamp = format(new Date(), 'yyyyMMdd-HHmmss');
 
   return `sbom-${slugify(productName)}-${slugify(versionName)}-${timestamp}.cyclonedx.xml`;
+};
+
+/** Create SBOM report with job (report-first approach) */
+export interface CreateSbomReportWithJobParams {
+  versionId: string;
+  productId: string;
+  jobType: 'REPO_GENERATE_SBOM' | 'FILE_IMPORT_SBOM';
+  jobPayload: any;
+  triggeredByUserId: string;
+  teamId: string;
+}
+
+export const createSbomReportWithJob = async (
+  prisma: PrismaClient,
+  params: CreateSbomReportWithJobParams
+): Promise<SbomReportDetails> => {
+  console.log(`[SBOM Report Operations] Creating SBOM report with job:`, {
+    versionId: params.versionId,
+    productId: params.productId,
+    jobType: params.jobType,
+    triggeredByUserId: params.triggeredByUserId,
+  });
+
+  const result = await prisma.$transaction(async (tx) => {
+    // 1. Pre-generate the report ID
+    const reportId = randomUUID();
+
+    // 2. Create job using helper with reportId in payload
+    const job = await createWorkerJobWithTx(tx, {
+      type: params.jobType,
+      triggeredByUserId: params.triggeredByUserId,
+      contextTeamId: params.teamId,
+      contextProductId: params.productId,
+      contextVersionId: params.versionId,
+      payload: {
+        ...params.jobPayload,
+        reportId, // Inject reportId into payload
+      },
+    });
+
+    // 3. Create report with pre-generated ID
+    const sbomReport = await tx.sbomReport.create({
+      data: {
+        id: reportId, // Use pre-generated ID
+        jobId: job.id,
+        versionId: params.versionId,
+        productId: params.productId,
+        sbomData: Prisma.JsonNull,
+      },
+    });
+
+    const completeReport = await tx.sbomReport.findUnique({
+      where: { id: sbomReport.id },
+      include: SBOM_REPORT_DETAILS_INCLUDE,
+    });
+
+    if (!completeReport) {
+      throw new Error(`SBOM report ${sbomReport.id} not found after creation`);
+    }
+
+    console.log(`[SBOM Report Operations] Created SBOM report and job:`, {
+      reportId: completeReport.id,
+      jobId: job.id,
+      status: completeReport.job.status,
+    });
+
+    return completeReport;
+  });
+
+  return transformToSbomReportDetails(result);
+};
+
+/** Get SBOM reports with details for a version */
+export const getSbomReportsWithDetails = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string,
+  limit: number = 50
+): Promise<SbomReportDetails[]> => {
+  console.log(`[SBOM Report Operations] Getting SBOM reports with details:`, {
+    teamId,
+    versionId,
+    limit,
+  });
+
+  const reports = await prisma.sbomReport.findMany({
+    where: {
+      versionId,
+      version: {
+        product: {
+          teamId,
+        },
+      },
+    },
+    include: SBOM_REPORT_DETAILS_INCLUDE,
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  console.log(
+    `[SBOM Report Operations] Found ${reports.length} SBOM reports with details`
+  );
+
+  return reports.map(transformToSbomReportDetails);
+};
+
+/** Get SBOM report with details by ID */
+export const getSbomReportDetailsById = async (
+  prisma: PrismaClient,
+  teamId: string,
+  reportId: string
+): Promise<SbomReportDetails | null> => {
+  console.log(`[SBOM Report Operations] Getting SBOM report details by ID:`, {
+    teamId,
+    reportId,
+  });
+
+  const report = await prisma.sbomReport.findFirst({
+    where: {
+      id: reportId,
+      version: {
+        product: {
+          teamId,
+        },
+      },
+    },
+    include: SBOM_REPORT_DETAILS_INCLUDE,
+  });
+
+  if (!report) {
+    console.log(
+      `[SBOM Report Operations] SBOM report not found or not accessible: ${reportId}`
+    );
+    return null;
+  }
+
+  return transformToSbomReportDetails(report);
+};
+
+/** Update SBOM report (used by job runner when job completes) */
+export interface UpdateSbomReportParams {
+  reportId: string;
+  sbomData?: any;
+  sbomFile?: {
+    filename: string;
+    fileData: Buffer;
+    mimeType?: string;
+  };
+  createdBy: string;
+}
+
+export const updateSbomReport = async (
+  prisma: PrismaClient,
+  params: UpdateSbomReportParams
+): Promise<void> => {
+  console.log(`[SBOM Report Operations] Updating SBOM report:`, {
+    reportId: params.reportId,
+    hasSbomData: !!params.sbomData,
+    hasSbomFile: !!params.sbomFile,
+  });
+
+  await prisma.$transaction(async (tx) => {
+    await tx.sbomReport.update({
+      where: { id: params.reportId },
+      data: {
+        sbomData: params.sbomData ?? null,
+      },
+    });
+
+    if (params.sbomFile) {
+      await createAttachmentWithTx(tx, {
+        name: params.sbomFile.filename,
+        description: 'SBOM Report File',
+        fileData: params.sbomFile.fileData,
+        fileSize: params.sbomFile.fileData.length,
+        mimeType: params.sbomFile.mimeType,
+        sbomReportId: params.reportId,
+        createdBy: params.createdBy,
+      });
+    }
+  });
+
+  console.log(`[SBOM Report Operations] SBOM report updated successfully:`, {
+    reportId: params.reportId,
+  });
+};
+
+/** Delete SBOM report by ID */
+export const deleteSbomReport = async (
+  prisma: PrismaClient,
+  teamId: string,
+  reportId: string
+): Promise<void> => {
+  console.log(`[SBOM Report Operations] Deleting SBOM report:`, {
+    teamId,
+    reportId,
+  });
+
+  const report = await prisma.sbomReport.findFirst({
+    where: {
+      id: reportId,
+      version: {
+        product: {
+          teamId,
+        },
+      },
+    },
+    select: { id: true },
+  });
+
+  if (!report) {
+    throw new Error(
+      `SBOM report ${reportId} not found or not accessible for team ${teamId}`
+    );
+  }
+
+  // Delete the report (cascade will handle job, attachment, file, and vulnerability scans)
+  await prisma.sbomReport.delete({
+    where: { id: reportId },
+  });
+
+  console.log(
+    `[SBOM Report Operations] Successfully deleted SBOM report ${reportId}`
+  );
 };

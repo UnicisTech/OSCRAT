@@ -44,6 +44,7 @@ export * from './types/assessment';
 export * from './types/product';
 export * from './types/version';
 export * from './types/vulnerabilities';
+export * from './types/vulnerabilityScan';
 export * from './types/incidents';
 export * from './types/repository';
 export * from './types/team';
@@ -54,10 +55,15 @@ export * from './types/jobPayloads';
 export { ERROR_CODES, type ErrorCode } from './constants/errorCodes';
 
 // Export specific operation types needed by frontend
-export type { SbomWorkerJob } from './operations/workerJob';
-export type { SbomReportSummary } from './operations/sbomReport';
+export type { SbomReportDetails, SbomReportSummary } from './operations/sbomReport';
+export type { VulnerabilityScanReportDetails, VulnerabilityScanReportSummary } from './operations/vulnerabilityScanReport';
+export { VulnerabilityScanSource, SbomSource } from './operations/workerJob';
 export type { CreateFileParams, FileData } from './operations/file';
 export type {
   AttachmentWithFile,
   CreateAttachmentParams,
 } from './operations/attachment';
+export type {
+  SbomReportScanVulnerabilitiesPayload,
+  SbomReportScanVulnerabilitiesResult,
+} from './types/jobPayloads';

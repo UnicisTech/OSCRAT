@@ -1,21 +1,33 @@
 import {
-  useGetSbomJobs,
-  useCreateRepoSbomJob,
-  useCreateFileSbomJob,
-  useDeleteSbomJob,
-  useInvalidateSbomJobs,
+  useGetSbomReports,
+  useCreateRepoSbomReport,
+  useCreateFileSbomReport,
+  useDeleteSbomReport,
+  useInvalidateSbomReports,
+  useGetVulnerabilityScanReports,
+  useCreateRepoVulnerabilityScanReport,
+  useCreateSbomReportVulnerabilityScan,
+  useDeleteVulnerabilityScanReport,
+  useInvalidateVulnerabilityScanReports,
 } from '@/lib/api/hooks/oscrat/jobs';
-import type { CreateSbomJobRequest } from '@/lib/api/endpoints/oscrat/jobs';
-import type { SbomWorkerJob } from '@oscrat/model';
+import type {
+  CreateSbomJobRequest,
+  CreateVulnerabilityScanJobRequest,
+  CreateSbomReportScanJobRequest,
+} from '@/lib/api/endpoints/oscrat/jobs';
+import type {
+  SbomReportDetails,
+  VulnerabilityScanReportDetails,
+} from '@oscrat/model/operations';
 
 /**
- * Hook specifically for SBOM jobs for a version (both REPO and FILE types)
+ * Hook for SBOM reports for a version (both REPO and FILE types)
  * @param teamId Team ID
  * @param productId Product ID that owns the version
  * @param versionId Version ID
  * @param options Optional configuration to control queries
  */
-export function useOscratVersionSbomJobs(
+export function useOscratVersionSbomReports(
   teamId: string,
   productId: string,
   versionId: string,
@@ -24,58 +36,130 @@ export function useOscratVersionSbomJobs(
   const enabled = options?.enabled !== false;
 
   const {
-    data: jobs,
-    isLoading: isFetchingJobs,
+    data: reports,
+    isLoading: isFetchingReports,
     isError,
     error,
-  } = useGetSbomJobs(teamId, productId, versionId, { enabled });
+  } = useGetSbomReports(teamId, productId, versionId, { enabled });
 
-  // Mutations for different job operations
-  const createRepoSbomJobMutation = useCreateRepoSbomJob(
+  // Mutations for different report operations
+  const createRepoSbomReportMutation = useCreateRepoSbomReport(
     teamId,
     productId,
     versionId
   );
-  const createFileSbomJobMutation = useCreateFileSbomJob(
+  const createFileSbomReportMutation = useCreateFileSbomReport(
     teamId,
     productId,
     versionId
   );
-  const deleteSbomJobMutation = useDeleteSbomJob(teamId, productId, versionId);
-  const invalidateSbomJobs = useInvalidateSbomJobs();
+  const deleteSbomReportMutation = useDeleteSbomReport(teamId, productId, versionId);
+  const invalidateSbomReports = useInvalidateSbomReports();
 
-  const createRepoSbomJob = async (data: CreateSbomJobRequest) => {
-    return createRepoSbomJobMutation.mutateAsync(data);
+  const createRepoSbomReport = async (data: CreateSbomJobRequest) => {
+    return createRepoSbomReportMutation.mutateAsync(data);
   };
 
-  const createFileSbomJob = async (file: File) => {
+  const createFileSbomReport = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return createFileSbomJobMutation.mutateAsync(formData);
+    return createFileSbomReportMutation.mutateAsync(formData);
   };
 
-  const deleteSbomJob = async (jobId: string) => {
-    return deleteSbomJobMutation.mutateAsync(jobId);
+  const deleteSbomReport = async (reportId: string) => {
+    return deleteSbomReportMutation.mutateAsync(reportId);
   };
 
-  const refreshJobs = () => {
-    return invalidateSbomJobs(teamId, versionId);
+  const refreshReports = () => {
+    return invalidateSbomReports(teamId, versionId);
   };
 
   const isLoading =
-    isFetchingJobs ||
-    createRepoSbomJobMutation.isPending ||
-    createFileSbomJobMutation.isPending ||
-    deleteSbomJobMutation.isPending;
+    isFetchingReports ||
+    createRepoSbomReportMutation.isPending ||
+    createFileSbomReportMutation.isPending ||
+    deleteSbomReportMutation.isPending;
 
   return {
-    jobs,
+    reports,
     isLoading,
     isError,
     error,
-    createRepoSbomJob,
-    createFileSbomJob,
-    deleteSbomJob,
-    refreshJobs,
+    createRepoSbomReport,
+    createFileSbomReport,
+    deleteSbomReport,
+    refreshReports,
+  };
+}
+
+/**
+ * Hook for vulnerability scan reports for a version
+ * @param teamId Team ID
+ * @param productId Product ID that owns the version
+ * @param versionId Version ID
+ * @param options Optional configuration to control queries
+ */
+export function useOscratVersionVulnerabilityScanReports(
+  teamId: string,
+  productId: string,
+  versionId: string,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled !== false;
+
+  const {
+    data: reports,
+    isLoading: isFetchingReports,
+    isError,
+    error,
+  } = useGetVulnerabilityScanReports(teamId, productId, versionId, { enabled });
+
+  // Mutations for different report operations
+  const createRepoVulnerabilityScanReportMutation =
+    useCreateRepoVulnerabilityScanReport(teamId, productId, versionId);
+  const createSbomReportVulnerabilityScanMutation =
+    useCreateSbomReportVulnerabilityScan(teamId, productId, versionId);
+  const deleteVulnerabilityScanReportMutation = useDeleteVulnerabilityScanReport(
+    teamId,
+    productId,
+    versionId
+  );
+  const invalidateVulnerabilityScanReports = useInvalidateVulnerabilityScanReports();
+
+  const createRepoVulnerabilityScanReport = async (
+    data: CreateVulnerabilityScanJobRequest
+  ) => {
+    return createRepoVulnerabilityScanReportMutation.mutateAsync(data);
+  };
+
+  const createSbomReportVulnerabilityScan = async (
+    data: CreateSbomReportScanJobRequest
+  ) => {
+    return createSbomReportVulnerabilityScanMutation.mutateAsync(data);
+  };
+
+  const deleteVulnerabilityScanReport = async (reportId: string) => {
+    return deleteVulnerabilityScanReportMutation.mutateAsync(reportId);
+  };
+
+  const refreshReports = () => {
+    return invalidateVulnerabilityScanReports(teamId, versionId);
+  };
+
+  const isLoading =
+    isFetchingReports ||
+    createRepoVulnerabilityScanReportMutation.isPending ||
+    createSbomReportVulnerabilityScanMutation.isPending ||
+    deleteVulnerabilityScanReportMutation.isPending;
+
+  return {
+    reports,
+    isLoading,
+    isError,
+    error,
+    createRepoVulnerabilityScanReport,
+    createSbomReportVulnerabilityScan,
+    deleteVulnerabilityScanReport,
+    refreshReports,
   };
 }

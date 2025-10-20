@@ -1,7 +1,7 @@
 {
   "phases": {
     "setup": {
-      "nixPkgs": ["...", "syft"]
+      "nixPkgs": ["...", "syft", "grype"]
     }
   }
 }

@@ -7,7 +7,7 @@ import type {
 import type { OscratRepositoryWithRelations } from '@oscrat/model/types/repository';
 import { getRepositoryById } from '@oscrat/model/operations/repository';
 import {
-  createSbomReport,
+  updateSbomReport,
   getProductVersionNames,
   generateSbomFilename,
 } from '@oscrat/model/operations/sbomReport';
@@ -94,7 +94,6 @@ async function generateSbomForRepository(
     console.log(`[SBOM Job] Creating SBOM report...`);
     const names = await getProductVersionNames(
       prisma,
-      repository.version.product.id,
       repository.version.id
     );
 
@@ -102,10 +101,13 @@ async function generateSbomForRepository(
       ? generateSbomFilename(names.productName, names.versionName)
       : path.basename(cycloneDxXmlPath);
 
-    const sbomReport = await createSbomReport(prisma, {
-      jobId: job.id,
-      versionId: repository.version.id,
-      productId: repository.version.product.id,
+    // Get report ID from payload (injected during job creation)
+    const payload = job.payload as unknown as RepoGenerateSbomPayload;
+    const reportId = payload.reportId;
+
+    // Update the existing report with data (status comes from job)
+    await updateSbomReport(prisma, {
+      reportId,
       sbomData: sbomSummary,
       createdBy: job.triggeredByUserId,
       sbomFile: {
@@ -115,16 +117,28 @@ async function generateSbomForRepository(
       },
     });
 
-    console.log(`[SBOM Job] Completed successfully. Report ID: ${sbomReport.id}`);
+    console.log(`[SBOM Job] Completed successfully. Report ID: ${reportId}`);
 
     return {
       repositoryId: repository.id,
-      sbomData: sbomReport.id,
+      sbomData: reportId,
       generatedAt: new Date().toISOString(),
     };
 
   } catch (error) {
     console.error(`[SBOM Job] Job ${job.id} failed:`, error);
+
+    // Update the report to FAILED status
+    try {
+      const reportWithJob = await prisma.workerJob.findUnique({
+        where: { id: job.id },
+        include: { sbomReport: true },
+      });
+
+    } catch (updateError) {
+      console.error(`[SBOM Job] Failed to update report status:`, updateError);
+    }
+
     await saveJobError(error, job, prisma);
     throw error;
   }

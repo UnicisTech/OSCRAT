@@ -99,6 +99,12 @@ export const queryKeys = {
             'jobs',
             'sbom',
           ] as const,
+        vulnerabilityScan: (teamId: string, projectId: string) =>
+          [
+            ...queryKeys.oscrat.projects.detail(teamId, projectId),
+            'jobs',
+            'vulnerability-scan',
+          ] as const,
       },
       versions: {
         all: (teamId: string, productId: string) =>
@@ -139,12 +145,36 @@ export const queryKeys = {
             ] as const,
         },
         jobs: {
-          sbom: (teamId: string, versionId: string) =>
-            [
-              ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
-              'jobs',
-              'sbom',
-            ] as const,
+          sbom: {
+            all: (teamId: string, versionId: string) =>
+              [
+                ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+                'jobs',
+                'sbom',
+              ] as const,
+            detail: (teamId: string, versionId: string, reportId: string) =>
+              [
+                ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+                'jobs',
+                'sbom',
+                reportId,
+              ] as const,
+          },
+          vulnerabilityScan: {
+            all: (teamId: string, versionId: string) =>
+              [
+                ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+                'jobs',
+                'vulnerability-scan',
+              ] as const,
+            detail: (teamId: string, versionId: string, reportId: string) =>
+              [
+                ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+                'jobs',
+                'vulnerability-scan',
+                reportId,
+              ] as const,
+          },
         },
         attachments: {
           all: (teamId: string, versionId: string) =>

@@ -337,6 +337,8 @@ enum OscratRepositoryAuthType {
 enum WorkerJobType {
   REPO_GENERATE_SBOM
   FILE_IMPORT_SBOM
+  REPO_SCAN_VULNERABILITIES
+  SBOM_REPORT_SCAN_VULNERABILITIES
 }
 
 enum WorkerJobStatus {
@@ -355,6 +357,7 @@ enum OscratProductVersionStatus {
   ARCHIVED
   WITHDRAWN
 }
+
 
 // OSCRAT Models
 
@@ -399,13 +402,14 @@ model OscratProductVersion {
   teamId String
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  assessments     OscratProductAssessment[]
-  vulnerabilities OscratProductVulnerability[]
-  incidents       OscratProductIncident[]
-  repository      OscratRepository?
-  sbomReports     SbomReport[]
-  attachments     Attachment[]
-  workerJobs      WorkerJob[]
+  assessments              OscratProductAssessment[]
+  vulnerabilities          OscratProductVulnerability[]
+  incidents                OscratProductIncident[]
+  repository               OscratRepository?
+  sbomReports              SbomReport[]
+  vulnerabilityScanReports VulnerabilityScanReport[]
+  attachments              Attachment[]
+  workerJobs               WorkerJob[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -564,10 +568,10 @@ model WorkerJob {
   // Context fields - team is mandatory, others optional
   contextTeamId    String
   contextTeam      Team @relation(fields: [contextTeamId], references: [id], onDelete: Cascade)
-  
+
   contextProductId String?
   contextProduct   OscratProduct? @relation(fields: [contextProductId], references: [id], onDelete: Cascade)
-  
+
   contextVersionId String?
   contextVersion   OscratProductVersion? @relation(fields: [contextVersionId], references: [id], onDelete: Cascade)
 
@@ -580,7 +584,8 @@ model WorkerJob {
   errMessage String?
   errCode    String?
 
-  sbomReport SbomReport?
+  sbomReport              SbomReport? @relation("SbomReportJob")
+  vulnerabilityScanReport VulnerabilityScanReport? @relation("VulnerabilityScanReportJob")
 
   @@index([status, type])
   @@index([contextVersionId, type])
@@ -592,16 +597,18 @@ model SbomReport {
   id String @id @default(uuid())
 
   jobId String    @unique
-  job   WorkerJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job   WorkerJob @relation("SbomReportJob", fields: [jobId], references: [id], onDelete: Cascade)
 
   versionId String
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
   productId String // Denormalized for easier queries
 
-  sbomData Json
+  sbomData Json?
 
   attachment Attachment?
+
+  vulnerabilityScans VulnerabilityScanReport[] @relation("SbomToVulnerabilityScan")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -610,6 +617,34 @@ model SbomReport {
   @@index([productId])
   @@index([versionId, createdAt])
   @@index([productId, createdAt])
+}
+
+model VulnerabilityScanReport {
+  id String @id @default(uuid())
+
+  jobId String    @unique
+  job   WorkerJob @relation("VulnerabilityScanReportJob", fields: [jobId], references: [id], onDelete: Cascade)
+
+  versionId String
+  version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  productId String // Denormalized for easier queries
+
+  scanData Json?
+
+  attachment Attachment?
+
+  sourceSbomReportId String?
+  sourceSbomReport   SbomReport? @relation("SbomToVulnerabilityScan", fields: [sourceSbomReportId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([versionId])
+  @@index([productId])
+  @@index([versionId, createdAt])
+  @@index([productId, createdAt])
+  @@index([sourceSbomReportId])
 }
 
 // File Models
@@ -644,21 +679,25 @@ model Attachment {
   // Polymorphic associations
   taskId Int?
   task   Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  
+
   versionId String?
   version   OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: Cascade)
-  
+
   sbomReportId String? @unique
   sbomReport   SbomReport? @relation(fields: [sbomReportId], references: [id], onDelete: Cascade)
-  
+
+  vulnerabilityScanReportId String? @unique
+  vulnerabilityScanReport   VulnerabilityScanReport? @relation(fields: [vulnerabilityScanReportId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdBy String
-  
+
   createdByUser User @relation("AttachmentCreatedBy", fields: [createdBy], references: [id])
-  
+
   @@index([taskId])
   @@index([versionId])
   @@index([sbomReportId])
+  @@index([vulnerabilityScanReportId])
   @@index([name])
 }

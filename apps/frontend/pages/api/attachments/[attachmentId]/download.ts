@@ -45,6 +45,8 @@ const handleGET = async (
       // TODO: Implement version permission check
     } else if (attachment.sbomReportId) {
       // TODO: Implement SBOM report permission check
+    } else if (attachment.vulnerabilityScanReportId) {
+      // TODO: Implement vulnerability scan report permission check
     } else {
       return res.status(400).json({
         data: null,

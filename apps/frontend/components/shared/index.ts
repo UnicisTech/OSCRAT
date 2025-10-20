@@ -18,3 +18,4 @@ export { default as FullScreenModal } from './FullScreenModal';
 export { default as Breadcrumb } from './Breadcrumb';
 export { default as SidePanel } from './SidePanel';
 export { default as Divider } from './Divider';
+export { default as PaginationControls } from './PaginationControls';

@@ -5,7 +5,7 @@ import type {
   FileImportSbomResult,
 } from '@oscrat/model/types/jobPayloads';
 import {
-  createSbomReport,
+  updateSbomReport,
   getProductVersionNames,
   generateSbomFilename,
 } from '@oscrat/model/operations/sbomReport';
@@ -61,7 +61,6 @@ export async function executeSbomImport(
       console.log(`[SBOM Import] Creating SBOM report...`);
       const names = await getProductVersionNames(
         prisma,
-        job.contextProductId!,
         job.contextVersionId!
       );
 
@@ -69,10 +68,12 @@ export async function executeSbomImport(
         ? generateSbomFilename(names.productName, names.versionName)
         : `imported-sbom-${job.id}.cyclonedx.xml`;
 
-      const sbomReport = await createSbomReport(prisma, {
-        jobId: job.id,
-        versionId: job.contextVersionId!,
-        productId: job.contextProductId!,
+      // Get report ID from payload (injected during job creation)
+      const reportId = payload.reportId;
+
+      // Update the existing report with data (status comes from job)
+      await updateSbomReport(prisma, {
+        reportId,
         sbomData: sbomSummary,
         createdBy: job.triggeredByUserId,
         sbomFile: {
@@ -82,16 +83,20 @@ export async function executeSbomImport(
         },
       });
 
-      console.log(`[SBOM Import] Completed successfully. Report ID: ${sbomReport.id}`);
+      console.log(`[SBOM Import] Completed successfully. Report ID: ${reportId}`);
 
       return {
-        sbomData: sbomReport.id,
+        sbomData: reportId,
         generatedAt: new Date().toISOString(),
         packageCount: packageCount,
       };
 
     } catch (error) {
       console.error(`[SBOM Import] Job ${job.id} failed:`, error);
+
+      // No need to update report on failure - status comes from job
+      // Report will automatically show FAILED status based on job.status
+
       await saveJobError(error, job, prisma);
       throw error;
     }

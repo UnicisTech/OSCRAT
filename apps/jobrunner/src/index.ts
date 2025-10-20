@@ -3,6 +3,8 @@ import { WorkerJobType, WorkerJob } from '@oscrat/model';
 import { popWorkerJob, finishWorkerJob } from '@oscrat/model/operations';
 import { executeSbomGeneration } from './jobs/sbom';
 import { executeSbomImport } from './jobs/sbomImport';
+import { executeVulnerabilityScan } from './jobs/vulnerabilityScan';
+import { executeSbomReportScan } from './jobs/sbomReportScan';
 import * as fs from 'fs';
 import * as path from 'path';
 import { $ } from 'zx';
@@ -73,6 +75,18 @@ class JobRunner {
     }
   }
 
+  private async checkGrypeAvailability(): Promise<void> {
+    try {
+      console.log('[Job Runner] Checking grype availability...');
+      await $`which grype`;
+      console.log('[Job Runner] grype is available');
+    } catch (error) {
+      throw new Error(
+        'grype is not installed or not available in PATH. Vulnerability scanning requires grype to be installed.'
+      );
+    }
+  }
+
   public getWorkspaceRoot(): string {
     return this.workspaceRoot;
   }
@@ -82,6 +96,7 @@ class JobRunner {
 
     try {
       await this.checkSyftAvailability();
+      await this.checkGrypeAvailability();
       await this.ensureWorkspaceRoot();
       await this.prisma.$connect();
       console.log('[Job Runner] Database connected');
@@ -236,6 +251,18 @@ class JobRunner {
           );
         case WorkerJobType.FILE_IMPORT_SBOM:
           return await executeSbomImport(job, this.prisma, this.workspaceRoot);
+        case WorkerJobType.REPO_SCAN_VULNERABILITIES:
+          return await executeVulnerabilityScan(
+            job,
+            this.prisma,
+            this.workspaceRoot
+          );
+        case WorkerJobType.SBOM_REPORT_SCAN_VULNERABILITIES:
+          return await executeSbomReportScan(
+            job,
+            this.prisma,
+            this.workspaceRoot
+          );
         default:
           throw new Error(`Unknown job type: ${job.type}`);
       }

@@ -19,6 +19,7 @@ export interface CreateAttachmentParams {
   taskId?: number;
   versionId?: string;
   sbomReportId?: string;
+  vulnerabilityScanReportId?: string;
 }
 
 /** Create a new attachment within an existing tx */
@@ -32,6 +33,7 @@ export const createAttachmentWithTx = async (
     taskId: params.taskId,
     versionId: params.versionId,
     sbomReportId: params.sbomReportId,
+    vulnerabilityScanReportId: params.vulnerabilityScanReportId,
   });
 
   const file = await createFileInTransaction(tx, {
@@ -51,6 +53,7 @@ export const createAttachmentWithTx = async (
       taskId: params.taskId,
       versionId: params.versionId,
       sbomReportId: params.sbomReportId,
+      vulnerabilityScanReportId: params.vulnerabilityScanReportId,
       createdBy: params.createdBy,
     },
     include: {
@@ -78,6 +81,7 @@ export const createAttachment = async (
     taskId: params.taskId,
     versionId: params.versionId,
     sbomReportId: params.sbomReportId,
+    vulnerabilityScanReportId: params.vulnerabilityScanReportId,
   });
 
   const result = await prisma.$transaction(async (tx) => {

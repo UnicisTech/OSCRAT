@@ -2,11 +2,10 @@ import React from 'react';
 import {
   FaDownload,
   FaTrash,
-  FaShieldAlt,
 } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import type { SbomReportDetails } from '@oscrat/model/operations';
+import type { VulnerabilityScanReportDetails } from '@oscrat/model/operations';
 import { WorkerJobStatus } from '@oscrat/model';
 import usePagination from '@/hooks/usePagination';
 import { getErrorCodeTranslationKey } from '@/utils/errorCodeTranslation';
@@ -16,19 +15,17 @@ import PaginationControls from '@/components/shared/PaginationControls';
 
 const ITEMS_PER_PAGE = 15;
 
-interface SsmTableProps {
-  reports?: SbomReportDetails[];
+interface VulnerabilityScanTableProps {
+  reports?: VulnerabilityScanReportDetails[];
   onDownload: (id: string, filename: string) => void;
   onDelete: (reportId: string) => void;
-  onScan: (reportId: string) => void;
   itemsPerPage?: number;
 }
 
-const Table: React.FC<SsmTableProps> = ({
+const Table: React.FC<VulnerabilityScanTableProps> = ({
   reports,
   onDownload,
   onDelete,
-  onScan,
   itemsPerPage,
 }) => {
   const { t, ready } = useTranslation('common');
@@ -44,7 +41,7 @@ const Table: React.FC<SsmTableProps> = ({
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination<SbomReportDetails>(reports || [], pageSize);
+  } = usePagination<VulnerabilityScanReportDetails>(reports || [], pageSize);
 
   if (!ready) {
     return null;
@@ -57,27 +54,27 @@ const Table: React.FC<SsmTableProps> = ({
     return `${minutes}m ${seconds}s`;
   };
 
-  const getStatusBadge = (report: SbomReportDetails) => {
+  const getStatusBadge = (report: VulnerabilityScanReportDetails) => {
     const statusConfig = {
       [WorkerJobStatus.COMPLETED]: {
         color: 'text-green-600',
-        label: t('oscrat.ui.versions.sbom.completed'),
+        label: t('oscrat.ui.versions.vulnerability-scan.completed'),
       },
       [WorkerJobStatus.IN_PROGRESS]: {
         color: 'text-blue-600',
-        label: t('oscrat.ui.versions.sbom.in-progress'),
+        label: t('oscrat.ui.versions.vulnerability-scan.in-progress'),
       },
       [WorkerJobStatus.FAILED]: {
         color: 'text-red-600',
-        label: t('oscrat.ui.versions.sbom.failed'),
+        label: t('oscrat.ui.versions.vulnerability-scan.failed'),
       },
       [WorkerJobStatus.PENDING]: {
         color: 'text-gray-600',
-        label: t('oscrat.ui.versions.sbom.pending'),
+        label: t('oscrat.ui.versions.vulnerability-scan.pending'),
       },
       [WorkerJobStatus.CANCELLED]: {
         color: 'text-gray-600',
-        label: t('oscrat.ui.versions.sbom.cancelled'),
+        label: t('oscrat.ui.versions.vulnerability-scan.cancelled'),
       },
     };
 
@@ -99,46 +96,10 @@ const Table: React.FC<SsmTableProps> = ({
     );
   };
 
-  const getVulnStatusBadge = (status: WorkerJobStatus) => {
-    const statusConfig = {
-      [WorkerJobStatus.COMPLETED]: {
-        color: 'bg-green-100 text-green-800',
-        label: t('oscrat.ui.versions.sbom.completed'),
-      },
-      [WorkerJobStatus.IN_PROGRESS]: {
-        color: 'bg-blue-100 text-blue-800',
-        label: t('oscrat.ui.versions.sbom.in-progress'),
-      },
-      [WorkerJobStatus.FAILED]: {
-        color: 'bg-red-100 text-red-800',
-        label: t('oscrat.ui.versions.sbom.failed'),
-      },
-      [WorkerJobStatus.PENDING]: {
-        color: 'bg-gray-100 text-gray-800',
-        label: t('oscrat.ui.versions.sbom.pending'),
-      },
-      [WorkerJobStatus.CANCELLED]: {
-        color: 'bg-gray-100 text-gray-800',
-        label: t('oscrat.ui.versions.sbom.cancelled'),
-      },
-    };
-
-    const config = statusConfig[status] || {
-      color: 'bg-gray-100 text-gray-800',
-      label: t('oscrat.ui.unknown'),
-    };
-
-    return (
-      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}>
-        {config.label}
-      </span>
-    );
-  };
-
   if (!reports || reports.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-        <p className="text-sm">{t('oscrat.ui.no-sbom-added')}</p>
+        <p className="text-sm">{t('oscrat.ui.no-vulnerability-scans-added')}</p>
       </div>
     );
   }
@@ -156,21 +117,30 @@ const Table: React.FC<SsmTableProps> = ({
                 {t('oscrat.ui.source')}
               </th>
               <th scope="col" className={`${tableStyles.th} w-28 text-center`}>
-                {t('oscrat.ui.versions.sbom.started')}
+                {t('oscrat.ui.versions.vulnerability-scan.started')}
               </th>
               <th scope="col" className={`${tableStyles.th} w-24 text-center`}>
-                {t('oscrat.ui.versions.sbom.triggered-by')}
+                {t('oscrat.ui.versions.vulnerability-scan.triggered-by')}
               </th>
               <th scope="col" className={`${tableStyles.th} w-16 text-center`}>
-                {t('oscrat.ui.versions.sbom.duration')}
+                {t('oscrat.ui.versions.vulnerability-scan.duration')}
               </th>
-              <th scope="col" className={`${tableStyles.th} w-16 text-center`}>
-                {t('oscrat.ui.versions.sbom.packages')}
+              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
+                {t('oscrat.ui.versions.vulnerability-scan.total')}
               </th>
-              <th scope="col" className={`${tableStyles.th} w-28 text-center`}>
-                {t('oscrat.ui.scan')}
+              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
+                {t('oscrat.ui.versions.vulnerability-scan.critical')}
               </th>
-              <th scope="col" className={`${tableStyles.th} w-48 text-center`}>
+              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
+                {t('oscrat.ui.versions.vulnerability-scan.high')}
+              </th>
+              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
+                {t('oscrat.ui.versions.vulnerability-scan.medium')}
+              </th>
+              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
+                {t('oscrat.ui.versions.vulnerability-scan.low')}
+              </th>
+              <th scope="col" className={`${tableStyles.th} w-40 text-center`}>
                 {t('actions')}
               </th>
             </tr>
@@ -182,7 +152,7 @@ const Table: React.FC<SsmTableProps> = ({
                 className={`${tableStyles.tr} cursor-pointer`}
                 onClick={() =>
                   router.push(
-                    `/teams/${slug}/products/${productId}/versions/${versionId}/sbom/${report.id}`
+                    `/teams/${slug}/products/${productId}/versions/${versionId}/scan/${report.id}`
                   )
                 }
               >
@@ -192,12 +162,12 @@ const Table: React.FC<SsmTableProps> = ({
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       report.job.source === 'REPO'
                         ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800'
+                        : 'bg-purple-100 text-purple-800'
                     }`}
                   >
                     {report.job.source === 'REPO'
                       ? t('oscrat.ui.repository.labels.title')
-                      : t('oscrat.ui.versions.sbom.file-import')}
+                      : t('oscrat.ui.versions.sbom.title')}
                   </span>
                 </td>
                 <td className={tableStyles.tdCenter}>
@@ -228,14 +198,27 @@ const Table: React.FC<SsmTableProps> = ({
                     : '-'}
                 </td>
                 <td className={tableStyles.tdCenter}>
-                  {report.sbomData?.overview?.totalComponents || '-'}
+                  {report.scanData?.totalVulnerabilities ?? '-'}
                 </td>
                 <td className={tableStyles.tdCenter}>
-                  {report.latestVulnerabilityScan ? (
-                    getVulnStatusBadge(report.latestVulnerabilityScan.status)
-                  ) : (
-                    <span className="text-gray-400">{t('oscrat.ui.none')}</span>
-                  )}
+                  <span className={report.scanData?.criticalCount ? 'text-red-600 font-semibold' : ''}>
+                    {report.scanData?.criticalCount ?? '-'}
+                  </span>
+                </td>
+                <td className={tableStyles.tdCenter}>
+                  <span className={report.scanData?.highCount ? 'text-orange-600 font-semibold' : ''}>
+                    {report.scanData?.highCount ?? '-'}
+                  </span>
+                </td>
+                <td className={tableStyles.tdCenter}>
+                  <span className={report.scanData?.mediumCount ? 'text-yellow-600' : ''}>
+                    {report.scanData?.mediumCount ?? '-'}
+                  </span>
+                </td>
+                <td className={tableStyles.tdCenter}>
+                  <span className={report.scanData?.lowCount ? 'text-blue-600' : ''}>
+                    {report.scanData?.lowCount ?? '-'}
+                  </span>
                 </td>
                 <td className="px-6 py-4 text-center align-middle">
                   <div
@@ -252,20 +235,9 @@ const Table: React.FC<SsmTableProps> = ({
                         !report.attachment
                       }
                       icon={<FaDownload size={12} />}
-                      title={t('oscrat.ui.versions.sbom.download-sbom')}
+                      title={t('oscrat.ui.versions.vulnerability-scan.download-report')}
                     >
-                      {t('oscrat.ui.versions.sbom.download')}
-                    </ActionButton>
-                    <ActionButton
-                      onClick={() => onScan(report.id)}
-                      disabled={
-                        report.status !== WorkerJobStatus.COMPLETED ||
-                        !!report.latestVulnerabilityScan
-                      }
-                      icon={<FaShieldAlt size={12} />}
-                      title={t('oscrat.ui.versions.sbom.scan-vulnerabilities')}
-                    >
-                      {t('oscrat.ui.scan')}
+                      {t('oscrat.ui.versions.vulnerability-scan.download')}
                     </ActionButton>
                     <ActionButton
                       onClick={() => onDelete(report.id)}
@@ -277,18 +249,28 @@ const Table: React.FC<SsmTableProps> = ({
                       title={
                         report.status === WorkerJobStatus.COMPLETED ||
                         report.status === WorkerJobStatus.FAILED
-                          ? t('oscrat.ui.versions.sbom.delete-job')
+                          ? t('oscrat.ui.versions.vulnerability-scan.delete-job')
                           : t(
-                              'oscrat.ui.versions.sbom.delete-only-completed-failed'
+                              'oscrat.ui.versions.vulnerability-scan.delete-only-completed-failed'
                             )
                       }
                     >
-                      {t('oscrat.ui.versions.sbom.delete')}
+                      {t('oscrat.ui.versions.vulnerability-scan.delete')}
                     </ActionButton>
                   </div>
                 </td>
               </tr>
             ))}
+            {(!reports || reports.length === 0) && (
+              <tr>
+                <td
+                  colSpan={11}
+                  className="px-6 py-8 text-center text-sm text-gray-500"
+                >
+                  {t('oscrat.ui.no-vulnerability-scans-added')}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

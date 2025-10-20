@@ -1,5 +1,5 @@
 import formidable from 'formidable';
-import { createFileImportSbomJob } from '@oscrat/model/operations/workerJob';
+import { createSbomReportWithJob } from '@oscrat/model/operations';
 import { extractFileData, handleFormidableError } from '@/lib/utils/fileUpload';
 import { prisma } from '@/lib/prisma';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
@@ -30,7 +30,7 @@ export default function handler(
   }
 }
 
-// Create a new file-based SBOM import job
+// POST: Create a new file-based SBOM import report
 const handlePOST = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
@@ -68,31 +68,34 @@ const handlePOST = async (
     }
 
     console.log(
-      `[SBOM Import] Processing file: ${uploadedFile.originalFilename} (${uploadedFile.size} bytes)`
+      `[SBOM Reports API] Processing file import: ${uploadedFile.originalFilename} (${uploadedFile.size} bytes)`
     );
 
     // Extract file data
     const fileUpload = await extractFileData(uploadedFile);
     const fileDataBase64 = fileUpload.fileData.toString('base64');
 
-    // Create the file import job with file data in payload
-    const job = await createFileImportSbomJob(prisma, {
-      filename: fileUpload.filename,
-      fileData: fileDataBase64,
-      mimeType: fileUpload.mimeType,
+    // Create the file import report and job with file data in payload
+    const report = await createSbomReportWithJob(prisma, {
+      versionId: versionId as string,
+      productId: productId as string,
+      jobType: 'FILE_IMPORT_SBOM',
+      jobPayload: {
+        filename: fileUpload.filename,
+        fileData: fileDataBase64,
+        mimeType: fileUpload.mimeType,
+      },
       triggeredByUserId: teamMember.userId,
       teamId: teamMember.teamId,
-      productId: productId as string,
-      versionId: versionId as string,
     });
 
     console.log(
-      `[SBOM Import] Job created: ${job.id}, filename: ${fileUpload.filename}, triggeredBy: ${teamMember.userId}`
+      `[SBOM Reports API] File-based report created: reportId: ${report.id}, filename: ${fileUpload.filename}`
     );
 
-    res.status(201).json({ data: job, error: null });
+    res.status(201).json({ data: report });
   } catch (error: any) {
-    console.error('SBOM import error:', error);
+    console.error('[SBOM Reports API] File import error:', error);
 
     if (error instanceof ApiError) {
       throw error;

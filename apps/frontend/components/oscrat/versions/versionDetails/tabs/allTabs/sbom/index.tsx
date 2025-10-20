@@ -1,7 +1,8 @@
 import ImportModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/sbom/modal';
 import Table from '@/components/oscrat/versions/versionDetails/tabs/allTabs/sbom/table';
 import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
-import { useOscratVersionSbomJobs } from '@/hooks/oscrat/useOscratJobs';
+import { useOscratVersionSbomReports } from '@/hooks/oscrat/useOscratJobs';
+import { useCreateSbomReportVulnerabilityScan } from '@/lib/api/hooks/oscrat/jobs';
 import { useAttachments } from '@/hooks/useAttachments';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -19,25 +20,31 @@ export default function Sbom() {
   const { version } = versionContext;
 
   const {
-    jobs,
-    createRepoSbomJob,
-    createFileSbomJob,
-    deleteSbomJob,
-    isLoading: isCreatingJob,
-    refreshJobs,
-  } = useOscratVersionSbomJobs(teamId, productId, versionId);
+    reports,
+    createRepoSbomReport,
+    createFileSbomReport,
+    deleteSbomReport,
+    isLoading: isCreatingReport,
+    refreshReports,
+  } = useOscratVersionSbomReports(teamId, productId, versionId);
+
+  const createSbomReportVulnerabilityScanMutation = useCreateSbomReportVulnerabilityScan(
+    teamId,
+    productId,
+    versionId
+  );
 
   const { downloadAttachment } = useAttachments();
-  const handleCreateRepoSbomJob = async () => {
+  const handleCreateRepoSbomReport = async () => {
     if (!repository?.id) {
       toast.error(t('oscrat.ui.repository-not-configured'));
       return;
     }
 
     try {
-      await createRepoSbomJob({ repositoryId: repository.id });
+      await createRepoSbomReport({ repositoryId: repository.id });
       toast.success(t('oscrat.ui.repo-sbom-job-created'));
-      await refreshJobs();
+      await refreshReports();
     } catch (error: unknown) {
       toast.error(
         `${t('oscrat.ui.versions.sbom.failed-create-repo-job')}: ${extractErrorMessage(error, t('oscrat.ui.versions.sbom.failed-create-repo-job'))}`
@@ -45,13 +52,13 @@ export default function Sbom() {
     }
   };
 
-  const handleFileImportAsJob = async (file: File) => {
+  const handleFileImportAsReport = async (file: File) => {
     try {
-      await createFileSbomJob(file);
+      await createFileSbomReport(file);
       toast.success(
         t('oscrat.ui.file-sbom-job-created', { filename: file.name })
       );
-      await refreshJobs();
+      await refreshReports();
     } catch (error: unknown) {
       toast.error(
         extractErrorMessage(
@@ -62,10 +69,24 @@ export default function Sbom() {
     }
   };
 
-  const handleGenerate = () => handleCreateRepoSbomJob();
+  const handleGenerate = () => handleCreateRepoSbomReport();
 
   const handleRefresh = async () => {
-    await refreshJobs();
+    await refreshReports();
+  };
+
+  const handleScanVulnerabilities = async (reportId: string) => {
+    try {
+      await createSbomReportVulnerabilityScanMutation.mutateAsync({
+        sbomReportId: reportId,
+      });
+      toast.success(t('oscrat.ui.vulnerability-scan-started'));
+      await refreshReports();
+    } catch (error: unknown) {
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-start-scan'))
+      );
+    }
   };
 
   const handleDownload = async (id: string, filename: string) => {
@@ -82,15 +103,15 @@ export default function Sbom() {
     }
   };
 
-  const handleDelete = async (jobId: string) => {
+  const handleDelete = async (reportId: string) => {
     if (!window.confirm(t('oscrat.ui.versions.sbom.confirm-delete-job'))) {
       return;
     }
 
     try {
-      await deleteSbomJob(jobId);
+      await deleteSbomReport(reportId);
       toast.success(t('oscrat.ui.versions.sbom.job-deleted'));
-      await refreshJobs();
+      await refreshReports();
     } catch (error: unknown) {
       toast.error(
         extractErrorMessage(
@@ -128,39 +149,39 @@ export default function Sbom() {
             </button>
             <button
               onClick={
-                hasRepositoryDefined && !isCreatingJob
+                hasRepositoryDefined && !isCreatingReport
                   ? handleGenerate
                   : undefined
               }
-              disabled={!hasRepositoryDefined || isCreatingJob}
+              disabled={!hasRepositoryDefined || isCreatingReport}
               title={
                 !hasRepositoryDefined
                   ? t('oscrat.ui.to-generate-sbom')
                   : undefined
               }
               className={`rounded-md border px-4 py-2 text-sm font-medium ${
-                hasRepositoryDefined && !isCreatingJob
+                hasRepositoryDefined && !isCreatingReport
                   ? 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'
                   : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
               }`}
             >
-              {isCreatingJob ? `${t('generate')}...` : t('generate')}
+              {isCreatingReport ? `${t('generate')}...` : t('generate')}
             </button>
           </div>
         </div>
 
         <Table
-          jobs={jobs}
+          reports={reports}
           onDownload={handleDownload}
           onDelete={handleDelete}
-          isLoading={isCreatingJob}
+          onScan={handleScanVulnerabilities}
         />
       </div>
 
       <ImportModal
         isOpen={isImportModalOpen}
         onClose={() => setImportModalOpen(false)}
-        onImportAsJob={handleFileImportAsJob}
+        onImportAsJob={handleFileImportAsReport}
       />
     </div>
   );

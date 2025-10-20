@@ -1,7 +1,3 @@
-// Product, version, and assessment exports removed - functionality moved to @oscrat/model/operations
-
-export { createSbomJobForRepository, getSbomResult } from './sbom';
-
 export {
   createVersionAttachment,
   getVersionAttachments,

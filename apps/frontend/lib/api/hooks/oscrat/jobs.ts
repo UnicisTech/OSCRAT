@@ -2,13 +2,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   oscratJobEndpoints,
   CreateSbomJobRequest,
+  CreateVulnerabilityScanJobRequest,
+  CreateSbomReportScanJobRequest,
 } from '@/lib/api/endpoints/oscrat/jobs';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
 import { WorkerJobType } from '@oscrat/model';
 
-// List SBOM jobs specifically
-export function useGetSbomJobs(
+// List SBOM reports
+export function useGetSbomReports(
   teamId: string,
   productId: string,
   versionId: string,
@@ -17,31 +19,57 @@ export function useGetSbomJobs(
   const enabled = options?.enabled !== false;
 
   return useQuery({
-    queryKey: queryKeys.oscrat.projects.versions.jobs.sbom(teamId, versionId),
+    queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(teamId, versionId),
     queryFn: () =>
-      oscratJobEndpoints.listSbomJobs(teamId, productId, versionId),
+      oscratJobEndpoints.listSbomReports(teamId, productId, versionId),
     enabled,
   });
 }
 
-// Create repository-based SBOM job
-export function useCreateRepoSbomJob(
+export function useGetSbomReportDetail(
+  teamId: string,
+  productId: string,
+  versionId: string,
+  reportId: string,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled !== false;
+
+  return useQuery({
+    queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.detail(
+      teamId,
+      versionId,
+      reportId
+    ),
+    queryFn: () =>
+      oscratJobEndpoints.getSbomReportDetail(
+        teamId,
+        productId,
+        versionId,
+        reportId
+      ),
+    enabled,
+  });
+}
+
+// Create repository-based SBOM report
+export function useCreateRepoSbomReport(
   teamId: string,
   productId: string,
   versionId: string
 ) {
   return useMutation({
     mutationFn: (data: CreateSbomJobRequest) =>
-      oscratJobEndpoints.createRepoSbomJob(teamId, productId, versionId, data),
+      oscratJobEndpoints.createRepoSbomReport(teamId, productId, versionId, data),
     onSuccess: () => {
       // Invalidate SBOM-specific queries
       queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.projects.versions.jobs.sbom(
+        queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(
           teamId,
           versionId
         ),
       });
-      // Also invalidate version detail since it may include job info
+      // Also invalidate version detail since it may include report info
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
@@ -49,15 +77,15 @@ export function useCreateRepoSbomJob(
   });
 }
 
-// Create file-based SBOM job
-export function useCreateFileSbomJob(
+// Create file-based SBOM report
+export function useCreateFileSbomReport(
   teamId: string,
   productId: string,
   versionId: string
 ) {
   return useMutation({
     mutationFn: (formData: FormData) =>
-      oscratJobEndpoints.createFileSbomJob(
+      oscratJobEndpoints.createFileSbomReport(
         teamId,
         productId,
         versionId,
@@ -66,12 +94,12 @@ export function useCreateFileSbomJob(
     onSuccess: () => {
       // Invalidate SBOM-specific queries
       queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.projects.versions.jobs.sbom(
+        queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(
           teamId,
           versionId
         ),
       });
-      // Also invalidate version detail since it may include job info
+      // Also invalidate version detail since it may include report info
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
@@ -79,24 +107,24 @@ export function useCreateFileSbomJob(
   });
 }
 
-// Delete SBOM job
-export function useDeleteSbomJob(
+// Delete SBOM report
+export function useDeleteSbomReport(
   teamId: string,
   productId: string,
   versionId: string
 ) {
   return useMutation({
-    mutationFn: (jobId: string) =>
-      oscratJobEndpoints.deleteSbomJob(teamId, productId, versionId, jobId),
+    mutationFn: (reportId: string) =>
+      oscratJobEndpoints.deleteSbomReport(teamId, productId, versionId, reportId),
     onSuccess: () => {
       // Invalidate SBOM-specific queries
       queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.projects.versions.jobs.sbom(
+        queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(
           teamId,
           versionId
         ),
       });
-      // Also invalidate version detail since it may include job info
+      // Also invalidate version detail since it may include report info
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
@@ -104,13 +132,178 @@ export function useDeleteSbomJob(
   });
 }
 
-// Invalidate SBOM jobs query
-export function useInvalidateSbomJobs() {
+// Invalidate SBOM reports query
+export function useInvalidateSbomReports() {
   const queryClient = useQueryClient();
 
   return (teamId: string, versionId: string) => {
     return queryClient.invalidateQueries({
-      queryKey: queryKeys.oscrat.projects.versions.jobs.sbom(teamId, versionId),
+      queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(teamId, versionId),
+    });
+  };
+}
+
+// ============================================
+// Vulnerability Scan Reports
+// ============================================
+
+// List vulnerability scan reports
+export function useGetVulnerabilityScanReports(
+  teamId: string,
+  productId: string,
+  versionId: string,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled !== false;
+
+  return useQuery({
+    queryKey: queryKeys.oscrat.projects.versions.jobs.vulnerabilityScan.all(
+      teamId,
+      versionId
+    ),
+    queryFn: () =>
+      oscratJobEndpoints.listVulnerabilityScanReports(
+        teamId,
+        productId,
+        versionId
+      ),
+    enabled,
+  });
+}
+
+export function useGetVulnerabilityScanReportDetail(
+  teamId: string,
+  productId: string,
+  versionId: string,
+  reportId: string,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled !== false;
+
+  return useQuery({
+    queryKey: queryKeys.oscrat.projects.versions.jobs.vulnerabilityScan.detail(
+      teamId,
+      versionId,
+      reportId
+    ),
+    queryFn: () =>
+      oscratJobEndpoints.getVulnerabilityScanReportDetail(
+        teamId,
+        productId,
+        versionId,
+        reportId
+      ),
+    enabled,
+  });
+}
+
+// Create repository-based vulnerability scan report
+export function useCreateRepoVulnerabilityScanReport(
+  teamId: string,
+  productId: string,
+  versionId: string
+) {
+  return useMutation({
+    mutationFn: (data: CreateVulnerabilityScanJobRequest) =>
+      oscratJobEndpoints.createRepoVulnerabilityScanReport(
+        teamId,
+        productId,
+        versionId,
+        data
+      ),
+    onSuccess: () => {
+      // Invalidate vulnerability scan queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.jobs.vulnerabilityScan.all(
+          teamId,
+          versionId
+        ),
+      });
+      // Also invalidate version detail since it may include report info
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+      });
+    },
+  });
+}
+
+// Create SBOM report-based vulnerability scan report
+export function useCreateSbomReportVulnerabilityScan(
+  teamId: string,
+  productId: string,
+  versionId: string
+) {
+  return useMutation({
+    mutationFn: (data: CreateSbomReportScanJobRequest) =>
+      oscratJobEndpoints.createSbomReportVulnerabilityScan(
+        teamId,
+        productId,
+        versionId,
+        data
+      ),
+    onSuccess: () => {
+      // Invalidate vulnerability scan queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.jobs.vulnerabilityScan.all(
+          teamId,
+          versionId
+        ),
+      });
+      // Invalidate SBOM queries (to update vulnerability scan status)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(
+          teamId,
+          versionId
+        ),
+      });
+      // Also invalidate version detail since it may include report info
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+      });
+    },
+  });
+}
+
+// Delete vulnerability scan report
+export function useDeleteVulnerabilityScanReport(
+  teamId: string,
+  productId: string,
+  versionId: string
+) {
+  return useMutation({
+    mutationFn: (reportId: string) =>
+      oscratJobEndpoints.deleteVulnerabilityScanReport(
+        teamId,
+        productId,
+        versionId,
+        reportId
+      ),
+    onSuccess: () => {
+      // Invalidate vulnerability scan queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.jobs.vulnerabilityScan.all(
+          teamId,
+          versionId
+        ),
+      });
+      // Also invalidate version detail since it may include report info
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+      });
+    },
+  });
+}
+
+// Invalidate vulnerability scan reports query
+export function useInvalidateVulnerabilityScanReports() {
+  const queryClient = useQueryClient();
+
+  return (teamId: string, versionId: string) => {
+    return queryClient.invalidateQueries({
+      queryKey: queryKeys.oscrat.projects.versions.jobs.vulnerabilityScan.all(
+        teamId,
+        versionId
+      ),
     });
   };
 }

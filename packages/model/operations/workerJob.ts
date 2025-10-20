@@ -38,10 +38,20 @@ export interface CreateWorkerJobParams {
   payload: any;
 }
 
+export enum SbomSource {
+  REPO = 'REPO',
+  FILE = 'FILE',
+}
+
+export enum VulnerabilityScanSource {
+  REPO = 'REPO',
+  SBOM_REPORT = 'SBOM_REPORT',
+}
+
 export interface SbomWorkerJob {
   id: string;
   status: WorkerJobStatus;
-  source: 'REPO' | 'FILE';
+  source: SbomSource;
   createdAt: Date;
   processStartTime: Date | null;
   processEndTime: Date | null;
@@ -53,6 +63,29 @@ export interface SbomWorkerJob {
     email: string;
   };
   sbomData?: any;
+  attachment?: {
+    id: string;
+    name: string;
+    fileSize: number;
+    mimeType?: string;
+  };
+}
+
+export interface VulnerabilityScanWorkerJob {
+  id: string;
+  status: WorkerJobStatus;
+  source: VulnerabilityScanSource;
+  createdAt: Date;
+  processStartTime: Date | null;
+  processEndTime: Date | null;
+  errCode?: string;
+  errMessage?: string;
+  triggeredByUser: {
+    id: string;
+    name: string | null;
+    email: string;
+  };
+  scanData?: any;
   attachment?: {
     id: string;
     name: string;
@@ -221,66 +254,38 @@ export const createWorkerJob = async (
   return job;
 };
 
-export const createSbomJob = async (
-  prisma: PrismaClient,
-  params: {
-    repositoryId: string;
-    triggeredByUserId: string;
-    teamId: string;
-    productId: string;
-    versionId: string;
-  }
-): Promise<SbomWorkerJob> => {
-  // Verify repository exists and belongs to the team
-  const repository = await prisma.oscratRepository.findFirst({
-    where: {
-      id: params.repositoryId,
-      teamId: params.teamId,
-    },
-    select: {
-      ...REPOSITORY_SELECT,
-    },
-  });
-
-  if (!repository) {
-    throw new Error(
-      `Repository ${params.repositoryId} not found or not accessible`
-    );
-  }
-
-  // Use base function to create the job with context
-  const baseJob = await createWorkerJob(prisma, {
-    type: WorkerJobType.REPO_GENERATE_SBOM,
+/** Create a new worker job within a transaction - used by report creation functions */
+export const createWorkerJobWithTx = async (
+  tx: Prisma.TransactionClient,
+  params: CreateWorkerJobParams
+): Promise<WorkerJob> => {
+  console.log(`[Worker Job Operations] Creating new worker job in transaction:`, {
+    type: params.type,
     triggeredByUserId: params.triggeredByUserId,
-    contextTeamId: params.teamId,
-    contextProductId: params.productId,
-    contextVersionId: params.versionId,
-    payload: { repositoryId: params.repositoryId },
+    payload: params.payload,
   });
 
-  // Get user info for the enhanced type
-  const user = await prisma.user.findUnique({
-    where: { id: params.triggeredByUserId },
-    select: USER_SELECT.select,
+  const job = await tx.workerJob.create({
+    data: {
+      type: params.type,
+      triggeredByUserId: params.triggeredByUserId,
+      contextTeamId: params.contextTeamId,
+      contextProductId: params.contextProductId,
+      contextVersionId: params.contextVersionId,
+      payload: params.payload,
+      status: WorkerJobStatus.PENDING,
+    },
   });
 
-  if (!user) {
-    throw new Error(`User ${params.triggeredByUserId} not found`);
-  }
-
-  console.log(`[Worker Job Operations] SBOM job created:`, {
-    id: baseJob.id,
-    repositoryId: params.repositoryId,
-    repositoryName: repository.name,
-    triggeredBy: params.triggeredByUserId,
+  console.log(`[Worker Job Operations] Worker job created successfully in transaction:`, {
+    id: job.id,
+    type: job.type,
+    status: job.status,
+    createdAt: job.createdAt,
+    triggeredByUserId: job.triggeredByUserId,
   });
 
-  // Return as SbomWorkerJob using transform function for consistency
-  return transformToSbomWorkerJob({
-    ...baseJob,
-    triggeredByUser: user,
-    sbomReport: null, // No report yet for new job
-  });
+  return job;
 };
 
 export const getProjectWorkerJobs = async (
@@ -382,7 +387,7 @@ const transformToSbomWorkerJob = (job: any): SbomWorkerJob => {
   return {
     id: job.id,
     status: job.status,
-    source: job.type === WorkerJobType.REPO_GENERATE_SBOM ? 'REPO' : 'FILE',
+    source: job.type === WorkerJobType.REPO_GENERATE_SBOM ? SbomSource.REPO : SbomSource.FILE,
     createdAt: job.createdAt,
     processStartTime: job.processStartTime,
     processEndTime: job.processEndTime,
@@ -452,57 +457,6 @@ export const getSbomWorkerJobs = async (
   return sbomWorkerJobs;
 };
 
-export const createFileImportSbomJob = async (
-  prisma: PrismaClient,
-  params: {
-    filename: string;
-    fileData: string; // base64 encoded
-    mimeType: string;
-    triggeredByUserId: string;
-    teamId: string;
-    productId: string;
-    versionId: string;
-  }
-): Promise<SbomWorkerJob> => {
-  // Use base function to create the job with context
-  const baseJob = await createWorkerJob(prisma, {
-    type: WorkerJobType.FILE_IMPORT_SBOM,
-    triggeredByUserId: params.triggeredByUserId,
-    contextTeamId: params.teamId,
-    contextProductId: params.productId,
-    contextVersionId: params.versionId,
-    payload: {
-      filename: params.filename,
-      fileData: params.fileData,
-      mimeType: params.mimeType,
-    },
-  });
-
-  // Get user info for the enhanced type
-  const user = await prisma.user.findUnique({
-    where: { id: params.triggeredByUserId },
-    select: USER_SELECT.select,
-  });
-
-  if (!user) {
-    throw new Error(`User ${params.triggeredByUserId} not found`);
-  }
-
-  console.log(`[Worker Job Operations] File import SBOM job created:`, {
-    id: baseJob.id,
-    filename: params.filename,
-    fileSize: Buffer.from(params.fileData, 'base64').length,
-    triggeredBy: params.triggeredByUserId,
-  });
-
-  // Return as SbomWorkerJob using transform function for consistency
-  return transformToSbomWorkerJob({
-    ...baseJob,
-    triggeredByUser: user,
-    sbomReport: null, // No report yet for new job
-  });
-};
-
 /** Delete an SBOM worker job and its associated data */
 export const deleteSbomWorkerJob = async (
   prisma: PrismaClient,
@@ -548,5 +502,144 @@ export const deleteSbomWorkerJob = async (
 
   console.log(
     `[Worker Job Operations] Successfully deleted SBOM job ${jobId} and all associated data`
+  );
+};
+
+// Vulnerability Scan Operations
+
+const transformToVulnerabilityScanWorkerJob = (
+  job: any
+): VulnerabilityScanWorkerJob => {
+  return {
+    id: job.id,
+    status: job.status,
+    source:
+      job.type === WorkerJobType.REPO_SCAN_VULNERABILITIES
+        ? VulnerabilityScanSource.REPO
+        : VulnerabilityScanSource.SBOM_REPORT,
+    createdAt: job.createdAt,
+    processStartTime: job.processStartTime,
+    processEndTime: job.processEndTime,
+    errCode: job.errCode || undefined,
+    errMessage: job.errMessage || undefined,
+    triggeredByUser: job.triggeredByUser,
+    scanData: job.vulnerabilityScanReport?.scanData,
+    attachment: job.vulnerabilityScanReport?.attachment
+      ? {
+          id: job.vulnerabilityScanReport.attachment.id,
+          name: job.vulnerabilityScanReport.attachment.name,
+          fileSize: job.vulnerabilityScanReport.attachment.fileSize,
+          mimeType: job.vulnerabilityScanReport.attachment.mimeType,
+        }
+      : undefined,
+  };
+};
+
+export const getVulnerabilityScanWorkerJobs = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string,
+  limit: number = 50
+): Promise<VulnerabilityScanWorkerJob[]> => {
+  console.log(
+    `[Worker Job Operations] Getting vulnerability scan jobs for version:`,
+    {
+      teamId,
+      versionId,
+      limit,
+    }
+  );
+
+  const jobs = await prisma.workerJob.findMany({
+    where: {
+      contextVersionId: versionId,
+      contextTeamId: teamId,
+      type: {
+        in: [
+          WorkerJobType.REPO_SCAN_VULNERABILITIES,
+          WorkerJobType.SBOM_REPORT_SCAN_VULNERABILITIES,
+        ],
+      },
+    },
+    include: {
+      triggeredByUser: USER_SELECT,
+      vulnerabilityScanReport: {
+        include: {
+          attachment: {
+            select: {
+              id: true,
+              name: true,
+              fileSize: true,
+              mimeType: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: limit,
+  });
+
+  const vulnerabilityScanWorkerJobs: VulnerabilityScanWorkerJob[] = jobs.map(
+    (job) => {
+      return transformToVulnerabilityScanWorkerJob(job);
+    }
+  );
+
+  console.log(
+    `[Worker Job Operations] Found ${vulnerabilityScanWorkerJobs.length} vulnerability scan jobs with enhanced data`
+  );
+  return vulnerabilityScanWorkerJobs;
+};
+
+export const deleteVulnerabilityScanWorkerJob = async (
+  prisma: PrismaClient,
+  teamId: string,
+  jobId: string
+): Promise<void> => {
+  console.log(`[Worker Job Operations] Deleting vulnerability scan job:`, {
+    teamId,
+    jobId,
+  });
+
+  // First, verify the job exists, belongs to the team, and is completed
+  const job = await prisma.workerJob.findFirst({
+    where: {
+      id: jobId,
+      contextTeamId: teamId,
+      type: {
+        in: [
+          WorkerJobType.REPO_SCAN_VULNERABILITIES,
+          WorkerJobType.SBOM_REPORT_SCAN_VULNERABILITIES,
+        ],
+      },
+    },
+    select: { id: true, status: true },
+  });
+
+  if (!job) {
+    throw new Error(
+      `Vulnerability scan job ${jobId} not found or not accessible for team ${teamId}`
+    );
+  }
+
+  if (
+    job.status !== WorkerJobStatus.COMPLETED &&
+    job.status !== WorkerJobStatus.FAILED
+  ) {
+    throw new Error(
+      `Cannot delete vulnerability scan job ${jobId}: only completed or failed jobs can be deleted (current status: ${job.status})`
+    );
+  }
+
+  // Delete the worker job - cascade deletes will handle VulnerabilityScanReport, Attachment, and File
+  await prisma.workerJob.delete({
+    where: { id: jobId },
+  });
+
+  console.log(
+    `[Worker Job Operations] Successfully deleted vulnerability scan job ${jobId} and all associated data`
   );
 };

@@ -1,5 +1,6 @@
-import { useState, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
 
 export type TabConfig = {
   id: string;
@@ -21,10 +22,28 @@ export default function TabsManager({
   onButtonClick,
 }: TabsManagerProps) {
   const { t, ready } = useTranslation('common');
-  const [activeTab, setActiveTab] = useState(defaultActiveTab || tabs[0]?.id);
+  const router = useRouter();
+
+  const initialTab = (router.query.tab as string) || defaultActiveTab || tabs[0]?.id;
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    const tabFromQuery = router.query.tab as string;
+    if (tabFromQuery && tabs.find(tab => tab.id === tabFromQuery)) {
+      setActiveTab(tabFromQuery);
+    }
+  }, [router.query.tab, tabs]);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, tab: tabId }
+      },
+      undefined,
+      { shallow: true }
+    );
   };
 
   if (!ready) return null;

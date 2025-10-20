@@ -55,6 +55,8 @@ Please follow these simple steps to get a local copy up and running.
 - PostgreSQL
 - PNPM
 - Docker compose
+- Syft
+- Grype
 
 ### Development
 
