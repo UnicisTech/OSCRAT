@@ -11,12 +11,11 @@ import SignupComponent from '@/components/auth/Signup';
 import type { NextPageWithLayout } from 'types';
 import { authProviderEnabled } from '@/lib/auth';
 import { AuthLayout } from '@/components/layouts';
-// import GithubButton from '@/components/auth/GithubButton';
-// import GoogleButton from '@/components/auth/GoogleButton';
 import JoinWithInvitation from '@/components/auth/JoinWithInvitation';
 import Head from 'next/head';
 import { Loading } from '@/components/shared';
 import env from '@/lib/env';
+import { getSession } from '@/lib/session';
 
 const Signup: NextPageWithLayout<
   InferGetServerSidePropsType<typeof getServerSideProps>
@@ -40,10 +39,6 @@ const Signup: NextPageWithLayout<
     return <Loading />;
   }
 
-  if (status === 'authenticated') {
-    router.push(env.redirectIfAuthenticated);
-  }
-
   const params = token ? `?token=${token}` : '';
 
   return (
@@ -52,14 +47,6 @@ const Signup: NextPageWithLayout<
         <title>{t('sign-up-title')}</title>
       </Head>
       <div className="rounded border p-6">
-        {/* <div className="flex gap-2 flex-wrap">
-          {authProviders.github && <GithubButton />}
-          {authProviders.google && <GoogleButton />}
-        </div>
-
-        {(authProviders.github || authProviders.google) &&
-          authProviders.credentials && <div className="divider">or</div>} */}
-        {/* <>{authProviders.email? 'True' : 'False'}</> */}
         {authProviders.credentials && (
           <>
             {token ? (
@@ -97,7 +84,17 @@ Signup.getLayout = function getLayout(page: ReactElement) {
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { locale } = context;
+  const { locale, req, res } = context;
+  const session = await getSession(req, res);
+
+  if (session) {
+    return {
+      redirect: {
+        destination: env.redirectIfAuthenticated,
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {

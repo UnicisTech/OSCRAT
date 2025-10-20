@@ -61,6 +61,7 @@ const handlePOST = async (
     slug,
     type: requestData.type,
     size: requestData.size,
+    orgRoles: [requestData.orgRole],
     taxId: requestData.taxId,
     postalAddress: requestData.postalAddress,
     contactEmail: requestData.contactEmail,

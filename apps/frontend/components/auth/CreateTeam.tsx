@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { OscratOrganizationSize, OscratOrganizationType } from '@oscrat/model';
+import { OscratOrganizationSize, OscratOrganizationType, OscratOrganizationRole } from '@oscrat/model';
 import { useFormik } from 'formik';
 import { InputWithLabel } from '@/components/shared';
 import { useTranslation } from 'next-i18next';
@@ -56,6 +56,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
       name: '',
       size: '',
       taxId: '',
+      orgRole: OscratOrganizationRole.MANUFACTURER,
       postalAddress: '',
       contactEmail: '',
       contactPhone: '',
@@ -68,6 +69,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
         const teamData = {
           name: values.name,
           type: values.type as OscratOrganizationType,
+          orgRole: values.orgRole as OscratOrganizationRole,
           ...((values.type as OscratOrganizationType) ===
             OscratOrganizationType.LIMITED_LIABILITY_COMPANY && {
             size: values.size as OscratOrganizationSize,
@@ -159,6 +161,41 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 </span>
               </label>
             </div>
+          </div>
+
+          {/* Organization Role Dropdown */}
+          <div className="mb-6">
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              {t('oscrat.ui.organization-role')}
+            </label>
+            <select
+              name="orgRole"
+              value={formik.values.orgRole}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              required
+              className={`w-full rounded-md border px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                formik.touched.orgRole && formik.errors.orgRole
+                  ? 'border-red-500'
+                  : 'border-gray-300'
+              }`}
+            >
+              {Object.values(OscratOrganizationRole).map((role) => (
+                <option key={role} value={role}>
+                  {t(`oscrat.organization.roles.${role.toLowerCase().replace(/_/g, '-')}`)}
+                </option>
+              ))}
+            </select>
+            {formik.values.orgRole && (
+              <p className="mt-2 text-xs text-gray-600">
+                {t(`oscrat.organization.roles.hints.${formik.values.orgRole.toLowerCase().replace(/_/g, '-')}`)}
+              </p>
+            )}
+            {formik.touched.orgRole && formik.errors.orgRole && (
+              <p className="mt-1 text-xs text-red-500">
+                {t(formik.errors.orgRole)}
+              </p>
+            )}
           </div>
 
           {/* Legal Person Specific Fields */}

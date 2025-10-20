@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { OscratOrganizationType } from '@oscrat/model';
+import { OscratOrganizationType, OscratOrganizationRole } from '@oscrat/model';
 import {
   emailSchema,
   phoneSchema,
@@ -32,6 +32,9 @@ export const teamCreationSchema = Yup.object({
     then: (_schema) => taxIdSchema.notRequired(),
     otherwise: (_schema) => _schema.notRequired(),
   }),
+  orgRole: Yup.mixed<OscratOrganizationRole>()
+    .oneOf(Object.values(OscratOrganizationRole), 'oscrat.ui.validation.organization-role-invalid')
+    .required('oscrat.ui.validation.organization-role-required'),
   postalAddress: postalAddressSchema.required('oscrat.ui.validation.postal-address-required'),
   contactEmail: emailSchema.required('oscrat.ui.validation.contact-email-required'),
   contactPhone: phoneSchema.required('oscrat.ui.validation.contact-phone-required'),

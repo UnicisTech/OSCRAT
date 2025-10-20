@@ -76,6 +76,7 @@ export interface TeamCreateRequest {
   name: string;
   type?: OscratOrganizationType;
   size?: OscratOrganizationSize;
+  orgRole: OscratOrganizationRole;
   taxId?: string;
   postalAddress?: string;
   contactEmail?: string;
