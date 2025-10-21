@@ -19,6 +19,7 @@ const prisma = new PrismaClient();
 const sampleProducts = [
   {
     name: 'SecureConnect IoT Gateway',
+    acronym: 'SCIG',
     description:
       'Enterprise-grade IoT gateway solution providing secure connectivity and device management for industrial IoT deployments.',
     type: OscratProductType.IOT_DEVICE,
@@ -29,6 +30,7 @@ const sampleProducts = [
   },
   {
     name: 'SmartHome Controller Pro',
+    acronym: 'SHCP',
     description:
       'Advanced home automation controller supporting multiple protocols and seamless integration with popular smart home ecosystems.',
     type: OscratProductType.SMART_HOME_DEVICE,
@@ -39,6 +41,7 @@ const sampleProducts = [
   },
   {
     name: 'Industrial Monitoring System',
+    acronym: 'IMS',
     description:
       'Real-time monitoring and control system for critical industrial infrastructure with built-in redundancy and failover capabilities.',
     type: OscratProductType.INDUSTRIAL_DEVICE,
@@ -49,6 +52,7 @@ const sampleProducts = [
   },
   {
     name: 'CyberShield Security Suite',
+    acronym: 'CSS',
     description:
       'Comprehensive cybersecurity platform offering threat detection, vulnerability management, and incident response capabilities.',
     type: OscratProductType.SECURITY_SOFTWARE,
@@ -59,6 +63,7 @@ const sampleProducts = [
   },
   {
     name: 'EdgeDevice Firmware v2.1',
+    acronym: 'EDF',
     description:
       'Optimized firmware for edge computing devices with enhanced security features and improved resource management.',
     type: OscratProductType.FIRMWARE,
@@ -69,6 +74,7 @@ const sampleProducts = [
   },
   {
     name: 'CloudConnector API Platform',
+    acronym: 'CCAP',
     description:
       'Scalable API management platform enabling secure cloud connectivity and data integration across hybrid environments.',
     type: OscratProductType.APPLICATION_SOFTWARE,

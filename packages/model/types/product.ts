@@ -11,6 +11,7 @@ import { OscratProductVersionSummary } from './version';
 export interface OscratProductSummary {
   id: string;
   name: string;
+  acronym: string;
   description: string;
   type: OscratProductType;
   productCategory: OscratProductCategory;
@@ -30,6 +31,7 @@ export interface OscratProductSummary {
 export interface OscratProductDetail {
   id: string;
   name: string;
+  acronym: string;
   description: string;
   type: OscratProductType;
   productCategory: OscratProductCategory;
@@ -45,6 +47,7 @@ export interface OscratProductDetail {
 
 export interface OscratProductCreate {
   name: string;
+  acronym: string;
   description?: string;
   type: OscratProductType;
   productCategory: OscratProductCategory;
@@ -57,6 +60,7 @@ export interface OscratProductCreate {
 
 export interface OscratProductUpdate {
   name?: string;
+  acronym?: string;
   type?: OscratProductType;
   description?: string;
   productCategory?: OscratProductCategory;

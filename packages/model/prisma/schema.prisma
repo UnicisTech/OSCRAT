@@ -366,6 +366,7 @@ enum OscratProductVersionStatus {
 model OscratProduct {
   id          String  @id @default(uuid())
   name        String
+  acronym     String  @default("")
   description String  @default("")
 
   teamId String

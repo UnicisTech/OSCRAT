@@ -71,11 +71,10 @@ export default function Existing() {
 
         const productData: OscratProductCreate = {
           name: values.name.trim(),
+          acronym: '', // TODO: uncomment when frontend is updated: values.acronym.trim(),
           type: selectedProduct.type as OscratProductType,
           productCategory: selectedProduct.productCategory as OscratProductCategory,
           createdBy: userId,
-          // TODO: Add acronym when implemented in DB
-          // acronym: values.acronym.trim(),
           description: values.description?.trim(),
           initialVersion: {
             version: values.version.trim(),

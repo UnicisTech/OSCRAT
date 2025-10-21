@@ -104,6 +104,7 @@ export const transformToProductSummary = (
   return {
     id: product.id,
     name: product.name,
+    acronym: product.acronym,
     description: product.description,
     type: product.type,
     productCategory: product.productCategory,
@@ -128,6 +129,7 @@ export const transformToProductDetail = (
 ): OscratProductDetail => ({
   id: product.id,
   name: product.name,
+  acronym: product.acronym,
   description: product.description,
   type: product.type,
   productCategory: product.productCategory,
@@ -198,6 +200,7 @@ export const createProduct = async (
   const product = await prisma.oscratProduct.create({
     data: {
       name: data.name,
+      acronym: data.acronym,
       description: data.description,
       type: data.type,
       productCategory: data.productCategory,
@@ -238,6 +241,7 @@ export const updateProduct = async (
     },
     data: {
       name: data.name,
+      acronym: data.acronym,
       description: data.description,
       type: data.type,
       productCategory: data.productCategory,

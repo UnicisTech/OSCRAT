@@ -12,6 +12,7 @@ import { OscratProductType, OscratProductCategory } from '@oscrat/model';
  */
 export const productCreateSchema = Yup.object({
   name: productNameSchema.required('oscrat.ui.validation.product-name-required'),
+  acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
   type: Yup.string()
     .oneOf(Object.values(OscratProductType), 'oscrat.ui.validation.product-type-invalid')
     .required('oscrat.ui.validation.product-type-required'),
@@ -25,8 +26,8 @@ export const productCreateSchema = Yup.object({
  */
 export const existingProductSchema = Yup.object({
   sourceProductId: Yup.string().required('oscrat.ui.validation.source-product-required'),
-  acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
   name: productNameSchema.required('oscrat.ui.validation.product-name-required'),
+  acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
   version: versionNameSchema.required('oscrat.ui.validation.version-required'),
   description: productDescriptionSchema.optional(),
 });
@@ -35,8 +36,8 @@ export const existingProductSchema = Yup.object({
  * Product creation schema (from cache)
  */
 export const cacheProductSchema = Yup.object({
-  acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
   name: productNameSchema.required('oscrat.ui.validation.product-name-required'),
+  acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
   version: versionNameSchema.required('oscrat.ui.validation.version-required'),
   description: productDescriptionSchema.optional(),
 });

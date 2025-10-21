@@ -70,8 +70,8 @@ export default function Cache() {
         setIsLoading(true);
         
         const productData: OscratProductCreate = {
-          // TODO: uncomment when added to DB:  acronym: values.acronym.trim(),
           name: values.name.trim(),
+          acronym: '', // TODO: uncomment when frontend is updated: values.acronym.trim(),
           type: OscratProductType.APPLICATION_SOFTWARE, // Default type since it's required in DB schema, Radu, please make optional in schema
           productCategory: getProductCategoryFromRisk(formState.highestRiskLevel),
           createdBy: session.user.id,
