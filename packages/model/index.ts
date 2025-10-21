@@ -31,8 +31,10 @@ export {
   OscratAssessmentType,
   OscratProductVulnerabilitySeverity,
   OscratProductVulnerabilityStatus,
-  OscratProductIncidentType,
-  OscratProductIncidentStatus,
+  IncidentStatus,
+  IncidentClassification,
+  IncidentAttackType,
+  IncidentSeverity,
   OscratRepositoryProvider,
   OscratRepositoryAuthType,
   WorkerJobType,
@@ -55,8 +57,14 @@ export * from './types/jobPayloads';
 export { ERROR_CODES, type ErrorCode } from './constants/errorCodes';
 
 // Export specific operation types needed by frontend
-export type { SbomReportDetails, SbomReportSummary } from './operations/sbomReport';
-export type { VulnerabilityScanReportDetails, VulnerabilityScanReportSummary } from './operations/vulnerabilityScanReport';
+export type {
+  SbomReportDetails,
+  SbomReportSummary,
+} from './operations/sbomReport';
+export type {
+  VulnerabilityScanReportDetails,
+  VulnerabilityScanReportSummary,
+} from './operations/vulnerabilityScanReport';
 export { VulnerabilityScanSource, SbomSource } from './operations/workerJob';
 export type { CreateFileParams, FileData } from './operations/file';
 export type {

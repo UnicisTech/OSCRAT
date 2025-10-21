@@ -144,6 +144,21 @@ export const queryKeys = {
               repositoryId,
             ] as const,
         },
+        incidents: {
+          all: (teamId: string, versionId: string) =>
+            [
+              ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+              'incidents',
+            ] as const,
+          detail: (teamId: string, versionId: string, incidentId: string) =>
+            [
+              ...queryKeys.oscrat.projects.versions.incidents.all(
+                teamId,
+                versionId
+              ),
+              incidentId,
+            ] as const,
+        },
         jobs: {
           sbom: {
             all: (teamId: string, versionId: string) =>

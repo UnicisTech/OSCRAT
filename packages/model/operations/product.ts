@@ -1,7 +1,6 @@
 import {
   PrismaClient,
   type Prisma,
-  OscratProductIncidentStatus,
   OscratProductVersionStatus,
 } from '@prisma/client';
 import type {
@@ -11,6 +10,7 @@ import type {
   OscratProductDetail,
 } from '../types/product';
 import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
+import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
 
 /** Include for product summary queries (lightweight with counts) */
 const PRODUCT_SUMMARY_INCLUDE = {
@@ -27,7 +27,11 @@ const PRODUCT_SUMMARY_INCLUDE = {
       _count: {
         select: {
           incidents: {
-            where: { status: OscratProductIncidentStatus.NOT_REPORTED },
+            where: {
+              status: {
+                in: OPEN_INCIDENT_STATUSES,
+              },
+            },
           },
           vulnerabilities: {
             where: {
@@ -55,7 +59,11 @@ const PRODUCT_DETAIL_INCLUDE = {
       _count: {
         select: {
           incidents: {
-            where: { status: OscratProductIncidentStatus.NOT_REPORTED },
+            where: {
+              status: {
+                in: OPEN_INCIDENT_STATUSES,
+              },
+            },
           },
           vulnerabilities: {
             where: {
@@ -71,7 +79,6 @@ const PRODUCT_DETAIL_INCLUDE = {
   },
 };
 
-/** Type aliases for better maintainability */
 type ProductSummaryPayload = Prisma.OscratProductGetPayload<{
   include: typeof PRODUCT_SUMMARY_INCLUDE;
 }>;
@@ -123,7 +130,6 @@ export const transformToProductSummary = (
   };
 };
 
-/** Transform Prisma product to ProductDetail (full data with relations) */
 export const transformToProductDetail = (
   product: ProductDetailPayload
 ): OscratProductDetail => ({
@@ -157,8 +163,6 @@ export const transformToProductDetail = (
   updatedBy: product.updatedBy,
 });
 
-// Query functions
-/** Get all products for a team */
 export const getProducts = async (
   prisma: PrismaClient,
   teamId: string
@@ -171,7 +175,6 @@ export const getProducts = async (
   return products.map(transformToProductSummary);
 };
 
-/** Get detailed information for a specific product */
 export const getProductDetail = async (
   prisma: PrismaClient,
   teamId: string,
@@ -191,7 +194,6 @@ export const getProductDetail = async (
   return product ? transformToProductDetail(product) : null;
 };
 
-/** Create a new product for the team */
 export const createProduct = async (
   prisma: PrismaClient,
   teamId: string,
@@ -211,7 +213,8 @@ export const createProduct = async (
         versions: {
           create: {
             version: data.initialVersion.version,
-            status: data.initialVersion.status || OscratProductVersionStatus.ACTIVE,
+            status:
+              data.initialVersion.status || OscratProductVersionStatus.ACTIVE,
             teamId: teamId,
             createdBy: data.createdBy,
             updatedBy: data.createdBy,
@@ -225,15 +228,12 @@ export const createProduct = async (
   return transformToProductDetail(product);
 };
 
-// Mutation functions
-/** Update an existing product */
 export const updateProduct = async (
   prisma: PrismaClient,
   teamId: string,
   productId: string,
   data: Partial<OscratProductUpdate>
 ): Promise<OscratProductDetail> => {
-  // Update the product with team ownership check
   const product = await prisma.oscratProduct.update({
     where: {
       id: productId,
@@ -253,13 +253,11 @@ export const updateProduct = async (
   return transformToProductDetail(product);
 };
 
-/** Delete a product */
 export const deleteProduct = async (
   prisma: PrismaClient,
   teamId: string,
   productId: string
 ): Promise<void> => {
-  // Delete the product with team ownership check
   await prisma.oscratProduct.delete({
     where: {
       id: productId,

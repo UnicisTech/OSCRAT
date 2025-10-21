@@ -1,7 +1,6 @@
 import {
   PrismaClient,
   type Prisma,
-  OscratProductIncidentStatus,
   OscratProductVersionStatus,
 } from '@prisma/client';
 import type {
@@ -11,13 +10,17 @@ import type {
   OscratProductVersionDetail,
 } from '../types/version';
 import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
+import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
 
-/** Include for version summary queries (with counts) */
 const VERSION_SUMMARY_INCLUDE = {
   _count: {
     select: {
       incidents: {
-        where: { status: OscratProductIncidentStatus.NOT_REPORTED },
+        where: {
+          status: {
+            in: OPEN_INCIDENT_STATUSES,
+          },
+        },
       },
       vulnerabilities: {
         where: {
@@ -36,9 +39,18 @@ const VERSION_SUMMARY_INCLUDE = {
   },
 };
 
-/** Include for version detail queries */
 const VERSION_DETAIL_INCLUDE = {
-  incidents: true,
+  incidents: {
+    include: {
+      reporter: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  },
   vulnerabilities: true,
   assessments: true,
   attachments: true,
@@ -60,7 +72,6 @@ const VERSION_DETAIL_INCLUDE = {
   },
 };
 
-/** Type aliases for better maintainability */
 type VersionSummaryPayload = Prisma.OscratProductVersionGetPayload<{
   include: typeof VERSION_SUMMARY_INCLUDE;
 }>;
@@ -69,8 +80,6 @@ type VersionDetailPayload = Prisma.OscratProductVersionGetPayload<{
   include: typeof VERSION_DETAIL_INCLUDE;
 }>;
 
-// Transform functions
-/** Transform Prisma version to VersionSummary */
 export const transformToVersionSummary = (
   version: VersionSummaryPayload
 ): OscratProductVersionSummary => ({
@@ -88,7 +97,6 @@ export const transformToVersionSummary = (
   updatedBy: version.updatedBy,
 });
 
-/** Transform Prisma version to VersionDetail */
 export const transformToVersionDetail = (
   version: VersionDetailPayload
 ): OscratProductVersionDetail => ({
@@ -99,16 +107,22 @@ export const transformToVersionDetail = (
   incidents:
     version.incidents?.map((incident) => ({
       id: incident.id,
-      name: incident.name,
-      type: incident.type,
       status: incident.status,
+      classification: incident.classification,
+      attackType: incident.attackType,
+      severity: incident.severity,
+      dateOfDetection: incident.dateOfDetection,
+      description: incident.description,
+      scope: incident.scope,
+      reporter: {
+        id: incident.reporter.id,
+        name: incident.reporter.name,
+        email: incident.reporter.email,
+      },
       createdAt: incident.createdAt,
       updatedAt: incident.updatedAt,
       createdBy: incident.createdBy,
       updatedBy: incident.updatedBy,
-      ...(incident.incidentReference && {
-        incidentReference: incident.incidentReference,
-      }),
     })) || [],
   vulnerabilities:
     version.vulnerabilities?.map((vuln) => ({
@@ -152,8 +166,6 @@ export const transformToVersionDetail = (
   updatedBy: version.updatedBy,
 });
 
-// Query functions
-/** Get all versions for a specific product */
 export const getVersions = async (
   prisma: PrismaClient,
   teamId: string,
@@ -171,7 +183,6 @@ export const getVersions = async (
   return versions.map(transformToVersionSummary);
 };
 
-/** Get detailed information for a specific version */
 export const getVersionDetail = async (
   prisma: PrismaClient,
   teamId: string,
@@ -188,13 +199,11 @@ export const getVersionDetail = async (
   return version ? transformToVersionDetail(version) : null;
 };
 
-/** Create a new version for a product */
 export const createVersion = async (
   prisma: PrismaClient,
   teamId: string,
   data: OscratProductVersionCreate
 ): Promise<OscratProductVersionDetail> => {
-  // Create the version - product ownership is implicit through teamId
   const version = await prisma.oscratProductVersion.create({
     data: {
       version: data.version,
@@ -210,15 +219,12 @@ export const createVersion = async (
   return transformToVersionDetail(version);
 };
 
-// Mutation functions
-/** Update an existing version */
 export const updateVersion = async (
   prisma: PrismaClient,
   teamId: string,
   versionId: string,
   data: OscratProductVersionUpdate
 ): Promise<OscratProductVersionDetail> => {
-  // Update the version with team ownership check
   const version = await prisma.oscratProductVersion.update({
     where: {
       id: versionId,
@@ -235,13 +241,11 @@ export const updateVersion = async (
   return transformToVersionDetail(version);
 };
 
-/** Delete a version */
 export const deleteVersion = async (
   prisma: PrismaClient,
   teamId: string,
   versionId: string
 ): Promise<void> => {
-  // Delete the version with team ownership check
   await prisma.oscratProductVersion.delete({
     where: {
       id: versionId,

@@ -7,6 +7,7 @@ export * from './team';
 export * from './product';
 export * from './version';
 export * from './assessment';
+export * from './incident';
 export * from './user';
 export * from './invitation';
 export * from './apiKey';

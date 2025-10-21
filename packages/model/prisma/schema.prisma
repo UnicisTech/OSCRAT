@@ -72,6 +72,7 @@ model User {
   updatedOscratVulnerabilities    OscratProductVulnerability[]  @relation("OscratProductVulnerabilityUpdatedBy")
   createdOscratIncidents          OscratProductIncident[]       @relation("OscratProductIncidentCreatedBy")
   updatedOscratIncidents          OscratProductIncident[]       @relation("OscratProductIncidentUpdatedBy")
+  reportedIncidents               OscratProductIncident[]       @relation("OscratProductIncidentReporter")
   triggeredWorkerJobs             WorkerJob[]                   @relation("WorkerJobTriggeredBy")
   createdAttachments              Attachment[]                  @relation("AttachmentCreatedBy")
 }
@@ -119,6 +120,7 @@ model Team {
   repositories                OscratRepository[]
   reportingOrganizations      OscratReportingOrganization[]
   workerJobs                  WorkerJob[]
+  incidents                   OscratProductIncident[] @relation("TeamIncidents")
 }
 
 model Task {
@@ -300,27 +302,40 @@ enum OscratProductVulnerabilityStatus {
   ACCEPTED_RISK
 }
 
-enum OscratProductIncidentType {
-  VULNERABILITY_EXPLOIT
-  PRODUCT_COMPROMISE
-  SUPPLY_CHAIN_INCIDENT
-  AUTHENTICATION_BYPASS
-  DATA_BREACH
-  DENIAL_OF_SERVICE
-  FIRMWARE_TAMPERING
-  CONFIGURATION_EXPLOIT
-  UPDATE_MECHANISM_FAILURE
-  CRYPTOGRAPHIC_FAILURE
-  NETWORK_INTRUSION
-  OTHER
+enum IncidentStatus {
+  PENDING
+  START
+  DECLARED
+  STABLE
+  ACTIVE
+  RESOLVED
+  COMPLETED
 }
 
-enum OscratProductIncidentStatus {
-  NOT_REPORTED
-  INITIAL_ALERT_SENT
-  DETAILED_REPORT_SENT
-  FINAL_REPORT_SENT
-  REPORTING_COMPLETE
+enum IncidentClassification {
+  GENERAL
+  CONFIDENTIALITY
+  INTEGRITY
+  AVAILABILITY
+  ACCESS_CONTROL
+  VULNERABILITIES
+  TECHNICAL_FAILURE
+  THEFT_OR_LOSS
+}
+
+enum IncidentAttackType {
+  DENIAL_OF_SERVICE
+  UNAUTHORISED_ACCESS
+  MALWARE
+  ABUSE
+  OTHERS
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
 }
 
 enum OscratRepositoryProvider {
@@ -500,16 +515,36 @@ model OscratProductVulnerability {
 model OscratProductIncident {
   id String @id @default(uuid())
 
-  name              String
-  description       String
-  type              OscratProductIncidentType
-  status            OscratProductIncidentStatus
-  incidentReference String?
+  status         IncidentStatus
+  classification IncidentClassification
+  attackType     IncidentAttackType
+  assetDetails   String?
+
+  reporterId String
+  reporter   User @relation("OscratProductIncidentReporter", fields: [reporterId], references: [id])
+
+  dateOfDetection DateTime
+  severity        IncidentSeverity
+  handlingDate    DateTime?
+
+  description        String
+  correctiveActions  String?
+  rootCause          String?
+  scope              String
+  preventiveActions  String?
+
+  suspectedUnlawfulAct     Boolean @default(false)
+  unlawfulActDescription   String?
+  crossBorderImpact        Boolean @default(false)
+  crossBorderImpactDetails String?
 
   versionId String
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
   productId String // Denormalized for easier queries
+
+  teamId String
+  team   Team @relation("TeamIncidents", fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -519,10 +554,17 @@ model OscratProductIncident {
   createdByUser User @relation("OscratProductIncidentCreatedBy", fields: [createdBy], references: [id])
   updatedByUser User @relation("OscratProductIncidentUpdatedBy", fields: [updatedBy], references: [id])
 
+  attachments Attachment[]
+
   @@index([versionId])
   @@index([productId])
+  @@index([teamId])
   @@index([versionId, status])
   @@index([productId, status])
+  @@index([teamId, status])
+  @@index([teamId, dateOfDetection])
+  @@index([dateOfDetection])
+  @@index([severity])
 }
 
 model OscratRepository {
@@ -690,6 +732,9 @@ model Attachment {
   vulnerabilityScanReportId String? @unique
   vulnerabilityScanReport   VulnerabilityScanReport? @relation(fields: [vulnerabilityScanReportId], references: [id], onDelete: Cascade)
 
+  incidentId String?
+  incident   OscratProductIncident? @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdBy String
@@ -700,5 +745,6 @@ model Attachment {
   @@index([versionId])
   @@index([sbomReportId])
   @@index([vulnerabilityScanReportId])
+  @@index([incidentId])
   @@index([name])
 }

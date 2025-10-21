@@ -6,22 +6,18 @@ import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { usePathname, useRouter } from 'next/navigation';
 import normalizeText from '@/utils/normalizeText';
-import {
-  OscratProductIncidentStatus,
-  OscratProductIncidentType,
-  OscratIncidentSummary,
-} from '@oscrat/model';
+import { IncidentStatus, OscratIncidentSummary } from '@oscrat/model';
 
 interface TabData {
-  id: OscratProductIncidentStatus;
+  id: IncidentStatus;
   title: string;
   count: number;
 }
 
 interface TabsProps {
   tabs: TabData[];
-  activeTab: OscratProductIncidentStatus;
-  onTabClick: (tabId: OscratProductIncidentStatus) => void;
+  activeTab: IncidentStatus;
+  onTabClick: (tabId: IncidentStatus) => void;
 }
 
 const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick }) => {
@@ -81,20 +77,22 @@ const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
       .join(' ');
   };
 
-  const StatusPill: React.FC<{ status: OscratProductIncidentStatus }> = ({
-    status,
-  }) => {
-    const getStatusPillClasses = (status: OscratProductIncidentStatus) => {
+  const StatusPill: React.FC<{ status: IncidentStatus }> = ({ status }) => {
+    const getStatusPillClasses = (status: IncidentStatus) => {
       switch (status) {
-        case OscratProductIncidentStatus.NOT_REPORTED:
+        case IncidentStatus.PENDING:
           return 'bg-red-200 text-gray-900';
-        case OscratProductIncidentStatus.INITIAL_ALERT_SENT:
+        case IncidentStatus.START:
           return 'bg-yellow-200 text-gray-900';
-        case OscratProductIncidentStatus.DETAILED_REPORT_SENT:
+        case IncidentStatus.DECLARED:
+          return 'bg-orange-200 text-gray-900';
+        case IncidentStatus.STABLE:
           return 'bg-blue-200 text-gray-900';
-        case OscratProductIncidentStatus.FINAL_REPORT_SENT:
+        case IncidentStatus.ACTIVE:
+          return 'bg-amber-200 text-gray-900';
+        case IncidentStatus.RESOLVED:
           return 'bg-green-200 text-gray-900';
-        case OscratProductIncidentStatus.REPORTING_COMPLETE:
+        case IncidentStatus.COMPLETED:
           return 'bg-gray-200 text-gray-900';
         default:
           return 'bg-gray-100 text-gray-800';
@@ -120,9 +118,9 @@ const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
           </div>
         </div>
         <div>
-          <div className="mb-1 text-xs text-gray-700">{t('id')}</div>
+          <div className="mb-1 text-xs text-gray-700">Severity</div>
           <div className="text-sm font-bold text-gray-900">
-            {item.incidentReference}
+            {normalizeText(item.severity)}
           </div>
         </div>
         <div>
@@ -130,7 +128,7 @@ const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
             {t('oscrat.ui.classification')}
           </div>
           <div className="text-sm font-bold text-gray-900">
-            {normalizeText(item.type)}
+            {normalizeText(item.classification)}
           </div>
         </div>
         <div>
@@ -138,7 +136,7 @@ const Item: React.FC<ItemProps> = ({ item, onShowMore }) => {
             {t('oscrat.ui.attack-type')}
           </div>
           <div className="text-sm font-bold text-gray-900">
-            {normalizeText(item.type)}
+            {normalizeText(item.attackType)}
           </div>
         </div>
         <div>
@@ -176,26 +174,26 @@ export default function Index() {
   const tabs: TabData[] = useMemo(() => {
     if (!version?.incidents) return [];
 
-    const statusCounts = Object.values(OscratProductIncidentStatus).reduce(
+    const statusCounts = Object.values(IncidentStatus).reduce(
       (acc, status) => {
         acc[status] =
           version.incidents?.filter((incident) => incident.status === status)
             .length || 0;
         return acc;
       },
-      {} as Record<OscratProductIncidentStatus, number>
+      {} as Record<IncidentStatus, number>
     );
 
-    return Object.values(OscratProductIncidentStatus).map((status) => ({
+    return Object.values(IncidentStatus).map((status) => ({
       id: status,
       title: normalizeText(status),
       count: statusCounts[status],
     }));
   }, [version?.incidents]);
 
-  // Set default active tab to first available status or NOT_REPORTED
-  const [activeTab, setActiveTab] = useState<OscratProductIncidentStatus>(
-    tabs.length > 0 ? tabs[0].id : OscratProductIncidentStatus.NOT_REPORTED
+  // Set default active tab to first available status or PENDING
+  const [activeTab, setActiveTab] = useState<IncidentStatus>(
+    tabs.length > 0 ? tabs[0].id : IncidentStatus.PENDING
   );
 
   // Filter incidents based on the active tab

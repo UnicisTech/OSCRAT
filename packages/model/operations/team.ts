@@ -6,7 +6,6 @@ import {
   OscratOrganizationType,
   OscratOrganizationSize,
   OscratOrganizationRole,
-  OscratProductIncidentStatus,
   OscratProductVulnerabilityStatus,
 } from '@prisma/client';
 import type {
@@ -20,6 +19,7 @@ import type {
   TeamMemberDetail,
 } from '../types/team';
 import { transformToProductSummary } from './product';
+import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
 
 /** Include for team summary queries */
 const TEAM_SUMMARY_INCLUDE = {
@@ -50,7 +50,11 @@ const TEAM_WITH_PRODUCTS_INCLUDE = {
           _count: {
             select: {
               incidents: {
-                where: { status: OscratProductIncidentStatus.NOT_REPORTED },
+                where: {
+                  status: {
+                    in: OPEN_INCIDENT_STATUSES,
+                  },
+                },
               },
               vulnerabilities: {
                 where: {
