@@ -108,7 +108,7 @@ const Index: React.FC<CreateVersionModalProps> = ({
           />
           {formErrors.version && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {formErrors.version}
+              {t(formErrors.version)}
             </p>
           )}
         </div>

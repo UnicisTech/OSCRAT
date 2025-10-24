@@ -80,6 +80,27 @@ export function useUpdateAvatar() {
   });
 }
 
+export function useDeleteAvatar() {
+  const { data: session, update } = useSession();
+
+  return useMutation({
+    mutationFn: () => usersEndpoints.deleteAvatar(),
+    onSuccess: async (response) => {
+      if (session) {
+        await update({
+          ...session,
+          user: {
+            ...session.user,
+            image: null,
+          },
+        });
+      }
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.users });
+    },
+  });
+}
+
 export function useDeleteUser() {
   return useMutation({
     mutationFn: (password: string) => usersEndpoints.deleteUser(password),

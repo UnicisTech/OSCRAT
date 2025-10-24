@@ -33,7 +33,7 @@ export const TeamContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!isLoading && (teamContext.error || !teamContext.team)) {
-      router.push('/404');
+      router.replace('/404');
     }
   }, [isLoading, teamContext.error, teamContext.team, router]);
 
@@ -47,6 +47,10 @@ export const TeamContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   if (isLoading) {
+    return <Loading />;
+  }
+
+  if (!teamContext.team) {
     return <Loading />;
   }
 

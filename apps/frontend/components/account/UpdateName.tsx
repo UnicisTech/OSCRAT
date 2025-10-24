@@ -25,7 +25,6 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
 
       if (result.success) {
         toast.success(t('successfully-updated'));
-        formik.resetForm({ values });
       } else {
         toast.error(
           extractErrorMessage(result.error, t('error.update-failed'))

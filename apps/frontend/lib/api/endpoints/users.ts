@@ -32,6 +32,9 @@ export const usersEndpoints = {
   updateAvatar: (image: string) =>
     api.put<ApiResponse<UserReturned>>('/users', { image }),
 
+  deleteAvatar: () =>
+    api.put<ApiResponse<UserReturned>>('/users', { image: null }),
+
   deleteUser: (password: string) =>
     api.delete<void>('/users', {
       params: { password },

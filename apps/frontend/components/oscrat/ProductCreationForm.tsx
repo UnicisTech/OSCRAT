@@ -63,7 +63,7 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
                 label={`${t('oscrat.ui.product-acronym')} *`}
                 error={
                   formik.touched.acronym && formik.errors.acronym 
-                    ? String(formik.errors.acronym)
+                    ? t(String(formik.errors.acronym))
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -82,7 +82,7 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
                 label={`${t('oscrat.ui.product-name')} *`}
                 error={
                   formik.touched.name && formik.errors.name 
-                    ? String(formik.errors.name)
+                    ? t(String(formik.errors.name))
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -101,7 +101,7 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
                 label={`${t('oscrat.ui.product-version')} *`}
                 error={
                   formik.touched.version && formik.errors.version 
-                    ? String(formik.errors.version)
+                    ? t(String(formik.errors.version))
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -129,7 +129,7 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
                 />
                 {formik.touched.description && formik.errors.description && (
                   <p className="mt-1 text-sm text-red-600" role="alert">
-                    {formik.errors.description}
+                    {t(String(formik.errors.description))}
                   </p>
                 )}
               </div>

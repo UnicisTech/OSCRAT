@@ -71,7 +71,7 @@ export default function Existing() {
 
         const productData: OscratProductCreate = {
           name: values.name.trim(),
-          acronym: '', // TODO: uncomment when frontend is updated: values.acronym.trim(),
+          acronym: values.acronym.trim(),
           type: selectedProduct.type as OscratProductType,
           productCategory: selectedProduct.productCategory as OscratProductCategory,
           createdBy: userId,
@@ -126,7 +126,7 @@ export default function Existing() {
         label={`${t('oscrat.ui.source-product')} *`}
         error={
           formik.touched.sourceProductId && formik.errors.sourceProductId 
-            ? formik.errors.sourceProductId 
+            ? t(formik.errors.sourceProductId)
             : undefined
         }
         onChange={handleSourceProductChange}

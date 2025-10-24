@@ -22,13 +22,13 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
     initialValues: {
       email: user.email,
     },
+    enableReinitialize: true,
     validationSchema: updateEmailSchema,
     onSubmit: async (values) => {
       const result = await updateUser(values);
 
       if (result.success) {
         toast.success(t('successfully-updated'));
-        formik.resetForm({ values });
       } else {
         toast.error(
           extractErrorMessage(result.error, t('error.update-failed'))

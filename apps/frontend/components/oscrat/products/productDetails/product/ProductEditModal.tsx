@@ -29,6 +29,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
   // Form state
   const [editName, setEditName] = useState<string>(initialData.name as string);
+  const [editAcronym, setEditAcronym] = useState<string>(initialData.acronym || '');
   // TODO: Doesn't work yet, product needs to have description in DB
   const [editDescription, setEditDescription] = useState(
     initialData.description || ''
@@ -42,6 +43,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setEditName(initialData.name as string);
+      setEditAcronym(initialData.acronym || '');
       setEditDescription(initialData.description || '');
       setEditType(initialData.type);
       setEditExternalReporting(
@@ -59,6 +61,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
     onSave({
       name: editName.trim(),
+      acronym: editAcronym.trim(),
       description: editDescription.trim(),
       type: editType,
       reportingOrganizations: selectedReportingOrgs,
@@ -67,6 +70,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
     });
   }, [
     editName,
+    editAcronym,
     editDescription,
     editType,
     editExternalReporting,
@@ -114,7 +118,26 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
           />
           {formErrors.name && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {formErrors.name}
+              {t(formErrors.name)}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium dark:text-gray-300">
+            {t('oscrat.ui.product-acronym')}
+          </label>
+          <input
+            type="text"
+            value={editAcronym}
+            onChange={(e) => setEditAcronym(e.target.value)}
+            maxLength={10}
+            className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            placeholder={t('oscrat.ui.validation.product-acronym-placeholder')}
+          />
+          {formErrors.acronym && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              {t(formErrors.acronym)}
             </p>
           )}
         </div>

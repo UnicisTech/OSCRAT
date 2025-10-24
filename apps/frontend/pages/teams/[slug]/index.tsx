@@ -1,8 +1,14 @@
-import { withTeamLayout } from '@/lib/layout-helpers';
-import TeamMembers from './members';
+import { GetServerSidePropsContext } from 'next';
 
-TeamMembers.getLayout = withTeamLayout;
+export async function getServerSideProps(_context: GetServerSidePropsContext) {
+  return {
+    redirect: {
+      destination: '/teams',
+      permanent: false,
+    },
+  };
+}
 
-export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';
-
-export default TeamMembers;
+export default function TeamIndex() {
+  return null;
+}

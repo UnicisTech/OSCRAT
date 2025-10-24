@@ -8,6 +8,14 @@ import { getUser } from 'models/user';
 import { UserReturned } from 'types';
 import { withApiHandler } from '@/lib/middleware';
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '2mb',
+    },
+  },
+};
+
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
@@ -60,8 +68,12 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     toUpdate['email'] = req.body.email.trim().toLowerCase();
   }
 
-  if ('image' in req.body && typeof req.body.image === 'string') {
-    toUpdate['image'] = req.body.image.trim();
+  if ('image' in req.body) {
+    if (req.body.image === null) {
+      toUpdate['image'] = null;
+    } else if (typeof req.body.image === 'string') {
+      toUpdate['image'] = req.body.image.trim();
+    }
   }
 
   if (Object.keys(toUpdate).length === 0) {

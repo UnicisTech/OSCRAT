@@ -80,6 +80,7 @@ const Index: React.FC<ProductProps> = ({
         onSave={handleEditSave}
         initialData={{
           name: project.name,
+          acronym: project.acronym,
           description: project.description,
           type: project.type,
           reportingOrganizations: project.reportingOrganizations,
@@ -100,8 +101,15 @@ const Index: React.FC<ProductProps> = ({
 
       <div className="flex flex-col gap-2 rounded-lg border border-gray-400 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="flex items-center justify-between">
-          <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            {project.name}
+          <div className="flex items-center gap-3">
+            <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              {project.name}
+            </div>
+            {project.acronym && (
+              <span className="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1.5 text-sm font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-400/20">
+                {project.acronym}
+              </span>
+            )}
           </div>
 
           <div className="flex font-medium text-gray-600">

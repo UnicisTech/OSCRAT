@@ -379,7 +379,6 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                   value={formik.values.contactPhone}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  required
                   className={`flex-1 rounded-r-md border border-l-0 px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     formik.touched.contactPhone && formik.errors.contactPhone
                       ? 'border-red-500'

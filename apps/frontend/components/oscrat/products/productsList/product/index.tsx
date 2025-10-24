@@ -2,8 +2,6 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { OscratProductSummary } from '@oscrat/model';
 import { getProductCategoryKey, getProductTypeKey } from '@/utils/translation';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
 import StatusBadge from './StatusBadge';
 import ActiveBadge from './ActiveBadge';
 import InfoField from './InfoField';
@@ -15,11 +13,9 @@ interface ProductProps {
 
 const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
   const { t, ready } = useTranslation('common');
-  const pathname = usePathname();
 
   // Memoize computed values
   const {
-    formPathName,
     openVulnerabilities,
     openIncidents,
     displayVulnerabilities,
@@ -30,7 +26,6 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
     const incidents = project.totalOpenIncidents;
 
     return {
-      formPathName: `${pathname}/${project.id}/form`,
       openVulnerabilities: vulnerabilities,
       openIncidents: incidents,
       displayVulnerabilities:
@@ -45,7 +40,7 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
         .toLowerCase()
         .replace('_', '-')}`,
     };
-  }, [project, pathname, t]);
+  }, [project, t]);
 
   const reportingOrganizations = useMemo(() => {
     return project.reportingOrganizations?.join(', ') || t('oscrat.ui.n-a');
@@ -59,12 +54,19 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
       aria-labelledby={`product-${project.id}-title`}
     >
       <header className="flex items-center justify-between">
-        <h3
-          id={`product-${project.id}-title`}
-          className="text-sm font-semibold text-black dark:text-gray-100"
-        >
-          {project.name}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3
+            id={`product-${project.id}-title`}
+            className="text-sm font-semibold text-black dark:text-gray-100"
+          >
+            {project.name}
+          </h3>
+          {project.acronym && (
+            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-400/20">
+              {project.acronym}
+            </span>
+          )}
+        </div>
 
         <nav
           className="flex gap-6 font-medium text-gray-600"

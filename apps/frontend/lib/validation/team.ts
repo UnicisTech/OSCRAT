@@ -37,7 +37,7 @@ export const teamCreationSchema = Yup.object({
     .required('oscrat.ui.validation.organization-role-required'),
   postalAddress: postalAddressSchema.required('oscrat.ui.validation.postal-address-required'),
   contactEmail: emailSchema.required('oscrat.ui.validation.contact-email-required'),
-  contactPhone: phoneSchema.required('oscrat.ui.validation.contact-phone-required'),
+  contactPhone: phoneSchema.notRequired(),
   countryCode: Yup.string().required('oscrat.ui.validation.country-required'),
   additionalInformation: additionalInfoSchema.notRequired(),
 });

@@ -2,6 +2,7 @@ import {
   useUpdateUser,
   useUpdatePassword,
   useUpdateAvatar,
+  useDeleteAvatar,
   useDeleteUser,
 } from '@/lib/api/hooks/users';
 import type {
@@ -16,6 +17,7 @@ export function useAccount() {
   const updateUserMutation = useUpdateUser();
   const updatePasswordMutation = useUpdatePassword();
   const updateAvatarMutation = useUpdateAvatar();
+  const deleteAvatarMutation = useDeleteAvatar();
   const deleteUserMutation = useDeleteUser();
 
   /**
@@ -58,6 +60,18 @@ export function useAccount() {
   };
 
   /**
+   * Delete the user avatar
+   */
+  const deleteAvatar = async () => {
+    try {
+      const result = await deleteAvatarMutation.mutateAsync();
+      return { success: true, data: result };
+    } catch (error: unknown) {
+      return { success: false, error };
+    }
+  };
+
+  /**
    * Delete user account
    * @param password Current password for verification
    */
@@ -74,10 +88,12 @@ export function useAccount() {
     updateUser,
     updatePassword,
     updateAvatar,
+    deleteAvatar,
     deleteAccount,
     isUpdateUserLoading: updateUserMutation.isPending,
     isUpdatePasswordLoading: updatePasswordMutation.isPending,
     isUpdateAvatarLoading: updateAvatarMutation.isPending,
-    isDeleteAccountLoading: deleteUserMutation.isPending,
+    isDeleteAvatarLoading: deleteAvatarMutation.isPending,
+    isDeleteUserLoading: deleteUserMutation.isPending,
   };
 }

@@ -1,7 +1,7 @@
 import { Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
-import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowUpCircleIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { ArrowUpCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { User } from '@oscrat/model';
 
@@ -11,16 +11,18 @@ import { extractErrorMessage } from '@/lib/utils';
 
 const UploadAvatar = ({ user }: { user: Partial<User> }) => {
   const { t } = useTranslation('common');
-  const { updateAvatar, isUpdateAvatarLoading } = useAccount();
+  const { updateAvatar, deleteAvatar, isUpdateAvatarLoading, isDeleteAvatarLoading } = useAccount();
   const [dragActive, setDragActive] = useState(false);
   const [image, setImage] = useState<string | null>();
 
+  const defaultImage = useMemo(() => 
+    `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`,
+    [user.name]
+  );
+
   useEffect(() => {
-    setImage(
-      user.image ||
-        `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`
-    );
-  }, [user]);
+    setImage(user.image || defaultImage);
+  }, [user.image, defaultImage]);
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -75,11 +77,31 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
     if (result.success) {
       toast.success(t('successfully-updated'));
     } else {
+      const errorMessage = extractErrorMessage(result.error, t('error.avatar-update-failed'));
+      
+      if (errorMessage.includes('413') || errorMessage.toLowerCase().includes('body exceeded')) {
+        toast.error('File size too big. Maximum file size is 2MB.');
+      } else {
+        toast.error(errorMessage);
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    const result = await deleteAvatar();
+
+    if (result.success) {
+      setImage(defaultImage);
+      toast.success(t('successfully-updated'));
+    } else {
       toast.error(
-        extractErrorMessage(result.error, t('error.avatar-update-failed'))
+        extractErrorMessage(result.error, t('error.avatar-delete-failed'))
       );
     }
   };
+
+  // Show delete button if there's a custom avatar (either saved or locally uploaded)
+  const hasCustomAvatar = (image && image !== defaultImage) || user.image;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -154,15 +176,31 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
           </div>
         </Card.Body>
         <Card.Footer>
-          <Button
-            type="submit"
-            color="primary"
-            size="md"
-            disabled={!image || image === user.image}
-            loading={isUpdateAvatarLoading}
-          >
-            {t('save-changes')}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              color="primary"
+              size="md"
+              disabled={!image || image === user.image}
+              loading={isUpdateAvatarLoading}
+            >
+              {t('save-changes')}
+            </Button>
+            {hasCustomAvatar && (
+              <Button
+                type="button"
+                color="error"
+                variant="outline"
+                size="md"
+                onClick={handleDelete}
+                loading={isDeleteAvatarLoading}
+                disabled={isUpdateAvatarLoading}
+              >
+                <TrashIcon className="h-5 w-5" />
+                {t('delete')}
+              </Button>
+            )}
+          </div>
         </Card.Footer>
       </Card>
     </form>
