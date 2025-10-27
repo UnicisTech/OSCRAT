@@ -46,6 +46,7 @@ export type Attachment = {
   taskId: number | null;
   versionId: string | null;
   sbomReportId: string | null;
+  incidentId: string | null;
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;

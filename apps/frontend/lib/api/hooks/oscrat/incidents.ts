@@ -34,7 +34,8 @@ export function useGetIncidentDetail(
   teamId: string,
   productId: string,
   versionId: string,
-  incidentId: string
+  incidentId: string,
+  options?: { enabled?: boolean }
 ) {
   return useQuery({
     queryKey: queryKeys.oscrat.projects.versions.incidents.detail(
@@ -49,6 +50,7 @@ export function useGetIncidentDetail(
         versionId,
         incidentId
       ),
+    enabled: options?.enabled !== false,
   });
 }
 
@@ -123,11 +125,10 @@ export function useUpdateIncident(
 export function useDeleteIncident(
   teamId: string,
   productId: string,
-  versionId: string,
-  incidentId: string
+  versionId: string
 ) {
   return useMutation({
-    mutationFn: () =>
+    mutationFn: (incidentId: string) =>
       oscratIncidentEndpoints.deleteIncident(
         teamId,
         productId,
