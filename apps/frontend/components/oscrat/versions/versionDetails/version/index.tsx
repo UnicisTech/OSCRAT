@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BsExclamationCircleFill } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
-import { FullScreenModal } from '@/components/shared';
 import { getBorderClass } from '@/lib/borderUtils';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useVersionContext } from '@/context/VersionContext';
@@ -9,6 +8,10 @@ import { useProductContext } from '@/context/ProductContext';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useTeamContext } from '@/context/TeamContext';
+import VersionEditModal from './VersionEditModal';
+import VersionActionModal from './VersionActionModal';
+import type { OscratProductVersionUpdate } from '@oscrat/model';
+import { extractErrorMessage } from '@/lib/utils';
 
 const Index = () => {
   const { t, ready } = useTranslation('common');
@@ -23,26 +26,11 @@ const Index = () => {
 
   const router = useRouter();
 
-  const [showModal, setShowModal] = useState(false);
-  const [modalAction, setModalAction] = useState<
-    'edit' | 'delete' | 'withdraw' | null
-  >(null);
-
-  // Edit form state
-  const [editName, setEditName] = useState('');
-
-  // Initialize edit form when version data is available
-  useEffect(() => {
-    if (version?.version) {
-      setEditName(version.version);
-    }
-  }, [version]);
-
-  // TODO: Align with design team to see if they belong
-  // const [editType, setEditType] = useState(version?.type);
-  // const [editExternalReporting, setEditExternalReporting] = useState<string[]>(
-  //   version.externalReportingAcronyms || []
-  // );
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showActionModal, setShowActionModal] = useState(false);
+  const [modalAction, setModalAction] = useState<'delete' | 'withdraw' | null>(
+    null
+  );
 
   // Standard way: don't render until translations are ready
   if (!ready) return null;
@@ -57,171 +45,69 @@ const Index = () => {
       ? `${version.incidents.length} ${t('oscrat.ui.open')}`
       : t('oscrat.ui.none');
 
-  const handleEdit = async () => {
-    if (!editName.trim()) {
-      toast.error('Version name is required');
-      return;
-    }
-
+  const handleEdit = async (updatedData: OscratProductVersionUpdate) => {
     try {
-      await updateVersion({
-        version: editName.trim(),
-      });
-      toast.success('Version updated successfully');
+      await updateVersion(updatedData);
+      toast.success(t('oscrat.ui.version-updated-successfully'));
+      setShowEditModal(false);
     } catch (error) {
-      console.error('Failed to update version:', error);
-      toast.error('Failed to update version');
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-update-version'))
+      );
     }
   };
 
   const handleDelete = async () => {
     try {
       await deleteVersion();
-      toast.success('Project deleted successfully');
-      const redirectPath = `/teams/${slug}/products/${productId}/versions`;
+      toast.success(t('oscrat.ui.version-deleted-successfully'));
+      const redirectPath = `/teams/${slug}/products/${productId}`;
       router.replace(redirectPath);
     } catch (error) {
-      console.error('Failed to delete version:', error);
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-delete-version'))
+      );
     }
   };
 
   const handleWithdraw = () => {
-    console.log('Withdraw product:', version?.id);
+    // TODO: Implement withdraw functionality
   };
 
-  // Function to get modal content based on action
-  const getModalContent = () => {
-    switch (modalAction) {
-      case 'edit':
-        return {
-          title: t('oscrat.ui.edit-version'),
-          continueButtonText: t('save'),
-          onContinue: () => {
-            setShowModal(false);
-            setModalAction(null);
-            handleEdit();
-          },
-        };
-      case 'delete':
-        return {
-          title: t('oscrat.ui.delete-version'),
-          text: t('oscrat.ui.delete-version-confirmation', {
-            versionName: version?.version,
-          }),
-          continueButtonText: t('delete'),
-          onContinue: () => {
-            setShowModal(false);
-            setModalAction(null);
-            handleDelete();
-          },
-        };
-      case 'withdraw':
-        return {
-          title: t('oscrat.ui.withdraw-version'),
-          text: t('oscrat.ui.withdraw-version-confirmation', {
-            versionName: version?.version,
-          }),
-          continueButtonText: t('oscrat.ui.withdraw'),
-          onContinue: () => {
-            setShowModal(false);
-            setModalAction(null);
-            handleWithdraw();
-          },
-        };
-      default:
-        return {
-          title: t('oscrat.ui.version-details'),
-          continueButtonText: t('oscrat.ui.close'),
-          onContinue: () => {
-            setShowModal(false);
-            setModalAction(null);
-          },
-        };
-    }
-  };
+  const handleEditClick = () => setShowEditModal(true);
 
-  const modalContent = getModalContent();
-
-  const handleActionClick = (action: 'edit' | 'delete' | 'withdraw') => {
+  const handleActionClick = (action: 'delete' | 'withdraw') => {
     setModalAction(action);
-    setShowModal(true);
+    setShowActionModal(true);
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
+  const handleCloseModals = () => {
+    setShowEditModal(false);
+    setShowActionModal(false);
     setModalAction(null);
   };
 
+  if (!version) return null;
+
   return (
     <>
-      <FullScreenModal
-        isOpen={showModal}
-        onClose={handleModalClose}
-        title={modalContent.title}
-        text={modalAction !== 'edit' ? modalContent.text : undefined}
-        cancelButtonText={t('cancel')}
-        continueButtonText={modalContent.continueButtonText}
-        onCancel={handleModalClose}
-        onContinue={modalContent.onContinue}
-      >
-        {modalAction === 'edit' && (
-          <div className="space-y-6">
-            <div>
-              <label className="mb-2 block text-sm font-medium dark:text-gray-300">
-                {t('oscrat.ui.version-name')}
-              </label>
-              <input
-                type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-                placeholder={t('oscrat.ui.version-name')}
-              />
-            </div>
+      <VersionEditModal
+        isOpen={showEditModal}
+        onClose={handleCloseModals}
+        onSave={handleEdit}
+        initialData={{
+          version: version?.version,
+          status: version?.status,
+        }}
+      />
 
-            {/*    /!*TODO:align with Radu to implement in DB*!/*/}
-            {/*<div>*/}
-            {/*  <label className="mb-2 block text-sm font-medium dark:text-gray-300">*/}
-            {/*    {t('oscrat.ui.role')}*/}
-            {/*  </label>*/}
-            {/*  <select*/}
-            {/*    value={editType}*/}
-            {/*    onChange={(e) => setEditType(e.target.value)}*/}
-            {/*    className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"*/}
-            {/*  >*/}
-            {/*    {mockProductTypes.map((productType) => (*/}
-            {/*      <option key={productType} value={productType}>*/}
-            {/*        {productType}*/}
-            {/*      </option>*/}
-            {/*    ))}*/}
-            {/*  </select>*/}
-            {/*</div>*/}
-
-            {/*    /!*TODO:align with Radu to implement in DB*!/*/}
-            {/*<div>*/}
-            {/*  <label className="mb-2 block text-sm font-medium dark:text-gray-300">*/}
-            {/*    {t('oscrat.ui.external-reporting')}*/}
-            {/*  </label>*/}
-            {/*  <select*/}
-            {/*    value={editExternalReporting[0] || ''}*/}
-            {/*    onChange={(e) =>*/}
-            {/*      setEditExternalReporting(*/}
-            {/*        e.target.value ? [e.target.value] : []*/}
-            {/*      )*/}
-            {/*    }*/}
-            {/*    className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"*/}
-            {/*  >*/}
-            {/*    <option value="">{t('choose')}</option>*/}
-            {/*    {mockExternalReportingOptions.map((option) => (*/}
-            {/*      <option key={option} value={option}>*/}
-            {/*        {option}*/}
-            {/*      </option>*/}
-            {/*    ))}*/}
-            {/*  </select>*/}
-            {/*</div>*/}
-          </div>
-        )}
-      </FullScreenModal>
+      <VersionActionModal
+        isOpen={showActionModal}
+        onClose={handleCloseModals}
+        action={modalAction}
+        versionName={version?.version || ''}
+        onConfirm={modalAction === 'delete' ? handleDelete : handleWithdraw}
+      />
       <div
         className={`flex flex-col gap-2 rounded-lg border border-gray-400 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800`}
       >
@@ -233,6 +119,15 @@ const Index = () => {
           <div className="flex font-medium text-gray-600">
             <div>
               <button
+                onClick={() => handleActionClick('delete')}
+                className="rounded px-6 py-1 text-sm"
+              >
+                {t('delete')}
+              </button>
+            </div>
+
+            <div>
+              <button
                 onClick={() => handleActionClick('withdraw')}
                 className="rounded px-6 py-1 text-sm"
               >
@@ -242,7 +137,7 @@ const Index = () => {
 
             <div>
               <button
-                onClick={() => handleActionClick('edit')}
+                onClick={handleEditClick}
                 className="rounded border border-gray-400 px-3 py-1 text-sm text-black hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
               >
                 {t('edit')}

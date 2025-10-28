@@ -64,6 +64,15 @@ export const oscratProductStatusTranslationMap = {
   INACTIVE: 'oscrat.product.status.inactive',
 } as const;
 
+// Product Version Status mappings
+export const oscratProductVersionStatusTranslationMap = {
+  DRAFT: 'oscrat.ui.draft',
+  ACTIVE: 'oscrat.ui.supported',
+  DEPRECATED: 'oscrat.ui.not-supported',
+  ARCHIVED: 'oscrat.ui.archived',
+  WITHDRAWN: 'oscrat.ui.withdrawn',
+} as const;
+
 // Risk Level mappings
 export const oscratRiskLevelTranslationMap = {
   LOW: 'oscrat.risk.levels.low',
@@ -185,3 +194,7 @@ export const getIncidentTypeKey = (
 export const getIncidentStatusKey = (
   status: keyof typeof oscratIncidentStatusTranslationMap
 ) => oscratIncidentStatusTranslationMap[status];
+
+export const getProductVersionStatusKey = (
+  status: keyof typeof oscratProductVersionStatusTranslationMap
+) => oscratProductVersionStatusTranslationMap[status];

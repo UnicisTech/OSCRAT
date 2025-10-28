@@ -2,9 +2,6 @@ import { useState } from 'react';
 import NotSupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/notSupported';
 import SupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/supported';
 import { OscratProductVersionSummary } from '@oscrat/model';
-import Index from '@/components/oscrat/products/productDetails/addVersion';
-import { useProductContext } from '@/context/ProductContext';
-import { useSession } from 'next-auth/react';
 
 export type TabConfig = {
   id: string;
@@ -26,25 +23,9 @@ export default function TabsManager({
   onButtonClick,
 }: TabsManagerProps) {
   const [activeTab, setActiveTab] = useState(defaultActiveTab || tabs[0]?.id);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-
-  const { teamId, productId } = useProductContext();
-  const { data: session } = useSession();
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
-  };
-
-  const handleButtonClick = () => {
-    if (onButtonClick) {
-      onButtonClick();
-    } else {
-      setShowCreateModal(true);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setShowCreateModal(false);
   };
 
   const renderTabContent = (tab: TabConfig) => {
@@ -84,11 +65,11 @@ export default function TabsManager({
           </button>
         ))}
 
-        {buttonText && (
+        {buttonText && onButtonClick && (
           <button
             type="button"
             className="ml-auto rounded border border-gray-300 bg-transparent px-4 py-2 text-sm font-medium text-black hover:bg-gray-100"
-            onClick={handleButtonClick}
+            onClick={onButtonClick}
           >
             {buttonText}
           </button>
@@ -106,15 +87,6 @@ export default function TabsManager({
           {activeTab === tab.id && renderTabContent(tab)}
         </div>
       ))}
-
-      {/* Create Version Modal */}
-      <Index
-        isOpen={showCreateModal}
-        onClose={handleCloseModal}
-        teamId={teamId}
-        productId={productId}
-        createdBy={session?.user?.id || ""}
-      />
     </div>
   );
 }

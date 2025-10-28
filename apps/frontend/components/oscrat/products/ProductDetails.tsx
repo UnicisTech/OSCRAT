@@ -65,6 +65,10 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
     }
   };
 
+  const handleAddVersion = () => {
+    router.push(`/teams/${slug}/products/${productId}/versions/new`);
+  };
+
   return (
     <>
       <ProductComponent
@@ -75,7 +79,11 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
         onEdit={handleEdit}
       />
       {tabs && tabs.length > 0 && (
-        <TabsManager buttonText={t('oscrat.ui.add-version')} tabs={tabs} />
+        <TabsManager 
+          buttonText={t('oscrat.ui.add-version')} 
+          tabs={tabs}
+          onButtonClick={handleAddVersion}
+        />
       )}
     </>
   );

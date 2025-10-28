@@ -7,7 +7,6 @@ import { getBorderClass } from '@/lib/borderUtils';
 import ProductEditModal from './ProductEditModal';
 import ProductActionModal from './ProductActionModal';
 import type { OscratProductUpdate } from '@oscrat/model';
-import { useTeamContext } from '@/context/TeamContext';
 
 interface ProductProps {
   project: OscratProductDetail;
@@ -23,7 +22,6 @@ const Index: React.FC<ProductProps> = ({
   onWithdraw,
 }) => {
   const { t, ready } = useTranslation('common');
-  const { slug } = useTeamContext();
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
@@ -249,18 +247,6 @@ const Index: React.FC<ProductProps> = ({
             <span className="font-semibold text-black dark:text-gray-100">
               {reportingOrganizations || t('oscrat.ui.n-a')}
             </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('status')}:
-            </span>
-            <div className="inline-flex font-semibold text-black dark:text-gray-100">
-              <span>
-                {t(
-                  `oscrat.compliance.status.${project.complianceStatus?.toLowerCase().replace('_', '-')}`
-                )}
-              </span>
-            </div>
           </div>
           <div className="flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
