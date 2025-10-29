@@ -23,6 +23,7 @@ import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import {
   createRepositoryCreateSchema,
   generateRepositoryUrl,
+  parseRepositoryUrl,
   type RepositoryCreateInput,
 } from '@/lib/validation/repository';
 
@@ -216,6 +217,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const formik = useFormik<RepositoryCreateInput>({
     initialValues: {
+      repositoryUrl: repository?.repositoryUrl || '',
       name: repository?.name || '',
       provider: repository?.provider || RepositoryProvider.GITHUB,
       user: repository?.user || '',
@@ -264,6 +266,29 @@ const Modal: React.FC<ModalProps> = ({
       }
     },
   });
+
+  const handleRepositoryUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    formik.handleChange(e);
+
+    if (url.trim()) {
+      const parsed = parseRepositoryUrl(url, formik.values.provider);
+      if (parsed) {
+        // Auto-populate user and name fields
+        formik.setFieldValue('user', parsed.user);
+        formik.setFieldValue('name', parsed.name);
+      }
+    }
+  };
+
+  const handleProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    formik.handleChange(e);
+
+    // Clear all repository-related fields when provider changes
+    formik.setFieldValue('repositoryUrl', '');
+    formik.setFieldValue('user', '');
+    formik.setFieldValue('name', '');
+  };
 
   // Live URL preview
   const previewUrl =
@@ -314,45 +339,45 @@ const Modal: React.FC<ModalProps> = ({
                   {t('oscrat.ui.repository.sections.information')}
                 </h3>
 
-                {/* Two-column grid for main fields */}
+                {/* Provider dropdown - full width */}
+                <SelectField
+                  label={t('oscrat.ui.repository.labels.provider')}
+                  name="provider"
+                  value={formik.values.provider}
+                  onChange={handleProviderChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.provider && formik.errors.provider
+                      ? t(formik.errors.provider)
+                      : undefined
+                  }
+                  required
+                >
+                  {PROVIDER_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.label)}
+                    </option>
+                  ))}
+                </SelectField>
+
+                {/* Repository URL input - full width */}
+                <FormField
+                  label={t('oscrat.ui.repository.labels.repository-url')}
+                  name="repositoryUrl"
+                  value={formik.values.repositoryUrl}
+                  onChange={handleRepositoryUrlChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.repositoryUrl && formik.errors.repositoryUrl
+                      ? t(formik.errors.repositoryUrl)
+                      : undefined
+                  }
+                  placeholder={t('oscrat.ui.repository.placeholders.repository-url')}
+                  required
+                />
+
+                {/* Two-column grid for parsed fields */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <SelectField
-                    label={t('oscrat.ui.repository.labels.provider')}
-                    name="provider"
-                    value={formik.values.provider}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.provider && formik.errors.provider
-                        ? t(formik.errors.provider)
-                        : undefined
-                    }
-                    required
-                  >
-                    {PROVIDER_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {t(option.label)}
-                      </option>
-                    ))}
-                  </SelectField>
-
-                  <FormField
-                    label={t('oscrat.ui.repository.labels.repository-name')}
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.name && formik.errors.name
-                        ? t(formik.errors.name)
-                        : undefined
-                    }
-                    placeholder={t(
-                      'oscrat.ui.repository.placeholders.repository-name'
-                    )}
-                    required
-                  />
-
                   <FormField
                     label={t('oscrat.ui.repository.labels.user-organization')}
                     name="user"
@@ -372,6 +397,22 @@ const Modal: React.FC<ModalProps> = ({
                     required
                   />
 
+                  <FormField
+                    label={t('oscrat.ui.repository.labels.repository-name')}
+                    name="name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.name && formik.errors.name
+                        ? t(formik.errors.name)
+                        : undefined
+                    }
+                    placeholder={t(
+                      'oscrat.ui.repository.placeholders.repository-name'
+                    )}
+                    required
+                  />
                 </div>
 
                 {/* URL Preview - Full width */}

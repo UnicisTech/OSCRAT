@@ -6,8 +6,8 @@ import {
   OscratOrganizationType,
   OscratOrganizationSize,
   OscratOrganizationRole,
-  OscratProductVulnerabilityStatus,
 } from '@prisma/client';
+import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
 import type {
   Team,
   TeamSummary,
@@ -59,10 +59,7 @@ const TEAM_WITH_PRODUCTS_INCLUDE = {
               vulnerabilities: {
                 where: {
                   status: {
-                    in: [
-                      OscratProductVulnerabilityStatus.OPEN,
-                      OscratProductVulnerabilityStatus.ACTIVELY_EXPLOITED,
-                    ],
+                    in: OPEN_VULNERABILITY_STATUSES,
                   },
                 },
               },

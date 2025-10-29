@@ -6,8 +6,8 @@ import {
   extractFileData,
 } from '@/lib/utils/fileUpload';
 import formidable from 'formidable';
-import { v4 as uuidv4 } from 'uuid';
 import type { Attachment } from '@oscrat/model';
+import type { AttachmentEntityFilters } from '@oscrat/model/types/attachments';
 
 export interface CreateVersionAttachmentParams {
   versionId: string;
@@ -15,6 +15,8 @@ export interface CreateVersionAttachmentParams {
   fileData: Buffer;
   createdBy: string;
   description?: string;
+  vulnerabilityId?: string;
+  incidentId?: string;
 }
 
 export const createVersionAttachment = async (
@@ -27,13 +29,16 @@ export const createVersionAttachment = async (
     fileSize: params.fileData.length,
     versionId: params.versionId,
     createdBy: params.createdBy,
+    vulnerabilityId: params.vulnerabilityId,
+    incidentId: params.incidentId,
   });
 };
 
 export const getVersionAttachments = async (
-  versionId: string
+  versionId: string,
+  filters?: AttachmentEntityFilters
 ): Promise<Attachment[]> => {
-  return await AttachmentOps.getVersionAttachments(prisma, versionId);
+  return await AttachmentOps.getVersionAttachments(prisma, versionId, filters);
 };
 
 export const getVersionAttachmentById = async (
@@ -60,23 +65,26 @@ export interface UploadVersionAttachmentParams {
   file: formidable.File;
   createdBy: string;
   description?: string;
+  vulnerabilityId?: string;
+  incidentId?: string;
 }
 
 export const saveFileAsVersionAttachment = async (
   params: UploadVersionAttachmentParams
-): Promise<string> => {
+): Promise<Attachment> => {
   const fileUpload = await extractFileData(params.file);
-  const attachmentId = uuidv4();
 
-  await createVersionAttachment({
+  const attachment = await createVersionAttachment({
     versionId: params.versionId,
     filename: fileUpload.filename,
     fileData: fileUpload.fileData,
     createdBy: params.createdBy,
     description: params.description,
+    vulnerabilityId: params.vulnerabilityId,
+    incidentId: params.incidentId,
   });
 
-  return `/version-attachments/${attachmentId}`;
+  return attachment;
 };
 
 // Use shared file validation

@@ -159,6 +159,21 @@ export const queryKeys = {
               incidentId,
             ] as const,
         },
+        vulnerabilities: {
+          all: (teamId: string, versionId: string) =>
+            [
+              ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+              'vulnerabilities',
+            ] as const,
+          detail: (teamId: string, versionId: string, vulnerabilityId: string) =>
+            [
+              ...queryKeys.oscrat.projects.versions.vulnerabilities.all(
+                teamId,
+                versionId
+              ),
+              vulnerabilityId,
+            ] as const,
+        },
         jobs: {
           sbom: {
             all: (teamId: string, versionId: string) =>
@@ -192,10 +207,11 @@ export const queryKeys = {
           },
         },
         attachments: {
-          all: (teamId: string, versionId: string) =>
+          all: (teamId: string, versionId: string, filters?: any) =>
             [
               ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
               'attachments',
+              ...(filters ? [filters] : []),
             ] as const,
         },
       },

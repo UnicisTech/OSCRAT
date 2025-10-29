@@ -4,11 +4,13 @@ import {
   useDeleteVersionAttachment,
 } from '@/lib/api/hooks/oscrat/versionAttachments';
 import { useAttachments } from '@/hooks/useAttachments';
+import type { AttachmentEntityFilters } from '@oscrat/model/types/attachments';
 
 export function useVersionAttachments(
   teamId: string,
   productId: string,
-  versionId: string
+  versionId: string,
+  filters?: AttachmentEntityFilters
 ) {
   // Get common attachment functionality
   const baseAttachments = useAttachments();
@@ -18,17 +20,19 @@ export function useVersionAttachments(
     isLoading: isFetchingAttachments,
     isError,
     error,
-  } = useGetVersionAttachments(teamId, productId, versionId);
+  } = useGetVersionAttachments(teamId, productId, versionId, filters);
 
   const uploadAttachmentMutation = useUploadVersionAttachment(
     teamId,
     productId,
-    versionId
+    versionId,
+    filters
   );
   const deleteAttachmentMutation = useDeleteVersionAttachment(
     teamId,
     productId,
-    versionId
+    versionId,
+    filters
   );
 
   const uploadAttachment = async (file: File, description?: string) => {

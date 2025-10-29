@@ -67,10 +67,12 @@ export default function Index() {
   }
 
   return (
-    <>
+    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
       <div className="w-full">
-        {/* Header with Button */}
-        <div className="mb-4 flex items-center justify-end">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-medium text-gray-900">
+            {t('oscrat.ui.versions.incidents.title')}
+          </h3>
           <button
             onClick={handleAddIncident}
             className="rounded-md border border-gray-400 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
@@ -79,11 +81,9 @@ export default function Index() {
           </button>
         </div>
 
-        {/* Incidents Table */}
         <Table incidents={incidents} onDelete={handleDelete} />
       </div>
 
-      {/* Delete Confirmation Modal */}
       <ConfirmationDialog
         visible={showDeleteModal}
         title={t('oscrat.ui.versions.incidents.delete-incident')}
@@ -97,6 +97,6 @@ export default function Index() {
       >
         {t('oscrat.ui.versions.incidents.confirm-delete')}
       </ConfirmationDialog>
-    </>
+    </div>
   );
 }

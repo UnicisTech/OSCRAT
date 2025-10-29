@@ -7,15 +7,17 @@ import { Loading, Breadcrumb } from '@/components/shared';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import usePagination from '@/hooks/usePagination';
-import { FaDownload } from 'react-icons/fa';
+import { FaDownload, FaPlus, FaEye, FaCheckCircle } from 'react-icons/fa';
 import { useAttachments } from '@/hooks/useAttachments';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import { reportStyles } from '@/components/oscrat/reportStyles';
-import { WorkerJobStatus } from '@oscrat/model';
+import { WorkerJobStatus, type ScanVulnerability } from '@oscrat/model';
 import ReportStatusMessage from '@/components/oscrat/ReportStatusMessage';
+import ActionButton from '@/components/oscrat/ActionButton';
+import { useTeamContext } from '@/context/TeamContext';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -188,17 +190,21 @@ function VulnerabilitiesTable({
   goToNextPage,
   getSeverityBadge,
   t,
+  onCreateVulnerability,
+  onViewVulnerability,
 }: {
-  vulnerabilities: any[];
+  vulnerabilities: ScanVulnerability[];
   currentPage: number;
   totalPages: number;
-  pageData: any[];
+  pageData: ScanVulnerability[];
   prevButtonDisabled: boolean;
   nextButtonDisabled: boolean;
   goToPreviousPage: () => void;
   goToNextPage: () => void;
   getSeverityBadge: (severity: string) => JSX.Element;
   t: (key: string, options?: any) => string;
+  onCreateVulnerability: (vuln: ScanVulnerability) => void;
+  onViewVulnerability: (vulnerabilityId: string) => void;
 }) {
   if (!vulnerabilities || vulnerabilities.length === 0) {
     return (
@@ -244,13 +250,25 @@ function VulnerabilitiesTable({
               <th className={tableStyles.th}>
                 {t('oscrat.ui.versions.vulnerability-scan.table-description')}
               </th>
+              <th className={tableStyles.th}>
+                {t('oscrat.ui.actions')}
+              </th>
             </tr>
           </thead>
           <tbody className={tableStyles.tbody}>
-            {pageData.map((vuln: any, index: number) => (
+            {pageData.map((vuln, index) => (
               <tr key={index} className={tableStyles.tr}>
                 <td className={`${tableStyles.td} font-medium text-gray-900`}>
-                  {vuln.cve}
+                  <div className="flex items-center gap-2">
+                    {vuln.cve}
+                    {vuln.existingVulnerability && (
+                      <FaCheckCircle
+                        className="text-green-600"
+                        size={14}
+                        title={t('oscrat.ui.versions.vulnerability-scan.already-tracked')}
+                      />
+                    )}
+                  </div>
                 </td>
                 <td className={tableStyles.td}>{getSeverityBadge(vuln.severity)}</td>
                 <td className={`${tableStyles.td} text-gray-900`}>{vuln.package}</td>
@@ -260,6 +278,25 @@ function VulnerabilitiesTable({
                   <div className="max-w-md truncate" title={vuln.description}>
                     {vuln.description || '-'}
                   </div>
+                </td>
+                <td className={tableStyles.td}>
+                  {vuln.existingVulnerability ? (
+                    <ActionButton
+                      onClick={() => onViewVulnerability(vuln.existingVulnerability!.id)}
+                      icon={<FaEye size={12} />}
+                      title={t('oscrat.ui.view')}
+                    >
+                      {t('oscrat.ui.view')}
+                    </ActionButton>
+                  ) : (
+                    <ActionButton
+                      onClick={() => onCreateVulnerability(vuln)}
+                      icon={<FaPlus size={12} />}
+                      title={t('oscrat.ui.create')}
+                    >
+                      {t('oscrat.ui.create')}
+                    </ActionButton>
+                  )}
                 </td>
               </tr>
             ))}
@@ -286,6 +323,7 @@ export default function VulnerabilityScanSummary() {
   const router = useRouter();
   const { reportId } = router.query;
   const { teamId, productId, versionId } = useVersionContext();
+  const { slug } = useTeamContext();
 
   const { project } = useOscratProject(teamId, productId);
   const { version: versionData } = useOscratVersion(teamId, productId, versionId);
@@ -301,6 +339,7 @@ export default function VulnerabilityScanSummary() {
   const { downloadAttachment } = useAttachments();
 
   const scanData = report?.scanData as any;
+  const vulnerabilities = (scanData?.vulnerabilities || []) as ScanVulnerability[];
 
   const {
     currentPage,
@@ -310,7 +349,7 @@ export default function VulnerabilityScanSummary() {
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination(scanData?.vulnerabilities || [], ITEMS_PER_PAGE);
+  } = usePagination(vulnerabilities, ITEMS_PER_PAGE);
 
   const breadcrumbItems = [
     {
@@ -381,7 +420,7 @@ export default function VulnerabilityScanSummary() {
         )}
 
         <VulnerabilitiesTable
-          vulnerabilities={scanData?.vulnerabilities || []}
+          vulnerabilities={vulnerabilities}
           currentPage={currentPage}
           totalPages={totalPages}
           pageData={pageData}
@@ -391,6 +430,24 @@ export default function VulnerabilityScanSummary() {
           goToNextPage={goToNextPage}
           getSeverityBadge={(severity) => getSeverityBadge(severity, t)}
           t={t}
+          onCreateVulnerability={(vuln) => {
+            const params = new URLSearchParams({
+              prefill: 'true',
+              cve: vuln.cve,
+              severity: vuln.severity,
+              description: vuln.description,
+              package: vuln.package,
+              version: vuln.version,
+            });
+            router.push(
+              `/teams/${slug}/products/${productId}/versions/${versionId}/vulnerabilities/new?${params.toString()}`
+            );
+          }}
+          onViewVulnerability={(vulnerabilityId) => {
+            router.push(
+              `/teams/${slug}/products/${productId}/versions/${versionId}/vulnerabilities/${vulnerabilityId}`
+            );
+          }}
         />
       </div>
     </>

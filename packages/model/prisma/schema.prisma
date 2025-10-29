@@ -294,12 +294,13 @@ enum OscratProductVulnerabilitySeverity {
 }
 
 enum OscratProductVulnerabilityStatus {
-  OPEN
-  ACTIVELY_EXPLOITED
-  PATCHED
-  MITIGATED
-  CLOSED
-  ACCEPTED_RISK
+  PENDING
+  PREPARATION
+  RECEIPT
+  VERIFICATION
+  REMEDIATION_DEVELOPMENT
+  RELEASE
+  POST_RELEASE
 }
 
 enum IncidentStatus {
@@ -493,10 +494,16 @@ model OscratProductVulnerability {
   status      OscratProductVulnerabilityStatus
   cve         String?
 
+  advisoryId            String?
+  dateOfDiscovery       DateTime
+  affectedMemberStates  String[]
+
   versionId String
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
   productId String // Denormalized for easier queries
+
+  attachments Attachment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -735,6 +742,9 @@ model Attachment {
   incidentId String?
   incident   OscratProductIncident? @relation(fields: [incidentId], references: [id], onDelete: Cascade)
 
+  vulnerabilityId String?
+  vulnerability   OscratProductVulnerability? @relation(fields: [vulnerabilityId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdBy String
@@ -746,5 +756,6 @@ model Attachment {
   @@index([sbomReportId])
   @@index([vulnerabilityScanReportId])
   @@index([incidentId])
+  @@index([vulnerabilityId])
   @@index([name])
 }

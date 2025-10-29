@@ -1,30 +1,26 @@
 import React from 'react';
-import {
-  FaDownload,
-  FaTrash,
-} from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import type { VulnerabilityScanReportDetails } from '@oscrat/model/operations';
-import { WorkerJobStatus } from '@oscrat/model';
+import type { OscratVulnerabilitySummary } from '@oscrat/model';
+import { OscratProductVulnerabilityStatus } from '@oscrat/model';
 import usePagination from '@/hooks/usePagination';
-import { getErrorCodeTranslationKey } from '@/utils/errorCodeTranslation';
 import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
+import normalizeText from '@/utils/normalizeText';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const ITEMS_PER_PAGE = 15;
 
-interface VulnerabilityScanTableProps {
-  reports?: VulnerabilityScanReportDetails[];
-  onDownload: (id: string, filename: string) => void;
-  onDelete: (reportId: string) => void;
+interface VulnerabilitiesTableProps {
+  vulnerabilities?: OscratVulnerabilitySummary[];
+  onDelete: (vulnerabilityId: string) => void;
   itemsPerPage?: number;
 }
 
-const Table: React.FC<VulnerabilityScanTableProps> = ({
-  reports,
-  onDownload,
+const Table: React.FC<VulnerabilitiesTableProps> = ({
+  vulnerabilities,
   onDelete,
   itemsPerPage,
 }) => {
@@ -41,233 +37,140 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination<VulnerabilityScanReportDetails>(reports || [], pageSize);
+  } = usePagination<OscratVulnerabilitySummary>(vulnerabilities || [], pageSize);
 
   if (!ready) {
     return null;
   }
 
-  const formatDuration = (start: Date, end: Date) => {
-    const duration = new Date(end).getTime() - new Date(start).getTime();
-    const minutes = Math.floor(duration / 60000);
-    const seconds = Math.floor((duration % 60000) / 1000);
-    return `${minutes}m ${seconds}s`;
-  };
-
-  const getStatusBadge = (report: VulnerabilityScanReportDetails) => {
-    const statusConfig = {
-      [WorkerJobStatus.COMPLETED]: {
-        color: 'text-green-600',
-        label: t('oscrat.ui.versions.vulnerability-scan.completed'),
-      },
-      [WorkerJobStatus.IN_PROGRESS]: {
-        color: 'text-blue-600',
-        label: t('oscrat.ui.versions.vulnerability-scan.in-progress'),
-      },
-      [WorkerJobStatus.FAILED]: {
-        color: 'text-red-600',
-        label: t('oscrat.ui.versions.vulnerability-scan.failed'),
-      },
-      [WorkerJobStatus.PENDING]: {
-        color: 'text-gray-600',
-        label: t('oscrat.ui.versions.vulnerability-scan.pending'),
-      },
-      [WorkerJobStatus.CANCELLED]: {
-        color: 'text-gray-600',
-        label: t('oscrat.ui.versions.vulnerability-scan.cancelled'),
-      },
+  const getStatusBadge = (status: OscratProductVulnerabilityStatus) => {
+    const statusConfig: Record<
+      OscratProductVulnerabilityStatus,
+      { bgColor: string; textColor: string }
+    > = {
+      [OscratProductVulnerabilityStatus.PENDING]: { bgColor: 'bg-gray-100', textColor: 'text-gray-800' },
+      [OscratProductVulnerabilityStatus.PREPARATION]: { bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
+      [OscratProductVulnerabilityStatus.RECEIPT]: { bgColor: 'bg-cyan-100', textColor: 'text-cyan-800' },
+      [OscratProductVulnerabilityStatus.VERIFICATION]: { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
+      [OscratProductVulnerabilityStatus.REMEDIATION_DEVELOPMENT]: { bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
+      [OscratProductVulnerabilityStatus.RELEASE]: { bgColor: 'bg-green-100', textColor: 'text-green-800' },
+      [OscratProductVulnerabilityStatus.POST_RELEASE]: { bgColor: 'bg-emerald-100', textColor: 'text-emerald-800' },
     };
 
-    const config = statusConfig[report.status] || {
-      color: 'text-gray-600',
-      label: t('oscrat.ui.unknown'),
-    };
+    const config = statusConfig[status] || statusConfig[OscratProductVulnerabilityStatus.PENDING];
 
     return (
       <span
-        className={`flex items-center ${config.color}`}
-        title={report.status === WorkerJobStatus.FAILED && report.job.errCode
-          ? `Error ${report.job.errCode}: ${t(getErrorCodeTranslationKey(report.job.errCode))}`
-          : undefined}
+        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${config.bgColor} ${config.textColor}`}
       >
-        <span className="mr-1">●</span>
-        {config.label}
+        {normalizeText(status)}
       </span>
     );
   };
 
-  if (!reports || reports.length === 0) {
+  const getSeverityBadge = (severity: string) => {
+    const severityConfig: Record<
+      string,
+      { bgColor: string; textColor: string }
+    > = {
+      LOW: { bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
+      MEDIUM: { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
+      HIGH: { bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
+      CRITICAL: { bgColor: 'bg-red-100', textColor: 'text-red-800' },
+    };
+
+    const config = severityConfig[severity] || severityConfig.LOW;
+
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-        <p className="text-sm">{t('oscrat.ui.no-vulnerability-scans-added')}</p>
-      </div>
+      <span
+        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${config.bgColor} ${config.textColor}`}
+      >
+        {normalizeText(severity)}
+      </span>
     );
-  }
+  };
+
+  const handleViewDetails = (vulnerabilityId: string) => {
+    router.push(
+      `/teams/${slug}/products/${productId}/versions/${versionId}/vulnerabilities/${vulnerabilityId}`
+    );
+  };
 
   return (
-    <div className="w-full rounded-lg">
+    <div className="w-full">
       <div className={tableStyles.wrapper}>
-        <table className={tableStyles.table}>
+        <table className="w-full text-left text-sm text-gray-600">
           <thead className={tableStyles.thead}>
             <tr>
-              <th scope="col" className={`${tableStyles.th} w-28`}>
-                {t('status')}
+              <th className={tableStyles.th}>
+                {t('oscrat.ui.versions.vulnerabilities.table-name')}
               </th>
-              <th scope="col" className={`${tableStyles.th} w-20 text-center`}>
-                {t('oscrat.ui.source')}
+              <th className={tableStyles.th}>
+                {t('oscrat.ui.versions.vulnerabilities.table-status')}
               </th>
-              <th scope="col" className={`${tableStyles.th} w-28 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.started')}
+              <th className={tableStyles.th}>
+                {t('oscrat.ui.versions.vulnerabilities.table-severity')}
               </th>
-              <th scope="col" className={`${tableStyles.th} w-24 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.triggered-by')}
+              <th className={tableStyles.th}>
+                {t('oscrat.ui.versions.vulnerabilities.table-date-of-discovery')}
               </th>
-              <th scope="col" className={`${tableStyles.th} w-16 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.duration')}
+              <th className={tableStyles.th}>
+                {t('oscrat.ui.versions.vulnerabilities.table-description')}
               </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.total')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.critical')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.high')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.medium')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.low')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-40 text-center`}>
+              <th className={tableStyles.th}>
                 {t('actions')}
               </th>
             </tr>
           </thead>
           <tbody className={tableStyles.tbody}>
-            {pageData.map((report) => (
+            {pageData.map((vulnerability) => (
               <tr
-                key={report.id}
+                key={vulnerability.id}
                 className={`${tableStyles.tr} cursor-pointer`}
-                onClick={() =>
-                  router.push(
-                    `/teams/${slug}/products/${productId}/versions/${versionId}/scan/${report.id}`
-                  )
-                }
+                onClick={() => handleViewDetails(vulnerability.id)}
               >
-                <td className={tableStyles.td}>{getStatusBadge(report)}</td>
-                <td className={tableStyles.tdCenter}>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      report.job.source === 'REPO'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-purple-100 text-purple-800'
-                    }`}
-                  >
-                    {report.job.source === 'REPO'
-                      ? t('oscrat.ui.repository.labels.title')
-                      : t('oscrat.ui.versions.sbom.title')}
-                  </span>
+                <td className={tableStyles.td}>
+                  <div className="max-w-[200px] truncate" title={vulnerability.name}>
+                    {vulnerability.name}
+                  </div>
                 </td>
-                <td className={tableStyles.tdCenter}>
-                  {new Date(report.job.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                <td className={tableStyles.td}>
+                  {getStatusBadge(vulnerability.status)}
                 </td>
-                <td
-                  className={tableStyles.tdCenter}
-                  title={
-                    report.job.triggeredByUser?.name ||
-                    report.job.triggeredByUser?.email ||
-                    '-'
-                  }
-                >
-                  {report.job.triggeredByUser?.name ||
-                    report.job.triggeredByUser?.email ||
-                    '-'}
+                <td className={tableStyles.td}>
+                  {getSeverityBadge(vulnerability.severity)}
                 </td>
-                <td className={tableStyles.tdCenter}>
-                  {report.status === WorkerJobStatus.COMPLETED &&
-                  report.job.processStartTime &&
-                  report.job.processEndTime
-                    ? formatDuration(report.job.processStartTime, report.job.processEndTime)
-                    : '-'}
+                <td className={tableStyles.td}>
+                  {formatDateShort(vulnerability.dateOfDiscovery)}
                 </td>
-                <td className={tableStyles.tdCenter}>
-                  {report.scanData?.totalVulnerabilities ?? '-'}
+                <td className={tableStyles.td}>
+                  <div className="max-w-[300px] truncate" title={vulnerability.description}>
+                    {vulnerability.description}
+                  </div>
                 </td>
-                <td className={tableStyles.tdCenter}>
-                  <span className={report.scanData?.criticalCount ? 'text-red-600 font-semibold' : ''}>
-                    {report.scanData?.criticalCount ?? '-'}
-                  </span>
-                </td>
-                <td className={tableStyles.tdCenter}>
-                  <span className={report.scanData?.highCount ? 'text-orange-600 font-semibold' : ''}>
-                    {report.scanData?.highCount ?? '-'}
-                  </span>
-                </td>
-                <td className={tableStyles.tdCenter}>
-                  <span className={report.scanData?.mediumCount ? 'text-yellow-600' : ''}>
-                    {report.scanData?.mediumCount ?? '-'}
-                  </span>
-                </td>
-                <td className={tableStyles.tdCenter}>
-                  <span className={report.scanData?.lowCount ? 'text-blue-600' : ''}>
-                    {report.scanData?.lowCount ?? '-'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-center align-middle">
+                <td className={tableStyles.td}>
                   <div
-                    className="flex items-center justify-center space-x-1"
+                    className="flex items-center gap-2"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ActionButton
-                      onClick={() =>
-                        report.attachment &&
-                        onDownload(report.attachment.id, report.attachment.name)
-                      }
-                      disabled={
-                        report.status !== WorkerJobStatus.COMPLETED ||
-                        !report.attachment
-                      }
-                      icon={<FaDownload size={12} />}
-                      title={t('oscrat.ui.versions.vulnerability-scan.download-report')}
-                    >
-                      {t('oscrat.ui.versions.vulnerability-scan.download')}
-                    </ActionButton>
-                    <ActionButton
-                      onClick={() => onDelete(report.id)}
-                      disabled={
-                        report.status !== WorkerJobStatus.COMPLETED &&
-                        report.status !== WorkerJobStatus.FAILED
-                      }
+                      onClick={() => onDelete(vulnerability.id)}
                       icon={<FaTrash size={12} />}
-                      title={
-                        report.status === WorkerJobStatus.COMPLETED ||
-                        report.status === WorkerJobStatus.FAILED
-                          ? t('oscrat.ui.versions.vulnerability-scan.delete-job')
-                          : t(
-                              'oscrat.ui.versions.vulnerability-scan.delete-only-completed-failed'
-                            )
-                      }
+                      title={t('oscrat.ui.versions.vulnerabilities.delete-vulnerability')}
                     >
-                      {t('oscrat.ui.versions.vulnerability-scan.delete')}
+                      {t('oscrat.ui.delete')}
                     </ActionButton>
                   </div>
                 </td>
               </tr>
             ))}
-            {(!reports || reports.length === 0) && (
+            {(!vulnerabilities || vulnerabilities.length === 0) && (
               <tr>
                 <td
-                  colSpan={11}
+                  colSpan={6}
                   className="px-6 py-8 text-center text-sm text-gray-500"
                 >
-                  {t('oscrat.ui.no-vulnerability-scans-added')}
+                  {t('oscrat.ui.versions.vulnerabilities.no-vulnerabilities-added')}
                 </td>
               </tr>
             )}
@@ -275,8 +178,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
         </table>
       </div>
 
-      {/* Pagination Controls */}
-      {reports && reports.length > pageSize && (
+      {vulnerabilities && vulnerabilities.length > pageSize && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}

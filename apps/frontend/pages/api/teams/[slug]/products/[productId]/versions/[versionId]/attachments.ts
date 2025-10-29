@@ -7,6 +7,7 @@ import {
   getVersionAttachments,
 } from 'models/oscrat';
 import { handleFormidableError } from '@/lib/utils/fileUpload';
+import { getFirstFieldValue } from '@/lib/utils/forms';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import { ApiError } from '@/lib/errors';
 import type { NextApiResponse } from 'next';
@@ -45,10 +46,18 @@ const handleGET = async (
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-  const { versionId } = req.query;
+  const { versionId, vulnerabilityId, incidentId } = req.query;
 
   try {
-    const attachments = await getVersionAttachments(versionId as string);
+    const filters = {
+      ...(vulnerabilityId && { vulnerabilityId: vulnerabilityId as string }),
+      ...(incidentId && { incidentId: incidentId as string }),
+    };
+
+    const attachments = await getVersionAttachments(
+      versionId as string,
+      Object.keys(filters).length > 0 ? filters : undefined
+    );
 
     res.status(200).json({
       data: attachments,
@@ -90,12 +99,14 @@ const handlePOST = async (
           versionId: versionId as string,
           file: file[0],
           createdBy: teamMember.userId,
-          description: fields.description?.[0] as string | undefined,
+          description: getFirstFieldValue(fields.description),
+          vulnerabilityId: getFirstFieldValue(fields.vulnerabilityId),
+          incidentId: getFirstFieldValue(fields.incidentId),
         };
 
-        const url = await saveFileAsVersionAttachment(uploadParams);
+        const attachment = await saveFileAsVersionAttachment(uploadParams);
         res.status(200).json({
-          data: { url },
+          data: attachment,
           error: null,
         });
       } catch (error) {

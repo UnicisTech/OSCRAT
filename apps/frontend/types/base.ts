@@ -47,6 +47,7 @@ export type Attachment = {
   versionId: string | null;
   sbomReportId: string | null;
   incidentId: string | null;
+  vulnerabilityId: string | null;
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;

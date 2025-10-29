@@ -1,15 +1,29 @@
 import { api } from '@/lib/api/client';
 import type { Attachment } from '@/types';
+import type { AttachmentEntityFilters } from '@oscrat/model/types/attachments';
 
 export const versionAttachmentsEndpoints = {
   getVersionAttachments: (
     teamId: string,
     productId: string,
-    versionId: string
-  ) =>
-    api.get<Attachment[]>(
-      `/teams/${teamId}/products/${productId}/versions/${versionId}/attachments`
-    ),
+    versionId: string,
+    filters?: AttachmentEntityFilters
+  ) => {
+    const params = new URLSearchParams();
+    if (filters?.vulnerabilityId) {
+      params.append('vulnerabilityId', filters.vulnerabilityId);
+    }
+    if (filters?.incidentId) {
+      params.append('incidentId', filters.incidentId);
+    }
+    const queryString = params.toString();
+
+    return api.get<Attachment[]>(
+      `/teams/${teamId}/products/${productId}/versions/${versionId}/attachments${
+        queryString ? `?${queryString}` : ''
+      }`
+    );
+  },
 
   uploadVersionAttachment: (
     teamId: string,
@@ -17,7 +31,7 @@ export const versionAttachmentsEndpoints = {
     versionId: string,
     formData: FormData
   ) =>
-    api.post<{ url: string }>(
+    api.post<Attachment>(
       `/teams/${teamId}/products/${productId}/versions/${versionId}/attachments`,
       formData,
       {

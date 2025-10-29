@@ -10,6 +10,34 @@ const AUTH_TYPES = Object.values(OscratRepositoryAuthType);
 // Validation schema factory that takes translation function
 export const createRepositoryCreateSchema = (t: (key: string) => string) =>
   Yup.object().shape({
+    repositoryUrl: Yup.string()
+      .trim()
+      .required(t('oscrat.ui.repository.validation.url-required'))
+      .url(t('oscrat.ui.repository.validation.url-invalid'))
+      .test(
+        'is-https',
+        t('oscrat.ui.repository.validation.url-must-be-https'),
+        (value) => {
+          if (!value) return false;
+          try {
+            const url = new URL(value);
+            return url.protocol === 'https:';
+          } catch {
+            return false;
+          }
+        }
+      )
+      .test(
+        'matches-provider',
+        t('oscrat.ui.repository.validation.url-provider-mismatch'),
+        function (value) {
+          if (!value) return false;
+          const { provider } = this.parent;
+          const parsed = parseRepositoryUrl(value, provider);
+          return parsed !== null;
+        }
+      ),
+
     name: Yup.string()
       .trim()
       .required(t('oscrat.ui.repository.validation.name-required'))
@@ -71,6 +99,34 @@ export const createRepositoryCreateSchema = (t: (key: string) => string) =>
 
 // Default schema without translations (for API usage)
 export const repositoryCreateSchema = Yup.object().shape({
+  repositoryUrl: Yup.string()
+    .trim()
+    .required('oscrat.ui.repository.validation.url-required')
+    .url('oscrat.ui.repository.validation.url-invalid')
+    .test(
+      'is-https',
+      'oscrat.ui.repository.validation.url-must-be-https',
+      (value) => {
+        if (!value) return false;
+        try {
+          const url = new URL(value);
+          return url.protocol === 'https:';
+        } catch {
+          return false;
+        }
+      }
+    )
+    .test(
+      'matches-provider',
+      'oscrat.ui.repository.validation.url-provider-mismatch',
+      function (value) {
+        if (!value) return false;
+        const { provider } = this.parent;
+        const parsed = parseRepositoryUrl(value, provider);
+        return parsed !== null;
+      }
+    ),
+
   name: Yup.string()
     .trim()
     .required('oscrat.ui.repository.validation.name-required')
@@ -155,5 +211,72 @@ export function generateRepositoryUrl(
       return `https://bitbucket.org/${user}/${name}`;
     default:
       throw new Error('Invalid provider');
+  }
+}
+
+// Helper to get domain for a provider
+function getProviderDomain(provider: OscratRepositoryProvider): string {
+  switch (provider) {
+    case OscratRepositoryProvider.GITHUB:
+      return 'github.com';
+    case OscratRepositoryProvider.GITLAB:
+      return 'gitlab.com';
+    case OscratRepositoryProvider.BITBUCKET:
+      return 'bitbucket.org';
+    default:
+      throw new Error('Invalid provider');
+  }
+}
+
+// Helper to parse repository URL and extract user and name
+export function parseRepositoryUrl(
+  url: string,
+  provider: OscratRepositoryProvider
+): { user: string; name: string } | null {
+  try {
+    // Trim and clean the URL
+    const cleanUrl = url.trim();
+
+    // Parse the URL
+    const urlObj = new URL(cleanUrl);
+
+    // Verify protocol is https
+    if (urlObj.protocol !== 'https:') {
+      return null;
+    }
+
+    // Verify hostname matches the provider
+    const expectedDomain = getProviderDomain(provider);
+    if (urlObj.hostname !== expectedDomain) {
+      return null;
+    }
+
+    // Extract pathname and remove leading/trailing slashes
+    let pathname = urlObj.pathname.replace(/^\/+|\/+$/g, '');
+
+    // Remove .git suffix if present
+    if (pathname.endsWith('.git')) {
+      pathname = pathname.slice(0, -4);
+    }
+
+    // Split into parts
+    const parts = pathname.split('/');
+
+    // Should have exactly 2 parts: user and repo name
+    if (parts.length !== 2) {
+      return null;
+    }
+
+    const [user, name] = parts;
+
+    // Validate that both parts are non-empty
+    if (!user || !name) {
+      return null;
+    }
+
+    return { user, name };
+  } catch (error) {
+    // Invalid URL format
+    return null;
   }
 }

@@ -1,5 +1,6 @@
 import { PrismaClient, Attachment, File, Prisma } from '@prisma/client';
 import { createFileInTransaction } from './file';
+import { AttachmentEntityFilters } from '../types/attachments';
 
 // Attachment with file data for downloads
 export interface AttachmentWithFile extends Attachment {
@@ -20,6 +21,8 @@ export interface CreateAttachmentParams {
   versionId?: string;
   sbomReportId?: string;
   vulnerabilityScanReportId?: string;
+  vulnerabilityId?: string;
+  incidentId?: string;
 }
 
 /** Create a new attachment within an existing tx */
@@ -34,6 +37,8 @@ export const createAttachmentWithTx = async (
     versionId: params.versionId,
     sbomReportId: params.sbomReportId,
     vulnerabilityScanReportId: params.vulnerabilityScanReportId,
+    vulnerabilityId: params.vulnerabilityId,
+    incidentId: params.incidentId,
   });
 
   const file = await createFileInTransaction(tx, {
@@ -54,6 +59,8 @@ export const createAttachmentWithTx = async (
       versionId: params.versionId,
       sbomReportId: params.sbomReportId,
       vulnerabilityScanReportId: params.vulnerabilityScanReportId,
+      vulnerabilityId: params.vulnerabilityId,
+      incidentId: params.incidentId,
       createdBy: params.createdBy,
     },
     include: {
@@ -82,6 +89,8 @@ export const createAttachment = async (
     versionId: params.versionId,
     sbomReportId: params.sbomReportId,
     vulnerabilityScanReportId: params.vulnerabilityScanReportId,
+    vulnerabilityId: params.vulnerabilityId,
+    incidentId: params.incidentId,
   });
 
   const result = await prisma.$transaction(async (tx) => {
@@ -150,14 +159,20 @@ export const getTaskAttachments = async (
 
 export const getVersionAttachments = async (
   prisma: PrismaClient,
-  versionId: string
+  versionId: string,
+  filters?: AttachmentEntityFilters
 ) => {
   console.log(
-    `[Attachment Operations] Getting attachments for version: ${versionId}`
+    `[Attachment Operations] Getting attachments for version: ${versionId}`,
+    filters ? `with filters: ${JSON.stringify(filters)}` : ''
   );
 
   const attachments = await prisma.attachment.findMany({
-    where: { versionId },
+    where: {
+      versionId,
+      ...(filters?.vulnerabilityId && { vulnerabilityId: filters.vulnerabilityId }),
+      ...(filters?.incidentId && { incidentId: filters.incidentId }),
+    },
     include: {
       createdByUser: {
         select: { id: true, name: true, firstName: true, lastName: true },

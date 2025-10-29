@@ -128,15 +128,18 @@ export const transformToVersionDetail = (
     version.vulnerabilities?.map((vuln) => ({
       id: vuln.id,
       name: vuln.name,
+      description: vuln.description,
       severity: vuln.severity,
       status: vuln.status,
+      cve: vuln.cve ?? undefined,
+      advisoryId: vuln.advisoryId ?? undefined,
+      dateOfDiscovery: vuln.dateOfDiscovery,
+      affectedMemberStates: vuln.affectedMemberStates,
       versionId: version.id,
-      description: vuln.description || '',
       createdAt: vuln.createdAt,
       updatedAt: vuln.updatedAt,
       createdBy: vuln.createdBy,
       updatedBy: vuln.updatedBy,
-      ...(vuln.cve && { cve: vuln.cve }),
     })) || [],
   assessments:
     version.assessments?.map((assessment) => ({

@@ -119,7 +119,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
             </div>
           </div>
         ) : (
-          <EmptyState title={t('no-attachments')} />
+          <EmptyState title={t('oscrat.ui.no-attachments')} />
         )}
       </>
     );
