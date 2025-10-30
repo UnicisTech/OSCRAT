@@ -7,16 +7,25 @@ import { useTranslation } from 'next-i18next';
 import { useSession } from 'next-auth/react';
 import { Divider } from '@/components/shared';
 import { formatRiskLevel } from '@/utils/craForm';
+import type { FormState } from '@/types/craForm';
 
-const Result: React.FC<ResultProps> = ({
+interface ResultWithFormStateProps extends ResultProps {
+  completedFormState?: FormState | null;
+  productId?: string;
+}
+
+const Result: React.FC<ResultWithFormStateProps> = ({
   isEligible,
   onTryAgain,
   highestRiskLevel,
   teamSlug,
+  completedFormState,
+  productId,
 }) => {
   const router = useRouter();
   const { t, ready } = useTranslation('common');
   const { data: session, status } = useSession();
+  const isEditMode = !!productId;
   
   if (!ready) return null;
   
@@ -32,7 +41,7 @@ const Result: React.FC<ResultProps> = ({
     onTryAgain?.();
   };
   const handleAddProduct = () => {
-      router.push(`/teams/${teamSlug}/products/add-product/cache`);
+    router.push(`/teams/${teamSlug}/products/add-product/cache`);
   };
 
   // Render buttons based on eligibility
@@ -58,19 +67,19 @@ const Result: React.FC<ResultProps> = ({
 
     return (
       <>
-      <Button
-        onClick={handleRegister}
-        className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
-        text={t('register')}
-        variant="normal"
-      />
-      <Button
-        onClick={handleLogin}
-        className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
-        text={t('log-in')}
-        variant="primary"
-      />
-    </>
+        <Button
+          onClick={handleRegister}
+          className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
+          text={t('register')}
+          variant="normal"
+        />
+        <Button
+          onClick={handleLogin}
+          className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
+          text={t('log-in')}
+          variant="primary"
+        />
+      </>
     );
   };
 
@@ -93,20 +102,18 @@ const Result: React.FC<ResultProps> = ({
           </p>
           
           <div className="mb-8 flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-          <>
-    <Button
-      onClick={handleLogin}
-      className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
-      text={t('oscrat.ui.go-home')}
-      variant="normal"
-    />
-    <Button
-      onClick={handleTryAgain}
-      className="hover:bg-pri w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
-      text={t('oscrat.ui.try-again')}
-      variant="primary"
-    />
-  </>
+            <Button
+              onClick={handleLogin}
+              className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
+              text={t('oscrat.ui.go-home')}
+              variant="normal"
+            />
+            <Button
+              onClick={handleTryAgain}
+              className="w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
+              text={t('oscrat.ui.try-again')}
+              variant="primary"
+            />
           </div>
         </div>
         

@@ -62,46 +62,6 @@ export const checkIsEliminatory = (
   return (answer && 'isEliminatory' in answer) ? answer.isEliminatory : false;
 };
 
-/**
- * Save form state to localStorage
- */
-export const saveFormState = (state: FormState): void => {
-  try {
-    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(state));
-  } catch (error) {
-    console.error('Failed to save form state:', error);
-  }
-};
-
-/**
- * Load form state from localStorage
- */
-export const loadFormState = (): Partial<FormState> | null => {
-  try {
-    const savedState = localStorage.getItem(LOCALSTORAGE_KEY);
-    if (!savedState) return null;
-    
-    const parsed = JSON.parse(savedState);
-    return {
-      answers: parsed.answers || {},
-      activeStep: parsed.activeStep || 1,
-      skippedQuestions: parsed.skippedQuestions || [],
-      highestRiskLevel: parsed.highestRiskLevel || null,
-      completed: parsed.completed || false,
-      completedAt: parsed.completedAt || null
-    };
-  } catch (error) {
-    console.error('Failed to load form state:', error);
-    return null;
-  }
-};
-
-/**
- * Clear form state from localStorage
- */
-export const clearFormState = (): void => {
-  localStorage.removeItem(LOCALSTORAGE_KEY);
-};
 
 /**
  * Format risk level for display
@@ -157,4 +117,79 @@ export const getProductCategoryFromRisk = (riskLevel: RiskLevel): OscratProductC
     default:
       return OscratProductCategory.DEFAULT;
   }
+};
+
+/**
+ * Save form state to localStorage (temporary storage during workflow)
+ */
+export const saveFormState = (state: FormState): void => {
+  try {
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error('Failed to save form state to localStorage:', error);
+  }
+};
+
+/**
+ * Load form state from localStorage (temporary storage during workflow)
+ */
+export const loadFormState = (): Partial<FormState> | null => {
+  try {
+    const savedState = localStorage.getItem(LOCALSTORAGE_KEY);
+    if (!savedState) return null;
+    
+    const parsed = JSON.parse(savedState);
+    return {
+      answers: parsed.answers || {},
+      activeStep: parsed.activeStep || 1,
+      skippedQuestions: parsed.skippedQuestions || [],
+      highestRiskLevel: parsed.highestRiskLevel || null,
+      completed: parsed.completed || false,
+      completedAt: parsed.completedAt || null
+    };
+  } catch (error) {
+    console.error('Failed to load form state from localStorage:', error);
+    return null;
+  }
+};
+
+/**
+ * Clear form state from localStorage (called after successful product creation)
+ */
+export const clearFormState = (): void => {
+  try {
+    localStorage.removeItem(LOCALSTORAGE_KEY);
+  } catch (error) {
+    console.error('Failed to clear form state from localStorage:', error);
+  }
+};
+
+/**
+ * Transform CRA FormState to assessment rawData format for database storage
+ * IMPORTANT: This saves all answers to the database
+ */
+export const transformFormStateToAssessmentData = (formState: FormState): Record<string, any> => {
+  // Validate that we have answers
+  if (!formState.answers || Object.keys(formState.answers).length === 0) {
+    console.error('FormState has no answers to save!', formState);
+    throw new Error('Cannot save assessment: FormState contains no answers');
+  }
+
+  // Ensure skippedQuestions is an array (handles runtime cases where it might be a Set)
+  const skippedQuestions: number[] | Set<number> | unknown = formState.skippedQuestions;
+  const skippedQuestionsArray = Array.isArray(skippedQuestions) 
+    ? skippedQuestions 
+    : skippedQuestions instanceof Set
+      ? Array.from(skippedQuestions as Set<number>)
+      : [];
+
+  return {
+    questionnaire_results: {
+      answers: formState.answers, // ALL answers with question IDs as keys
+      completedAt: formState.completedAt || new Date().toISOString(),
+      highestRiskLevel: formState.highestRiskLevel,
+      skippedQuestions: skippedQuestionsArray,
+      activeStep: formState.activeStep, // Also save activeStep for reference
+    },
+  };
 };

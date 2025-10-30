@@ -77,6 +77,10 @@ export function useCreateAssessment(
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
+      // Invalidate product-level assessments query
+      queryClient.invalidateQueries({
+        queryKey: ['oscrat', 'projects', teamId, productId, 'assessments'],
+      });
     },
   });
 }
@@ -108,5 +112,44 @@ export function useDeleteAssessment(
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
     },
+  });
+}
+
+// List assessments for a product
+export function useGetProductAssessments(
+  slug: string,
+  productId: string,
+  options?: { enabled?: boolean }
+) {
+  const result = useQuery({
+    queryKey: ['oscrat', 'projects', slug, productId, 'assessments'],
+    queryFn: () => {
+      return oscratAssessmentEndpoints.listProductAssessments(
+        slug,
+        productId
+      );
+    },
+    enabled: options?.enabled !== false,
+  });
+
+  return result;
+}
+
+// Get assessment detail for a product (by productId and assessmentId)
+export function useGetProductAssessmentDetail(
+  slug: string,
+  productId: string,
+  assessmentId: string,
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: ['oscrat', 'projects', slug, productId, 'assessments', assessmentId],
+    queryFn: () =>
+      oscratAssessmentEndpoints.getProductAssessmentDetail(
+        slug,
+        productId,
+        assessmentId
+      ),
+    enabled: options?.enabled !== false && !!assessmentId,
   });
 }

@@ -3,18 +3,23 @@ import { FaEye, FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import type { OscratIncidentSummary } from '@oscrat/model';
-import { IncidentStatus } from '@oscrat/model';
+import { IncidentStatus, IncidentSeverity } from '@oscrat/model';
 import usePagination from '@/hooks/usePagination';
 import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
-import normalizeText from '@/utils/normalizeText';
 import { formatDateShort } from '@/utils/dateFormat';
 import {
   TableWrapper,
   TableHeader,
   TableRow,
 } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import {
+  INCIDENT_STATUS_MAP,
+  INCIDENT_CLASSIFICATION_MAP,
+  INCIDENT_ATTACK_TYPE_MAP,
+  INCIDENT_SEVERITY_MAP,
+} from '@/utils/incidentEnumMaps';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -89,29 +94,29 @@ const Table: React.FC<IncidentsTableProps> = ({
       <span
         className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${config.bgColor} ${config.textColor}`}
       >
-        {normalizeText(status)}
+        {t(INCIDENT_STATUS_MAP[status])}
       </span>
     );
   };
 
-  const getSeverityBadge = (severity: string) => {
+  const getSeverityBadge = (severity: IncidentSeverity) => {
     const severityConfig: Record<
-      string,
+      IncidentSeverity,
       { bgColor: string; textColor: string }
     > = {
-      LOW: { bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
-      MEDIUM: { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
-      HIGH: { bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
-      CRITICAL: { bgColor: 'bg-red-100', textColor: 'text-red-800' },
+      [IncidentSeverity.LOW]: { bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
+      [IncidentSeverity.MEDIUM]: { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
+      [IncidentSeverity.HIGH]: { bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
+      [IncidentSeverity.CRITICAL]: { bgColor: 'bg-red-100', textColor: 'text-red-800' },
     };
 
-    const config = severityConfig[severity] || severityConfig.LOW;
+    const config = severityConfig[severity] || severityConfig[IncidentSeverity.LOW];
 
     return (
       <span
         className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${config.bgColor} ${config.textColor}`}
       >
-        {normalizeText(severity)}
+        {t(INCIDENT_SEVERITY_MAP[severity])}
       </span>
     );
   };
@@ -147,17 +152,18 @@ const Table: React.FC<IncidentsTableProps> = ({
                 <td className={tableStyles.td}>
                   <div
                     className="max-w-[150px] truncate"
-                    title={normalizeText(incident.classification)}
+                    title={t(INCIDENT_CLASSIFICATION_MAP[incident.classification])}
                   >
-                    {normalizeText(incident.classification)}
+                    {t(INCIDENT_CLASSIFICATION_MAP[incident.classification])}
                   </div>
                 </td>
                 <td className={tableStyles.td}>
                   <div
                     className="max-w-[150px] truncate"
-                    title={normalizeText(incident.attackType)}
+                    title={t(INCIDENT_CLASSIFICATION_MAP[incident.classification])}
                   >
-                    {normalizeText(incident.attackType)}
+                    {t(INCIDENT_ATTACK_TYPE_MAP[incident.attackType])}
+
                   </div>
                 </td>
                 <td className={tableStyles.td}>

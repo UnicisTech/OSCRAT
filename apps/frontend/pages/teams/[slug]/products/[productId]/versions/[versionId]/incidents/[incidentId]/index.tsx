@@ -6,15 +6,13 @@ import { useProductContext } from '@/context/ProductContext';
 import { useTeamContext } from '@/context/TeamContext';
 import { useIncidents } from '@/hooks/oscrat/useIncidents';
 import { useVersionAttachments } from '@/hooks/oscrat/useVersionAttachments';
-import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
-import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { withProductDetailLayout } from '@/lib/layout-helpers';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import EditIncidentModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/incidents/EditIncidentModal';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
-import { FaDownload } from 'react-icons/fa';
+import { FaDownload, FaTrash } from 'react-icons/fa';
 import { IncidentStatus } from '@oscrat/model';
 import normalizeText from '@/utils/normalizeText';
 import { formatDateLong } from '@/utils/dateFormat';
@@ -25,12 +23,17 @@ function IncidentDetailsPage() {
   const router = useRouter();
   const { incidentId } = router.query;
   const { slug } = useTeamContext();
-  const { versionId } = useVersionContext();
-  const { teamId, productId } = useProductContext();
+  const { versionContext, teamId, productId, versionId } = useVersionContext();
+  const { productContext } = useProductContext();
 
-  const { downloadAttachment, uploadAttachment } = useVersionAttachments(teamId, productId, versionId);
-  const { version } = useOscratVersion(teamId, productId, versionId);
-  const { project } = useOscratProject(teamId, productId);
+  const version = versionContext.version;
+  const project = productContext.project;
+  const { downloadAttachment, uploadAttachment, deleteAttachment } = useVersionAttachments(
+    teamId,
+    productId,
+    versionId,
+    { incidentId: incidentId as string }
+  );
   const { members } = useTeamMembers(slug);
   
   const { incident, isLoading, isDetailError, detailError, updateIncident } = useIncidents(
@@ -84,6 +87,19 @@ function IncidentDetailsPage() {
       toast.success(t('oscrat.ui.download-starting'));
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-download')));
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!confirm(t('oscrat.ui.delete-attachment-confirmation'))) {
+      return;
+    }
+
+    try {
+      await deleteAttachment(attachmentId);
+      toast.success(t('oscrat.ui.attachment-deleted'));
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-delete-attachment')));
     }
   };
 
@@ -337,15 +353,24 @@ function IncidentDetailsPage() {
                         {incident.createdByUser.name}
                       </td>
                       <td className={tableStyles.td}>
-                        <button
-                          onClick={() =>
-                            handleDownloadAttachment(attachment.id, attachment.name)
-                          }
-                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800"
-                        >
-                          <FaDownload size={12} />
-                          {t('oscrat.ui.download')}
-                        </button>
+                        <div className="flex items-center justify-start space-x-4">
+                          <button
+                            onClick={() =>
+                              handleDownloadAttachment(attachment.id, attachment.name)
+                            }
+                            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                          >
+                            <FaDownload size={12} />
+                            {t('oscrat.ui.download')}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAttachment(attachment.id)}
+                            className="inline-flex items-center gap-1 text-red-600 hover:text-red-800"
+                          >
+                            <FaTrash size={12} />
+                            {t('oscrat.ui.delete')}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -377,7 +402,7 @@ function IncidentDetailsPage() {
             createdAt: att.createdAt,
           }))}
           onUploadAttachment={async (file: File) => {
-            await uploadAttachment(file);
+            return await uploadAttachment(file);
           }}
           onDownloadAttachment={downloadAttachment}
         />

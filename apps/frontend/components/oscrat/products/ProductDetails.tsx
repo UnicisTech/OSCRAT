@@ -8,6 +8,7 @@ import ProductComponent from '@/components/oscrat/products/productDetails/produc
 import TabsManager from '@/components/shared/TabsManager';
 import { useTranslation } from 'next-i18next';
 import createTabsConfig from '@/components/oscrat/products/productDetails/tabs/tabs';
+import ApplicabilitySurveySection from '@/components/oscrat/products/productDetails/applicabilitySurvey';
 import type { OscratProductDetail, OscratProductUpdate } from '@oscrat/model';
 
 interface ProductDetailsProps {
@@ -78,6 +79,9 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
         onWithdraw={handleWithdraw}
         onEdit={handleEdit}
       />
+      {project && (
+        <ApplicabilitySurveySection product={project as OscratProductDetail} />
+      )}
       {tabs && tabs.length > 0 && (
         <TabsManager 
           buttonText={t('oscrat.ui.add-version')} 

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import {
   useGetProjectDetail,
   useCreateProduct,
@@ -32,13 +33,19 @@ export function useOscratProject(
   const createProductMutation = useCreateProduct(teamId);
   const updateProjectMutation = useUpdateProject(teamId, projectId);
 
-  const createProject = async (data: OscratProductCreate) => {
-    return createProductMutation.mutateAsync(data);
-  };
+  const createProject = useCallback(
+    async (data: OscratProductCreate) => {
+      return createProductMutation.mutateAsync(data);
+    },
+    [createProductMutation.mutateAsync]
+  );
 
-  const updateProject = async (data: OscratProductUpdate) => {
-    return updateProjectMutation.mutateAsync(data);
-  };
+  const updateProject = useCallback(
+    async (data: OscratProductUpdate) => {
+      return updateProjectMutation.mutateAsync(data);
+    },
+    [updateProjectMutation.mutateAsync]
+  );
 
   const isLoading =
     isFetchingProject ||

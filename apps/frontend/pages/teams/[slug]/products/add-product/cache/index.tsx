@@ -13,19 +13,20 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 
 // Models & Types
-import { OscratProductType, OscratProductVersionStatus } from '@oscrat/model';
-import type { OscratProductCreate } from '@oscrat/model';
+import { OscratProductType, OscratProductVersionStatus, OscratAssessmentType } from '@oscrat/model';
+import type { OscratProductCreate, OscratAssessmentCreate } from '@oscrat/model';
 import type { ApiError } from '@/types';
 
 // Utils
 import { cacheProductSchema, type CacheProductData } from '@/lib/validation/product';
-import { loadFormState, clearFormState, getProductCategoryFromRisk } from '@/utils/craForm';
+import { getProductCategoryFromRisk, transformFormStateToAssessmentData, loadFormState, clearFormState } from '@/utils/craForm';
 import normalizeText from '@/utils/normalizeText';
 import type { FormState } from '@/types/craForm';
 import { withTeamLayout } from '@/lib/layout-helpers';
 
 // Components
 import ProductCreationForm from '@/components/oscrat/ProductCreationForm';
+import { useAssessments } from '@/hooks/oscrat/useOscratAssessment';
 
 export default function Cache() {
   const { t, ready } = useTranslation('common');
@@ -35,10 +36,48 @@ export default function Cache() {
 
   const [formState, setFormState] = useState<FormState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingAssessment, setPendingAssessment] = useState<{
+    productId: string;
+    versionId: string;
+    data: OscratAssessmentCreate;
+  } | null>(null);
 
-  const { createProject, isLoading: isCreatingProject } = useOscratProject(teamId, '', { enabled: false });
+  const { createProject, isLoading: isCreatingProject } = useOscratProject(teamId, '', { enabled: false});
+  
+  // Create assessment hook - enabled when we have pending assessment
+  const { createAssessment, isLoading: isCreatingAssessment } = useAssessments(
+    teamId,
+    pendingAssessment?.productId || '',
+    pendingAssessment?.versionId || '',
+    { enabled: !!pendingAssessment }
+  );
 
-  // Load cached form state on mount
+  // Save assessment when hook becomes available and ready
+  useEffect(() => {
+    if (pendingAssessment && !isCreatingAssessment && pendingAssessment.productId && pendingAssessment.versionId) {
+      const assessmentPromise = createAssessment(pendingAssessment.data);
+      assessmentPromise
+        .then(() => {
+          // Clear localStorage only after successful product AND assessment creation
+          clearFormState();
+          setPendingAssessment(null);
+          toast.success(t('oscrat.ui.assessment-saved-successfully'));
+        })
+        .catch((error) => {
+          console.error('Failed to save CRA assessment:', {
+            error,
+            productId: pendingAssessment.productId,
+            versionId: pendingAssessment.versionId,
+            data: pendingAssessment.data,
+          });
+          toast.error(t('oscrat.ui.failed-to-save-assessment'));
+          // Don't clear localStorage if assessment save fails - user can retry
+          setPendingAssessment(null);
+        });
+    }
+  }, [pendingAssessment, createAssessment, isCreatingAssessment, t]);
+
+  // Load form state from localStorage on mount
   useEffect(() => {
     const cachedState = loadFormState();
     if (cachedState?.completed && cachedState?.highestRiskLevel && cachedState?.answers) {
@@ -84,9 +123,43 @@ export default function Cache() {
 
         const createdProduct = await createProject(productData);
 
-        toast.success(t('oscrat.ui.validation.product-created-successfully'));
+        // Save CRA assessment to DB if form state exists
+        // IMPORTANT: Ensure all answers are saved in the assessment
+        if (formState && createdProduct.versions && createdProduct.versions.length > 0) {
+          const versionId = createdProduct.versions[0].id;
+          
+          // Verify formState has answers before saving
+          if (!formState.answers || Object.keys(formState.answers).length === 0) {
+            console.error('FormState missing answers!', formState);
+            toast.error(t('oscrat.ui.validation.no-answers-to-save'));
+            setIsLoading(false);
+            return;
+          }
+
+          // Transform form state to assessment data - this includes ALL answers
+          const rawData = transformFormStateToAssessmentData(formState);
+          
+          // Queue assessment creation - useEffect will handle it
+          setPendingAssessment({
+            productId: createdProduct.id,
+            versionId,
+            data: {
+              type: OscratAssessmentType.CRA,
+              schemaVersion: '1.0.0',
+              rawData: rawData,
+              productId: createdProduct.id,
+              createdBy: session.user.id,
+            },
+          });
+        } else {
+          // No assessment to save, clear localStorage
+          clearFormState();
+        }
+
+        // Note: localStorage will be cleared by useEffect after assessment is saved
+        // If assessment save fails, localStorage remains so user can retry
         
-        clearFormState();
+        toast.success(t('oscrat.ui.validation.product-created-successfully'));
         
         router.replace(`/teams/${teamId}/products/${createdProduct.id}`);
       } catch (err) {
@@ -112,7 +185,7 @@ export default function Cache() {
 
   if (!ready) return null;
 
-  const isFormLoading = isLoading || isCreatingProject;
+  const isFormLoading = isLoading || isCreatingProject || isCreatingAssessment;
 
   const additionalFields = (
     <>

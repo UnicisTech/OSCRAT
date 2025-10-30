@@ -12,35 +12,27 @@ import { getComplianceNamespace, COMPLIANCE_NAMESPACES } from '@/lib/compliance/
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { FaDownload } from 'react-icons/fa';
 import { OscratOrganizationRole } from '@oscrat/model';
+import { loadFormState } from '@/utils/craForm';
+import type { FormState } from '@/types/craForm';
 
 const TeamDashboard = () => {
   const { t } = useTranslation('common');
   const { teamContext } = useTeamContext();
   const team = teamContext.team;
 
-  const [completedFormData, setCompletedFormData] = useState<{
-    completed: boolean;
-    riskLevel: string;
-  } | null>(null);
-
-  const shouldShowCompletedAppCheck = completedFormData?.completed && completedFormData.riskLevel;
+  // Check localStorage for completed CRA form data (before product creation)
+  const [completedCraForm, setCompletedCraForm] = useState<FormState | null>(null);
 
   useEffect(() => {
-    const savedState = localStorage.getItem('craFormState');
-    if (!savedState) return;
-
-    try {
-      const parsed = JSON.parse(savedState);
-      if (parsed.completed && parsed.highestRiskLevel) {
-        setCompletedFormData({
-          completed: true,
-          riskLevel: parsed.highestRiskLevel
-        });
-      }
-    } catch (error) {
-      console.error("Failed to parse saved state:", error);
+    const formState = loadFormState();
+    if (formState && formState.completed && formState.highestRiskLevel) {
+      setCompletedCraForm(formState as FormState);
+    } else {
+      setCompletedCraForm(null);
     }
   }, []);
+
+  const shouldShowCompletedAppCheck = !!completedCraForm;
 
   const { complianceData, isLoading: isComplianceLoading } = useComplianceData({
     teamSlug: team?.slug || '',
@@ -129,8 +121,8 @@ const TeamDashboard = () => {
         <h2 className="mb-2 text-xl font-semibold">{t('Dashboard')}</h2>
       </div>
       <div className="space-y-6">
-        {shouldShowCompletedAppCheck && (
-          <CompletedAppCheck riskLevel={completedFormData.riskLevel} />
+        {shouldShowCompletedAppCheck && completedCraForm?.highestRiskLevel && (
+          <CompletedAppCheck riskLevel={completedCraForm.highestRiskLevel} />
         )}
         {showCharts && (
           <div className="space-y-4">

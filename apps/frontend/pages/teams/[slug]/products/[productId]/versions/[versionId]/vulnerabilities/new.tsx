@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { useSession } from 'next-auth/react';
 import { useVersionContext } from '@/context/VersionContext';
 import { useProductContext } from '@/context/ProductContext';
 import { useTeamContext } from '@/context/TeamContext';
 import { useVersionAttachments } from '@/hooks/oscrat/useVersionAttachments';
 import { useVulnerabilities } from '@/hooks/oscrat/useVulnerabilities';
+import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { withProductDetailLayout } from '@/lib/layout-helpers';
 import VulnerabilityFormFields, {
   type VulnerabilityFormData,
@@ -19,7 +21,6 @@ import {
   OscratProductVulnerabilitySeverity,
   type OscratVulnerabilityCreate
 } from '@oscrat/model';
-import { FaInfoCircle } from 'react-icons/fa';
 
 const PAGE_STYLES = {
   sectionCard: 'rounded-lg border border-gray-300 bg-white p-6',
@@ -35,6 +36,7 @@ const PAGE_STYLES = {
 function NewVulnerabilityPage() {
   const { t, ready } = useTranslation('common');
   const router = useRouter();
+  const { data: session } = useSession();
   const { slug } = useTeamContext();
   const { versionContext, teamId, productId, versionId } = useVersionContext();
   const { productContext } = useProductContext();
@@ -43,6 +45,9 @@ function NewVulnerabilityPage() {
   const project = productContext.project;
   const { attachments, uploadAttachment } = useVersionAttachments(teamId, productId, versionId);
   const { createVulnerability, isCreating } = useVulnerabilities(teamId, productId, versionId);
+  const { members } = useTeamMembers(slug);
+
+  const currentUserId = session?.user?.id || '';
 
   const [formData, setFormData] = useState<VulnerabilityFormData>({
     name: '',
@@ -52,6 +57,8 @@ function NewVulnerabilityPage() {
     cve: '',
     advisoryId: '',
     dateOfDiscovery: new Date().toISOString().split('T')[0],
+    assigner: currentUserId,
+    hasOtherMemberStates: false,
     affectedMemberStates: '',
   });
 
@@ -82,10 +89,12 @@ function NewVulnerabilityPage() {
         cve: cve as string,
         advisoryId: '',
         dateOfDiscovery: new Date().toISOString().split('T')[0],
+        assigner: currentUserId,
+        hasOtherMemberStates: false,
         affectedMemberStates: '',
       });
     }
-  }, [router.query]);
+  }, [router.query, currentUserId]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -94,6 +103,15 @@ function NewVulnerabilityPage() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleCheckboxChange = (name: string, checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked,
+      // Clear affectedMemberStates when checkbox is unchecked
+      ...(name === 'hasOtherMemberStates' && !checked ? { affectedMemberStates: '' } : {}),
     }));
   };
 
@@ -132,10 +150,12 @@ function NewVulnerabilityPage() {
     }
 
     try {
-      const affectedMemberStatesArray = formData.affectedMemberStates
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
+      const affectedMemberStatesArray = formData.hasOtherMemberStates && formData.affectedMemberStates
+        ? formData.affectedMemberStates
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s.length > 0)
+        : [];
 
       const createData: OscratVulnerabilityCreate = {
         name: formData.name,
@@ -231,7 +251,11 @@ function NewVulnerabilityPage() {
             <VulnerabilityFormFields
               formData={formData}
               onChange={handleInputChange}
+              onCheckboxChange={handleCheckboxChange}
               isFromScanReport={isFromScanReport}
+              affectedProductName={project?.name}
+              affectedVersionName={version?.version}
+              teamMembers={members}
             />
           </div>
 

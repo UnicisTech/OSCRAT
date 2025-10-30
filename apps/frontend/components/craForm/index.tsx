@@ -5,15 +5,14 @@ import { CraQuestion } from '@oscrat/model';
 import data from '@/components/craForm/data.json';
 import { CraFormProps } from '@/types/craForm';
 import { useCraForm } from '@/hooks/useCraForm';
-import { 
-  checkIsEliminatory, 
-  clearFormState, 
-} from '@/utils/craForm';
+import { checkIsEliminatory, saveFormState } from '@/utils/craForm';
 
 const CraForm: React.FC<CraFormProps> = ({
   setIsNotEligible,
   setShowResult,
   setHighestRisk,
+  onFormCompleted,
+  initialFormState,
 }) => {
   const allQuestions: (CraQuestion)[] = [
     ...data.applicabilityQuestions,
@@ -33,7 +32,8 @@ const CraForm: React.FC<CraFormProps> = ({
     findPreviousNonSkippedStep,
   } = useCraForm({
     questions: allQuestions,
-    onHighestRiskChange: setHighestRisk
+    onHighestRiskChange: setHighestRisk,
+    initialFormState: initialFormState || null,
   });
 
   const handleNext = useCallback(() => {
@@ -47,7 +47,6 @@ const CraForm: React.FC<CraFormProps> = ({
     if (isEliminatory) {
       setIsNotEligible(true);
       setShowResult(true);
-      clearFormState();
       return;
     }
     
@@ -64,7 +63,11 @@ const CraForm: React.FC<CraFormProps> = ({
         completed: true,
         completedAt: new Date().toISOString()
       };
-      localStorage.setItem('craFormState', JSON.stringify(completedState));
+      
+      // Save to localStorage for temporary storage until product is created
+      saveFormState(completedState);
+      
+      onFormCompleted?.(completedState);
     } else {
       setActiveStep(activeStep + 1);
     }
@@ -78,6 +81,7 @@ const CraForm: React.FC<CraFormProps> = ({
     setIsNotEligible,
     setShowResult,
     setHighestRisk,
+    onFormCompleted,
     TOTAL_QUESTIONS
   ]);
 

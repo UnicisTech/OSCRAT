@@ -4,15 +4,12 @@ import { useTranslation } from 'next-i18next';
 import { useVersionContext } from '@/context/VersionContext';
 import { useProductContext } from '@/context/ProductContext';
 import { useTeamContext } from '@/context/TeamContext';
-import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
-import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useVersionAttachments } from '@/hooks/oscrat/useVersionAttachments';
 import { useIncidents } from '@/hooks/oscrat/useIncidents';
 import { withProductDetailLayout } from '@/lib/layout-helpers';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
-import normalizeText from '@/utils/normalizeText';
 import { Breadcrumb } from '@/components/shared';
 import { 
   IncidentStatus,
@@ -21,16 +18,24 @@ import {
   IncidentSeverity,
   type OscratIncidentCreate 
 } from '@oscrat/model';
+import { incidentCreateSchema } from '@/lib/validation/incident';
+import * as Yup from 'yup';
+import {
+  INCIDENT_STATUS_MAP,
+  INCIDENT_CLASSIFICATION_MAP,
+  INCIDENT_ATTACK_TYPE_MAP,
+  INCIDENT_SEVERITY_MAP,
+} from '@/utils/incidentEnumMaps';
 
 function NewIncidentPage() {
   const { t, ready } = useTranslation('common');
   const router = useRouter();
   const { slug } = useTeamContext();
-  const { versionId } = useVersionContext();
-  const { teamId, productId } = useProductContext();
+  const { versionContext, teamId, productId, versionId } = useVersionContext();
+  const { productContext } = useProductContext();
 
-  const { version } = useOscratVersion(teamId, productId, versionId);
-  const { project } = useOscratProject(teamId, productId);
+  const version = versionContext.version;
+  const project = productContext.project;
   const { members } = useTeamMembers(slug);
   const { attachments, uploadAttachment } = useVersionAttachments(teamId, productId, versionId);
   const { createIncident, isCreating } = useIncidents(teamId, productId, versionId);
@@ -55,7 +60,7 @@ function NewIncidentPage() {
     crossBorderImpactDetails: '',
   });
 
-  const [selectedAttachments, setSelectedAttachments] = useState<string[]>([]);
+  const [uploadedAttachmentIds, setUploadedAttachmentIds] = useState<string[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
 
   useEffect(() => {
@@ -83,7 +88,8 @@ function NewIncidentPage() {
 
     setUploadingFile(true);
     try {
-      await uploadAttachment(file);
+      const attachment = await uploadAttachment(file);
+      setUploadedAttachmentIds(prev => [...prev, attachment.id]);
       toast.success(t('oscrat.ui.file-uploaded-successfully'));
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file')));
@@ -95,44 +101,39 @@ function NewIncidentPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.description.trim()) {
-      toast.error(t('oscrat.ui.versions.incidents.description-required'));
-      return;
-    }
+    const createData: OscratIncidentCreate = {
+      status: formData.status,
+      classification: formData.classification,
+      attackType: formData.attackType,
+      assetDetails: formData.assetDetails || undefined,
+      reporterId: formData.reporterId,
+      dateOfDetection: new Date(formData.dateOfDetection),
+      severity: formData.severity,
+      handlingDate: formData.handlingDate ? new Date(formData.handlingDate) : undefined,
+      description: formData.description,
+      correctiveActions: formData.correctiveActions || undefined,
+      rootCause: formData.rootCause || undefined,
+      scope: formData.scope,
+      preventiveActions: formData.preventiveActions || undefined,
+      suspectedUnlawfulAct: formData.suspectedUnlawfulAct,
+      unlawfulActDescription: formData.suspectedUnlawfulAct ? formData.unlawfulActDescription || undefined : undefined,
+      crossBorderImpact: formData.crossBorderImpact,
+      crossBorderImpactDetails: formData.crossBorderImpact ? formData.crossBorderImpactDetails || undefined : undefined,
+      attachmentIds: uploadedAttachmentIds.length > 0 ? uploadedAttachmentIds : undefined,
+      createdBy: '',
+    };
 
-    if (!formData.scope.trim()) {
-      toast.error(t('oscrat.ui.versions.incidents.scope-required'));
-      return;
-    }
-
-    if (!formData.dateOfDetection) {
-      toast.error(t('oscrat.ui.versions.incidents.date-detection-required'));
-      return;
+    try {
+      await incidentCreateSchema.validate(createData, { abortEarly: false });
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        const firstError = error.errors[0];
+        toast.error(t(firstError));
+        return;
+      }
     }
 
     try {
-      const createData: OscratIncidentCreate = {
-        status: formData.status,
-        classification: formData.classification,
-        attackType: formData.attackType,
-        assetDetails: formData.assetDetails || undefined,
-        reporterId: formData.reporterId,
-        dateOfDetection: new Date(formData.dateOfDetection),
-        severity: formData.severity,
-        handlingDate: formData.handlingDate ? new Date(formData.handlingDate) : undefined,
-        description: formData.description,
-        correctiveActions: formData.correctiveActions || undefined,
-        rootCause: formData.rootCause || undefined,
-        scope: formData.scope,
-        preventiveActions: formData.preventiveActions || undefined,
-        suspectedUnlawfulAct: formData.suspectedUnlawfulAct,
-        unlawfulActDescription: formData.suspectedUnlawfulAct ? formData.unlawfulActDescription || undefined : undefined,
-        crossBorderImpact: formData.crossBorderImpact,
-        crossBorderImpactDetails: formData.crossBorderImpact ? formData.crossBorderImpactDetails || undefined : undefined,
-        attachmentIds: selectedAttachments.length > 0 ? selectedAttachments : undefined,
-        createdBy: '', // Will be set by the API
-      };
-
       await createIncident(createData);
       toast.success(t('oscrat.ui.versions.incidents.created-successfully'));
       router.push(`/teams/${slug}/products/${productId}/versions/${versionId}?tab=incidents`);
@@ -146,16 +147,6 @@ function NewIncidentPage() {
   };
 
   if (!ready || !teamId || !productId || !versionId) return null;
-
-  const STATUS_OPTIONS = [
-    IncidentStatus.PENDING,
-    IncidentStatus.START,
-    IncidentStatus.DECLARED,
-    IncidentStatus.STABLE,
-    IncidentStatus.ACTIVE,
-    IncidentStatus.RESOLVED,
-    IncidentStatus.COMPLETED,
-  ];
 
   const breadcrumbItems = [
     {
@@ -233,9 +224,9 @@ function NewIncidentPage() {
                   required
                   className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
                 >
-                  {STATUS_OPTIONS.map((status) => (
+                  {Object.values(IncidentStatus).map((status) => (
                     <option key={status} value={status}>
-                      {normalizeText(status)}
+                      {t(INCIDENT_STATUS_MAP[status])}
                     </option>
                   ))}
                 </select>
@@ -254,7 +245,7 @@ function NewIncidentPage() {
                 >
                   {Object.values(IncidentClassification).map((classification) => (
                     <option key={classification} value={classification}>
-                      {normalizeText(classification)}
+                      {t(INCIDENT_CLASSIFICATION_MAP[classification])}
                     </option>
                   ))}
                 </select>
@@ -273,7 +264,7 @@ function NewIncidentPage() {
                 >
                   {Object.values(IncidentAttackType).map((attackType) => (
                     <option key={attackType} value={attackType}>
-                      {normalizeText(attackType)}
+                      {t(INCIDENT_ATTACK_TYPE_MAP[attackType])}
                     </option>
                   ))}
                 </select>
@@ -338,7 +329,7 @@ function NewIncidentPage() {
                 >
                   {Object.values(IncidentSeverity).map((severity) => (
                     <option key={severity} value={severity}>
-                      {normalizeText(severity)}
+                      {t(INCIDENT_SEVERITY_MAP[severity])}
                     </option>
                   ))}
                 </select>
@@ -492,25 +483,18 @@ function NewIncidentPage() {
                 {uploadingFile ? t('oscrat.ui.uploading') : t('oscrat.ui.add-document')}
               </label>
             </div>
-            {attachments && attachments.length > 0 && (
+            {uploadedAttachmentIds.length > 0 && attachments && (
               <div className="space-y-2">
-                {attachments.filter(att => !att.incidentId).map((attachment) => (
-                  <label key={attachment.id} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={selectedAttachments.includes(attachment.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedAttachments([...selectedAttachments, attachment.id]);
-                        } else {
-                          setSelectedAttachments(selectedAttachments.filter(id => id !== attachment.id));
-                        }
-                      }}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700">{attachment.name}</span>
-                  </label>
-                ))}
+                <p className="text-sm font-medium text-gray-700">
+                  {t('oscrat.ui.uploaded-attachments')}: {uploadedAttachmentIds.length}
+                </p>
+                {attachments
+                  .filter(att => uploadedAttachmentIds.includes(att.id))
+                  .map((attachment) => (
+                    <div key={attachment.id} className="flex items-center text-sm text-gray-700">
+                      <span>{attachment.name}</span>
+                    </div>
+                  ))}
               </div>
             )}
           </div>

@@ -24,6 +24,8 @@ export interface CraFormProps {
   setIsNotEligible: (value: boolean) => void;
   setShowResult: (value: boolean) => void;
   setHighestRisk: (value: RiskLevel | null) => void;
+  onFormCompleted?: (formState: FormState) => void;
+  initialFormState?: Partial<FormState> | null;
 }
 
 export interface FormPageState {

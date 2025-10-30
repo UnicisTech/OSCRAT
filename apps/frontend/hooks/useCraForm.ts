@@ -10,9 +10,6 @@ import {
 } from '@/types/craForm';
 import {
   calculateHighestRiskFromAnswers,
-  saveFormState,
-  loadFormState,
-  clearFormState,
   getSkippedQuestions,
   findPreviousNonSkippedStep as findPreviousStep
 } from '@/utils/craForm';
@@ -20,6 +17,7 @@ import {
 interface UseCraFormProps {
   questions: (CraQuestion)[];
   onHighestRiskChange?: (risk: RiskLevel | null) => void;
+  initialFormState?: Partial<FormState> | null;
 }
 
 interface UseCraFormReturn {
@@ -42,61 +40,58 @@ interface UseCraFormReturn {
   clearForm: () => void;
 }
 
-export const useCraForm = ({ questions, onHighestRiskChange }: UseCraFormProps): UseCraFormReturn => {
-  const [answers, setAnswers] = useState<FormAnswers>({});
-  const [activeStep, setActiveStep] = useState(1);
-  const [skippedQuestions, setSkippedQuestions] = useState<Set<number>>(new Set());
-  const [highestRiskLevel, setHighestRiskLevel] = useState<RiskLevel | null>(null);
-  const isInitialLoadRef = useRef(true);
-  const onHighestRiskChangeRef = useRef(onHighestRiskChange);
+export const useCraForm = ({ questions, onHighestRiskChange, initialFormState }: UseCraFormProps): UseCraFormReturn => {
+  // Initialize with existing form state if provided (edit mode)
+  const [answers, setAnswers] = useState<FormAnswers>(initialFormState?.answers || {});
+  const [activeStep, setActiveStep] = useState(initialFormState?.activeStep || 1);
+  const [skippedQuestions, setSkippedQuestions] = useState<Set<number>>(
+    initialFormState?.skippedQuestions 
+      ? new Set(Array.isArray(initialFormState.skippedQuestions) 
+          ? initialFormState.skippedQuestions 
+          : [])
+      : new Set()
+  );
+  const [highestRiskLevel, setHighestRiskLevel] = useState<RiskLevel | null>(
+    initialFormState?.highestRiskLevel || null
+  );
+  const previousHighestRiskLevelRef = useRef<RiskLevel | null>(
+    initialFormState?.highestRiskLevel || null
+  );
+  const initialRiskLevelRef = useRef<RiskLevel | null>(
+    initialFormState?.highestRiskLevel || null
+  );
 
-  // Update the ref when the callback changes
+  // Re-initialize form when initialFormState changes (e.g., when loading existing assessment)
   useEffect(() => {
-    onHighestRiskChangeRef.current = onHighestRiskChange;
-  }, [onHighestRiskChange]);
+    if (initialFormState) {
+      setAnswers(initialFormState.answers || {});
+      setActiveStep(initialFormState.activeStep || 1);
+      setSkippedQuestions(
+        initialFormState.skippedQuestions 
+          ? new Set(Array.isArray(initialFormState.skippedQuestions) 
+              ? initialFormState.skippedQuestions 
+              : [])
+          : new Set()
+      );
+      const initialRisk = initialFormState.highestRiskLevel || null;
+      setHighestRiskLevel(initialRisk);
+      previousHighestRiskLevelRef.current = initialRisk;
+      initialRiskLevelRef.current = initialRisk;
+    }
+  }, [initialFormState]);
 
-  // Load saved state on mount
+  // Call onHighestRiskChange when highestRiskLevel changes (but not during initialization)
   useEffect(() => {
-    const savedState = loadFormState();
-    
-    if (savedState && savedState.completed) {
-      // Form was completed, clear all progress and start fresh
-      clearFormState();
-    } else if (savedState) {
-      // Load saved progress if form wasn't completed
-      if (savedState.answers) {
-        setAnswers(savedState.answers);
-        const recalculatedRisk = calculateHighestRiskFromAnswers(savedState.answers);
-        setHighestRiskLevel(recalculatedRisk);
-        onHighestRiskChangeRef.current?.(recalculatedRisk);
+    const previousValue = previousHighestRiskLevelRef.current;
+    if (highestRiskLevel !== previousValue) {
+      previousHighestRiskLevelRef.current = highestRiskLevel;
+      // Only call callback if this change is not the initial value being set
+      // We check if the previous value was the initial value to detect initialization
+      if (previousValue !== initialRiskLevelRef.current) {
+        onHighestRiskChange?.(highestRiskLevel);
       }
-      if (savedState.activeStep) setActiveStep(savedState.activeStep);
-      if (savedState.skippedQuestions) {
-        setSkippedQuestions(new Set(savedState.skippedQuestions));
-      }
     }
-    isInitialLoadRef.current = false;
-  }, []); 
-
-  // Save state to localStorage whenever it changes (but not during initial load)
-  useEffect(() => {
-    if (!isInitialLoadRef.current) {
-      const state: FormState = {
-        answers,
-        activeStep,
-        skippedQuestions: Array.from(skippedQuestions),
-        highestRiskLevel
-      };
-      saveFormState(state);
-    }
-  }, [answers, activeStep, skippedQuestions, highestRiskLevel]);
-
-  // Call onHighestRiskChange when highestRiskLevel changes (but not during initial load)
-  useEffect(() => {
-    if (!isInitialLoadRef.current) {
-      onHighestRiskChangeRef.current?.(highestRiskLevel);
-    }
-  }, [highestRiskLevel]);
+  }, [highestRiskLevel, onHighestRiskChange]);
 
   // Derive selectedAnswer from current state
   const selectedAnswer = (() => {
@@ -121,8 +116,6 @@ export const useCraForm = ({ questions, onHighestRiskChange }: UseCraFormProps):
       }
     };
     
-    setAnswers(newAnswers);
-
     // Clear any skipped questions that come after this question
     // since the new answer might not cause the same skips
     const currentStepIndex = questions.findIndex(q => q.id === question.id);
@@ -135,30 +128,64 @@ export const useCraForm = ({ questions, onHighestRiskChange }: UseCraFormProps):
         newSkippedQuestions.add(skippedStep);
       }
     });
+    
+    // Remove answers for questions that are no longer skipped (were skipped before but aren't now)
+    // This happens when retaking the form and changing an answer that previously caused skips
+    const removedSkippedSteps = new Set<number>();
+    skippedQuestions.forEach(skippedStep => {
+      if (skippedStep >= currentStep && !newSkippedQuestions.has(skippedStep)) {
+        removedSkippedSteps.add(skippedStep);
+      }
+    });
+    
+    // Remove answers for questions that are now skipped or were previously skipped
+    removedSkippedSteps.forEach(stepNum => {
+      const questionIndex = stepNum - 1;
+      if (questionIndex >= 0 && questionIndex < questions.length) {
+        const questionToRemove = questions[questionIndex];
+        if (questionToRemove && newAnswers[questionToRemove.id]) {
+          delete newAnswers[questionToRemove.id];
+        }
+      }
+    });
+    
+    setAnswers(newAnswers);
     setSkippedQuestions(newSkippedQuestions);
 
     // Recalculate highest risk level
     const newHighestRisk = calculateHighestRiskFromAnswers(newAnswers);
     setHighestRiskLevel(newHighestRisk);
-    onHighestRiskChangeRef.current?.(newHighestRisk);
   }, [answers, questions, skippedQuestions]);
 
   const handleSkip = useCallback((fromStep: number, toStep: number) => {
     const newSkippedQuestions = getSkippedQuestions(fromStep, toStep, skippedQuestions);
+    
+    // Remove answers for ALL questions that are now skipped (including ones that were previously answered but are now skipped)
+    // This is important when retaking the form - if an answer changes and causes a skip, we need to clear old answers
+    const newAnswers = { ...answers };
+    newSkippedQuestions.forEach(skippedStep => {
+      const questionIndex = skippedStep - 1;
+      if (questionIndex >= 0 && questionIndex < questions.length) {
+        const questionToRemove = questions[questionIndex];
+        if (questionToRemove && newAnswers[questionToRemove.id]) {
+          delete newAnswers[questionToRemove.id];
+        }
+      }
+    });
+    
+    setAnswers(newAnswers);
     setSkippedQuestions(newSkippedQuestions);
-  }, [skippedQuestions]);
+  }, [answers, questions, skippedQuestions]);
 
   const findPreviousNonSkippedStep = useCallback((currentStep: number): number => {
     return findPreviousStep(currentStep, skippedQuestions);
   }, [skippedQuestions]);
 
   const clearForm = useCallback(() => {
-    clearFormState();
     setAnswers({});
     setActiveStep(1);
     setSkippedQuestions(new Set());
     setHighestRiskLevel(null);
-    onHighestRiskChangeRef.current?.(null);
   }, []); 
 
   return {

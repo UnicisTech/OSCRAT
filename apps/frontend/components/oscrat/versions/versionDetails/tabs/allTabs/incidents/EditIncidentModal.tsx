@@ -8,11 +8,19 @@ import {
   type OscratIncidentDetail,
   type OscratIncidentUpdate,
 } from '@oscrat/model';
-import { FaDownload, FaTimes } from 'react-icons/fa';
+import { FaDownload, FaTimes, FaTrash } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
-import normalizeText from '@/utils/normalizeText';
+import ActionButton from '@/components/oscrat/ActionButton';
 import { formatDateLong } from '@/utils/dateFormat';
+import { incidentUpdateSchema } from '@/lib/validation/incident';
+import * as Yup from 'yup';
+import {
+  INCIDENT_STATUS_MAP,
+  INCIDENT_CLASSIFICATION_MAP,
+  INCIDENT_ATTACK_TYPE_MAP,
+  INCIDENT_SEVERITY_MAP,
+} from '@/utils/incidentEnumMaps';
 
 interface EditIncidentModalProps {
   isOpen: boolean;
@@ -23,45 +31,9 @@ interface EditIncidentModalProps {
   product?: { name: string };
   teamMembers?: Array<{ userId: string; user: { name: string; email: string } }>;
   attachments?: Array<{ id: string; name: string; mimeType?: string; createdAt: Date }>;
-  onUploadAttachment?: (file: File) => Promise<void>;
+  onUploadAttachment?: (file: File) => Promise<{ id: string }>;
   onDownloadAttachment?: (attachmentId: string, filename: string) => Promise<void>;
 }
-
-const STATUS_OPTIONS = [
-  IncidentStatus.PENDING,
-  IncidentStatus.START,
-  IncidentStatus.DECLARED,
-  IncidentStatus.STABLE,
-  IncidentStatus.ACTIVE,
-  IncidentStatus.RESOLVED,
-  IncidentStatus.COMPLETED,
-];
-
-const CLASSIFICATION_OPTIONS = [
-  IncidentClassification.GENERAL,
-  IncidentClassification.CONFIDENTIALITY,
-  IncidentClassification.INTEGRITY,
-  IncidentClassification.AVAILABILITY,
-  IncidentClassification.ACCESS_CONTROL,
-  IncidentClassification.VULNERABILITIES,
-  IncidentClassification.TECHNICAL_FAILURE,
-  IncidentClassification.THEFT_OR_LOSS,
-];
-
-const ATTACK_TYPE_OPTIONS = [
-  IncidentAttackType.DENIAL_OF_SERVICE,
-  IncidentAttackType.UNAUTHORISED_ACCESS,
-  IncidentAttackType.MALWARE,
-  IncidentAttackType.ABUSE,
-  IncidentAttackType.OTHERS,
-];
-
-const SEVERITY_OPTIONS = [
-  IncidentSeverity.LOW,
-  IncidentSeverity.MEDIUM,
-  IncidentSeverity.HIGH,
-  IncidentSeverity.CRITICAL,
-];
 
 const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
   isOpen,
@@ -102,12 +74,13 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
   });
 
   const [formData, setFormData] = useState(() => mapIncidentToFormData(incident));
-  const [uploadingFile, setUploadingFile] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setFormData(mapIncidentToFormData(incident));
-  }, [incident]);
+    setPendingFiles([]);
+  }, [incident, isOpen]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -121,19 +94,17 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
     }));
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !onUploadAttachment) return;
+    if (!file) return;
 
-    setUploadingFile(true);
-    try {
-      await onUploadAttachment(file);
-      toast.success(t('oscrat.ui.file-uploaded-successfully'));
-    } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file')));
-    } finally {
-      setUploadingFile(false);
-    }
+    setPendingFiles(prev => [...prev, file]);
+    toast.success(t('oscrat.ui.file-added-will-upload-on-save'));
+    e.target.value = '';
+  };
+
+  const handleRemovePendingFile = (index: number) => {
+    setPendingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleDownloadAttachment = async (attachmentId: string, filename: string) => {
@@ -146,49 +117,73 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
     }
   };
 
+  const uploadPendingFiles = async (): Promise<string[]> => {
+    if (pendingFiles.length === 0 || !onUploadAttachment) return [];
+
+    const uploadedIds: string[] = [];
+    for (const file of pendingFiles) {
+      try {
+        const result = await onUploadAttachment(file);
+        uploadedIds.push(result.id);
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, `${t('oscrat.ui.failed-to-upload-file')}: ${file.name}`));
+        throw error; // Re-throw to stop the save process
+      }
+    }
+    return uploadedIds;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.description.trim()) {
-      toast.error(t('oscrat.ui.versions.incidents.description-required'));
-      return;
-    }
+    const updateData: OscratIncidentUpdate = {
+      status: formData.status,
+      classification: formData.classification,
+      attackType: formData.attackType,
+      assetDetails: formData.assetDetails || undefined,
+      reporterId: formData.reporterId,
+      dateOfDetection: new Date(formData.dateOfDetection),
+      severity: formData.severity,
+      handlingDate: formData.handlingDate ? new Date(formData.handlingDate) : undefined,
+      description: formData.description,
+      correctiveActions: formData.correctiveActions || undefined,
+      rootCause: formData.rootCause || undefined,
+      scope: formData.scope,
+      preventiveActions: formData.preventiveActions || undefined,
+      suspectedUnlawfulAct: formData.suspectedUnlawfulAct,
+      unlawfulActDescription: formData.suspectedUnlawfulAct ? formData.unlawfulActDescription || undefined : undefined,
+      crossBorderImpact: formData.crossBorderImpact,
+      crossBorderImpactDetails: formData.crossBorderImpact ? formData.crossBorderImpactDetails || undefined : undefined,
+      updatedBy: '', // Will be set by API from authenticated user
+    };
 
-    if (!formData.scope.trim()) {
-      toast.error(t('oscrat.ui.versions.incidents.scope-required'));
-      return;
-    }
-
-    if (!formData.dateOfDetection) {
-      toast.error(t('oscrat.ui.versions.incidents.date-detection-required'));
+    // Validate form data
+    try {
+      await incidentUpdateSchema.validate(updateData, { abortEarly: false });
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        toast.error(t(error.errors[0]));
+      }
       return;
     }
 
     setSaving(true);
     try {
-      const updateData: OscratIncidentUpdate = {
-        status: formData.status,
-        classification: formData.classification,
-        attackType: formData.attackType,
-        assetDetails: formData.assetDetails || undefined,
-        reporterId: formData.reporterId,
-        dateOfDetection: new Date(formData.dateOfDetection),
-        severity: formData.severity,
-        handlingDate: formData.handlingDate ? new Date(formData.handlingDate) : undefined,
-        description: formData.description,
-        correctiveActions: formData.correctiveActions || undefined,
-        rootCause: formData.rootCause || undefined,
-        scope: formData.scope,
-        preventiveActions: formData.preventiveActions || undefined,
-        suspectedUnlawfulAct: formData.suspectedUnlawfulAct,
-        unlawfulActDescription: formData.suspectedUnlawfulAct ? formData.unlawfulActDescription || undefined : undefined,
-        crossBorderImpact: formData.crossBorderImpact,
-        crossBorderImpactDetails: formData.crossBorderImpact ? formData.crossBorderImpactDetails || undefined : undefined,
-        updatedBy: '',
-      };
+      // Upload pending files first and get their IDs
+      const uploadedAttachmentIds = await uploadPendingFiles();
 
+      // Include ALL attachment IDs (existing + newly uploaded)
+      // Always preserve existing attachments, even if no new files are uploaded
+      const existingAttachmentIds = attachments?.map(att => att.id) || [];
+      updateData.attachmentIds = uploadedAttachmentIds.length > 0
+        ? [...existingAttachmentIds, ...uploadedAttachmentIds]
+        : existingAttachmentIds;
+
+      // Save incident updates
       await onSave(updateData);
+      
       toast.success(t('oscrat.ui.versions.incidents.updated-successfully'));
+      setPendingFiles([]);
       onClose();
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, t('oscrat.ui.versions.incidents.failed-to-update')));
@@ -264,9 +259,9 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
                     required
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
                   >
-                    {STATUS_OPTIONS.map((status) => (
+                    {Object.values(IncidentStatus).map((status) => (
                       <option key={status} value={status}>
-                        {normalizeText(status)}
+                        {t(INCIDENT_STATUS_MAP[status])}
                       </option>
                     ))}
                   </select>
@@ -283,9 +278,9 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
                     required
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
                   >
-                    {CLASSIFICATION_OPTIONS.map((classification) => (
+                    {Object.values(IncidentClassification).map((classification) => (
                       <option key={classification} value={classification}>
-                        {normalizeText(classification)}
+                        {t(INCIDENT_CLASSIFICATION_MAP[classification])}
                       </option>
                     ))}
                   </select>
@@ -302,9 +297,9 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
                     required
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
                   >
-                    {ATTACK_TYPE_OPTIONS.map((attackType) => (
+                    {Object.values(IncidentAttackType).map((attackType) => (
                       <option key={attackType} value={attackType}>
-                        {normalizeText(attackType)}
+                        {t(INCIDENT_ATTACK_TYPE_MAP[attackType])}
                       </option>
                     ))}
                   </select>
@@ -367,9 +362,9 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
                     required
                     className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
                   >
-                    {SEVERITY_OPTIONS.map((severity) => (
+                    {Object.values(IncidentSeverity).map((severity) => (
                       <option key={severity} value={severity}>
-                        {normalizeText(severity)}
+                        {t(INCIDENT_SEVERITY_MAP[severity])}
                       </option>
                     ))}
                   </select>
@@ -518,13 +513,37 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
                     <input
                       type="file"
                       onChange={handleFileUpload}
-                      disabled={uploadingFile}
+                      disabled={saving}
                       className="hidden"
                     />
-                    {uploadingFile ? t('oscrat.ui.uploading') : t('oscrat.ui.add-document')}
+                    {t('oscrat.ui.add-document')}
                   </label>
                 )}
               </div>
+
+              {/* Pending files to upload */}
+              {pendingFiles.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="mb-2 text-sm font-medium text-gray-700">
+                    {t('oscrat.ui.pending-uploads')}:
+                  </h4>
+                  <div className="space-y-2">
+                    {pendingFiles.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between rounded-md bg-yellow-50 px-3 py-2">
+                        <span className="text-sm text-gray-700">{file.name}</span>
+                        <ActionButton
+                          onClick={() => handleRemovePendingFile(index)}
+                          disabled={saving}
+                          icon={<FaTrash size={12} />}
+                          title={t('oscrat.ui.remove')}
+                        >
+                          {t('oscrat.ui.remove')}
+                        </ActionButton>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {attachments && attachments.length > 0 ? (
                 <div className="overflow-x-auto">
