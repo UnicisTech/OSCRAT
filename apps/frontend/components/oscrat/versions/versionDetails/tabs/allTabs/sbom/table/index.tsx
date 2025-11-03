@@ -13,6 +13,7 @@ import { getErrorCodeTranslationKey } from '@/utils/errorCodeTranslation';
 import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
+import { ShortUuidButton } from '@/components/shared';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -232,7 +233,14 @@ const Table: React.FC<SsmTableProps> = ({
                 </td>
                 <td className={tableStyles.tdCenter}>
                   {report.latestVulnerabilityScan ? (
-                    getVulnStatusBadge(report.latestVulnerabilityScan.status)
+                    report.latestVulnerabilityScan.status === WorkerJobStatus.COMPLETED ? (
+                      <ShortUuidButton
+                        uuid={report.latestVulnerabilityScan.id}
+                        href={`/teams/${slug}/products/${productId}/versions/${versionId}/scan/${report.latestVulnerabilityScan.id}`}
+                      />
+                    ) : (
+                      getVulnStatusBadge(report.latestVulnerabilityScan.status)
+                    )
                   ) : (
                     <span className="text-gray-400">{t('oscrat.ui.none')}</span>
                   )}
@@ -260,7 +268,8 @@ const Table: React.FC<SsmTableProps> = ({
                       onClick={() => onScan(report.id)}
                       disabled={
                         report.status !== WorkerJobStatus.COMPLETED ||
-                        !!report.latestVulnerabilityScan
+                        (report.latestVulnerabilityScan?.status === WorkerJobStatus.PENDING ||
+                         report.latestVulnerabilityScan?.status === WorkerJobStatus.IN_PROGRESS)
                       }
                       icon={<FaShieldAlt size={12} />}
                       title={t('oscrat.ui.versions.sbom.scan-vulnerabilities')}

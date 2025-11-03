@@ -17,6 +17,7 @@ import { generateSbom, analyzeSBOM, SyftSBOM } from '../utils/sbom';
 import { JobError, saveJobError } from '../utils/JobError';
 import { ERROR_CODES } from '@oscrat/model/constants/errorCodes';
 import { translateError } from '../utils/errorTranslator';
+import { $ } from 'zx';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -54,6 +55,41 @@ async function simulateSbomGeneration(
   };
 }
 
+export async function generateLockFileIfNeeded(repoDir: string): Promise<void> {
+  const packageJsonPath = path.join(repoDir, 'package.json');
+
+  if (!fs.existsSync(packageJsonPath)) {
+    return;
+  }
+
+  console.log(`[SBOM Job] Found package.json`);
+
+  const lockFiles = [
+    'package-lock.json',  // npm
+    'yarn.lock',          // yarn
+    'pnpm-lock.yaml',     // pnpm
+    'bun.lockb',          // bun
+  ];
+
+  const hasLockFile = lockFiles.some(lockFile =>
+    fs.existsSync(path.join(repoDir, lockFile))
+  );
+
+  if (hasLockFile) {
+    console.log(`[SBOM Job] Lock file already exists, skipping generation`);
+    return;
+  }
+
+  console.log(`[SBOM Job] No lock file found, generating package-lock.json...`);
+  const $$ = $({ cwd: repoDir });
+  try {
+    await $$`npm install --package-lock-only`;
+    console.log(`[SBOM Job] Successfully generated package-lock.json`);
+  } catch (error) {
+    console.warn(`[SBOM Job] Failed to generate lock file, continuing anyway:`, error);
+  }
+}
+
 async function generateSbomForRepository(
   repository: OscratRepositoryWithRelations,
   job: WorkerJob,
@@ -75,6 +111,8 @@ async function generateSbomForRepository(
       );
       throw jobError;
     }
+
+    await generateLockFileIfNeeded(repoDir);
 
     // Generate SBOM
     console.log(`[SBOM Job] Generating SBOM files...`);

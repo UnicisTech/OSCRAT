@@ -97,7 +97,6 @@ export async function cloneRepository(
   const cloneUrl = getAuthenticatedCloneUrl(repository);
   const targetRef = getTargetReference(repository);
   const repoPath = path.join(tempDir, repository.name);
-  const originalCwd = $.cwd;
 
   console.log(`[Git Utils] Clone configuration:`, {
     repoPath,
@@ -118,18 +117,13 @@ export async function cloneRepository(
       `[Git Utils] Cloning repository ${repository.user}/${repository.name} to ${repoPath}`
     );
 
-    // Set working directory for git operations
-    console.log(`[Git Utils] Setting working directory to: ${tempDir}`);
-    $.cwd = tempDir;
-
-    // Clone the repository
+    // Clone the repository to the target path
     console.log(`[Git Utils] Executing git clone command...`);
-    await $`git clone ${cloneUrl} ${repository.name}`;
+    await $`git clone ${cloneUrl} ${repoPath}`;
     console.log(`[Git Utils] Repository cloned successfully`);
 
-    // Change to the repository directory
-    console.log(`[Git Utils] Changing to repository directory: ${repoPath}`);
-    $.cwd = repoPath;
+    // Create isolated $ instance for git operations in the repo directory
+    const $$ = $({ cwd: repoPath });
 
     // Checkout specific reference if specified
     if (targetRef) {
@@ -137,11 +131,11 @@ export async function cloneRepository(
 
       // Fetch all references to ensure we have the target
       console.log(`[Git Utils] Fetching all references...`);
-      await $`git fetch --all --tags`;
+      await $$`git fetch --all --tags`;
 
       // Checkout the target reference
       console.log(`[Git Utils] Checking out target reference: ${targetRef}`);
-      await $`git checkout ${targetRef}`;
+      await $$`git checkout ${targetRef}`;
     } else {
       console.log(
         `[Git Utils] No specific reference to checkout, using default branch`
@@ -150,8 +144,8 @@ export async function cloneRepository(
 
     // Verify the checkout
     console.log(`[Git Utils] Verifying checkout...`);
-    const currentRef = (await $`git rev-parse HEAD`).stdout.trim();
-    const currentBranch = (await $`git branch --show-current`).stdout.trim();
+    const currentRef = (await $$`git rev-parse HEAD`).stdout.trim();
+    const currentBranch = (await $$`git branch --show-current`).stdout.trim();
 
     console.log(`[Git Utils] Repository clone completed successfully:`, {
       repoPath,
@@ -175,8 +169,5 @@ export async function cloneRepository(
     });
 
     throw jobError;
-  } finally {
-    console.log(`[Git Utils] Resetting working directory to: ${originalCwd}`);
-    $.cwd = originalCwd;
   }
 }

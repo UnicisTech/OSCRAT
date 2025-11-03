@@ -540,6 +540,7 @@
       "no-description": "No description",
       "unknown": "Unknown",
       "source": "Source",
+      "source-sbom": "Source Sbom",
       "repository-not-configured": "No repository configured for this project",
       "repo-sbom-job-created": "Repository SBOM job created successfully",
       "file-sbom-job-created": "SBOM import job created for \"{{filename}}\"",

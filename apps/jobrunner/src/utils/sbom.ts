@@ -9,11 +9,7 @@ import { translateError } from './errorTranslator';
 export async function generateSbom(
   repoDir: string
 ): Promise<{ syftJsonPath: string; cycloneDxXmlPath: string }> {
-  const originalCwd = $.cwd;
-
   try {
-    $.cwd = repoDir;
-
     const timestamp = Date.now();
     const syftJsonPath = path.join(repoDir, `sbom-${timestamp}.syft.json`);
     const cycloneDxXmlPath = path.join(repoDir, `sbom-${timestamp}.cyclonedx.xml`);
@@ -50,8 +46,6 @@ export async function generateSbom(
       ERROR_CODES.SBOM_GENERATION_FAILED,
       'Failed to generate SBOM'
     );
-  } finally {
-    $.cwd = originalCwd;
   }
 }
 
@@ -78,8 +72,6 @@ export async function convertSbomToSyftJson(
   inputPath: string,
   outputPath: string
 ): Promise<void> {
-  const originalCwd = $.cwd;
-
   try {
     console.log(`[SBOM Conversion] Converting: ${inputPath} -> ${outputPath}`);
 
@@ -102,8 +94,6 @@ export async function convertSbomToSyftJson(
       ERROR_CODES.SBOM_CONVERSION_FAILED,
       'Failed to convert SBOM format'
     );
-  } finally {
-    $.cwd = originalCwd;
   }
 }
 

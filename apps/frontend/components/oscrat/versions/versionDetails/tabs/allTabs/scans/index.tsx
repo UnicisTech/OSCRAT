@@ -1,5 +1,4 @@
 import Table from './table';
-import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
 import { useOscratVersionVulnerabilityScanReports } from '@/hooks/oscrat/useOscratJobs';
 import { useAttachments } from '@/hooks/useAttachments';
 import toast from 'react-hot-toast';
@@ -9,40 +8,16 @@ import { useTranslation } from 'next-i18next';
 import { HiOutlineRefresh } from 'react-icons/hi';
 
 export default function Vulnerabilities() {
-  const { teamId, productId, versionId, versionContext } = useVersionContext();
+  const { teamId, productId, versionId } = useVersionContext();
   const { t } = useTranslation('common');
-
-  const { repository } = useOscratRepository(teamId, productId, versionId);
-  const { version } = versionContext;
 
   const {
     reports,
-    createRepoVulnerabilityScanReport,
     deleteVulnerabilityScanReport,
-    isLoading: isCreatingReport,
     refreshReports,
   } = useOscratVersionVulnerabilityScanReports(teamId, productId, versionId);
 
   const { downloadAttachment } = useAttachments();
-
-  const handleCreateRepoVulnerabilityScanReport = async () => {
-    if (!repository?.id) {
-      toast.error(t('oscrat.ui.repository-not-configured'));
-      return;
-    }
-
-    try {
-      await createRepoVulnerabilityScanReport({ repositoryId: repository.id });
-      toast.success(t('oscrat.ui.repo-vulnerability-scan-job-created'));
-      await refreshReports();
-    } catch (error: unknown) {
-      toast.error(
-        `${t('oscrat.ui.versions.vulnerability-scan.failed-create-repo-job')}: ${extractErrorMessage(error, t('oscrat.ui.versions.vulnerability-scan.failed-create-repo-job'))}`
-      );
-    }
-  };
-
-  const handleGenerate = () => handleCreateRepoVulnerabilityScanReport();
 
   const handleRefresh = async () => {
     await refreshReports();
@@ -83,9 +58,6 @@ export default function Vulnerabilities() {
     }
   };
 
-  const hasRepositoryDefined =
-    version?.repository && Object.keys(version.repository).length > 0;
-
   return (
     <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
       <div className="w-full">
@@ -101,27 +73,6 @@ export default function Vulnerabilities() {
               title={t('refresh')}
             >
               <HiOutlineRefresh className="h-4 w-4" />
-            </button>
-            {/* Note: Import functionality not yet implemented */}
-            <button
-              onClick={
-                hasRepositoryDefined && !isCreatingReport
-                  ? handleGenerate
-                  : undefined
-              }
-              disabled={!hasRepositoryDefined || isCreatingReport}
-              title={
-                !hasRepositoryDefined
-                  ? t('oscrat.ui.to-generate-vulnerability-scan')
-                  : undefined
-              }
-              className={`rounded-md border px-4 py-2 text-sm font-medium ${
-                hasRepositoryDefined && !isCreatingReport
-                  ? 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'
-                  : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
-              }`}
-            >
-              {isCreatingReport ? `${t('generate')}...` : t('generate')}
             </button>
           </div>
         </div>

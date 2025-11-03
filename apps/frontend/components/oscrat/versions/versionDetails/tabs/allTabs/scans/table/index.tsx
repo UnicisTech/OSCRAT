@@ -12,6 +12,7 @@ import { getErrorCodeTranslationKey } from '@/utils/errorCodeTranslation';
 import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
+import { ShortUuidButton } from '@/components/shared';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -158,17 +159,14 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
               >
                 <td className={tableStyles.td}>{getStatusBadge(report)}</td>
                 <td className={tableStyles.tdCenter}>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      report.job.source === 'REPO'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-purple-100 text-purple-800'
-                    }`}
-                  >
-                    {report.job.source === 'REPO'
-                      ? t('oscrat.ui.repository.labels.title')
-                      : t('oscrat.ui.versions.sbom.title')}
-                  </span>
+                  {report.sourceSbomReport ? (
+                    <ShortUuidButton
+                      uuid={report.sourceSbomReport.id}
+                      href={`/teams/${slug}/products/${productId}/versions/${versionId}/sbom/${report.sourceSbomReport.id}`}
+                    />
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
                 </td>
                 <td className={tableStyles.tdCenter}>
                   {new Date(report.job.createdAt).toLocaleDateString('en-US', {
