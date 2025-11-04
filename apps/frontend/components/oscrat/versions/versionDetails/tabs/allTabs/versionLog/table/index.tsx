@@ -32,6 +32,13 @@ const Table: React.FC<EventLogTableProps> = ({ events, onPreview }) => {
             columns={tableHeaders.map((header) => ({ label: header }))}
           />
           <tbody className={tableStyles.tbody}>
+            {(!events || events.length === 0) && (
+              <tr>
+                <td colSpan={3} className="px-6 py-8 text-center text-sm text-gray-500">
+                  {t('oscrat.ui.no-version-logs')}
+                </td>
+              </tr>
+            )}
             {events.map((event) => (
               <TableRow key={event.id}>
                 <td className={tableStyles.td}>

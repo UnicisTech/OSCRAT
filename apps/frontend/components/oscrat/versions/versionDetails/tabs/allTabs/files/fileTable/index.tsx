@@ -62,6 +62,13 @@ const FileTable: React.FC<FileTableProps> = ({
         <table className={tableStyles.table}>
           <TableHeader columns={tableHeaders} />
           <tbody className={tableStyles.tbody}>
+            {(!attachments || attachments.length === 0) && (
+              <tr>
+                <td colSpan={5} className="px-6 py-8 text-center text-sm text-gray-500">
+                  {t('oscrat.ui.no-files-added')}
+                </td>
+              </tr>
+            )}
             {pageData.map((attachment) => (
               <TableRow key={attachment.id}>
                 <td className={tableStyles.td}>

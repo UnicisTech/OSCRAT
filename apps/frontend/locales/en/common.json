@@ -515,6 +515,8 @@
       "no-sbom-added": "There is currently no SBOM added. Please import or generate one to populate the table.",
       "to-generate-sbom": "To generate an SBOM, first define a repository in the Repository tab.",
       "no-vulnerability-scans-added": "There are currently no vulnerability scans added. Please generate one to populate the table.",
+      "no-files-added": "No files added",
+      "no-version-logs": "No version logs",
       "to-generate-vulnerability-scan": "To generate a vulnerability scan, first define a repository in the Repository tab.",
       "repo-vulnerability-scan-job-created": "Repository vulnerability scan job created successfully",
       "create-organization": "Create Organization",
