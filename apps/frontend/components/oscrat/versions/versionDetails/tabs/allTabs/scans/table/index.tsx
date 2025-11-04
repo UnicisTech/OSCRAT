@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  FaDownload,
-  FaTrash,
-} from 'react-icons/fa';
+import { FaDownload, FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import type { VulnerabilityScanReportDetails } from '@oscrat/model/operations';
@@ -13,8 +10,13 @@ import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { ShortUuidButton } from '@/components/shared';
+import {
+  TableWrapper,
+  TableHeader,
+  TableRow,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 10;
 
 interface VulnerabilityScanTableProps {
   reports?: VulnerabilityScanReportDetails[];
@@ -87,9 +89,11 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
     return (
       <span
         className={`flex items-center ${config.color}`}
-        title={report.status === WorkerJobStatus.FAILED && report.job.errCode
-          ? `Error ${report.job.errCode}: ${t(getErrorCodeTranslationKey(report.job.errCode))}`
-          : undefined}
+        title={
+          report.status === WorkerJobStatus.FAILED && report.job.errCode
+            ? `Error ${report.job.errCode}: ${t(getErrorCodeTranslationKey(report.job.errCode))}`
+            : undefined
+        }
       >
         <span className="mr-1">●</span>
         {config.label}
@@ -107,50 +111,52 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
 
   return (
     <div className="w-full rounded-lg">
-      <div className={tableStyles.wrapper}>
+      <TableWrapper>
         <table className={tableStyles.table}>
-          <thead className={tableStyles.thead}>
-            <tr>
-              <th scope="col" className={`${tableStyles.th} w-28`}>
-                {t('status')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-20 text-center`}>
-                {t('oscrat.ui.source')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-28 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.started')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-24 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.triggered-by')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-16 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.duration')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.total')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.critical')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.high')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.medium')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-12 text-center`}>
-                {t('oscrat.ui.versions.vulnerability-scan.low')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-40 text-center`}>
-                {t('actions')}
-              </th>
-            </tr>
-          </thead>
+          <TableHeader
+            columns={[
+              { label: t('status'), className: 'w-28' },
+              { label: t('oscrat.ui.source'), className: 'w-20 text-center' },
+              {
+                label: t('oscrat.ui.versions.vulnerability-scan.started'),
+                className: 'w-28 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerability-scan.triggered-by'),
+                className: 'w-24 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerability-scan.duration'),
+                className: 'w-16 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerability-scan.total'),
+                className: 'w-12 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerability-scan.critical'),
+                className: 'w-12 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerability-scan.high'),
+                className: 'w-12 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerability-scan.medium'),
+                className: 'w-12 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerability-scan.low'),
+                className: 'w-12 text-center',
+              },
+              { label: t('actions'), className: 'w-40 text-center' },
+            ]}
+          />
           <tbody className={tableStyles.tbody}>
             {pageData.map((report) => (
-              <tr
+              <TableRow
                 key={report.id}
-                className={`${tableStyles.tr} cursor-pointer`}
+                className="cursor-pointer"
                 onClick={() =>
                   router.push(
                     `/teams/${slug}/products/${productId}/versions/${versionId}/scan/${report.id}`
@@ -192,29 +198,50 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                   {report.status === WorkerJobStatus.COMPLETED &&
                   report.job.processStartTime &&
                   report.job.processEndTime
-                    ? formatDuration(report.job.processStartTime, report.job.processEndTime)
+                    ? formatDuration(
+                        report.job.processStartTime,
+                        report.job.processEndTime
+                      )
                     : '-'}
                 </td>
                 <td className={tableStyles.tdCenter}>
                   {report.scanData?.totalVulnerabilities ?? '-'}
                 </td>
                 <td className={tableStyles.tdCenter}>
-                  <span className={report.scanData?.criticalCount ? 'text-red-600 font-semibold' : ''}>
+                  <span
+                    className={
+                      report.scanData?.criticalCount
+                        ? 'font-semibold text-red-600'
+                        : ''
+                    }
+                  >
                     {report.scanData?.criticalCount ?? '-'}
                   </span>
                 </td>
                 <td className={tableStyles.tdCenter}>
-                  <span className={report.scanData?.highCount ? 'text-orange-600 font-semibold' : ''}>
+                  <span
+                    className={
+                      report.scanData?.highCount
+                        ? 'font-semibold text-orange-600'
+                        : ''
+                    }
+                  >
                     {report.scanData?.highCount ?? '-'}
                   </span>
                 </td>
                 <td className={tableStyles.tdCenter}>
-                  <span className={report.scanData?.mediumCount ? 'text-yellow-600' : ''}>
+                  <span
+                    className={
+                      report.scanData?.mediumCount ? 'text-yellow-600' : ''
+                    }
+                  >
                     {report.scanData?.mediumCount ?? '-'}
                   </span>
                 </td>
                 <td className={tableStyles.tdCenter}>
-                  <span className={report.scanData?.lowCount ? 'text-blue-600' : ''}>
+                  <span
+                    className={report.scanData?.lowCount ? 'text-blue-600' : ''}
+                  >
                     {report.scanData?.lowCount ?? '-'}
                   </span>
                 </td>
@@ -233,7 +260,9 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                         !report.attachment
                       }
                       icon={<FaDownload size={12} />}
-                      title={t('oscrat.ui.versions.vulnerability-scan.download-report')}
+                      title={t(
+                        'oscrat.ui.versions.vulnerability-scan.download-report'
+                      )}
                     >
                       {t('oscrat.ui.versions.vulnerability-scan.download')}
                     </ActionButton>
@@ -247,7 +276,9 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                       title={
                         report.status === WorkerJobStatus.COMPLETED ||
                         report.status === WorkerJobStatus.FAILED
-                          ? t('oscrat.ui.versions.vulnerability-scan.delete-job')
+                          ? t(
+                              'oscrat.ui.versions.vulnerability-scan.delete-job'
+                            )
                           : t(
                               'oscrat.ui.versions.vulnerability-scan.delete-only-completed-failed'
                             )
@@ -257,7 +288,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                     </ActionButton>
                   </div>
                 </td>
-              </tr>
+              </TableRow>
             ))}
             {(!reports || reports.length === 0) && (
               <tr>
@@ -271,7 +302,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
             )}
           </tbody>
         </table>
-      </div>
+      </TableWrapper>
 
       {/* Pagination Controls */}
       {reports && reports.length > pageSize && (

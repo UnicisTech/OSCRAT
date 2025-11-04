@@ -1,6 +1,8 @@
 import React from 'react';
 import { FaRegEye } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
+import { TabHeader, TableWrapper, TableHeader, TableRow } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import { tableStyles } from '@/components/oscrat/tableStyles';
 
 // --- TYPE DEFINITIONS ---
 interface EventData {
@@ -21,30 +23,22 @@ const Table: React.FC<EventLogTableProps> = ({ events, onPreview }) => {
   if (!ready) return null;
 
   return (
-    <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-gray-600">
-          <thead className="bg-gray-200 text-xs text-gray-700">
-            <tr>
-              {tableHeaders.map((header) => (
-                <th
-                  key={header}
-                  scope="col"
-                  className="px-6 py-3 first:pl-8 last:pr-8"
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
+    <div className="w-full">
+      <TabHeader title={t('oscrat.ui.version-log')} />
+
+      <TableWrapper>
+        <table className={tableStyles.table}>
+          <TableHeader
+            columns={tableHeaders.map((header) => ({ label: header }))}
+          />
+          <tbody className={tableStyles.tbody}>
             {events.map((event) => (
-              <tr key={event.id} className="border-t bg-white hover:bg-gray-50">
-                <td className="whitespace-nowrap px-6 py-4 text-gray-800 first:pl-8">
+              <TableRow key={event.id}>
+                <td className={tableStyles.td}>
                   {event.dateAdded}
                 </td>
-                <td className="px-6 py-4">{event.type}</td>
-                <td className="px-6 py-4 text-right last:pr-8">
+                <td className={tableStyles.td}>{event.type}</td>
+                <td className={`${tableStyles.td} text-right`}>
                   <button
                     onClick={() => onPreview(event.id)}
                     className="flex items-center text-xs font-medium text-gray-900 hover:text-blue-600"
@@ -53,11 +47,11 @@ const Table: React.FC<EventLogTableProps> = ({ events, onPreview }) => {
                     {t('preview')}
                   </button>
                 </td>
-              </tr>
+              </TableRow>
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrapper>
     </div>
   );
 };

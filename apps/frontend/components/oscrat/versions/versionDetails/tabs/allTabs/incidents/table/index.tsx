@@ -10,8 +10,13 @@ import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import normalizeText from '@/utils/normalizeText';
 import { formatDateShort } from '@/utils/dateFormat';
+import {
+  TableWrapper,
+  TableHeader,
+  TableRow,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 10;
 
 interface IncidentsTableProps {
   incidents?: OscratIncidentSummary[];
@@ -48,13 +53,34 @@ const Table: React.FC<IncidentsTableProps> = ({
       IncidentStatus,
       { bgColor: string; textColor: string }
     > = {
-      [IncidentStatus.PENDING]: { bgColor: 'bg-gray-100', textColor: 'text-gray-800' },
-      [IncidentStatus.START]: { bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
-      [IncidentStatus.DECLARED]: { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
-      [IncidentStatus.STABLE]: { bgColor: 'bg-cyan-100', textColor: 'text-cyan-800' },
-      [IncidentStatus.ACTIVE]: { bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
-      [IncidentStatus.RESOLVED]: { bgColor: 'bg-green-100', textColor: 'text-green-800' },
-      [IncidentStatus.COMPLETED]: { bgColor: 'bg-emerald-100', textColor: 'text-emerald-800' },
+      [IncidentStatus.PENDING]: {
+        bgColor: 'bg-gray-100',
+        textColor: 'text-gray-800',
+      },
+      [IncidentStatus.START]: {
+        bgColor: 'bg-blue-100',
+        textColor: 'text-blue-800',
+      },
+      [IncidentStatus.DECLARED]: {
+        bgColor: 'bg-yellow-100',
+        textColor: 'text-yellow-800',
+      },
+      [IncidentStatus.STABLE]: {
+        bgColor: 'bg-cyan-100',
+        textColor: 'text-cyan-800',
+      },
+      [IncidentStatus.ACTIVE]: {
+        bgColor: 'bg-orange-100',
+        textColor: 'text-orange-800',
+      },
+      [IncidentStatus.RESOLVED]: {
+        bgColor: 'bg-green-100',
+        textColor: 'text-green-800',
+      },
+      [IncidentStatus.COMPLETED]: {
+        bgColor: 'bg-emerald-100',
+        textColor: 'text-emerald-800',
+      },
     };
 
     const config = statusConfig[status] || statusConfig[IncidentStatus.PENDING];
@@ -98,49 +124,39 @@ const Table: React.FC<IncidentsTableProps> = ({
 
   return (
     <div className="w-full">
-      <div className={tableStyles.wrapper}>
+      <TableWrapper>
         <table className="w-full text-left text-sm text-gray-600">
-          <thead className={tableStyles.thead}>
-            <tr>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.incidents.table-status')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.incidents.table-classification')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.incidents.table-attack-type')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.incidents.table-severity')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.incidents.table-date-detected')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.incidents.table-reporter')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.incidents.table-description')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('actions')}
-              </th>
-            </tr>
-          </thead>
+          <TableHeader
+            columns={[
+              { label: t('oscrat.ui.versions.incidents.table-status') },
+              { label: t('oscrat.ui.versions.incidents.table-classification') },
+              { label: t('oscrat.ui.versions.incidents.table-attack-type') },
+              { label: t('oscrat.ui.versions.incidents.table-severity') },
+              { label: t('oscrat.ui.versions.incidents.table-date-detected') },
+              { label: t('oscrat.ui.versions.incidents.table-reporter') },
+              { label: t('oscrat.ui.versions.incidents.table-description') },
+              { label: t('actions') },
+            ]}
+          />
           <tbody className={tableStyles.tbody}>
             {pageData.map((incident) => (
-              <tr key={incident.id} className={tableStyles.tr}>
+              <TableRow key={incident.id}>
                 <td className={tableStyles.td}>
                   {getStatusBadge(incident.status)}
                 </td>
                 <td className={tableStyles.td}>
-                  <div className="max-w-[150px] truncate" title={normalizeText(incident.classification)}>
+                  <div
+                    className="max-w-[150px] truncate"
+                    title={normalizeText(incident.classification)}
+                  >
                     {normalizeText(incident.classification)}
                   </div>
                 </td>
                 <td className={tableStyles.td}>
-                  <div className="max-w-[150px] truncate" title={normalizeText(incident.attackType)}>
+                  <div
+                    className="max-w-[150px] truncate"
+                    title={normalizeText(incident.attackType)}
+                  >
                     {normalizeText(incident.attackType)}
                   </div>
                 </td>
@@ -151,12 +167,18 @@ const Table: React.FC<IncidentsTableProps> = ({
                   {formatDateShort(incident.dateOfDetection)}
                 </td>
                 <td className={tableStyles.td}>
-                  <div className="max-w-[150px] truncate" title={incident.reporter.name}>
+                  <div
+                    className="max-w-[150px] truncate"
+                    title={incident.reporter.name}
+                  >
                     {incident.reporter.name}
                   </div>
                 </td>
                 <td className={tableStyles.td}>
-                  <div className="max-w-[250px] truncate" title={incident.description}>
+                  <div
+                    className="max-w-[250px] truncate"
+                    title={incident.description}
+                  >
                     {incident.description}
                   </div>
                 </td>
@@ -178,7 +200,7 @@ const Table: React.FC<IncidentsTableProps> = ({
                     </ActionButton>
                   </div>
                 </td>
-              </tr>
+              </TableRow>
             ))}
             {(!incidents || incidents.length === 0) && (
               <tr>
@@ -192,7 +214,7 @@ const Table: React.FC<IncidentsTableProps> = ({
             )}
           </tbody>
         </table>
-      </div>
+      </TableWrapper>
 
       {/* Pagination Controls */}
       {incidents && incidents.length > pageSize && (
@@ -210,4 +232,3 @@ const Table: React.FC<IncidentsTableProps> = ({
 };
 
 export default Table;
-

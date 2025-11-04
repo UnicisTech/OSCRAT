@@ -28,8 +28,10 @@ export default function Index() {
   };
 
   return (
-    <div className="flex w-full flex-col items-center">
-      <Table events={events} onPreview={handlePreview} />
+    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+      <div className="w-full">
+        <Table events={events} onPreview={handlePreview} />
+      </div>
     </div>
   );
 }

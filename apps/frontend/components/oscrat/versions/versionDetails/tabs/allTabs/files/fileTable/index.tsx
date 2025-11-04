@@ -1,7 +1,15 @@
 import React from 'react';
 import { IoAdd } from 'react-icons/io5';
+import { FaDownload, FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import type { Attachment } from '@/types';
+import { TabHeader, TableWrapper, TableHeader, TableRow, TabActionButton } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import { tableStyles } from '@/components/oscrat/tableStyles';
+import usePagination from '@/hooks/usePagination';
+import PaginationControls from '@/components/shared/PaginationControls';
+import ActionButton from '@/components/oscrat/ActionButton';
+
+const ITEMS_PER_PAGE = 10;
 
 interface FileTableProps {
   attachments: Attachment[];
@@ -21,70 +29,65 @@ const FileTable: React.FC<FileTableProps> = ({
   const { t, ready } = useTranslation('common');
   if (!ready) return null;
 
+  const {
+    currentPage,
+    totalPages,
+    pageData,
+    goToPreviousPage,
+    goToNextPage,
+    prevButtonDisabled,
+    nextButtonDisabled,
+  } = usePagination<Attachment>(attachments, ITEMS_PER_PAGE);
+
   const tableHeaders = [
-    t('oscrat.ui.file-name'),
-    t('oscrat.ui.file-description'),
-    t('oscrat.ui.date-added'),
-    t('oscrat.ui.added-by'),
-    '',
+    { label: t('oscrat.ui.file-name') },
+    { label: t('oscrat.ui.file-description') },
+    { label: t('oscrat.ui.date-added') },
+    { label: t('oscrat.ui.added-by') },
+    { label: t('actions'), className: 'text-right' },
   ];
 
   return (
-    <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
-      <div className="mb-4">
-        <button
+    <div className="w-full">
+      <TabHeader title={t('oscrat.ui.files')}>
+        <TabActionButton
           onClick={onAddFileClick}
-          className="flex items-center justify-center rounded-md border border-gray-600 bg-white px-3 py-1 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+          icon={<IoAdd size={18} />}
         >
-          <IoAdd className="mr-2" size={18} />
           {t('oscrat.ui.add-file')}
-        </button>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-gray-600">
-          <thead className="bg-gray-200 text-xs text-gray-700">
-            <tr>
-              {tableHeaders.map((header) => (
-                <th key={header} scope="col" className="px-6 py-3">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {attachments.map((attachment) => (
-              <tr
-                key={attachment.id}
-                className="border-b bg-white hover:bg-gray-50"
-              >
-                <td className="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                  {attachment.name}
+        </TabActionButton>
+      </TabHeader>
+
+      <TableWrapper>
+        <table className={tableStyles.table}>
+          <TableHeader columns={tableHeaders} />
+          <tbody className={tableStyles.tbody}>
+            {pageData.map((attachment) => (
+              <TableRow key={attachment.id}>
+                <td className={tableStyles.td}>
+                  <div className="font-medium">{attachment.name}</div>
                 </td>
-                <td className="px-6 py-4">
+                <td className={tableStyles.td}>
                   {attachment.description || t('oscrat.ui.no-description')}
                 </td>
-                <td className="px-6 py-4">
+                <td className={tableStyles.td}>
                   {new Date(attachment.createdAt).toLocaleDateString('en-GB')}
                 </td>
-                <td className="px-6 py-4">
+                <td className={tableStyles.td}>
                   {attachment.createdByUser
                     ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
                       attachment.createdByUser.name
                     : t('oscrat.ui.unknown')}
                 </td>
-                <td className="px-6 py-4 text-center">
-                  <div className="flex gap-6">
+                <td className={`${tableStyles.td} text-right`}>
+                  <div className="flex items-center justify-end space-x-1">
                     {onDownloadFile && (
-                      <button
+                      <ActionButton
                         onClick={() =>
                           onDownloadFile(attachment.id, attachment.name)
                         }
                         disabled={downloadingFiles.has(attachment.id)}
-                        className={`${
-                          downloadingFiles.has(attachment.id)
-                            ? 'cursor-not-allowed text-gray-400'
-                            : 'text-blue-600 hover:text-blue-800'
-                        }`}
+                        icon={<FaDownload size={12} />}
                         title={
                           downloadingFiles.has(attachment.id)
                             ? t('oscrat.ui.downloading')
@@ -94,17 +97,13 @@ const FileTable: React.FC<FileTableProps> = ({
                         {downloadingFiles.has(attachment.id)
                           ? t('oscrat.ui.downloading')
                           : t('oscrat.ui.download')}
-                      </button>
+                      </ActionButton>
                     )}
                     {onDeleteFile && (
-                      <button
+                      <ActionButton
                         onClick={() => onDeleteFile(attachment.id)}
                         disabled={downloadingFiles.has(attachment.id)}
-                        className={`${
-                          downloadingFiles.has(attachment.id)
-                            ? 'cursor-not-allowed text-gray-400'
-                            : 'text-red-600 hover:text-red-800'
-                        }`}
+                        icon={<FaTrash size={12} />}
                         title={
                           downloadingFiles.has(attachment.id)
                             ? t('oscrat.ui.download-in-progress')
@@ -112,15 +111,26 @@ const FileTable: React.FC<FileTableProps> = ({
                         }
                       >
                         {t('delete')}
-                      </button>
+                      </ActionButton>
                     )}
                   </div>
                 </td>
-              </tr>
+              </TableRow>
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrapper>
+
+      {attachments.length > ITEMS_PER_PAGE && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          prevButtonDisabled={prevButtonDisabled}
+          nextButtonDisabled={nextButtonDisabled}
+          goToPreviousPage={goToPreviousPage}
+          goToNextPage={goToNextPage}
+        />
+      )}
     </div>
   );
 };

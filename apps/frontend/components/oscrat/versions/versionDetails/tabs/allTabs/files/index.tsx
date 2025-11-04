@@ -77,14 +77,16 @@ export default function Files() {
   }
 
   return (
-    <div className="flex w-full flex-col items-center">
-      <FileTable
-        attachments={attachments}
-        onAddFileClick={() => setAddModalOpen(true)}
-        onDownloadFile={handleDownloadFile}
-        onDeleteFile={handleDeleteFile}
-        downloadingFiles={downloadingFiles}
-      />
+    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+      <div className="w-full">
+        <FileTable
+          attachments={attachments}
+          onAddFileClick={() => setAddModalOpen(true)}
+          onDownloadFile={handleDownloadFile}
+          onDeleteFile={handleDeleteFile}
+          downloadingFiles={downloadingFiles}
+        />
+      </div>
 
       <AddFileModal
         isOpen={isAddModalOpen}

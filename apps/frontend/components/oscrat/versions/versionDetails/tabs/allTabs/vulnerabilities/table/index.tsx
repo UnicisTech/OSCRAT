@@ -10,6 +10,7 @@ import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import normalizeText from '@/utils/normalizeText';
 import { formatDateShort } from '@/utils/dateFormat';
+import { TableWrapper, TableHeader, TableRow } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -98,35 +99,23 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
 
   return (
     <div className="w-full">
-      <div className={tableStyles.wrapper}>
+      <TableWrapper>
         <table className="w-full text-left text-sm text-gray-600">
-          <thead className={tableStyles.thead}>
-            <tr>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.vulnerabilities.table-name')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.vulnerabilities.table-status')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.vulnerabilities.table-severity')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.vulnerabilities.table-date-of-discovery')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.versions.vulnerabilities.table-description')}
-              </th>
-              <th className={tableStyles.th}>
-                {t('actions')}
-              </th>
-            </tr>
-          </thead>
+          <TableHeader
+            columns={[
+              { label: t('oscrat.ui.versions.vulnerabilities.table-name') },
+              { label: t('oscrat.ui.versions.vulnerabilities.table-status') },
+              { label: t('oscrat.ui.versions.vulnerabilities.table-severity') },
+              { label: t('oscrat.ui.versions.vulnerabilities.table-date-of-discovery') },
+              { label: t('oscrat.ui.versions.vulnerabilities.table-description') },
+              { label: t('actions') },
+            ]}
+          />
           <tbody className={tableStyles.tbody}>
             {pageData.map((vulnerability) => (
-              <tr
+              <TableRow
                 key={vulnerability.id}
-                className={`${tableStyles.tr} cursor-pointer`}
+                className="cursor-pointer"
                 onClick={() => handleViewDetails(vulnerability.id)}
               >
                 <td className={tableStyles.td}>
@@ -162,7 +151,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                     </ActionButton>
                   </div>
                 </td>
-              </tr>
+              </TableRow>
             ))}
             {(!vulnerabilities || vulnerabilities.length === 0) && (
               <tr>
@@ -176,7 +165,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
             )}
           </tbody>
         </table>
-      </div>
+      </TableWrapper>
 
       {vulnerabilities && vulnerabilities.length > pageSize && (
         <PaginationControls

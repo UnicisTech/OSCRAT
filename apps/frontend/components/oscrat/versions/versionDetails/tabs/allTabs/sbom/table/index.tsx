@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  FaDownload,
-  FaTrash,
-  FaShieldAlt,
-} from 'react-icons/fa';
+import { FaDownload, FaTrash, FaShieldAlt } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import type { SbomReportDetails } from '@oscrat/model/operations';
@@ -14,8 +10,13 @@ import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { ShortUuidButton } from '@/components/shared';
+import {
+  TableWrapper,
+  TableHeader,
+  TableRow,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 10;
 
 interface SsmTableProps {
   reports?: SbomReportDetails[];
@@ -90,9 +91,11 @@ const Table: React.FC<SsmTableProps> = ({
     return (
       <span
         className={`flex items-center ${config.color}`}
-        title={report.status === WorkerJobStatus.FAILED && report.job.errCode
-          ? `Error ${report.job.errCode}: ${t(getErrorCodeTranslationKey(report.job.errCode))}`
-          : undefined}
+        title={
+          report.status === WorkerJobStatus.FAILED && report.job.errCode
+            ? `Error ${report.job.errCode}: ${t(getErrorCodeTranslationKey(report.job.errCode))}`
+            : undefined
+        }
       >
         <span className="mr-1">●</span>
         {config.label}
@@ -130,7 +133,9 @@ const Table: React.FC<SsmTableProps> = ({
     };
 
     return (
-      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}>
+      <span
+        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}
+      >
         {config.label}
       </span>
     );
@@ -146,41 +151,37 @@ const Table: React.FC<SsmTableProps> = ({
 
   return (
     <div className="w-full rounded-lg">
-      <div className={tableStyles.wrapper}>
+      <TableWrapper>
         <table className={tableStyles.table}>
-          <thead className={tableStyles.thead}>
-            <tr>
-              <th scope="col" className={`${tableStyles.th} w-28`}>
-                {t('status')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-20 text-center`}>
-                {t('oscrat.ui.source')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-28 text-center`}>
-                {t('oscrat.ui.versions.sbom.started')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-24 text-center`}>
-                {t('oscrat.ui.versions.sbom.triggered-by')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-16 text-center`}>
-                {t('oscrat.ui.versions.sbom.duration')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-16 text-center`}>
-                {t('oscrat.ui.versions.sbom.packages')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-28 text-center`}>
-                {t('oscrat.ui.scan')}
-              </th>
-              <th scope="col" className={`${tableStyles.th} w-48 text-center`}>
-                {t('actions')}
-              </th>
-            </tr>
-          </thead>
+          <TableHeader
+            columns={[
+              { label: t('status'), className: 'w-28' },
+              { label: t('oscrat.ui.source'), className: 'w-20 text-center' },
+              {
+                label: t('oscrat.ui.versions.sbom.started'),
+                className: 'w-28 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.sbom.triggered-by'),
+                className: 'w-24 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.sbom.duration'),
+                className: 'w-16 text-center',
+              },
+              {
+                label: t('oscrat.ui.versions.sbom.packages'),
+                className: 'w-16 text-center',
+              },
+              { label: t('oscrat.ui.scan'), className: 'w-28 text-center' },
+              { label: t('actions'), className: 'w-48 text-center' },
+            ]}
+          />
           <tbody className={tableStyles.tbody}>
             {pageData.map((report) => (
-              <tr
+              <TableRow
                 key={report.id}
-                className={`${tableStyles.tr} cursor-pointer`}
+                className="cursor-pointer"
                 onClick={() =>
                   router.push(
                     `/teams/${slug}/products/${productId}/versions/${versionId}/sbom/${report.id}`
@@ -225,7 +226,10 @@ const Table: React.FC<SsmTableProps> = ({
                   {report.status === WorkerJobStatus.COMPLETED &&
                   report.job.processStartTime &&
                   report.job.processEndTime
-                    ? formatDuration(report.job.processStartTime, report.job.processEndTime)
+                    ? formatDuration(
+                        report.job.processStartTime,
+                        report.job.processEndTime
+                      )
                     : '-'}
                 </td>
                 <td className={tableStyles.tdCenter}>
@@ -233,7 +237,8 @@ const Table: React.FC<SsmTableProps> = ({
                 </td>
                 <td className={tableStyles.tdCenter}>
                   {report.latestVulnerabilityScan ? (
-                    report.latestVulnerabilityScan.status === WorkerJobStatus.COMPLETED ? (
+                    report.latestVulnerabilityScan.status ===
+                    WorkerJobStatus.COMPLETED ? (
                       <ShortUuidButton
                         uuid={report.latestVulnerabilityScan.id}
                         href={`/teams/${slug}/products/${productId}/versions/${versionId}/scan/${report.latestVulnerabilityScan.id}`}
@@ -268,8 +273,10 @@ const Table: React.FC<SsmTableProps> = ({
                       onClick={() => onScan(report.id)}
                       disabled={
                         report.status !== WorkerJobStatus.COMPLETED ||
-                        (report.latestVulnerabilityScan?.status === WorkerJobStatus.PENDING ||
-                         report.latestVulnerabilityScan?.status === WorkerJobStatus.IN_PROGRESS)
+                        report.latestVulnerabilityScan?.status ===
+                          WorkerJobStatus.PENDING ||
+                        report.latestVulnerabilityScan?.status ===
+                          WorkerJobStatus.IN_PROGRESS
                       }
                       icon={<FaShieldAlt size={12} />}
                       title={t('oscrat.ui.versions.sbom.scan-vulnerabilities')}
@@ -296,11 +303,11 @@ const Table: React.FC<SsmTableProps> = ({
                     </ActionButton>
                   </div>
                 </td>
-              </tr>
+              </TableRow>
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrapper>
 
       {/* Pagination Controls */}
       {reports && reports.length > pageSize && (

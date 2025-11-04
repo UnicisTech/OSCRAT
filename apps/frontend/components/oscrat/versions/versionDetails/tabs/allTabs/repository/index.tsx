@@ -18,6 +18,7 @@ import {
 import { useVersionContext } from '@/context/VersionContext';
 import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
 import { Divider } from '@/components/shared';
+import { TabHeader, TabActionButton } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import Modal from './modal';
 import ConfirmationModal from './confirmationModal';
 
@@ -96,28 +97,25 @@ export default function Repository() {
   // If no repository exists, show warning message and add button
   if (!repository) {
     return (
-      <div className="flex w-full flex-col rounded-lg border border-gray-400 bg-white">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {t('oscrat.ui.repository.labels.title')}
-          </h2>
-          <button
-            onClick={handleAddRepository}
-            disabled={isLoading}
-            className="rounded-md border border-gray-400 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-50"
-          >
-            {t('add-new')}
-          </button>
-        </div>
+      <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+        <div className="w-full">
+          <TabHeader title={t('oscrat.ui.repository.labels.title')}>
+            <TabActionButton
+              onClick={handleAddRepository}
+              disabled={isLoading}
+            >
+              {t('add-new')}
+            </TabActionButton>
+          </TabHeader>
 
-        {/* Warning message */}
-        <div className="flex items-center gap-4 px-6 py-8">
-          <div className="flex items-center">
-            <AlertTriangle className="mr-3 h-6 w-6 text-yellow-600" />
-            <p className="text-sm text-gray-700">
-              {t('oscrat.ui.no-repo-defined')}
-            </p>
+          {/* Warning message */}
+          <div className="flex items-center gap-4 py-8">
+            <div className="flex items-center">
+              <AlertTriangle className="mr-3 h-6 w-6 text-yellow-600" />
+              <p className="text-sm text-gray-700">
+                {t('oscrat.ui.no-repo-defined')}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -136,18 +134,15 @@ export default function Repository() {
 
   // Show repository information when it exists
   return (
-    <div className="flex w-full flex-col rounded-lg border border-gray-400 bg-white">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-        <h2 className="text-lg font-semibold text-gray-900">Repository</h2>
-        <div className="flex items-center space-x-3">
-          <button
+    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+      <div className="w-full">
+        <TabHeader title="Repository">
+          <TabActionButton
             onClick={() => handleEdit()}
             disabled={isLoading}
-            className="rounded border border-gray-400 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
           >
             {t('edit')}
-          </button>
+          </TabActionButton>
           <button
             onClick={() => handleDelete(repository.id)}
             disabled={isLoading}
@@ -155,8 +150,7 @@ export default function Repository() {
           >
             {t('delete')}
           </button>
-        </div>
-      </div>
+        </TabHeader>
 
       {/* Repository Information Section */}
       <div className="px-6 py-4">
@@ -285,6 +279,7 @@ export default function Repository() {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       <Modal

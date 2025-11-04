@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { FaRegEye } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
+import { TabHeader, TableWrapper, TableHeader, TableRow, TabActionButton } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import { tableStyles } from '@/components/oscrat/tableStyles';
 import AddNewTaskModal from './modal';
 
 // TODO: Wait for Radu to implement tasks
@@ -55,9 +57,8 @@ const TaskTable: React.FC<TaskTableProps> = ({
   ];
 
   return (
-    <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
-      {/* Header with Filter and Add Button */}
-      <div className="mb-4 flex items-center justify-between p-2">
+    <div className="w-full">
+      <TabHeader title={t('oscrat.ui.tasks')}>
         <div className="flex items-center space-x-2">
           <label
             htmlFor="status-filter"
@@ -79,36 +80,26 @@ const TaskTable: React.FC<TaskTableProps> = ({
             ))}
           </select>
         </div>
-        <button
-          onClick={onAddTask}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-        >
+        <TabActionButton onClick={onAddTask}>
           {t('oscrat.ui.add-task')}
-        </button>
-      </div>
+        </TabActionButton>
+      </TabHeader>
 
-      {/* Task Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-gray-900">
-          <thead className="bg-gray-200 text-xs uppercase text-gray-900">
-            <tr>
-              {tableHeaders.map((h) => (
-                <th key={h} className="px-6 py-3">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
+      <TableWrapper>
+        <table className={tableStyles.table}>
+          <TableHeader
+            columns={tableHeaders.map((h) => ({ label: h }))}
+          />
+          <tbody className={tableStyles.tbody}>
             {tasks.map((task) => (
-              <tr key={task.id} className="border-t bg-white hover:bg-gray-50">
-                <td className="px-6 py-4 font-medium text-gray-900">
-                  {task.name}
+              <TableRow key={task.id}>
+                <td className={tableStyles.td}>
+                  <div className="font-medium">{task.name}</div>
                 </td>
-                <td className="px-6 py-4">{task.dateAdded}</td>
-                <td className="px-6 py-4">{task.section}</td>
-                <td className="px-6 py-4">{task.assignee}</td>
-                <td className="px-6 py-4">
+                <td className={tableStyles.td}>{task.dateAdded}</td>
+                <td className={tableStyles.td}>{task.section}</td>
+                <td className={tableStyles.td}>{task.assignee}</td>
+                <td className={tableStyles.td}>
                   <select
                     value={task.status}
                     onChange={(e) =>
@@ -123,7 +114,7 @@ const TaskTable: React.FC<TaskTableProps> = ({
                     ))}
                   </select>
                 </td>
-                <td className="px-6 py-4 text-center">
+                <td className={`${tableStyles.td} text-center`}>
                   <button
                     onClick={() => onViewTask(task.id)}
                     className="flex items-center text-gray-900 hover:text-indigo-600"
@@ -131,11 +122,11 @@ const TaskTable: React.FC<TaskTableProps> = ({
                     <FaRegEye className="mr-2" /> {t('view')}
                   </button>
                 </td>
-              </tr>
+              </TableRow>
             ))}
           </tbody>
         </table>
-      </div>
+      </TableWrapper>
     </div>
   );
 };
@@ -260,16 +251,18 @@ export default function Index() {
   }, [tasks, statusFilter]);
 
   return (
-    <div className="flex w-full justify-center">
-      <TaskTable
-        tasks={filteredTasks}
-        onAddTask={handleAddTask}
-        onViewTask={handleViewTask}
-        onStatusChange={handleStatusChange}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        statusOptions={allStatusOptions}
-      />
+    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+      <div className="w-full">
+        <TaskTable
+          tasks={filteredTasks}
+          onAddTask={handleAddTask}
+          onViewTask={handleViewTask}
+          onStatusChange={handleStatusChange}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          statusOptions={allStatusOptions}
+        />
+      </div>
 
       <AddNewTaskModal
         isOpen={isModalOpen}
