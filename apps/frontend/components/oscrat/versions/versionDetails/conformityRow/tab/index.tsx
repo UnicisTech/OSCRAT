@@ -46,7 +46,7 @@ const Tab: React.FC<TabProps> = ({
           className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-black transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
         >
           <FaRegEye className="mr-1.5" />
-          {t('View')}
+          {t('oscrat.ui.view')}
         </button>
         <ActionButton />
       </div>

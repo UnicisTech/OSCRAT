@@ -49,36 +49,36 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
 
   const navItems = [
     {
-      name: t('Dashboard'),
+      name: t('dashboard'),
       href: `/teams/${slug}/dashboard`,
       icon: ChartBarIcon,
       active: activePathname?.includes(`/teams/${slug}/dashboard`),
     },
     {
-      name: t('Products'),
+      name: t('products'),
       href: `/teams/${slug}/products`,
       icon: RectangleStackIcon,
       active: activePathname?.includes(`/teams/${slug}/products`),
     },
     {
-      name: t('Tasks'),
+      name: t('oscrat.ui.tasks'),
       href: `/teams/${slug}/tasks`,
       icon: DocumentCheckIcon,
       active: activePathname?.includes(`/teams/${slug}/tasks`),
     },
     {
-      name: t('Settings'),
+      name: t('settings'),
       href: `/teams/${slug}/settings`,
       icon: Cog6ToothIcon,
       active: activePathname?.includes(`/teams/${slug}/settings`),
     },
     {
-      name: t('Reports'),
+      name: t('reports'),
       href: '#',
       icon: ExclamationCircleIcon,
     },
     {
-      name: t('Compliance'),
+      name: t('compliance'),
       href: `/teams/${slug}/compliance`,
       icon: ClipboardDocumentCheckIcon,
       className: 'stroke-blue-600',

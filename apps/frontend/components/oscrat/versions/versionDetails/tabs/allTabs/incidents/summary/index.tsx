@@ -100,7 +100,7 @@ export default function Index() {
 
   // --- HANDLERS ---
   const handleAddDocument = () => {
-    alert('Add Document clicked. Functionality not yet implemented.');
+    alert(t('add-document-clicked-not-implemented'));
   };
 
   const handleMoreAction = (id: string) => {
@@ -121,7 +121,7 @@ export default function Index() {
         {summaryText}
       </p>
       <h3 className="mb-1 text-xs font-semibold text-gray-500">
-        {t('advisory-ids')}
+        {t('oscrat.ui.advisory-ids')}
       </h3>
       <p className="text-sm font-semibold text-gray-900">{advisoryId}</p>
     </div>

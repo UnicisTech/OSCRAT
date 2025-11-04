@@ -81,7 +81,7 @@ export default function Index() {
 
   // --- HANDLERS ---
   const handleAddDocument = () => {
-    alert('Add Document clicked. Functionality not yet implemented.');
+    alert(t('add-document-clicked-not-implemented'));
   };
 
   const handleMoreAction = (id: string) => {

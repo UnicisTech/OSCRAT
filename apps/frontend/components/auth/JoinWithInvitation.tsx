@@ -52,7 +52,7 @@ const JoinWithInvitation = ({
     onSubmit: async (values) => {
       try {
         if (!invitation) {
-          toast.error(t('invitation-not-found'));
+          toast.error(t('oscrat.ui.invitation-not-found'));
           return;
         }
         
@@ -77,7 +77,7 @@ const JoinWithInvitation = ({
         });
         
       } catch (error: unknown) {
-        toast.error(extractErrorMessage(error, t('error-joining')));
+        toast.error(extractErrorMessage(error, t('oscrat.ui.error-joining')));
         recaptchaRef.current?.reset();
       }
     },
@@ -88,7 +88,7 @@ const JoinWithInvitation = ({
   }
 
   if (error || !invitation) {
-    return <Error message={error?.message || t('invitation-not-found')} />;
+    return <Error message={error?.message || t('oscrat.ui.invitation-not-found')} />;
   }
 
   return (

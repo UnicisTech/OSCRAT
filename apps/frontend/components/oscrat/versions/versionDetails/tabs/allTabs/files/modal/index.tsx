@@ -65,7 +65,7 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) {
-      alert('Please select a file to upload.');
+      alert(t('please-select-file-to-upload'));
       return;
     }
     onAddFile(selectedFile, description.trim() || undefined);

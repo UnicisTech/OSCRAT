@@ -175,7 +175,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       if (allAreasComplete) {
         toast.success(t('oscrat.ui.compliance-assessment-complete'));
         // TODO: Save to productCompliance in DB, once specs logic is more clear
-        alert('Done! All compliance areas have been assessed.');
+        alert(t('done-all-compliance-areas-assessed'));
       }
       
       // Return to area list

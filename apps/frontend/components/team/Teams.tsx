@@ -46,7 +46,7 @@ const Teams = () => {
           router.replace('/teams', undefined, { shallow: true });
         } catch (error: unknown) {
           console.error('Failed to accept invitation:', error);
-          toast.error(extractErrorMessage(error, t('failed-to-accept-invitation')));
+          toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-accept-invitation')));
           
           router.replace('/teams', undefined, { shallow: true });
         }

@@ -19,7 +19,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
 
   const menus: MenuItem[] = [
     {
-      name: t('Dashboard'),
+      name: t('dashboard'),
       href: `/teams/${slug}/dashboard`,
       icon: ChartBarIcon,
       className: 'fill-blue-600 stroke-blue-600',
@@ -28,7 +28,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
         activePathname.includes('dashboard'),
     },
     {
-      name: t('All Tasks'),
+      name: t('all-tasks'),
       href: `/teams/${slug}/tasks`,
       icon: QueueListIcon,
       className: 'fill-blue-600 stroke-blue-600',
@@ -37,7 +37,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
         activePathname.includes('tasks'),
     },
     {
-      name: t('Cybersecurity Management System'),
+      name: t('cybersecurity-management-system'),
       href: `/teams/${slug}/csc`,
       icon: () => <Icon src="/unicis-csc-logo.png" />,
       active:
@@ -45,18 +45,18 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
         activePathname.includes('csc'),
     },
     {
-      name: t('Oscrat'),
+      name: t('oscrat-brand'),
       icon: () => <Icon src="/unicis-csc-logo.png" />,
       children: [
         {
-          name: t('Projects'),
+          name: t('projects'),
           href: `/teams/${slug}/products`,
           active:
             activePathname?.startsWith(`/teams/${slug}`) &&
             activePathname.includes('products'),
         },
         {
-          name: t('Reports'),
+          name: t('reports'),
           href: `/teams/${slug}/oscrat/reports`,
           active:
             activePathname?.startsWith(`/teams/${slug}`) &&
@@ -69,7 +69,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
       href: '',
     },
     {
-      name: t('Documentation'),
+      name: t('documentation'),
       href: 'https://www.unicis.tech/docs',
       icon: CodeBracketIcon,
       className: 'stroke-blue-600',
@@ -78,7 +78,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
         activePathname.includes('documentation'),
     },
     {
-      name: t('Feedback'),
+      name: t('feedback'),
       href: 'https://feedback.unicis.tech',
       icon: ChatBubbleBottomCenterTextIcon,
       className: 'stroke-blue-600',
@@ -87,12 +87,12 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
         activePathname.includes('feedback'),
     },
     {
-      name: t('Support'),
+      name: t('support'),
       href: 'https://discord.com/invite/8TwyeD97HD',
       icon: QuestionMarkCircleIcon,
     },
     {
-      name: t('Settings'),
+      name: t('settings'),
       href: `/teams/${slug}/settings`,
       icon: Cog6ToothIcon,
       className: 'stroke-blue-600',

@@ -38,11 +38,11 @@ export default function Index() {
 
   // --- HANDLERS ---
   const handleEdit = () => {
-    alert('Edit button clicked. Functionality not implemented.');
+    alert(t('edit-button-clicked-not-implemented'));
   };
 
   const handleClose = () => {
-    alert('Close button clicked. Functionality not implemented.');
+    alert(t('close-button-clicked-not-implemented'));
   };
 
   // --- SUB-COMPONENTS
