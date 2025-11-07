@@ -21,17 +21,16 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
 
   const organizationSizeOptions = Object.values(OscratOrganizationSize).map(
     (size) => {
-      const labels: Record<string, string> = {
-        MICROENTERPRISE: '1-10 employees',
-        SMALL_ENTERPRISE: '11-50 employees',
-        MEDIUM_ENTERPRISE: '51-200 employees',
-        LARGE_ENTERPRISE: '201+ employees',
-        STARTUP: 'Startup',
+      const translationKeys: Record<string, string> = {
+        MICRO_ENTERPRISE: 'oscrat.organization.sizes.micro-enterprise',
+        SMALL_ENTERPRISE: 'oscrat.organization.sizes.small-enterprise',
+        MEDIUM_ENTERPRISE: 'oscrat.organization.sizes.medium-enterprise',
+        OTHER: 'oscrat.organization.sizes.other',
       };
 
       return {
         value: size,
-        label: labels[size] || size,
+        label: t(translationKeys[size] || size),
       };
     }
   );

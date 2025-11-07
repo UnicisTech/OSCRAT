@@ -7,6 +7,7 @@ export interface OscratProductVersionSummary {
   id: string;
   version: string;
   status: OscratProductVersionStatus;
+  supportEndDate?: Date;
   productId: string;
   openIncidents: number;
   openVulnerabilities: number;
@@ -22,6 +23,7 @@ export interface OscratProductVersionDetail {
   id: string;
   version: string;
   status: OscratProductVersionStatus;
+  supportEndDate?: Date;
   productId: string;
   incidents: OscratIncidentSummary[];
   vulnerabilities: OscratVulnerabilitySummary[];
@@ -45,6 +47,7 @@ export interface OscratProductVersionDetail {
 export interface OscratProductVersionCreate {
   version: string;
   status?: OscratProductVersionStatus;
+  supportEndDate?: Date;
   productId: string;
   createdBy: string;
 }
@@ -52,5 +55,6 @@ export interface OscratProductVersionCreate {
 export interface OscratProductVersionUpdate {
   version?: string;
   status?: OscratProductVersionStatus;
+  supportEndDate?: Date;
   updatedBy?: string;
 }

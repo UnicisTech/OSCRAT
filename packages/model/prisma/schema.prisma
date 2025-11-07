@@ -65,7 +65,7 @@ model User {
   updatedOscratProducts           OscratProduct[]               @relation("OscratProductUpdatedBy")
   createdOscratProductVersions    OscratProductVersion[]        @relation("OscratProductVersionCreatedBy")
   updatedOscratProductVersions    OscratProductVersion[]        @relation("OscratProductVersionUpdatedBy")
-  createdOscratProductAssessments OscratProductAssessment[]     @relation("OscratProductAssessmentCreatedBy")
+  createdOscratAssessments        OscratAssessment[]            @relation("OscratAssessmentCreatedBy")
   createdOscratReportingOrgs      OscratReportingOrganization[] @relation("OscratReportingOrganizationCreatedBy")
   updatedOscratReportingOrgs      OscratReportingOrganization[] @relation("OscratReportingOrganizationUpdatedBy")
   createdOscratVulnerabilities    OscratProductVulnerability[]  @relation("OscratProductVulnerabilityCreatedBy")
@@ -100,7 +100,7 @@ model Team {
   properties         Json                @default("{}")
   
   type               OscratOrganizationType   @default(OTHER)
-  size               OscratOrganizationSize   @default(STARTUP)
+  size               OscratOrganizationSize   @default(SMALL_ENTERPRISE)
   orgRoles           OscratOrganizationRole[] @default([MANUFACTURER])
   
   taxId              String?
@@ -113,7 +113,7 @@ model Team {
   invitations        Invitation[]
   tasks              Task[]
   members            TeamMember[]
-  
+
   // Relationships from OscratOrganization
   products                    OscratProduct[]
   productVersions             OscratProductVersion[]
@@ -121,6 +121,7 @@ model Team {
   reportingOrganizations      OscratReportingOrganization[]
   workerJobs                  WorkerJob[]
   incidents                   OscratProductIncident[] @relation("TeamIncidents")
+  assessments                 OscratAssessment[]
 }
 
 model Task {
@@ -223,11 +224,10 @@ enum OscratOrganizationType {
 }
 
 enum OscratOrganizationSize {
-  MICROENTERPRISE
+  MICRO_ENTERPRISE
   SMALL_ENTERPRISE
   MEDIUM_ENTERPRISE
-  LARGE_ENTERPRISE
-  STARTUP
+  OTHER
 }
 
 enum OscratProductCategory {
@@ -284,6 +284,7 @@ enum OscratConformityProcedure {
 enum OscratAssessmentType {
   CRA
   ORG
+  COMPLIANCE
 }
 
 enum OscratProductVulnerabilitySeverity {
@@ -412,6 +413,7 @@ model OscratProductVersion {
 
   version String
   status  OscratProductVersionStatus @default(DRAFT)
+  supportEndDate DateTime?
 
   productId String
   product   OscratProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -419,7 +421,7 @@ model OscratProductVersion {
   teamId String
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  assessments              OscratProductAssessment[]
+  assessments              OscratAssessment[]
   vulnerabilities          OscratProductVulnerability[]
   incidents                OscratProductIncident[]
   repository               OscratRepository?
@@ -443,25 +445,29 @@ model OscratProductVersion {
   @@index([teamId, id])
 }
 
-model OscratProductAssessment {
+model OscratAssessment {
   id String @id @default(uuid())
 
   type          OscratAssessmentType
   schemaVersion String
   rawData       Json
 
-  versionId String
-  version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  teamId String
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-  productId String // Denormalized for easier queries
+  productId String? // Optional - null for ORG type
+  versionId String? // Optional - null for ORG and CRA types
+  version   OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   createdBy String
 
-  createdByUser User @relation("OscratProductAssessmentCreatedBy", fields: [createdBy], references: [id])
+  createdByUser User @relation("OscratAssessmentCreatedBy", fields: [createdBy], references: [id])
 
-  @@index([versionId])
+  @@index([teamId])
   @@index([productId])
+  @@index([versionId])
+  @@index([teamId, type])
   @@index([versionId, type])
 }
 

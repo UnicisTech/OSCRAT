@@ -6,13 +6,13 @@ import Result from '@/components/craForm/result';
 import { FormPageState, RiskLevel, FormState } from '@/types/craForm';
 import { useTeamContext } from '@/context/TeamContext';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
-import { useGetProductAssessments, useGetProductAssessmentDetail } from '@/lib/api/hooks/oscrat/assessments';
 import { OscratAssessmentType } from '@oscrat/model';
 import { getProductCategoryFromRisk } from '@/utils/craForm';
 import { useSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
 import { useAssessments } from '@/hooks/oscrat/useOscratAssessment';
-import type { OscratAssessmentCreate } from '@oscrat/model';
+import { useFindAssessments, useGetAssessmentDetail } from '@/lib/api/hooks/oscrat/assessments';
+import type { OscratAssessmentCreateRequest } from '@oscrat/model';
 import { transformFormStateToAssessmentData } from '@/utils/craForm';
 import { extractErrorMessage } from '@/lib/utils';
 
@@ -40,8 +40,8 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
 
   // Fetch product and existing assessment if in edit mode
   const { project, updateProject } = useOscratProject(slug, productId || '', { enabled: isEditMode && !!productId });
-  
-  const { data: assessmentsResponse } = useGetProductAssessments(slug, productId || '', {
+
+  const { data: assessmentsResponse } = useFindAssessments(slug, { productId }, {
     enabled: isEditMode && !!productId,
   });
 
@@ -54,9 +54,8 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
     )[0] || null;
   }, [assessments, isEditMode]);
 
-  const { data: assessmentDetailResponse } = useGetProductAssessmentDetail(
+  const { data: assessmentDetailResponse } = useGetAssessmentDetail(
     slug,
-    productId || '',
     latestCRAAssessment?.id || '',
     { enabled: isEditMode && !!latestCRAAssessment }
   );
@@ -113,8 +112,7 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
   const versionId = project?.versions?.[0]?.id;
   const { createAssessment } = useAssessments(
     slug,
-    productId || '',
-    versionId || '',
+    { productId, versionId },
     { enabled: isEditMode && !!versionId }
   );
 
@@ -162,7 +160,7 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
           }
           
           // Create new assessment with all answers
-          const assessmentData: OscratAssessmentCreate = {
+          const assessmentData: OscratAssessmentCreateRequest = {
             type: OscratAssessmentType.CRA,
             schemaVersion: '1.0.0',
             rawData: transformFormStateToAssessmentData(completedFormState),

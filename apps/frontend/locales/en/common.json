@@ -1225,11 +1225,10 @@
         "other": "Other"
       },
       "sizes": {
-        "microenterprise": "Microenterprise",
-        "small-enterprise": "Small Enterprise",
-        "medium-enterprise": "Medium Enterprise",
-        "large-enterprise": "Large Enterprise",
-        "startup": "Startup"
+        "micro-enterprise": "Microenterprise",
+        "small-enterprise": "Small enterprise",
+        "medium-enterprise": "Medium enterprise",
+        "other": "Other than micro, small, medium enterprise"
       }
     },
     "product": {

@@ -207,7 +207,7 @@ export const createTeam = async (
       slug,
       domain,
       type: type ?? OscratOrganizationType.OTHER,
-      size: size ?? OscratOrganizationSize.STARTUP,
+      size: size ?? OscratOrganizationSize.SMALL_ENTERPRISE,
       orgRoles: orgRoles ?? [OscratOrganizationRole.MANUFACTURER],
       taxId,
       postalAddress,

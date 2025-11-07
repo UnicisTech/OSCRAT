@@ -14,6 +14,9 @@ export const versionCreateSchema = Yup.object({
   status: Yup.string()
     .oneOf(Object.values(OscratProductVersionStatus), 'oscrat.ui.validation.status-invalid')
     .required('oscrat.ui.validation.status-required'),
+  supportEndDate: Yup.date()
+    .nullable()
+    .optional(),
 });
 
 /**
@@ -24,6 +27,9 @@ export const versionUpdateSchema = Yup.object({
   status: Yup.string()
     .oneOf(Object.values(OscratProductVersionStatus), 'oscrat.ui.validation.status-invalid')
     .required('oscrat.ui.validation.status-required'),
+  supportEndDate: Yup.date()
+    .nullable()
+    .optional(),
 });
 
 // Type exports

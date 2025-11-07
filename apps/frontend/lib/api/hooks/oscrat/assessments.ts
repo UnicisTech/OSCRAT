@@ -2,154 +2,72 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { oscratAssessmentEndpoints } from '@/lib/api/endpoints/oscrat/assessments';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
-import type { OscratAssessmentCreate } from '@oscrat/model';
+import type { OscratAssessmentCreateRequest } from '@oscrat/model';
 
-// List assessments
-export function useGetAssessments(
-  teamId: string,
-  productId: string,
-  versionId: string,
+export function useFindAssessments(
+  teamSlug: string,
+  filters?: { productId?: string; versionId?: string },
   options?: { enabled?: boolean }
-) {
-  const result = useQuery({
-    queryKey: queryKeys.oscrat.projects.versions.assessments.all(
-      teamId,
-      versionId
-    ),
-    queryFn: () => {
-      return oscratAssessmentEndpoints.listAssessments(
-        teamId,
-        productId,
-        versionId
-      );
-    },
-    enabled: options?.enabled !== false,
-  });
-
-  return result;
-}
-
-// Get assessment detail
-export function useGetAssessmentDetail(
-  teamId: string,
-  productId: string,
-  versionId: string,
-  assessmentId: string
 ) {
   return useQuery({
-    queryKey: queryKeys.oscrat.projects.versions.assessments.detail(
-      teamId,
-      versionId,
-      assessmentId
-    ),
-    queryFn: () =>
-      oscratAssessmentEndpoints.getAssessmentDetail(
-        teamId,
-        productId,
-        versionId,
-        assessmentId
-      ),
-  });
-}
-
-// Create assessment
-export function useCreateAssessment(
-  teamId: string,
-  productId: string,
-  versionId: string
-) {
-  return useMutation({
-    mutationFn: (data: OscratAssessmentCreate) =>
-      oscratAssessmentEndpoints.createAssessment(
-        teamId,
-        productId,
-        versionId,
-        data
-      ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.projects.versions.assessments.all(
-          teamId,
-          versionId
-        ),
-      });
-      // Also invalidate version detail since it might include assessment summaries
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
-      });
-      // Invalidate product-level assessments query
-      queryClient.invalidateQueries({
-        queryKey: ['oscrat', 'projects', teamId, productId, 'assessments'],
-      });
-    },
-  });
-}
-
-// Delete assessment
-export function useDeleteAssessment(
-  teamId: string,
-  productId: string,
-  versionId: string,
-  assessmentId: string
-) {
-  return useMutation({
-    mutationFn: () =>
-      oscratAssessmentEndpoints.deleteAssessment(
-        teamId,
-        productId,
-        versionId,
-        assessmentId
-      ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.projects.versions.assessments.all(
-          teamId,
-          versionId
-        ),
-      });
-      // Also invalidate version detail since it might include assessment summaries
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
-      });
-    },
-  });
-}
-
-// List assessments for a product
-export function useGetProductAssessments(
-  slug: string,
-  productId: string,
-  options?: { enabled?: boolean }
-) {
-  const result = useQuery({
-    queryKey: ['oscrat', 'projects', slug, productId, 'assessments'],
-    queryFn: () => {
-      return oscratAssessmentEndpoints.listProductAssessments(
-        slug,
-        productId
-      );
-    },
+    queryKey: queryKeys.oscrat.assessments.find(teamSlug, filters),
+    queryFn: () => oscratAssessmentEndpoints.findAssessments(teamSlug, filters),
     enabled: options?.enabled !== false,
   });
-
-  return result;
 }
 
-// Get assessment detail for a product (by productId and assessmentId)
-export function useGetProductAssessmentDetail(
-  slug: string,
-  productId: string,
+export function useGetAssessmentDetail(
+  teamSlug: string,
   assessmentId: string,
   options?: { enabled?: boolean }
 ) {
   return useQuery({
-    queryKey: ['oscrat', 'projects', slug, productId, 'assessments', assessmentId],
-    queryFn: () =>
-      oscratAssessmentEndpoints.getProductAssessmentDetail(
-        slug,
-        productId,
-        assessmentId
-      ),
+    queryKey: queryKeys.oscrat.assessments.detail(teamSlug, assessmentId),
+    queryFn: () => oscratAssessmentEndpoints.getAssessmentDetail(teamSlug, assessmentId),
     enabled: options?.enabled !== false && !!assessmentId,
+  });
+}
+
+export function useCreateAssessment(teamSlug: string) {
+  return useMutation({
+    mutationFn: (data: OscratAssessmentCreateRequest) =>
+      oscratAssessmentEndpoints.createAssessment(teamSlug, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.assessments.all(teamSlug),
+      });
+    },
+  });
+}
+
+export function useUpdateAssessment(teamSlug: string) {
+  return useMutation({
+    mutationFn: ({
+      assessmentId,
+      data,
+    }: {
+      assessmentId: string;
+      data: { schemaVersion?: string; rawData?: Record<string, any> };
+    }) => oscratAssessmentEndpoints.updateAssessment(teamSlug, assessmentId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.assessments.detail(teamSlug, variables.assessmentId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.assessments.all(teamSlug),
+      });
+    },
+  });
+}
+
+export function useDeleteAssessment(teamSlug: string) {
+  return useMutation({
+    mutationFn: (assessmentId: string) =>
+      oscratAssessmentEndpoints.deleteAssessment(teamSlug, assessmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.assessments.all(teamSlug),
+      });
+    },
   });
 }

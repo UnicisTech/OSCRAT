@@ -12,7 +12,6 @@
     "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "reset": "dotenv -e ../../.env -- prisma migrate reset",
     "reset:force": "dotenv -e ../../.env -- prisma migrate reset --force",
-    "seed:oscrat": "dotenv -e ../../.env -- npx tsx prisma/seed-oscrat.ts",
     "build": "prisma generate"
   },
   "dependencies": {

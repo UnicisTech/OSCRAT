@@ -14,7 +14,7 @@ import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 
 // Models & Types
 import { OscratProductType, OscratProductVersionStatus, OscratAssessmentType } from '@oscrat/model';
-import type { OscratProductCreate, OscratAssessmentCreate } from '@oscrat/model';
+import type { OscratProductCreate, OscratAssessmentCreateRequest } from '@oscrat/model';
 import type { ApiError } from '@/types';
 
 // Utils
@@ -39,7 +39,7 @@ export default function Cache() {
   const [pendingAssessment, setPendingAssessment] = useState<{
     productId: string;
     versionId: string;
-    data: OscratAssessmentCreate;
+    data: OscratAssessmentCreateRequest;
   } | null>(null);
 
   const { createProject, isLoading: isCreatingProject } = useOscratProject(teamId, '', { enabled: false});
@@ -47,8 +47,7 @@ export default function Cache() {
   // Create assessment hook - enabled when we have pending assessment
   const { createAssessment, isLoading: isCreatingAssessment } = useAssessments(
     teamId,
-    pendingAssessment?.productId || '',
-    pendingAssessment?.versionId || '',
+    { productId: pendingAssessment?.productId, versionId: pendingAssessment?.versionId },
     { enabled: !!pendingAssessment }
   );
 

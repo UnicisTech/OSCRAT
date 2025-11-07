@@ -26,11 +26,10 @@ export const oscratOrganizationTypeTranslationMap = {
 
 // Organization Size mappings
 export const oscratOrganizationSizeTranslationMap = {
-  MICROENTERPRISE: 'oscrat.organization.sizes.microenterprise',
+  MICRO_ENTERPRISE: 'oscrat.organization.sizes.micro-enterprise',
   SMALL_ENTERPRISE: 'oscrat.organization.sizes.small-enterprise',
   MEDIUM_ENTERPRISE: 'oscrat.organization.sizes.medium-enterprise',
-  LARGE_ENTERPRISE: 'oscrat.organization.sizes.large-enterprise',
-  STARTUP: 'oscrat.organization.sizes.startup',
+  OTHER: 'oscrat.organization.sizes.other',
 } as const;
 
 // Product Category mappings

@@ -64,6 +64,13 @@ export const queryKeys = {
       detail: (teamId: string) =>
         ['teams', teamId, 'oscrat', 'organization', 'detail'] as const,
     },
+    assessments: {
+      all: (teamSlug: string) => [...queryKeys.teams.detail(teamSlug), 'oscrat', 'assessments'] as const,
+      find: (teamSlug: string, filters?: { productId?: string; versionId?: string }) =>
+        [...queryKeys.oscrat.assessments.all(teamSlug), 'find', ...(filters ? [filters] : [])] as const,
+      detail: (teamSlug: string, assessmentId: string) =>
+        [...queryKeys.oscrat.assessments.all(teamSlug), assessmentId] as const,
+    },
     projects: {
       all: (teamId: string) => ['teams', teamId, 'oscrat', 'projects'] as const,
       detail: (teamId: string, projectId: string) =>

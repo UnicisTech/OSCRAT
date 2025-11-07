@@ -2,57 +2,43 @@ import { api } from '@/lib/api/client';
 import {
   OscratAssessmentSummary,
   OscratAssessmentDetail,
-  OscratAssessmentCreate,
+  OscratAssessmentCreateRequest,
 } from '@oscrat/model';
 
 export const oscratAssessmentEndpoints = {
-  listAssessments: (teamId: string, productId: string, versionId: string) =>
-    api.get<OscratAssessmentSummary[]>(
-      `/teams/${teamId}/products/${productId}/versions/${versionId}/assessments`
+  findAssessments: (
+    teamSlug: string,
+    filters?: { productId?: string; versionId?: string }
+  ) =>
+    api.post<OscratAssessmentSummary[]>(
+      `/teams/${teamSlug}/assessments/find`,
+      filters || {}
     ),
 
   createAssessment: (
-    teamId: string,
-    productId: string,
-    versionId: string,
-    data: OscratAssessmentCreate
+    teamSlug: string,
+    data: OscratAssessmentCreateRequest
   ) =>
     api.post<OscratAssessmentDetail>(
-      `/teams/${teamId}/products/${productId}/versions/${versionId}/assessments`,
+      `/teams/${teamSlug}/assessments`,
       data
     ),
 
-  getAssessmentDetail: (
-    teamId: string,
-    productId: string,
-    versionId: string,
-    assessmentId: string
-  ) =>
+  getAssessmentDetail: (teamSlug: string, assessmentId: string) =>
     api.get<OscratAssessmentDetail>(
-      `/teams/${teamId}/products/${productId}/versions/${versionId}/assessments/${assessmentId}`
+      `/teams/${teamSlug}/assessments/${assessmentId}`
     ),
 
-  deleteAssessment: (
-    teamId: string,
-    productId: string,
-    versionId: string,
-    assessmentId: string
+  updateAssessment: (
+    teamSlug: string,
+    assessmentId: string,
+    data: { schemaVersion?: string; rawData?: Record<string, any> }
   ) =>
-    api.delete<void>(
-      `/teams/${teamId}/products/${productId}/versions/${versionId}/assessments/${assessmentId}`
+    api.put<OscratAssessmentDetail>(
+      `/teams/${teamSlug}/assessments/${assessmentId}`,
+      data
     ),
 
-  listProductAssessments: (slug: string, productId: string) =>
-    api.get<OscratAssessmentSummary[]>(
-      `/teams/${slug}/products/${productId}/assessments`
-    ),
-
-  getProductAssessmentDetail: (
-    slug: string,
-    productId: string,
-    assessmentId: string
-  ) =>
-    api.get<OscratAssessmentDetail>(
-      `/teams/${slug}/products/${productId}/assessments/${assessmentId}`
-    ),
+  deleteAssessment: (teamSlug: string, assessmentId: string) =>
+    api.delete<void>(`/teams/${teamSlug}/assessments/${assessmentId}`),
 };

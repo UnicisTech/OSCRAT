@@ -86,6 +86,7 @@ export const transformToVersionSummary = (
   id: version.id,
   version: version.version,
   status: version.status,
+  supportEndDate: version.supportEndDate || undefined,
   productId: version.productId,
   openIncidents: version._count?.incidents || 0,
   openVulnerabilities: version._count?.vulnerabilities || 0,
@@ -103,6 +104,7 @@ export const transformToVersionDetail = (
   id: version.id,
   version: version.version,
   status: version.status,
+  supportEndDate: version.supportEndDate || undefined,
   productId: version.productId,
   incidents:
     version.incidents?.map((incident) => ({
@@ -146,8 +148,9 @@ export const transformToVersionDetail = (
       id: assessment.id,
       type: assessment.type,
       schemaVersion: assessment.schemaVersion,
-      versionId: assessment.versionId,
-      productId: assessment.productId,
+      teamId: assessment.teamId,
+      versionId: assessment.versionId ?? undefined,
+      productId: assessment.productId ?? undefined,
       createdAt: assessment.createdAt,
       createdBy: assessment.createdBy,
     })) || [],
@@ -211,6 +214,7 @@ export const createVersion = async (
     data: {
       version: data.version,
       status: data.status || OscratProductVersionStatus.DRAFT,
+      supportEndDate: data.supportEndDate,
       productId: data.productId,
       teamId: teamId,
       createdBy: data.createdBy,
@@ -236,6 +240,7 @@ export const updateVersion = async (
     data: {
       version: data.version,
       status: data.status,
+      supportEndDate: data.supportEndDate,
       updatedBy: data.updatedBy,
     },
     include: VERSION_DETAIL_INCLUDE,

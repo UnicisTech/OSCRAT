@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { FaRegEye, FaPencilAlt } from 'react-icons/fa';
 import { OscratAssessmentType } from '@oscrat/model';
 import {
-  useGetProductAssessments,
-  useGetProductAssessmentDetail,
+  useFindAssessments,
+  useGetAssessmentDetail,
 } from '@/lib/api/hooks/oscrat/assessments';
 import { useTeamContext } from '@/context/TeamContext';
 import type { OscratProductDetail } from '@oscrat/model';
@@ -24,11 +24,11 @@ export default function ApplicabilitySurveySection({
   const { slug } = useTeamContext();
   const [showViewModal, setShowViewModal] = useState(false);
 
-  const { 
-    data: assessmentsResponse, 
+  const {
+    data: assessmentsResponse,
     isLoading: isLoadingAssessments,
-    error: assessmentsError 
-  } = useGetProductAssessments(slug, product.id, {
+    error: assessmentsError
+  } = useFindAssessments(slug, { productId: product.id }, {
     enabled: !!product.id && !!slug,
   });
 
@@ -52,14 +52,13 @@ export default function ApplicabilitySurveySection({
     )[0];
   }, [assessments]);
 
-  const { data: assessmentDetailResponse } = useGetProductAssessmentDetail(
+  const { data: assessmentDetailResponse } = useGetAssessmentDetail(
     slug,
-    product.id,
     latestCRAAssessment?.id || '',
     { enabled: showViewModal && !!latestCRAAssessment && !!latestCRAAssessment.id }
   );
 
- const assessmentDetail = assessmentDetailResponse || null;
+  const assessmentDetail = assessmentDetailResponse || null;
 
   if (!ready) return null;
 

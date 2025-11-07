@@ -1,23 +1,22 @@
 import { useCallback } from 'react';
 import {
-  useGetAssessments,
+  useFindAssessments,
   useGetAssessmentDetail,
   useCreateAssessment,
+  useUpdateAssessment,
   useDeleteAssessment,
 } from '@/lib/api/hooks/oscrat/assessments';
-import type { OscratAssessmentCreate } from '@oscrat/model';
+import type { OscratAssessmentCreateRequest } from '@oscrat/model';
 
 /**
- * Hook to fetch and manage assessments for a version
- * @param teamId Team ID
- * @param productId Product ID that owns the version
- * @param versionId Version ID
+ * Hook to fetch and manage assessments with optional filtering
+ * @param teamSlug Team slug
+ * @param filters Optional filters (productId, versionId)
  * @param options Optional configuration to control queries
  */
 export function useAssessments(
-  teamId: string,
-  productId: string,
-  versionId: string,
+  teamSlug: string,
+  filters?: { productId?: string; versionId?: string },
   options?: { enabled?: boolean }
 ) {
   const {
@@ -25,15 +24,15 @@ export function useAssessments(
     isLoading: isFetchingAssessments,
     isError,
     error,
-  } = useGetAssessments(teamId, productId, versionId, options);
+  } = useFindAssessments(teamSlug, filters, options);
 
-  const createAssessmentMutation = useCreateAssessment(teamId, productId, versionId);
+  const createAssessmentMutation = useCreateAssessment(teamSlug);
 
   const createAssessment = useCallback(
-    async (data: OscratAssessmentCreate) => {
+    async (data: OscratAssessmentCreateRequest) => {
       return createAssessmentMutation.mutateAsync(data);
     },
-    [createAssessmentMutation.mutateAsync]
+    [createAssessmentMutation]
   );
 
   const isLoading = isFetchingAssessments || createAssessmentMutation.isPending;
@@ -50,45 +49,46 @@ export function useAssessments(
 
 /**
  * Hook to fetch and manage a specific OSCRAT assessment
- * @param teamId Team ID
- * @param productId Product ID that owns the version
- * @param versionId Version ID that owns the assessment
+ * @param teamSlug Team slug
  * @param assessmentId Assessment ID for detailed operations
  */
 export function useOscratAssessment(
-  teamId: string,
-  productId: string,
-  versionId: string,
-  assessmentId: string
+  teamSlug: string,
+  assessmentId: string,
+  options?: { enabled?: boolean }
 ) {
   const {
     data: assessment,
     isLoading: isFetchingAssessment,
     isError,
     error,
-  } = useGetAssessmentDetail(teamId, productId, versionId, assessmentId);
+  } = useGetAssessmentDetail(teamSlug, assessmentId, options);
 
-  const deleteAssessmentMutation = useDeleteAssessment(
-    teamId,
-    productId,
-    versionId,
-    assessmentId
-  );
+  const updateAssessmentMutation = useUpdateAssessment(teamSlug);
+  const deleteAssessmentMutation = useDeleteAssessment(teamSlug);
 
-  const deleteAssessment = useCallback(
-    async () => {
-      return deleteAssessmentMutation.mutateAsync();
+  const updateAssessment = useCallback(
+    async (data: { schemaVersion?: string; rawData?: Record<string, any> }) => {
+      return updateAssessmentMutation.mutateAsync({ assessmentId, data });
     },
-    [deleteAssessmentMutation.mutateAsync]
+    [updateAssessmentMutation, assessmentId]
   );
 
-  const isLoading = isFetchingAssessment || deleteAssessmentMutation.isPending;
+  const deleteAssessment = useCallback(async () => {
+    return deleteAssessmentMutation.mutateAsync(assessmentId);
+  }, [deleteAssessmentMutation, assessmentId]);
+
+  const isLoading =
+    isFetchingAssessment ||
+    updateAssessmentMutation.isPending ||
+    deleteAssessmentMutation.isPending;
 
   return {
     assessment,
     isLoading,
     isError,
     error,
+    updateAssessment,
     deleteAssessment,
   };
 }
