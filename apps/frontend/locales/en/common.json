@@ -552,6 +552,8 @@
       "no-assessments-found-for-product": "No assessments found for this product",
       "assessment-saved-successfully": "Assessment saved successfully",
       "failed-to-save-assessment": "Failed to save assessment",
+      "assessment-deleted-successfully": "Assessment deleted successfully",
+      "failed-to-delete-assessment": "Failed to delete assessment",
       "no-answers-to-save": "No answers found to save in assessment",
       "product-not-applicable-cannot-update": "Product is not applicable to CRA requirements. Cannot update category.",
       "product-category-updated": "Product category updated successfully",

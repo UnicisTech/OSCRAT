@@ -41,7 +41,8 @@ const TeamCompliancePage = () => {
 
       <ComplianceForm
         complianceData={complianceData}
-        productId={team.id}
+        teamSlug={team.slug}
+        teamId={team.id}
         teamRole={getRoleForTeam(team.orgRoles[0])}
         teamName={team.name}
         productName={team.name}

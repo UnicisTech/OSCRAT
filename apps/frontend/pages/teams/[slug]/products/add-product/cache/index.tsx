@@ -41,6 +41,7 @@ export default function Cache() {
     versionId: string;
     data: OscratAssessmentCreateRequest;
   } | null>(null);
+  const [assessmentSaveInitiated, setAssessmentSaveInitiated] = useState(false);
 
   const { createProject, isLoading: isCreatingProject } = useOscratProject(teamId, '', { enabled: false});
   
@@ -51,15 +52,16 @@ export default function Cache() {
     { enabled: !!pendingAssessment }
   );
 
-  // Save assessment when hook becomes available and ready
-  useEffect(() => {
-    if (pendingAssessment && !isCreatingAssessment && pendingAssessment.productId && pendingAssessment.versionId) {
+ useEffect(() => {
+    if (pendingAssessment && !assessmentSaveInitiated && !isCreatingAssessment && pendingAssessment.productId && pendingAssessment.versionId) {
+      setAssessmentSaveInitiated(true);
       const assessmentPromise = createAssessment(pendingAssessment.data);
       assessmentPromise
         .then(() => {
           // Clear localStorage only after successful product AND assessment creation
           clearFormState();
           setPendingAssessment(null);
+          setAssessmentSaveInitiated(false);
           toast.success(t('oscrat.ui.assessment-saved-successfully'));
         })
         .catch((error) => {
@@ -72,9 +74,10 @@ export default function Cache() {
           toast.error(t('oscrat.ui.failed-to-save-assessment'));
           // Don't clear localStorage if assessment save fails - user can retry
           setPendingAssessment(null);
+          setAssessmentSaveInitiated(false);
         });
     }
-  }, [pendingAssessment, createAssessment, isCreatingAssessment, t]);
+  }, [pendingAssessment, assessmentSaveInitiated, isCreatingAssessment, t]);
 
   // Load form state from localStorage on mount
   useEffect(() => {

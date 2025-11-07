@@ -1,4 +1,6 @@
 import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetServerSidePropsContext } from 'next';
 import React, { useState, useEffect, useMemo } from 'react';
 import { withTeamLayout } from '@/lib/layout-helpers';
 import CompletedAppCheck from '@/components/oscrat/dashboard/CompletedAppCheck';
@@ -8,17 +10,25 @@ import { ComplianceCharts, exportComplianceToPDF } from '@/components/compliance
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { useTeamContext } from '@/context/TeamContext';
 import { ComplianceState } from '@/types/compliance';
-import { getComplianceNamespace, COMPLIANCE_NAMESPACES } from '@/lib/compliance/translations';
+import { getComplianceNamespace } from '@/lib/compliance/translations';
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { FaDownload } from 'react-icons/fa';
-import { OscratOrganizationRole } from '@oscrat/model';
+import { OscratAssessmentType } from '@oscrat/model';
 import { loadFormState } from '@/utils/craForm';
 import type { FormState } from '@/types/craForm';
+import { useAssessments, useOscratAssessment } from '@/hooks/oscrat/useOscratAssessment';
+import { useLatestAssessment } from '@/hooks/oscrat/useLatestAssessment';
+import { transformOrgAssessmentToComplianceState } from '@/utils/compliance';
 
 const TeamDashboard = () => {
-  const { t } = useTranslation('common');
   const { teamContext } = useTeamContext();
-  const team = teamContext.team;
+  const team = teamContext.team!;
+  
+  const complianceNamespace = useMemo(() => {
+    return getComplianceNamespace(getRoleForTeam(team.orgRoles[0]), 'team');
+  }, [team.orgRoles]);
+  
+  const { t, ready } = useTranslation(['common', complianceNamespace]);
 
   // Check localStorage for completed CRA form data (before product creation)
   const [completedCraForm, setCompletedCraForm] = useState<FormState | null>(null);
@@ -35,14 +45,29 @@ const TeamDashboard = () => {
   const shouldShowCompletedAppCheck = !!completedCraForm;
 
   const { complianceData, isLoading: isComplianceLoading } = useComplianceData({
-    teamSlug: team?.slug || '',
-    teamRole: team?.orgRoles[0] || OscratOrganizationRole.MANUFACTURER,
+    teamSlug: team.slug,
+    teamRole: team.orgRoles[0],
     complianceType: 'team',
-    enabled: !!team,
   });
 
+  const { assessments, isLoading: isLoadingAssessments } = useAssessments(team.slug);
+
+  const latestOrgAssessmentId = useLatestAssessment(assessments, OscratAssessmentType.ORG);
+
+  // Fetch the detailed assessment with rawData
+  const { assessment: assessmentDetail, isLoading: isLoadingAssessmentDetail } = useOscratAssessment(
+    team.slug,
+    latestOrgAssessmentId || '',
+    { enabled: !!latestOrgAssessmentId }
+  );
+
   const complianceState = useMemo<ComplianceState | null>(() => {
-    if (!team) return null;
+    if (assessmentDetail?.rawData) {
+      return transformOrgAssessmentToComplianceState(
+        assessmentDetail.rawData,
+        team.orgRoles[0]
+      );
+    }
     
     const storageKey = `team_compliance_${team.id}`;
     const saved = localStorage.getItem(storageKey);
@@ -51,22 +76,17 @@ const TeamDashboard = () => {
       try {
         return JSON.parse(saved) as ComplianceState;
       } catch {
-        return null;
+        localStorage.removeItem(storageKey);
       }
     }
     
     return null;
-  }, [team]);
+  }, [team.id, team.orgRoles, assessmentDetail]);
 
-  const complianceNamespace = useMemo(() => {
-    if (!team?.orgRoles[0]) return COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER;
-    return getComplianceNamespace(getRoleForTeam(team.orgRoles[0]), 'team');
-  }, [team]);
-
-  const showCharts = !isComplianceLoading && complianceData && complianceState && complianceData.length > 0;
+  const showCharts = !isComplianceLoading && !isLoadingAssessments && !isLoadingAssessmentDetail && complianceData && complianceState && complianceData.length > 0;
 
   const handleExportPDF = async () => {
-    if (!complianceData || !complianceState || !team) return;
+    if (!complianceData || !complianceState || !ready) return;
 
     const pdfTranslations = {
       reportTitle: t('oscrat.ui.dashboard.pdf.report-title'),
@@ -109,11 +129,13 @@ const TeamDashboard = () => {
       complianceState,
       team.id,
       team.name,
-      team.name,
+      undefined,
       pdfTranslations,
       (key: string) => t(key, { ns: complianceNamespace })
     );
   };
+
+  if (!ready) return null;
 
   return (
     <>
@@ -154,6 +176,17 @@ const TeamDashboard = () => {
 
 TeamDashboard.getLayout = withTeamLayout;
 
-export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { locale } = context;
+  const { getAllComplianceNamespaces } = await import('@/lib/compliance/translations');
+  
+  const namespaces = ['common', ...getAllComplianceNamespaces()];
+
+  return {
+    props: {
+      ...(locale ? await serverSideTranslations(locale, namespaces) : {}),
+    },
+  };
+}
 
 export default TeamDashboard;

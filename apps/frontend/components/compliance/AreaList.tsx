@@ -11,7 +11,7 @@ interface AreaListProps {
   onAreaSelect: (areaIndex: number) => void;
   getAreaProgress: (areaId: number) => number;
   complianceState: ComplianceState;
-  productId: string;
+  productId?: string;
   teamName: string;
   productName: string;
   onReset: () => void;

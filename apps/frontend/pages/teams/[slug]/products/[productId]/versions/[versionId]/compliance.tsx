@@ -47,7 +47,10 @@ const CompliancePage = () => {
 
       <ComplianceForm
         complianceData={complianceData}
-        productId={versionId}
+        productId={productId}
+        versionId={versionId}
+        teamSlug={team.slug}
+        teamId={team.id}
         teamRole={getRoleForTeam(team.orgRoles[0])}
         teamName={team.name}
         productName={`${project.name} (${versionData.version})`}

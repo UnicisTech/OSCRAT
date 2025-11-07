@@ -201,7 +201,7 @@ interface CompliancePDFDocumentProps {
   state: ComplianceState;
   productId: string;
   organizationName: string;
-  productName: string;
+  productName?: string;
   translations: PDFTranslations;
   translateComplianceFn: (key: string) => string;
 }
@@ -209,7 +209,6 @@ interface CompliancePDFDocumentProps {
 const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
   complianceData,
   state,
-  productId,
   organizationName,
   productName,
   translations: t,
@@ -276,7 +275,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.title}>{t.reportTitle}</Text>
-          <Text style={styles.subtitle}>{t.product}: {productName}</Text>
+          {productName && <Text style={styles.subtitle}>{t.product}: {productName}</Text>}
           <Text style={styles.subtitle}>{t.organization}: {organizationName}</Text>
           <Text style={styles.subtitle}>{t.generated}: {exportDate}</Text>
         </View>
@@ -428,7 +427,7 @@ export const exportComplianceToPDF = async (
   state: ComplianceState,
   productId: string,
   organizationName: string,
-  productName: string,
+  productName: string | undefined,
   translations: PDFTranslations,
   translateComplianceFn: (key: string) => string
 ) => {
@@ -445,7 +444,10 @@ export const exportComplianceToPDF = async (
   ).toBlob();
 
   const timestamp = new Date().toISOString().split('T')[0];
-  const filename = `compliance-assessment-${productName.replace(/[^a-z0-9]/gi, '-')}-${timestamp}.pdf`
+  const namePart = productName 
+    ? productName.replace(/[^a-z0-9]/gi, '-')
+    : organizationName.replace(/[^a-z0-9]/gi, '-');
+  const filename = `compliance-assessment-${namePart}-${timestamp}.pdf`
   saveAs(blob, filename);
 };
 
