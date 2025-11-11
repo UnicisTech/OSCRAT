@@ -9,7 +9,7 @@ import { TabHeader, TabActionButton } from '@/components/oscrat/versions/version
 import Table from './table';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
-import ConfirmationDialog from '@/components/shared/ConfirmationDialog';
+import FullScreenModal from '@/components/shared/FullScreenModal';
 
 export default function Index() {
   const { t, ready } = useTranslation('common');
@@ -38,13 +38,18 @@ export default function Index() {
     try {
       await deleteIncident(incidentToDelete);
       toast.success(t('oscrat.ui.versions.incidents.deleted-successfully'));
+      setShowDeleteModal(false);
+      setIncidentToDelete(null);
     } catch (error: unknown) {
       toast.error(
         extractErrorMessage(error, t('oscrat.ui.versions.incidents.failed-to-delete'))
       );
-    } finally {
-      setIncidentToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setIncidentToDelete(null);
   };
 
   const handleAddIncident = () => {
@@ -79,19 +84,16 @@ export default function Index() {
         <Table incidents={incidents} onDelete={handleDelete} />
       </div>
 
-      <ConfirmationDialog
-        visible={showDeleteModal}
+      <FullScreenModal
+        isOpen={showDeleteModal}
+        onClose={handleCancelDelete}
         title={t('oscrat.ui.versions.incidents.delete-incident')}
-        onConfirm={confirmDelete}
-        onCancel={() => {
-          setShowDeleteModal(false);
-          setIncidentToDelete(null);
-        }}
-        confirmText={t('delete')}
-        cancelText={t('cancel')}
-      >
-        {t('oscrat.ui.versions.incidents.confirm-delete')}
-      </ConfirmationDialog>
+        text={t('oscrat.ui.versions.incidents.confirm-delete')}
+        cancelButtonText={t('cancel')}
+        continueButtonText={t('delete')}
+        onCancel={handleCancelDelete}
+        onContinue={confirmDelete}
+      />
     </div>
   );
 }

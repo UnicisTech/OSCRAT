@@ -28,6 +28,7 @@ export interface CRAAssessmentRawData {
 }
 
 /**
+<<<<<<< HEAD
  * Validates if rawData has the structure of ComplianceAssessmentRawData
  * 
  * Needed because rawData is stored as unstructured JSON in the database.
@@ -35,7 +36,7 @@ export interface CRAAssessmentRawData {
  * before accessing its properties.
  */
 export function validateComplianceAssessmentRawData(
-  data: unknown
+ data: unknown
 ): data is ComplianceAssessmentRawData {
   if (!data || typeof data !== 'object') return false;
   
@@ -52,4 +53,20 @@ export function validateComplianceAssessmentRawData(
     typeof results.startedAt === 'string' &&
     typeof results.lastUpdatedAt === 'string'
   );
+}
+
+/**
+ * Type guard to check if rawData is CRAAssessmentRawData
+ */
+export function isCRAAssessmentRawData(
+  data: unknown
+): data is CRAAssessmentRawData {
+  if (!data || typeof data !== 'object') return false;
+  
+  const obj = data as Record<string, unknown>;
+  if (!obj.questionnaire_results || typeof obj.questionnaire_results !== 'object') return false;
+  
+  const results = obj.questionnaire_results as Record<string, unknown>;
+  
+  return typeof results.answers === 'object' && results.answers !== null;
 }

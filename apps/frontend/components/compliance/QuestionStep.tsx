@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ComplianceQuestion, ComplianceAnswer } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
-import { FaUpload, FaFile, FaTimes } from 'react-icons/fa';
+import { FaUpload, FaFile, FaTimes, FaInfoCircle } from 'react-icons/fa';
 
 interface QuestionStepProps {
   question: ComplianceQuestion;
@@ -115,14 +115,25 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
     }
 
     if (question.answerType === 'text') {
+      const charCount = (answer as string).length;
+      const MAX_CHARS = 1000;
+      
       return (
-        <textarea
-          value={answer as string}
-          onChange={(e) => setAnswer(e.target.value)}
-          placeholder={t('oscrat.ui.enter-your-answer')}
-          className="w-full p-3 border border-gray-300 rounded-lg min-h-[120px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          rows={4}
-        />
+        <div>
+          <textarea
+            value={answer as string}
+            onChange={(e) => setAnswer(e.target.value)}
+            placeholder={t('oscrat.ui.enter-your-answer')}
+            className="w-full p-3 border border-gray-300 rounded-lg min-h-[120px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            rows={4}
+            maxLength={MAX_CHARS}
+          />
+          <div className="flex justify-end mt-1">
+            <span className={`text-xs ${charCount >= MAX_CHARS ? 'text-red-600' : 'text-gray-500'}`}>
+              {charCount} / {MAX_CHARS}
+            </span>
+          </div>
+        </div>
       );
     }
 
@@ -188,22 +199,36 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
             placeholder={t('oscrat.ui.enter-additional-information')}
             className="w-full p-3 border border-gray-300 rounded-lg min-h-[100px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             rows={3}
+            maxLength={1000}
           />
+          <div className="flex justify-end mt-1">
+            <span className={`text-xs ${additionalInformation.length >= 1000 ? 'text-red-600' : 'text-gray-500'}`}>
+              {additionalInformation.length} / 1000
+            </span>
+          </div>
         </div>
       )}
 
       {/* Evidence upload */}
       {question.evidence && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('oscrat.ui.evidence-upload')}
-            {question.evidence.required && <span className="text-red-600 ml-1">*</span>}
-            {question.evidence.hint && (
-              <span className="ml-2 text-xs text-gray-500 font-normal">
-                ({question.evidence.hint})
-              </span>
-            )}
-          </label>
+          <div className="flex items-center gap-2 mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              {t('oscrat.ui.evidence-upload')}
+              {question.evidence.required && <span className="text-red-600 ml-1">*</span>}
+              {question.evidence.hint && (
+                <span className="ml-2 text-xs text-gray-500 font-normal">
+                  ({question.evidence.hint})
+                </span>
+              )}
+            </label>
+            <div
+              className="tooltip tooltip-right"
+              data-tip={`${t('oscrat.ui.file-upload-max-size')} • ${t('oscrat.ui.file-upload-allowed-types')}`}
+            >
+              <FaInfoCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            </div>
+          </div>
           
           {!evidenceFile && !hasExistingEvidence ? (
             <div className="mt-2">

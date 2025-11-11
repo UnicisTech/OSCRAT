@@ -21,7 +21,7 @@ export function useVersionCompliance({
   teamRole,
   userId,
 }: UseVersionComplianceOptions) {
-  const storageKey = `${STORAGE_KEY_PREFIX.VERSION_COMPLIANCE}_${productId}`;
+  const storageKey = `${STORAGE_KEY_PREFIX.VERSION_COMPLIANCE}_${versionId}`;
 
   const { assessments, createAssessment, isCreating } = useAssessments(
     teamSlug,

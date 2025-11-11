@@ -4,6 +4,7 @@ import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
 import { FaPlay, FaCheckCircle, FaRedo } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import FullScreenModal from '@/components/shared/FullScreenModal';
 
 interface AreaListProps {
   areas: ComplianceArea[];
@@ -37,6 +38,10 @@ const AreaList: React.FC<AreaListProps> = ({
     onReset();
     setShowResetConfirm(false);
     toast.success(t('oscrat.ui.compliance-reset-success'));
+  };
+
+  const handleCancelReset = () => {
+    setShowResetConfirm(false);
   };
   
   if (!ready) return null;
@@ -121,11 +126,11 @@ const AreaList: React.FC<AreaListProps> = ({
                         e.stopPropagation();
                         onAreaSelect(index);
                       }}
-                      className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-200 transition-colors min-w-[70px]"
                       aria-label={t('oscrat.ui.start-assessment-area', { area: t(area.areaOfRequirements, { ns: complianceNamespace }) })}
                     >
                       <FaPlay className="text-blue-600 text-2xl mb-1" />
-                      <span className="text-xs text-blue-600 font-medium">
+                      <span className="text-xs text-blue-600 font-medium whitespace-nowrap">
                         {isInProgress ? t('continue') : t('start')}
                       </span>
                     </button>
@@ -149,32 +154,16 @@ const AreaList: React.FC<AreaListProps> = ({
         </div>
       )}
 
-      {showResetConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t('oscrat.ui.reset-assessment-confirm-title')}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {t('oscrat.ui.reset-assessment-confirm-message')}
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowResetConfirm(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                {t('cancel')}
-              </button>
-              <button
-                onClick={handleResetConfirm}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                {t('oscrat.ui.reset-assessment')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <FullScreenModal
+        isOpen={showResetConfirm}
+        onClose={handleCancelReset}
+        title={t('oscrat.ui.reset-assessment-confirm-title')}
+        text={t('oscrat.ui.reset-assessment-confirm-message')}
+        cancelButtonText={t('cancel')}
+        continueButtonText={t('oscrat.ui.reset-assessment')}
+        onCancel={handleCancelReset}
+        onContinue={handleResetConfirm}
+      />
     </div>
   );
 };

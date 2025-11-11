@@ -62,15 +62,25 @@ export function useUploadVersionAttachment(
           versionId,
           filters
         ),
+        exact: false,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.attachments.all(
+          teamId,
+          versionId
+        ),
+        exact: false,
       });
 
       if (filters?.vulnerabilityId) {
-        queryClient.invalidateQueries({
+          queryClient.invalidateQueries({
           queryKey: queryKeys.oscrat.projects.versions.vulnerabilities.detail(
             teamId,
             versionId,
             filters.vulnerabilityId
           ),
+          exact: false,
         });
       }
 
@@ -81,6 +91,7 @@ export function useUploadVersionAttachment(
             versionId,
             filters.incidentId
           ),
+          exact: false,
         });
       }
     },
@@ -109,6 +120,15 @@ export function useDeleteVersionAttachment(
           versionId,
           filters
         ),
+        exact: false,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.attachments.all(
+          teamId,
+          versionId
+        ),
+        exact: false,
       });
 
       if (filters?.vulnerabilityId) {
@@ -118,6 +138,7 @@ export function useDeleteVersionAttachment(
             versionId,
             filters.vulnerabilityId
           ),
+          exact: false,
         });
       }
 
@@ -128,6 +149,7 @@ export function useDeleteVersionAttachment(
             versionId,
             filters.incidentId
           ),
+          exact: false,
         });
       }
     },

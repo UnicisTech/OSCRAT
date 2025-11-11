@@ -196,7 +196,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     
     if (nextRequirementIndex >= currentArea.content.length) {
       toast.success(t('oscrat.ui.area-completed', { 
-        area: currentArea.areaOfRequirements 
+        area: t(currentArea.areaOfRequirements, { ns: complianceNamespace })
       }));
       
       if (allAreasComplete) {
@@ -216,6 +216,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     localState.currentRequirementIndex,
     t,
     saveToDatabase,
+    complianceNamespace,
   ]);
 
   const handleBack = useCallback(() => {

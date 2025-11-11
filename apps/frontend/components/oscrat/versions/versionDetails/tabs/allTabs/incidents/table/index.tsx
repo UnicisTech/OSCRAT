@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaEye, FaTrash } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import type { OscratIncidentSummary } from '@oscrat/model';
@@ -145,7 +145,11 @@ const Table: React.FC<IncidentsTableProps> = ({
           />
           <tbody className={tableStyles.tbody}>
             {pageData.map((incident) => (
-              <TableRow key={incident.id}>
+              <TableRow 
+                key={incident.id}
+                onClick={() => handleViewDetails(incident.id)}
+                className="cursor-pointer hover:bg-gray-50"
+              >
                 <td className={tableStyles.td}>
                   {getStatusBadge(incident.status)}
                 </td>
@@ -191,14 +195,10 @@ const Table: React.FC<IncidentsTableProps> = ({
                 <td className={tableStyles.td}>
                   <div className="flex items-center gap-2">
                     <ActionButton
-                      onClick={() => handleViewDetails(incident.id)}
-                      icon={<FaEye size={12} />}
-                      title={t('oscrat.ui.versions.incidents.view-details')}
-                    >
-                      {t('oscrat.ui.view')}
-                    </ActionButton>
-                    <ActionButton
-                      onClick={() => onDelete(incident.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(incident.id);
+                      }}
                       icon={<FaTrash size={12} />}
                       title={t('oscrat.ui.versions.incidents.delete-incident')}
                     >

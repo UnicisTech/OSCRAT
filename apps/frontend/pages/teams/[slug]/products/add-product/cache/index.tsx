@@ -187,6 +187,39 @@ export default function Cache() {
 
   if (!ready) return null;
 
+  if (!formState || !formState.highestRiskLevel) {
+    return (
+      <div className="flex w-full justify-center">
+        <div className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white shadow-md">
+          <div className="p-10">
+            <h1 className="text-[20px] font-semibold text-gray-800 mb-4">
+              {t('oscrat.ui.no-cached-survey')}
+            </h1>
+            <p className="text-sm text-gray-600 mb-6">
+              {t('oscrat.ui.no-cached-survey-description')}
+            </p>
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={() => router.push(`/teams/${teamId}/products/add-product`)}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                {t('back')}
+              </button>
+              <button
+                type="button"
+                onClick={handleRetakeSurvey}
+                className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                {t('oscrat.ui.take-survey')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const isFormLoading = isLoading || isCreatingProject || isCreatingAssessment;
 
   const additionalFields = (

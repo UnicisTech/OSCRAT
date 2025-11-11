@@ -32,8 +32,8 @@ export const transformOrgAssessmentToComplianceState = (
   teamRole: OscratOrganizationRole
 ): ComplianceState | null => {
   if (!validateComplianceAssessmentRawData(rawData)) {
-    return null;
-  }
+   return null;
+ }
 
   const results = rawData.compliance_results;
 
@@ -62,8 +62,8 @@ export const transformVersionAssessmentToComplianceState = (
   teamRole: OscratOrganizationRole
 ): ComplianceState | null => {
   if (!validateComplianceAssessmentRawData(rawData)) {
-    return null;
-  }
+   return null;
+ }
 
   const results = rawData.compliance_results;
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import { FormikProps } from 'formik';
 import { InputWithLabel } from '@/components/shared';
+import { useTeamContext } from '@/context/TeamContext';
 
 interface ProductFormValues {
   acronym: string;
@@ -30,9 +31,10 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
 }: ProductCreationFormProps<T>) {
   const { t, ready } = useTranslation('common');
   const router = useRouter();
+  const { slug: teamId } = useTeamContext();
 
   const handleBack = () => {
-    router.back();
+    router.push(`/teams/${teamId}/products/add-product`);
   };
 
   if (!ready) return null;

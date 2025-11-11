@@ -15,7 +15,7 @@ import { useMemo } from 'react';
 import { ComplianceState } from '@/types/compliance';
 import { getComplianceNamespace, COMPLIANCE_NAMESPACES } from '@/lib/compliance/translations';
 import { getRoleForTeam } from '@/lib/compliance/utils';
-import { FaDownload, FaClipboardCheck } from 'react-icons/fa';
+import { FaDownload, FaPlayCircle } from 'react-icons/fa';
 import { OscratOrganizationRole } from '@oscrat/model';
 import { useRouter } from 'next/router';
 
@@ -51,11 +51,24 @@ export default function Index() {
       try {
         return JSON.parse(saved) as ComplianceState;
       } catch {
-        return null;
+        localStorage.removeItem(storageKey);
       }
     }
     
-    return null;
+    // Initialize empty state for newly created versions 
+    return {
+      productId: versionId,
+      teamRole: team.orgRoles[0],
+      assessments: [],
+      currentAreaIndex: null,
+      currentRequirementIndex: null,
+      completedAreas: [],
+      completedRequirements: [],
+      startedAt: new Date().toISOString(),
+      lastUpdatedAt: new Date().toISOString(),
+      completed: false,
+      started: false,
+    };
   }, [team, versionId]);
 
   const complianceNamespace = useMemo(() => {
@@ -144,27 +157,34 @@ export default function Index() {
       <Breadcrumb items={breadcrumbItems} />
       <Version />
       <ConformityRow />
-      {showCharts && (
+      {showCharts && complianceState && (
         <div className="mt-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900">
               {t('oscrat.ui.compliance-assessment')}
             </h2>
             <div className="flex items-center gap-3">
-              <button
-                onClick={handleNavigateToCompliance}
-                className="flex items-center gap-2 rounded-lg border border-blue-600 bg-transparent px-4 py-2 text-blue-600 transition-colors hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-950"
-              >
-                <FaClipboardCheck />
-                {t('oscrat.ui.compliance-assessment')}
-              </button>
-              <button
-                onClick={handleExportPDF}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <FaDownload />
-                {t('oscrat.ui.dashboard.export-pdf')}
-              </button>
+              {!complianceState.completed && (
+                <button
+                  onClick={handleNavigateToCompliance}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <FaPlayCircle />
+                  {complianceState.started 
+                    ? t('oscrat.ui.dashboard.continue-assessment')
+                    : t('oscrat.ui.dashboard.start-assessment')
+                  }
+                </button>
+              )}
+              {complianceState.completed && (
+                <button
+                  onClick={handleExportPDF}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <FaDownload />
+                  {t('oscrat.ui.dashboard.export-pdf')}
+                </button>
+              )}
             </div>
           </div>
           <ComplianceCharts

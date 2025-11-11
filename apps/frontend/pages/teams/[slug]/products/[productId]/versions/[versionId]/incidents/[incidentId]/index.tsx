@@ -12,11 +12,11 @@ import { tableStyles } from '@/components/oscrat/tableStyles';
 import EditIncidentModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/incidents/EditIncidentModal';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
-import { FaDownload, FaTrash } from 'react-icons/fa';
+import { FaDownload, FaTrash, FaInfoCircle } from 'react-icons/fa';
 import { IncidentStatus } from '@oscrat/model';
 import normalizeText from '@/utils/normalizeText';
 import { formatDateLong } from '@/utils/dateFormat';
-import { Breadcrumb } from '@/components/shared';
+import { Breadcrumb, FullScreenModal } from '@/components/shared';
 
 function IncidentDetailsPage() {
   const { t, ready } = useTranslation('common');
@@ -45,6 +45,8 @@ function IncidentDetailsPage() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [showDeleteAttachmentModal, setShowDeleteAttachmentModal] = useState(false);
+  const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
 
   const handleEdit = () => {
     setIsEditModalOpen(true);
@@ -90,17 +92,27 @@ function IncidentDetailsPage() {
     }
   };
 
-  const handleDeleteAttachment = async (attachmentId: string) => {
-    if (!confirm(t('oscrat.ui.delete-attachment-confirmation'))) {
-      return;
-    }
+  const handleDeleteAttachment = (attachmentId: string) => {
+    setAttachmentToDelete(attachmentId);
+    setShowDeleteAttachmentModal(true);
+  };
+
+  const confirmDeleteAttachment = async () => {
+    if (!attachmentToDelete) return;
 
     try {
-      await deleteAttachment(attachmentId);
+      await deleteAttachment(attachmentToDelete);
       toast.success(t('oscrat.ui.attachment-deleted'));
+      setShowDeleteAttachmentModal(false);
+      setAttachmentToDelete(null);
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-delete-attachment')));
     }
+  };
+
+  const handleCancelDeleteAttachment = () => {
+    setShowDeleteAttachmentModal(false);
+    setAttachmentToDelete(null);
   };
 
   if (!ready) return null;
@@ -318,15 +330,23 @@ function IncidentDetailsPage() {
             <h2 className="text-xl font-semibold text-gray-900">
               {t('oscrat.ui.attachments')}
             </h2>
-            <label className="inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-              <input
-                type="file"
-                onChange={handleFileUpload}
-                disabled={uploadingFile}
-                className="hidden"
-              />
-              {uploadingFile ? t('oscrat.ui.uploading') : t('oscrat.ui.add-document')}
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <input
+                  type="file"
+                  onChange={handleFileUpload}
+                  disabled={uploadingFile}
+                  className="hidden"
+                />
+                {uploadingFile ? t('oscrat.ui.uploading') : t('oscrat.ui.add-document')}
+              </label>
+              <div
+                className="tooltip tooltip-left"
+                data-tip={`${t('oscrat.ui.file-upload-max-size')} • ${t('oscrat.ui.file-upload-allowed-types')}`}
+              >
+                <FaInfoCircle className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              </div>
+            </div>
           </div>
 
           {incident.attachments && incident.attachments.length > 0 ? (
@@ -407,6 +427,18 @@ function IncidentDetailsPage() {
           onDownloadAttachment={downloadAttachment}
         />
       )}
+
+      {/* Delete Attachment Confirmation Modal */}
+      <FullScreenModal
+        isOpen={showDeleteAttachmentModal}
+        onClose={handleCancelDeleteAttachment}
+        title={t('oscrat.ui.delete-attachment')}
+        text={t('oscrat.ui.delete-attachment-confirmation')}
+        cancelButtonText={t('cancel')}
+        continueButtonText={t('delete')}
+        onCancel={handleCancelDeleteAttachment}
+        onContinue={confirmDeleteAttachment}
+      />
     </>
   );
 }

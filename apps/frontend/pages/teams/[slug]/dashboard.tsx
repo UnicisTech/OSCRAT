@@ -2,6 +2,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { GetServerSidePropsContext } from 'next';
 import React, { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/router';
 import { withTeamLayout } from '@/lib/layout-helpers';
 import CompletedAppCheck from '@/components/oscrat/dashboard/CompletedAppCheck';
 import TasksAndProducts from '@/components/oscrat/dashboard/TasksAndProducts';
@@ -12,7 +13,7 @@ import { useTeamContext } from '@/context/TeamContext';
 import { ComplianceState } from '@/types/compliance';
 import { getComplianceNamespace } from '@/lib/compliance/translations';
 import { getRoleForTeam } from '@/lib/compliance/utils';
-import { FaDownload } from 'react-icons/fa';
+import { FaDownload, FaPlayCircle } from 'react-icons/fa';
 import { OscratAssessmentType } from '@oscrat/model';
 import { loadFormState } from '@/utils/craForm';
 import type { FormState } from '@/types/craForm';
@@ -23,6 +24,7 @@ import { transformOrgAssessmentToComplianceState } from '@/utils/compliance';
 const TeamDashboard = () => {
   const { teamContext } = useTeamContext();
   const team = teamContext.team!;
+  const router = useRouter();
   
   const complianceNamespace = useMemo(() => {
     return getComplianceNamespace(getRoleForTeam(team.orgRoles[0]), 'team');
@@ -80,10 +82,23 @@ const TeamDashboard = () => {
       }
     }
     
-    return null;
+    // Initialize empty state for newly created teams
+    return {
+      productId: team.id,
+      teamRole: team.orgRoles[0],
+      assessments: [],
+      currentAreaIndex: null,
+      currentRequirementIndex: null,
+      completedAreas: [],
+      completedRequirements: [],
+      startedAt: new Date().toISOString(),
+      lastUpdatedAt: new Date().toISOString(),
+      completed: false,
+      started: false,
+    };
   }, [team.id, team.orgRoles, assessmentDetail]);
 
-  const showCharts = !isComplianceLoading && !isLoadingAssessments && !isLoadingAssessmentDetail && complianceData && complianceState && complianceData.length > 0;
+  const showCharts = !isComplianceLoading && !isLoadingAssessments && !isLoadingAssessmentDetail && complianceData && complianceData.length > 0;
 
   const handleExportPDF = async () => {
     if (!complianceData || !complianceState || !ready) return;
@@ -135,30 +150,50 @@ const TeamDashboard = () => {
     );
   };
 
+  const handleGoToAssessment = () => {
+    router.push(`/teams/${team.slug}/compliance`);
+  };
+
   if (!ready) return null;
 
   return (
     <>
       <div className="flex flex-col pb-6">
-        <h2 className="mb-2 text-xl font-semibold">{t('Dashboard')}</h2>
+        <h2 className="mb-2 text-xl font-semibold">{t('dashboard')}</h2>
       </div>
       <div className="space-y-6">
         {shouldShowCompletedAppCheck && completedCraForm?.highestRiskLevel && (
           <CompletedAppCheck riskLevel={completedCraForm.highestRiskLevel} />
         )}
-        {showCharts && (
+        {showCharts && complianceState && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">
                 {t('oscrat.ui.team-compliance-assessment')}
               </h2>
-              <button
-                onClick={handleExportPDF}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <FaDownload />
-                {t('oscrat.ui.dashboard.export-pdf')}
-              </button>
+              <div className="flex items-center gap-3">
+                {!complianceState.completed && (
+                  <button
+                    onClick={handleGoToAssessment}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <FaPlayCircle />
+                    {complianceState.started 
+                      ? t('oscrat.ui.dashboard.continue-assessment')
+                      : t('oscrat.ui.dashboard.start-assessment')
+                    }
+                  </button>
+                )}
+                {complianceState.completed && (
+                  <button
+                    onClick={handleExportPDF}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <FaDownload />
+                    {t('oscrat.ui.dashboard.export-pdf')}
+                  </button>
+                )}
+              </div>
             </div>
             <ComplianceCharts
               complianceData={complianceData}
