@@ -68,6 +68,7 @@ export default function Index() {
       lastUpdatedAt: new Date().toISOString(),
       completed: false,
       started: false,
+      finished: false,
     };
   }, [team, versionId]);
 

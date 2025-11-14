@@ -1,53 +1,60 @@
-import React from 'react';
-import { Team } from '@oscrat/model';
+import React, { useMemo } from 'react';
+import { Team, TaskStatus } from '@oscrat/model';
 import toast from 'react-hot-toast';
 import Modal from '@/components/shared/Modal';
 import { Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
-import statusesData from '@/components/defaultLanding/data/statuses.json';
+import { DEFAULT_TASK_STATUS, getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { getCurrentStringDate } from '@/components/services/taskService';
 import useTasks from '@/hooks/useTasks';
 import { useFormik } from 'formik';
 import { taskCreateSchema, type TaskCreateData } from '@/lib/validation/task';
 import type { ApiError } from '@/types';
-
-const statuses = statusesData;
-// TODO: Update this to schema enum after specs arrive and Radu implements it, until then use the statusesData as backup
-const DEFAULT_STATUS_VALUE = 'todo';
+import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
 
 const CreateTask = ({
   visible,
   setVisible,
   team,
+  defaultProductId,
+  defaultVersionId,
 }: {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   team: Team;
+  defaultProductId?: string;
+  defaultVersionId?: string;
 }) => {
   const { t, ready } = useTranslation('common');
   const { createTask } = useTasks(team.slug);
+  const { data: products } = useSearchProducts(team.slug, { includeVersions: true });
   
   const initialValues: TaskCreateData = {
     title: '',
-    status: DEFAULT_STATUS_VALUE,
+    status: DEFAULT_TASK_STATUS,
     duedate: new Date(getCurrentStringDate()),
     description: '',
+    productId: defaultProductId || '',
+    versionId: defaultVersionId || '',
   };
   
   const formik = useFormik<TaskCreateData>({
     initialValues,
     validationSchema: taskCreateSchema,
     enableReinitialize: true,
+    validateOnChange: false,
     validateOnBlur: false,
     onSubmit: async (values) => {
       try {
         await createTask({
           title: values.title.trim(),
-          status: values.status,
+          status: values.status as TaskStatus,
           duedate: values.duedate,
           description: values.description?.trim() || '',
+          productId: values.productId || undefined,
+          versionId: values.versionId || undefined,
         });
         
         toast.success(t('task-created'));
@@ -59,6 +66,17 @@ const CreateTask = ({
       }
     },
   });
+
+  const availableVersions = useMemo(() => {
+    if (!formik.values.productId || !products) return [];
+    const selectedProduct = products.find(p => p.id === formik.values.productId);
+    return selectedProduct?.versions || [];
+  }, [formik.values.productId, products]);
+
+  const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    formik.setFieldValue('productId', e.target.value);
+    formik.setFieldValue('versionId', '');
+  };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dateValue = e.target.value ? new Date(e.target.value) : new Date();
@@ -94,13 +112,45 @@ const CreateTask = ({
               label={t('status')}
               value={formik.values.status}
               onChange={formik.handleChange}
-              options={statuses.map(status => ({
-                value: status.value,
-                label: status.label,
+              options={Object.values(TaskStatus).map(status => ({
+                value: status,
+                label: t(getTaskStatusTranslationKey(status)),
               }))}
               error={formik.errors.status ? t(formik.errors.status) : undefined}
               required
             />
+            
+            <SelectWithLabel
+              name="productId"
+              label={t('product')}
+              value={formik.values.productId || ''}
+              onChange={handleProductChange}
+              disabled={!!defaultProductId}
+              options={[
+                { value: '', label: t('oscrat.ui.no-product') },
+                ...(products?.map(product => ({
+                  value: product.id,
+                  label: product.name,
+                })) || [])
+              ]}
+            />
+            
+            {formik.values.productId && (
+              <SelectWithLabel
+                name="versionId"
+                label={t('version')}
+                value={formik.values.versionId || ''}
+                onChange={formik.handleChange}
+                disabled={!!defaultVersionId}
+                options={[
+                  { value: '', label: t('oscrat.ui.no-version') },
+                  ...availableVersions.map(version => ({
+                    value: version.id,
+                    label: version.version,
+                  }))
+                ]}
+              />
+            )}
             
             <InputWithLabel
               type="date"

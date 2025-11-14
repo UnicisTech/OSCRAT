@@ -3,6 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
 import { FaDownload, FaCheckCircle, FaExclamationCircle, FaClock } from 'react-icons/fa';
+import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 
 interface ComplianceDashboardProps {
   complianceData: ComplianceArea[];
@@ -43,11 +44,12 @@ const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
         
         const isEvaluated = assessment?.complianceStatus !== undefined;
         
-        let conformityStatus = 'Not Evaluated';
+        // Use string type because we generate dynamic strings like "In Evaluation [45%]"
+        let conformityStatus: string = CONFORMITY_STATUS.NOT_COMPLIANT;
         if (isEvaluated && assessment?.complianceStatus) {
           conformityStatus = assessment.complianceStatus;
         } else if (completionPercentage > 0 && completionPercentage < 100) {
-          conformityStatus = `In Evaluation [${completionPercentage}%]`;
+          conformityStatus = `${CONFORMITY_STATUS.IN_EVALUATION} [${completionPercentage}%]`;
         }
 
         allRequirements.push({
@@ -68,24 +70,24 @@ const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
 
 
   const getStatusIcon = (status: string) => {
-    if (status === 'Fully compliant') {
+    if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) {
       return <FaCheckCircle className="text-green-500" />;
-    } else if (status.startsWith('In Evaluation')) {
+    } else if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) {
       return <FaClock className="text-blue-500" />;
-    } else if (status === 'Not Evaluated') {
+    } else if (status === CONFORMITY_STATUS.NOT_EVALUATED) {
       return <FaExclamationCircle className="text-gray-400" />;
-    } else if (status === 'Not Compliant') {
+    } else if (status === CONFORMITY_STATUS.NOT_COMPLIANT) {
       return <FaExclamationCircle className="text-red-500" />;
     }
     return null;
   };
 
   const getStatusBadgeColor = (status: string) => {
-    if (status === 'Fully compliant') return 'bg-green-100 text-green-800';
-    if (status === 'Partially compliant') return 'bg-yellow-100 text-yellow-800';
-    if (status === 'Not Compliant') return 'bg-red-100 text-red-800';
-    if (status === 'Not Applicable') return 'bg-gray-100 text-gray-800';
-    if (status.startsWith('In Evaluation')) return 'bg-blue-100 text-blue-800';
+    if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) return 'bg-green-100 text-green-800';
+    if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT) return 'bg-yellow-100 text-yellow-800';
+    if (status === CONFORMITY_STATUS.NOT_COMPLIANT) return 'bg-red-100 text-red-800';
+    if (status === CONFORMITY_STATUS.NOT_APPLICABLE) return 'bg-gray-100 text-gray-800';
+    if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) return 'bg-blue-100 text-blue-800';
     return 'bg-gray-100 text-gray-600';
   };
 

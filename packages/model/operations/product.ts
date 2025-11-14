@@ -8,6 +8,8 @@ import type {
   OscratProductUpdate,
   OscratProductSummary,
   OscratProductDetail,
+  OscratProductSearchRequest,
+  OscratProductSearchResult,
 } from '../types/product';
 import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
 import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
@@ -175,6 +177,18 @@ export const getProducts = async (
   return products.map(transformToProductSummary);
 };
 
+export const getProductsWithDetails = async (
+  prisma: PrismaClient,
+  teamId: string
+): Promise<OscratProductDetail[]> => {
+  const products = await prisma.oscratProduct.findMany({
+    where: { teamId },
+    include: PRODUCT_DETAIL_INCLUDE,
+  });
+
+  return products.map(transformToProductDetail);
+};
+
 export const getProductDetail = async (
   prisma: PrismaClient,
   teamId: string,
@@ -264,4 +278,104 @@ export const deleteProduct = async (
       teamId: teamId,
     },
   });
+};
+
+/** Helper to convert ProductDetail to SearchResult */
+const productDetailToSearchResult = (
+  product: OscratProductDetail
+): OscratProductSearchResult => ({
+  id: product.id,
+  name: product.name,
+  complianceStatus: product.complianceStatus,
+  versions: product.versions,
+});
+
+export const searchProducts = async (
+  prisma: PrismaClient,
+  teamId: string,
+  params: OscratProductSearchRequest
+): Promise<OscratProductSearchResult[]> => {
+  const { productIds, includeVersions = true, includeDetails = false } = params;
+
+  const whereClause: Prisma.OscratProductWhereInput = {
+    teamId,
+  };
+
+  if (productIds && productIds.length > 0) {
+    whereClause.id = {
+      in: productIds,
+    };
+  }
+
+  if (!includeVersions) {
+    if (includeDetails) {
+      const products = await prisma.oscratProduct.findMany({
+        where: whereClause,
+        select: {
+          id: true,
+          name: true,
+          complianceStatus: true,
+        },
+        orderBy: [{ name: 'asc' }],
+      });
+
+      return products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        complianceStatus: product.complianceStatus,
+        versions: [],
+      }));
+    }
+
+    const products = await prisma.oscratProduct.findMany({
+      where: whereClause,
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: [{ name: 'asc' }],
+    });
+
+    return products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      versions: [],
+    }));
+  }
+
+  if (includeDetails) {
+    const products = await prisma.oscratProduct.findMany({
+      where: whereClause,
+      include: PRODUCT_DETAIL_INCLUDE,
+      orderBy: [{ name: 'asc' }],
+    });
+
+    return products
+      .map(transformToProductDetail)
+      .map(productDetailToSearchResult);
+  }
+
+  const products = await prisma.oscratProduct.findMany({
+    where: whereClause,
+    select: {
+      id: true,
+      name: true,
+      versions: {
+        select: {
+          id: true,
+          version: true,
+        },
+      },
+    },
+    orderBy: [{ name: 'asc' }],
+  });
+
+  return products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    versions: product.versions.map((version) => ({
+      id: version.id,
+      version: version.version,
+    })),
+  }));
 };

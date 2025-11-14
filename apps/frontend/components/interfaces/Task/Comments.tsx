@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
-import type { TaskExtended } from 'types';
+import type { Task } from '@oscrat/model';
 import { IssuePanelContainer } from 'sharedStyles';
 import Comment from './comments/Comment';
 import CreateCommentForm from './comments/CreateCommentForm';
@@ -15,7 +15,7 @@ interface FormData {
   text: string;
 }
 
-export default function Comments({ task }: { task: TaskExtended }) {
+export default function Comments({ task }: { task: Task }) {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { slug, taskNumber } = router.query;
@@ -24,7 +24,7 @@ export default function Comments({ task }: { task: TaskExtended }) {
   const [confirmationDialogVisible, setConfirmationDialogVisible] =
     useState(false);
 
-  const { createComment, updateComment, deleteComment } = useComments(
+  const { comments, createComment, updateComment, deleteComment } = useComments(
     slug as string,
     taskNumber as string
   );
@@ -84,8 +84,8 @@ export default function Comments({ task }: { task: TaskExtended }) {
   return (
     <IssuePanelContainer>
       <div style={{ marginTop: '30px' }}>
-        {task.comments
-          .sort(
+        {comments
+          ?.sort(
             (a, b) =>
               Date.parse(a.createdAt as any) - Date.parse(b.createdAt as any)
           )

@@ -1,25 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { useTeamContext } from '@/context/TeamContext';
 import { useTranslation } from 'next-i18next';
-
-// TODO: De legat cand termina Radu de facut hook/api endpoint pt getAllProducts(details not summary)
-const MOCK_TASKS_SUMMARY = {
-  totalOpen: 29,
-  categories: [
-    { label: 'Vulnerabilities', count: 2 },
-    { label: 'Incidents', count: 2 },
-    { label: 'SBOM', count: 0 },
-    { label: 'Tech. Documentation', count: 2 },
-  ],
-};
-
-const MOCK_PRODUCTS_SUMMARY = {
-  total: 12,
-  assessment: 6,
-  active: 5,
-  withdrawn: 1,
-};
+import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
+import { OscratProductComplianceStatus, OscratProductVersionStatus } from '@oscrat/model';
 
 const TasksSummaryCard = ({ data }) => {
   const { t, ready } = useTranslation('common');
@@ -33,7 +17,7 @@ const TasksSummaryCard = ({ data }) => {
       return (
         <div className="flex items-center rounded-full border border-red-500 px-3 py-1 text-sm">
           <FaExclamationCircle className="mr-1.5 text-red-600" />
-          {MOCK_TASKS_SUMMARY.totalOpen} {t('oscrat.ui.open')}
+          {category.count} {t('oscrat.ui.open')}
         </div>
       );
     }
@@ -92,8 +76,90 @@ const ProductsSummaryCard = ({ data }) => {
 };
 
 export default function App() {
-  const [tasksSummary, setTasksSummary] = useState(MOCK_TASKS_SUMMARY);
-  const [productsSummary, setProductsSummary] = useState(MOCK_PRODUCTS_SUMMARY);
+  const { teamContext } = useTeamContext();
+  const team = teamContext.team!;
+  const { t } = useTranslation('common');
+  
+  const { data: products, isLoading } = useSearchProducts(team.slug, { 
+    includeVersions: true, 
+    includeDetails: true 
+  });
+
+  const tasksSummary = useMemo(() => {
+    if (!products) {
+      return {
+        totalOpen: 0,
+        categories: [
+          { label: t('oscrat.ui.vulnerabilities'), count: 0 },
+          { label: t('oscrat.ui.incidents'), count: 0 },
+          { label: 'SBOM', count: 0 },
+          { label: t('oscrat.ui.tech-documentation'), count: 0 },
+        ],
+      };
+    }
+
+    const totalVulnerabilities = products.reduce((sum, product) => {
+      return sum + product.versions.reduce((vSum, version) => {
+        return vSum + (version.openVulnerabilities || 0);
+      }, 0);
+    }, 0);
+
+    const totalIncidents = products.reduce((sum, product) => {
+      return sum + product.versions.reduce((vSum, version) => {
+        return vSum + (version.openIncidents || 0);
+      }, 0);
+    }, 0);
+
+    const totalSbomReports = products.reduce((sum, product) => {
+      return sum + product.versions.reduce((vSum, version) => {
+        return vSum + (version.sbomReportsCount || 0);
+      }, 0);
+    }, 0);
+
+    return {
+      totalOpen: totalVulnerabilities + totalIncidents,
+      categories: [
+        { label: t('oscrat.ui.vulnerabilities'), count: totalVulnerabilities },
+        { label: t('oscrat.ui.incidents'), count: totalIncidents },
+        { label: 'SBOM', count: totalSbomReports },
+        { label: t('oscrat.ui.tech-documentation'), count: 0 },
+      ],
+    };
+  }, [products, t]);
+
+  const productsSummary = useMemo(() => {
+    if (!products) {
+      return { total: 0, assessment: 0, active: 0, withdrawn: 0 };
+    }
+
+    const assessment = products.filter(
+      (p) => p.complianceStatus === OscratProductComplianceStatus.NOT_ASSESSED ||
+             p.complianceStatus === OscratProductComplianceStatus.IN_PROGRESS
+    ).length;
+
+    const active = products.filter(
+      (p) => p.versions.some(v => v.status === OscratProductVersionStatus.ACTIVE)
+    ).length;
+
+    const withdrawn = products.filter(
+      (p) => p.versions.some(v => v.status === OscratProductVersionStatus.WITHDRAWN)
+    ).length;
+
+    return {
+      total: products.length,
+      assessment,
+      active,
+      withdrawn,
+    };
+  }, [products]);
+
+  if (isLoading) {
+    return (
+      <div className="flex w-full justify-center">
+        <div className="text-gray-600">{t('loading')}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full justify-center">

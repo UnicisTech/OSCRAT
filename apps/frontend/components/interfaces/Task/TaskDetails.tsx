@@ -6,7 +6,8 @@ import TextField from '@atlaskit/textfield';
 import Select, { ValueType } from '@atlaskit/select';
 import { Button } from 'react-daisyui';
 import type { Task, Team } from '@oscrat/model';
-import statuses from '@/components/defaultLanding/data/statuses.json';
+import { TaskStatus } from '@oscrat/model';
+import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
 import { WithoutRing, IssuePanelContainer } from 'sharedStyles';
 import { useTask } from 'hooks/useTask';
@@ -19,16 +20,21 @@ const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface FormData {
   title: string;
-  status: ValueType<Option>;
+  status: ValueType<StatusOption>;
   team: ValueType<Option>;
   duedate: string;
   description: string;
-  [key: string]: string | ValueType<Option>;
+  [key: string]: string | ValueType<Option> | ValueType<StatusOption>;
 }
 
 interface Option {
   label: string;
   value: string;
+}
+
+interface StatusOption {
+  label: string;
+  value: TaskStatus;
 }
 
 const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
@@ -50,7 +56,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
     try {
       const updateData: UpdateTaskData = {
         title,
-        status: status?.value,
+        status: status?.value as TaskStatus,
         description: description || '',
         duedate: duedate ? new Date(duedate) : undefined,
       };
@@ -94,14 +100,15 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                   </Fragment>
                 )}
               </Field>
-              <Field<ValueType<Option>>
+              <Field<ValueType<StatusOption>>
                 name="status"
                 label="Status"
                 aria-required={true}
                 isRequired
-                defaultValue={statuses.find(
-                  ({ value }) => value === task.status
-                )}
+                defaultValue={{
+                  label: t(getTaskStatusTranslationKey(task.status)),
+                  value: task.status,
+                }}
                 validate={async (value) => {
                   if (value) {
                     return undefined;
@@ -115,10 +122,13 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                 {({ fieldProps: { id, ...rest }, error }) => (
                   <Fragment>
                     <WithoutRing>
-                      <Select
+                      <Select<StatusOption>
                         inputId={id}
                         {...rest}
-                        options={statuses}
+                        options={Object.values(TaskStatus).map(status => ({
+                          label: t(getTaskStatusTranslationKey(status)),
+                          value: status,
+                        }))}
                         validationState={error ? 'error' : 'default'}
                         onInputChange={checkFormChanges}
                       />

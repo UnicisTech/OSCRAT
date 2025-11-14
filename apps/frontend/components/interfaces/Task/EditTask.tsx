@@ -6,7 +6,8 @@ import { useTranslation } from 'next-i18next';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
 import type { Task, Team } from '@oscrat/model';
-import statuses from '@/components/defaultLanding/data/statuses.json';
+import { TaskStatus } from '@oscrat/model';
+import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { useTask } from 'hooks/useTask';
 import { useFormik } from 'formik';
 import { taskUpdateSchema, type TaskUpdateData } from '@/lib/validation/task';
@@ -91,9 +92,9 @@ const EditTask = ({
               label={t('status')}
               value={formik.values.status || ''}
               onChange={formik.handleChange}
-              options={statuses.map(status => ({
-                value: status.value,
-                label: status.label,
+              options={Object.values(TaskStatus).map(status => ({
+                value: status,
+                label: t(getTaskStatusTranslationKey(status)),
               }))}
               error={formik.errors.status ? t(formik.errors.status) : undefined}
               required

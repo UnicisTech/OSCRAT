@@ -1,35 +1,23 @@
 import React, { useState, useMemo } from 'react';
-import { FaRegEye } from 'react-icons/fa';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { TabHeader, TableWrapper, TableHeader, TableRow, TabActionButton } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { tableStyles } from '@/components/oscrat/tableStyles';
-import AddNewTaskModal from './modal';
-
-// TODO: Wait for Radu to implement tasks
-type TaskStatus = 'To do' | 'In Progress' | 'Done' | 'Blocked';
-
-interface TaskData {
-  id: string;
-  name: string;
-  dateAdded: string;
-  section: string;
-  assignee: string;
-  status: TaskStatus;
-}
-
-interface NewTaskFormData {
-  name: string;
-  product: string;
-  version: string;
-  section: string;
-  details: string;
-}
+import { TaskStatus } from '@oscrat/model';
+import type { Task, Team } from '@oscrat/model';
+import { useVersionContext } from '@/context/VersionContext';
+import { useTeamContext } from '@/context/TeamContext';
+import useTasks from '@/hooks/useTasks';
+import { TASK_STATUS_TRANSLATION_MAP } from '@/constants/taskStatuses';
+import { CreateTask } from '@/components/interfaces/Task';
+import TaskStatusDropdown from '@/components/oscrat/tasks/TaskStatusDropdown';
+import { useTeamMembers } from '@/hooks/useTeamMembers';
 
 interface TaskTableProps {
-  tasks: TaskData[];
+  tasks: Task[];
+  team: Team;
   onAddTask: () => void;
-  onViewTask: (id: string) => void;
-  onStatusChange: (id: string, newStatus: TaskStatus) => void;
+  onViewTask: (taskNumber: number) => void;
   statusFilter: string;
   onStatusFilterChange: (status: string) => void;
   statusOptions: TaskStatus[];
@@ -37,23 +25,31 @@ interface TaskTableProps {
 
 const TaskTable: React.FC<TaskTableProps> = ({
   tasks,
+  team,
   onAddTask,
   onViewTask,
-  onStatusChange,
   statusFilter,
   onStatusFilterChange,
   statusOptions,
 }) => {
   const { t, ready } = useTranslation('common');
+  const { members } = useTeamMembers(team.slug);
+  
+  const memberMap = useMemo(() => {
+    const map = new Map();
+    members?.forEach(member => {
+      map.set(member.userId, member.user.name);
+    });
+    return map;
+  }, [members]);
+  
   if (!ready) return null;
 
   const tableHeaders = [
-    'Name',
-    'Dated Added',
-    'Section',
-    'Assignee',
-    'Status',
-    '',
+    t('task'),
+    t('due-date'),
+    t('assignee'),
+    t('status'),
   ];
 
   return (
@@ -75,7 +71,7 @@ const TaskTable: React.FC<TaskTableProps> = ({
             <option value="All">{t('all')}</option>
             {statusOptions.map((opt) => (
               <option key={opt} value={opt}>
-                {opt}
+                {t(TASK_STATUS_TRANSLATION_MAP[opt])}
               </option>
             ))}
           </select>
@@ -91,39 +87,38 @@ const TaskTable: React.FC<TaskTableProps> = ({
             columns={tableHeaders.map((h) => ({ label: h }))}
           />
           <tbody className={tableStyles.tbody}>
-            {tasks.map((task) => (
-              <TableRow key={task.id}>
-                <td className={tableStyles.td}>
-                  <div className="font-medium">{task.name}</div>
+            {tasks.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  {t('no-tasks-yet')}
                 </td>
-                <td className={tableStyles.td}>{task.dateAdded}</td>
-                <td className={tableStyles.td}>{task.section}</td>
-                <td className={tableStyles.td}>{task.assignee}</td>
-                <td className={tableStyles.td}>
-                  <select
-                    value={task.status}
-                    onChange={(e) =>
-                      onStatusChange(task.id, e.target.value as TaskStatus)
-                    }
-                    className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                  >
-                    {statusOptions.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-                <td className={`${tableStyles.td} text-center`}>
-                  <button
-                    onClick={() => onViewTask(task.id)}
-                    className="flex items-center text-gray-900 hover:text-indigo-600"
-                  >
-                    <FaRegEye className="mr-2" /> {t('view')}
-                  </button>
-                </td>
-              </TableRow>
-            ))}
+              </tr>
+            ) : (
+              tasks.map((task) => (
+                <TableRow 
+                  key={task.id}
+                  onClick={() => onViewTask(task.taskNumber)}
+                  className="cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  <td className={tableStyles.td}>
+                    <div className="font-medium">
+                      {task.title}
+                    </div>
+                  </td>
+                  <td className={tableStyles.td}>
+                    {new Date(task.duedate).toLocaleDateString()}
+                  </td>
+                  <td className={tableStyles.td}>
+                    {task.assigneeId 
+                      ? (memberMap.get(task.assigneeId) || t('assigned'))
+                      : t('unassigned')}
+                  </td>
+                  <td className={tableStyles.td} onClick={(e) => e.stopPropagation()}>
+                    <TaskStatusDropdown task={task} team={team} />
+                  </td>
+                </TableRow>
+              ))
+            )}
           </tbody>
         </table>
       </TableWrapper>
@@ -134,141 +129,73 @@ const TaskTable: React.FC<TaskTableProps> = ({
 // --- MAIN APP COMPONENT ---
 
 export default function Index() {
-  // --- MOCK DATA ---
-  const allStatusOptions: TaskStatus[] = [
-    'To do',
-    'In Progress',
-    'Done',
-    'Blocked',
-  ];
-
-  const mockTasks: TaskData[] = [
-    {
-      id: 'task-1',
-      name: 'MVSP - 1.1',
-      dateAdded: '01.01.2025',
-      section: 'Incidents',
-      assignee: 'Anna Meier',
-      status: 'To do',
-    },
-    {
-      id: 'task-2',
-      name: 'MVSP - 1.2',
-      dateAdded: '01.01.2025',
-      section: 'Vulnerabilities',
-      assignee: 'Ravi Patel',
-      status: 'To do',
-    },
-    {
-      id: 'task-3',
-      name: 'MVSP - 1.2',
-      dateAdded: '01.01.2025',
-      section: 'SBOM',
-      assignee: 'Emily Carter',
-      status: 'To do',
-    },
-    {
-      id: 'task-4',
-      name: 'MVSP - 2.1',
-      dateAdded: '02.01.2025',
-      section: 'Incidents',
-      assignee: 'Anna Meier',
-      status: 'In Progress',
-    },
-    {
-      id: 'task-5',
-      name: 'MVSP - 2.2',
-      dateAdded: '03.01.2025',
-      section: 'Vulnerabilities',
-      assignee: 'Ravi Patel',
-      status: 'Done',
-    },
-  ];
-
-  // --- STATE ---
-  const [tasks, setTasks] = useState<TaskData[]>(mockTasks);
+  const router = useRouter();
+  const { t } = useTranslation('common');
+  const { versionId, productId } = useVersionContext();
+  const { teamContext } = useTeamContext();
+  const { team } = teamContext;
+  
   const [statusFilter, setStatusFilter] = useState<string>('All');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [createTaskVisible, setCreateTaskVisible] = useState(false);
 
-  // Initial data for the new task form
-  const initialTaskData: NewTaskFormData = useMemo(
-    () => ({
-      name: '',
-      product: '',
-      version: 'V2.3',
-      section: 'Incidents',
-      details: '',
-    }),
-    []
-  );
+  const { tasks: allTasks, isLoading } = useTasks(team?.slug || '');
+
+  // Filter tasks by versionId
+  const versionTasks = useMemo(() => {
+    if (!allTasks) return [];
+    return allTasks.filter(task => task.versionId === versionId);
+  }, [allTasks, versionId]);
+
+  // Apply status filter
+  const filteredTasks = useMemo(() => {
+    if (statusFilter === 'All') {
+      return versionTasks;
+    }
+    return versionTasks.filter((task) => task.status === statusFilter);
+  }, [versionTasks, statusFilter]);
+
+  const allStatusOptions = Object.values(TaskStatus);
 
   // --- HANDLERS ---
   const handleAddTask = () => {
-    setIsModalOpen(true);
+    setCreateTaskVisible(true);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleAddNewTask = (taskData: NewTaskFormData) => {
-    // Generate new task ID
-    const newTaskId = `task-${Date.now()}`;
-
-    // Create new task with current date
-    const newTask: TaskData = {
-      id: newTaskId,
-      name: taskData.name,
-      dateAdded: new Date().toLocaleDateString('en-GB'),
-      section: taskData.section,
-      assignee: 'Unassigned',
-      status: 'To do',
-    };
-
-    // Add new task to the list
-    setTasks((currentTasks) => [...currentTasks, newTask]);
-    setIsModalOpen(false);
-  };
-
-  const handleViewTask = (id: string) => {
-    alert(`View Task clicked for task: ${id}`);
-  };
-
-  const handleStatusChange = (id: string, newStatus: TaskStatus) => {
-    setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === id ? { ...task, status: newStatus } : task
-      )
+  const handleViewTask = (taskNumber: number) => {
+    if (!team) return;
+    router.push(
+      `/teams/${team.slug}/products/${productId}/versions/${versionId}/task/${taskNumber}`
     );
   };
 
-  // --- DERIVED STATE ---
-  const filteredTasks = useMemo(() => {
-    if (statusFilter === 'All') {
-      return tasks;
-    }
-    return tasks.filter((task) => task.status === statusFilter);
-  }, [tasks, statusFilter]);
+  if (!team || isLoading) {
+    return (
+      <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+        <div className="w-full py-8 text-center text-gray-500">{t('loading-tasks')}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
       <div className="w-full">
         <TaskTable
           tasks={filteredTasks}
+          team={team}
           onAddTask={handleAddTask}
           onViewTask={handleViewTask}
-          onStatusChange={handleStatusChange}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
           statusOptions={allStatusOptions}
         />
       </div>
 
-      <AddNewTaskModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        onAddTask={handleAddNewTask}
-        initialData={initialTaskData}
+      <CreateTask
+        visible={createTaskVisible}
+        setVisible={setCreateTaskVisible}
+        team={team}
+        defaultProductId={productId}
+        defaultVersionId={versionId}
       />
     </div>
   );

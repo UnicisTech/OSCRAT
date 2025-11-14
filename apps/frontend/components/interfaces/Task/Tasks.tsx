@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { Error, Loading, StatusBadge } from '@/components/shared';
 import useTasks from 'hooks/useTasks';
 import useCanAccess from '@/hooks/useCanAccess';
-import statuses from '@/components/defaultLanding/data/statuses.json';
+import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { WithLoadingAndError } from '@/components/shared';
 import type { Task, Team } from '@oscrat/model';
 import { CreateTask, DeleteTask, EditTask } from '@/components/interfaces/Task';
@@ -107,10 +107,7 @@ const Tasks = ({ team }: { team: Team }) => {
                     <td className="px-6 py-3">
                       <StatusBadge
                         value={task.status}
-                        label={
-                          statuses.find(({ value }) => value === task.status)
-                            ?.label as string
-                        }
+                        label={t(getTaskStatusTranslationKey(task.status))}
                       />
                     </td>
                     <td className="px-6 py-3">

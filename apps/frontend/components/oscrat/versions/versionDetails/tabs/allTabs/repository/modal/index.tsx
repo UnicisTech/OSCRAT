@@ -304,8 +304,8 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
-      <div className="animate-fade-in-up flex max-h-[90vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-2xl">
-        <form onSubmit={formik.handleSubmit} className="flex flex-col">
+      <div className="animate-fade-in-up flex h-[90vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-2xl">
+        <form onSubmit={formik.handleSubmit} className="flex h-full flex-col">
           {/* Fixed Header */}
           <header className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-4">
             <div>
@@ -331,7 +331,7 @@ const Modal: React.FC<ModalProps> = ({
           </header>
 
           {/* Scrollable Content */}
-          <div className="overflow-y-auto">
+          <div className="flex-1 overflow-y-auto">
             <main className="space-y-6 p-6">
               {/* Repository Information Section */}
               <div className="space-y-4">

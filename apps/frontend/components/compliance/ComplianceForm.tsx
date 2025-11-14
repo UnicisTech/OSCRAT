@@ -8,6 +8,8 @@ import toast from 'react-hot-toast';
 import { getComplianceNamespace } from '@/lib/compliance/translations';
 import { useOrgCompliance } from '@/hooks/oscrat/useOrgCompliance';
 import { useVersionCompliance } from '@/hooks/oscrat/useVersionCompliance';
+import { useComplianceTaskGeneration } from '@/hooks/oscrat/useComplianceTaskGeneration';
+import { COMPLIANCE_STATUS } from '@/constants/conformityStatuses';
 
 interface ComplianceFormProps {
   complianceData: ComplianceArea[];
@@ -36,6 +38,7 @@ const createInitialState = (
   lastUpdatedAt: new Date().toISOString(),
   completed: false,
   started: false,
+  finished: false,
 });
 
 const ComplianceForm: React.FC<ComplianceFormProps> = ({
@@ -76,6 +79,14 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     versionId: versionId!,
     teamRole,
     userId: session?.user?.id,
+  });
+
+  const taskGeneration = useComplianceTaskGeneration({
+    teamSlug,
+    productId: productId || undefined,
+    versionId: versionId || undefined,
+    userId: session?.user?.id as string,
+    complianceNamespace,
   });
 
   const {
@@ -175,6 +186,16 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
 
       allAreasComplete = completedAreas.length === complianceData.length;
 
+      const totalRequirements = complianceData.reduce((total, area) => total + area.content.length, 0);
+      const allRequirementsEvaluated = newAssessments.length === totalRequirements && 
+        newAssessments.every(a => a.complianceStatus !== undefined);
+      
+      const allCompliantOrNotApplicable = allRequirementsEvaluated &&
+        newAssessments.every(a => 
+          a.complianceStatus === COMPLIANCE_STATUS.FULLY_COMPLIANT || 
+          a.complianceStatus === COMPLIANCE_STATUS.NOT_APPLICABLE
+        );
+
       const nextRequirementIndex = prev.currentRequirementIndex + 1;
 
       updatedState = {
@@ -186,13 +207,62 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         lastUpdatedAt: new Date().toISOString(),
         completed: allAreasComplete,
         started: true,
+        finished: allCompliantOrNotApplicable,
       };
       
       return updatedState;
     });
 
-    const currentArea = complianceData[localState.currentAreaIndex];
-    const nextRequirementIndex = localState.currentRequirementIndex + 1;
+    const currentArea = complianceData[updatedState.currentAreaIndex!];
+    const currentRequirementIndexJustCompleted = updatedState.currentRequirementIndex! - 1;
+    const currentRequirement = currentArea.content[currentRequirementIndexJustCompleted];
+    const nextRequirementIndex = updatedState.currentRequirementIndex!;
+
+    // Check if task should be generated for non-compliant requirement
+    if (taskGeneration.shouldGenerateTask(assessment.complianceStatus!)) {
+      const taskProposed = taskGeneration.proposeTask(currentRequirement, assessment);
+      if (taskProposed) {
+        toast((toastInstance) => (
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="font-semibold">{t('oscrat.ui.auto-task-generated')}</p>
+              <p className="text-sm text-gray-600 mt-1">{t('oscrat.ui.auto-task-prompt')}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  try {
+                    await taskGeneration.acceptTask();
+                    toast.success(t('oscrat.ui.task-created-successfully'));
+                    toast.dismiss(toastInstance.id);
+                  } catch {
+                    toast.error(t('oscrat.ui.task-creation-failed'));
+                    toast.dismiss(toastInstance.id);
+                  }
+                }}
+                className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                disabled={taskGeneration.isGenerating}
+              >
+                {t('oscrat.ui.accept-task')}
+              </button>
+              <button
+                onClick={() => {
+                  taskGeneration.rejectTask();
+                  toast.success(t('oscrat.ui.task-rejected'));
+                  toast.dismiss(toastInstance.id);
+                }}
+                className="px-3 py-1.5 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300"
+              >
+                {t('oscrat.ui.reject-task')}
+              </button>
+            </div>
+          </div>
+        ), { 
+          duration: Infinity,
+          position: 'top-right',
+        });
+      }
+    }
     
     if (nextRequirementIndex >= currentArea.content.length) {
       toast.success(t('oscrat.ui.area-completed', { 
@@ -202,7 +272,12 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       if (allAreasComplete) {
         try {
           await saveToDatabase(updatedState);
-          toast.success(t('oscrat.ui.assessment-saved-successfully'));
+          
+          if (updatedState.finished) {
+            toast.success(t('oscrat.ui.assessment-completed-finished'));
+          } else {
+            toast.success(t('oscrat.ui.assessment-saved-successfully'));
+          }
         } catch {
           toast.error(t('oscrat.ui.failed-to-save-assessment'));
         }
@@ -217,6 +292,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     t,
     saveToDatabase,
     complianceNamespace,
+    isVersionCompliance,
+    taskGeneration,
   ]);
 
   const handleBack = useCallback(() => {

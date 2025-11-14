@@ -1,19 +1,21 @@
 import {
-  TaskExtended,
   TaskProperties,
   ExtendedComment,
   Attachment,
 } from '@/types';
 import { api } from '@/lib/api/client';
-import { Task } from '@oscrat/model';
+import { Task, TaskStatus, TaskOriginType } from '@oscrat/model';
 
 export type CreateTaskData = {
   title: string;
   description?: string;
-  assigneeId?: string;
+  assigneeId?: string | null;
   duedate?: Date;
   priority?: string;
-  status?: string;
+  status?: TaskStatus;
+  productId?: string;
+  versionId?: string;
+  originType?: TaskOriginType;
 };
 
 export type UpdateTaskData = Partial<CreateTaskData>;
@@ -44,7 +46,7 @@ export const tasksEndpoints = {
 
   // Single task
   getTask: (slug: string, taskNumber: string) =>
-    api.get<TaskExtended>(`/teams/${slug}/tasks/${taskNumber}`),
+    api.get<Task>(`/teams/${slug}/tasks/${taskNumber}`),
 
   updateTask: (slug: string, taskNumber: string, data: UpdateTaskData) =>
     api.put<Task>(`/teams/${slug}/tasks/${taskNumber}`, data),

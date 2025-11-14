@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
-import { TaskExtended } from 'types';
+import type { Task } from '@oscrat/model';
 import AttachmentsCard from './AttachmentCard';
 import { checkExtensionAndMIMEType } from '@/components/services/taskService';
 import useCanAccess from '@/hooks/useCanAccess';
@@ -10,7 +10,7 @@ import { EmptyState } from '@/components/shared';
 import { useTaskAttachments } from '@/hooks/useTaskAttachments';
 import { extractErrorMessage } from '@/lib/utils';
 
-const Attachments = ({ task }: { task: TaskExtended }) => {
+const Attachments = ({ task }: { task: Task }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { t } = useTranslation('common');
@@ -87,7 +87,6 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
           toast.error(
             extractErrorMessage(error, 'Failed to upload attachment')
           );
-          console.error(error);
         }
       }
     };
@@ -95,20 +94,25 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
     uploadFile();
   }, [selectedFile]);
 
-  //TODO: refactoring
+  // TODO: refactoring after attachments added in DB
+  const attachments = (task as any).attachments || [];
+  if(task) {
+    return null;
+  }
+
   if (!canAccess('task', ['update'])) {
     return (
       <>
-        {task.attachments.length ? (
+        {attachments.length ? (
           <div className="flex w-full items-center justify-center">
             <div
               className={`flex flex-wrap ${
-                task.attachments.length ? 'justify-start' : 'justify-center'
+                attachments.length ? 'justify-start' : 'justify-center'
               } h-full w-full border-2 bg-white px-4 py-2 transition dark:bg-[color:hsla(var(--b1))] ${
                 isDragOver ? 'border-blue-400' : 'border-gray-300'
               } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
             >
-              {task.attachments.map((attachment, index) => (
+              {attachments.map((attachment: any, index: number) => (
                 <AttachmentsCard
                   key={index}
                   attachment={attachment}
@@ -129,7 +133,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
     <div className="flex w-full items-center justify-center">
       <div
         className={`flex flex-wrap ${
-          task.attachments.length ? 'justify-start' : 'justify-center'
+          attachments.length ? 'justify-start' : 'justify-center'
         } h-full w-full border-2 bg-white px-4 py-2 transition dark:bg-[color:hsla(var(--b1))] ${
           isDragOver ? 'border-blue-400' : 'border-gray-300'
         } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
@@ -139,8 +143,8 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
         onDrop={handleDrop}
         onClick={handleClick}
       >
-        {task.attachments.length ? (
-          task.attachments.map((attachment, index) => (
+        {attachments.length ? (
+          attachments.map((attachment: any, index: number) => (
             <AttachmentsCard
               key={index}
               attachment={attachment}
@@ -162,7 +166,7 @@ const Attachments = ({ task }: { task: TaskExtended }) => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 1 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                 />
               </svg>
               <span className="font-medium text-gray-600 dark:text-gray-400">

@@ -1,7 +1,9 @@
 // Types for compliance questionnaire structure
 
+import type { ComplianceStatus } from '@/constants/conformityStatuses';
+
 export type AnswerType = 'boolean' | 'text';
-export type ComplianceStatus = 'Fully compliant' | 'Partially compliant' | 'Not Compliant' | 'Not Applicable';
+export type { ComplianceStatus };
 
 export interface Evidence {
   type: 'fileUpload';
@@ -67,4 +69,5 @@ export interface ComplianceState {
   lastUpdatedAt: string;
   completed: boolean;
   started: boolean;
+  finished: boolean;
 }

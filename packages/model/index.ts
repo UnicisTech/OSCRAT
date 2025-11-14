@@ -4,7 +4,6 @@ export type {
   User,
   ApiKey,
   Invitation,
-  Task,
   Comment,
   File,
   Attachment,
@@ -12,6 +11,7 @@ export type {
   WorkerJob,
   VerificationToken,
   Prisma,
+  Task,
   // Exclude Team - we use our own Team types
 } from '@prisma/client';
 
@@ -39,6 +39,8 @@ export {
   OscratRepositoryAuthType,
   WorkerJobType,
   WorkerJobStatus,
+  TaskStatus,
+  TaskOriginType,
 } from '@prisma/client';
 
 // Export shared application types (these are safe for client)

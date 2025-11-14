@@ -1,30 +1,42 @@
-import Details from './details';
-import TabsManager from '@/components/shared/TabsManager';
-// import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/allTabs/task/taskDetails/tabs';
 import React from 'react';
+import { useTranslation } from 'next-i18next';
+import { useTeamContext } from '@/context/TeamContext';
+import { useTask } from '@/hooks/useTask';
+import { TaskDetailsForm } from '@/components/oscrat/tasks';
+import { Task, Team } from '@oscrat/model';
+// import TabsManager from '@/components/shared/TabsManager';
+// import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/allTabs/task/taskDetails/tabs';
 
-export default function TaskDetails() {
-  // --- MOCK DATA ---
-  const mockTaskDetails = {
-    name: 'MVSP - 1.1',
-    section: 'Incidents',
-    assignee: 'Anna Meier',
-    dateAdded: '01.01.2025',
-    details: `On request, enable your customer or their delegates to test the security of your application
-Test on a non-production environment if it resembles the production environment in functionality
-Ensure non-production environment do not contain production data`,
-    availableSections: ['Incidents', 'Vulnerabilities', 'SBOM', 'Compliance'],
-    availableAssignees: [
-      'Anna Meier',
-      'Ravi Patel',
-      'Emily Carter',
-      'John Doe',
-    ],
-  };
+interface TaskDetailsProps {
+  taskNumber: string;
+}
+
+export default function TaskDetails({ taskNumber }: TaskDetailsProps) {
+  const { t } = useTranslation('common');
+  const { teamContext } = useTeamContext();
+  const { team } = teamContext as { team: Team };
+
+  const { task, isLoading, isError } = useTask(team.slug, taskNumber);
+
+  if (!team || isLoading) {
+    return (
+      <div className="flex flex-col p-4">
+        <div className="text-center text-gray-500">{t('loading-task-details')}</div>
+      </div>
+    );
+  }
+
+  if (isError || !task) {
+    return (
+      <div className="flex flex-col p-4">
+        <div className="text-center text-red-500">{t('task-not-found')}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col">
-      <Details task={mockTaskDetails} />
+    <div className="flex flex-col space-y-6">
+      <TaskDetailsForm task={task} team={team} />
       {/*<TabsManager tabs={TABS_CONFIG} />*/}
     </div>
   );

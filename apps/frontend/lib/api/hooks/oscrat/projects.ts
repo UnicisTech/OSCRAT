@@ -2,13 +2,30 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { oscratProjectEndpoints } from '@/lib/api/endpoints/oscrat/projects';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
-import type { OscratProductCreate, OscratProductUpdate } from '@oscrat/model';
+import type {
+  OscratProductCreate,
+  OscratProductUpdate,
+  OscratProductSearchRequest,
+} from '@oscrat/model';
 
 // List products
 export function useGetProducts(teamId: string) {
   return useQuery({
     queryKey: queryKeys.oscrat.projects.all(teamId),
     queryFn: () => oscratProjectEndpoints.listProducts(teamId),
+  });
+}
+
+// Search products with optional filtering
+export function useSearchProducts(
+  teamId: string,
+  params: OscratProductSearchRequest = {},
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: [...queryKeys.oscrat.projects.all(teamId), 'search', params],
+    queryFn: () => oscratProjectEndpoints.searchProducts(teamId, params),
+    enabled: options?.enabled !== false,
   });
 }
 

@@ -12,6 +12,7 @@ export interface ComplianceAssessmentRawData {
     teamRole: string;
     completed: boolean;
     started: boolean;
+    finished: boolean;
   };
 }
 

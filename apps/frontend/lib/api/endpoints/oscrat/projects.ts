@@ -1,14 +1,22 @@
 import { api } from '@/lib/api/client';
 import {
   OscratProductSummary,
-  OscratProductDetail,
   OscratProductCreate,
   OscratProductUpdate,
+  OscratProductSearchRequest,
+  OscratProductSearchResult,
 } from '@oscrat/model';
+import type { OscratProductDetail } from '@oscrat/model';
 
 export const oscratProjectEndpoints = {
   listProducts: (teamId: string) =>
     api.get<OscratProductSummary[]>(`/teams/${teamId}/products`),
+
+  searchProducts: (teamId: string, params: OscratProductSearchRequest = {}) =>
+    api.post<OscratProductSearchResult[]>(
+      `/teams/${teamId}/products/search`,
+      params
+    ),
 
   createProduct: (teamId: string, data: OscratProductCreate) =>
     api.post<OscratProductDetail>(`/teams/${teamId}/products`, data),

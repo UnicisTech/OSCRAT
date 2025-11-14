@@ -1,4 +1,4 @@
-import type { Prisma, TeamMember, User, Comment } from '@oscrat/model';
+import type { Prisma, TeamMember, User, Comment, Task } from '@oscrat/model';
 import type { TaskCscProperties, TeamCscProperties } from './csc';
 
 export type ApiError = {
@@ -18,21 +18,6 @@ export type ApiResponse<T = unknown> =
     };
 
 export type Role = 'owner' | 'member';
-
-export type TaskExtended = Prisma.TaskGetPayload<{
-  include: {
-    comments: {
-      include: {
-        createdBy: true;
-      };
-    };
-    attachments: {
-      include: {
-        createdByUser: true;
-      };
-    };
-  };
-}>;
 
 // Unified attachment type for all entities (optimized for UI display)
 export type Attachment = {

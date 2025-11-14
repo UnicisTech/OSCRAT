@@ -1,60 +1,102 @@
 import Tab from './tab';
 import ViewModal from '@/components/oscrat/versions/versionDetails/conformityRow/tab/modal';
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import { useVersionContext } from '@/context/VersionContext';
+import { useTeamContext } from '@/context/TeamContext';
+import { useVersionCompliance } from '@/hooks/oscrat/useVersionCompliance';
+import { useComplianceData } from '@/hooks/useComplianceData';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
+import { getComplianceNamespace } from '@/lib/compliance/translations';
+import { getRoleForTeam } from '@/lib/compliance/utils';
+import { OscratOrganizationRole } from '@oscrat/model';
+import type { ComplianceAnswer } from '@/types/compliance';
 
 export default function ConformityRow() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const { productId, versionId } = useVersionContext();
+  const { teamContext } = useTeamContext();
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
 
-  // Mock data for the modal content.
-  const conformityAssessmentContent = [
-    { question: 'Is the product commercially supplied?', answer: 'No' },
-    {
-      question:
-        'Is the product made available only for a limited period required for testing purposes?',
-      answer: 'No',
-    },
-    {
-      question:
-        'Does the product with digital elements was developed as a spare part to replace identical components on the market?',
-      answer: 'No',
-    },
-    {
-      question:
-        'Is this a new solution or a modification of an existing product?',
-      answer: 'Modification of an existing product',
-    },
-    { question: 'Is this a substantial modification?', answer: 'Yes' },
-    {
-      question: 'Does the product contain digital elements?',
-      answer:
-        'The product is a hardware solution in form of physical electronic information system, capable of processing, storing or transmitting digital data',
-    },
-    { question: 'Is the product commercially supplied?', answer: 'No' },
-    {
-      question:
-        'Is the product made available only for a limited period required for testing purposes?',
-      answer: 'No',
-    },
-    {
-      question:
-        'Does the product with digital elements was developed as a spare part to replace identical components on the market?',
-      answer: 'No',
-    },
-    {
-      question:
-        'Is this a new solution or a modification of an existing product?',
-      answer: 'Modification of an existing product',
-    },
-    { question: 'Is this a substantial modification?', answer: 'Yes' },
-    {
-      question: 'Does the product contain digital elements?',
-      answer:
-        'The product is a hardware solution in form of physical electronic information system, capable of processing, storing or transmitting digital data',
-    },
-  ];
+  const team = teamContext.team;
+  if (!team) return null;
+  const complianceNamespace = useMemo(() => {
+    return getComplianceNamespace(getRoleForTeam(team.orgRoles[0] as OscratOrganizationRole), 'version');
+  }, [team]);
 
-  const declarationContent = [
+  const { t } = useTranslation(['common', complianceNamespace]);
+  
+  const { complianceState } = useVersionCompliance({
+    teamSlug: team?.slug,
+    productId,
+    versionId,
+    teamRole: team?.orgRoles[0],
+    userId: session?.user?.id,
+  });
+
+  const { complianceData } = useComplianceData({
+    teamSlug: team?.slug,
+    teamRole: team?.orgRoles[0],
+    complianceType: 'version',
+    enabled: !!team,
+  });
+
+  const formatAnswerText = useCallback((answer: ComplianceAnswer) => {
+    let text = typeof answer.answer === 'boolean' 
+      ? (answer.answer ? t('yes') : t('no'))
+      : answer.answer;
+
+    if (answer.additionalInformation) {
+      text += ` - ${answer.additionalInformation}`;
+    }
+
+    return text;
+  }, [t]);
+
+  const structuredContent = useMemo(() => {
+    if (!complianceState?.assessments || !complianceData) return [];
+
+    return complianceData
+      .map((area) => {
+        const requirements = area.content
+          .map((requirement) => {
+            const assessment = complianceState.assessments.find(
+              (a) => a.requirementId === requirement.reqId
+            );
+            if (!assessment) return null;
+
+            const questions = requirement.questions
+              .map((question) => {
+                const answer = assessment.answers.find((a) => a.questionId === question.questionId);
+                return answer ? {
+                  question: t(question.questionText, { ns: complianceNamespace }),
+                  answer: formatAnswerText(answer),
+                } : null;
+              })
+              .filter((q): q is NonNullable<typeof q> => q !== null);
+
+            return questions.length > 0 ? {
+              requirementTitle: t(requirement.requirement, { ns: complianceNamespace }),
+              requirementId: requirement.reqId,
+              status: assessment.complianceStatus,
+              questions,
+            } : null;
+          })
+          .filter((r): r is NonNullable<typeof r> => r !== null);
+
+        return requirements.length > 0 ? {
+          areaTitle: t(area.areaOfRequirements, { ns: complianceNamespace }),
+          areaId: area.id,
+          requirements,
+        } : null;
+      })
+      .filter((a): a is NonNullable<typeof a> => a !== null);
+  }, [complianceState, complianceData, t, complianceNamespace, formatAnswerText]);
+
+  const declarationContent = useMemo(() => [
     {
       question: 'Has the product been tested against EN 62368-1:2020?',
       answer: 'Yes, passed all tests.',
@@ -67,14 +109,15 @@ export default function ConformityRow() {
       question: 'Is the CE marking affixed to the product?',
       answer: 'Yes, the CE mark is present on the product label.',
     },
-  ];
+  ], []);
 
-  const handleDirectEdit = () => {
-    // Will be used to send to CRA Form to edit the conformity assessment, answers will be pre-filled with actual data.
-  };
-  const handleDirectDownload = () => {
-    // Will be used to download the declaration of conformity, answers will be pre-filled with actual data.
-  };
+  const handleDirectEdit = useCallback(() => {
+    router.push(`/teams/${team?.slug}/products/${productId}/versions/${versionId}/compliance`);
+  }, [router, team?.slug, productId, versionId]);
+
+  const handleDirectDownload = useCallback(() => {
+    // TODO: Implement download functionality
+  }, []);
 
   return (
     <div className="mt-4 flex w-full items-center justify-center space-x-4">
@@ -96,9 +139,9 @@ export default function ConformityRow() {
         isOpen={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
         title="Conformity Assessment"
-        content={conformityAssessmentContent}
+        structuredContent={structuredContent}
         variant="edit"
-        onEdit={undefined}
+        onEdit={handleDirectEdit}
       />
 
       <ViewModal
@@ -107,7 +150,7 @@ export default function ConformityRow() {
         title="Declaration of Conformity"
         content={declarationContent}
         variant="download"
-        onDownload={undefined}
+        onDownload={handleDirectDownload}
       />
     </div>
   );

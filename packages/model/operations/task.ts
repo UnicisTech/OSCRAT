@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TaskStatus, TaskOriginType } from '@prisma/client';
 
 /** Create a new task */
 export const createTask = async (
@@ -7,13 +7,16 @@ export const createTask = async (
     authorId: string;
     teamId: string;
     title: string;
-    status: string;
+    status: TaskStatus;
     duedate: string;
     description: string;
     taskNumber: number;
+    productId?: string;
+    versionId?: string;
+    originType?: TaskOriginType;
   }
 ) => {
-  const { authorId, teamId, title, status, duedate, description, taskNumber } =
+  const { authorId, teamId, title, status, duedate, description, taskNumber, productId, versionId, originType } =
     param;
 
   return await prisma.task.create({
@@ -22,10 +25,13 @@ export const createTask = async (
       taskNumber,
       teamId,
       title,
-      status,
+      status: status,
       duedate,
       description,
       properties: {},
+      productId,
+      versionId,
+      originType: originType,
     },
   });
 };
@@ -162,6 +168,15 @@ export const getTeamTasks = async (prisma: PrismaClient, slug: string) => {
     where: {
       team: {
         slug,
+      },
+    },
+    include: {
+      assignee: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
       },
     },
   });

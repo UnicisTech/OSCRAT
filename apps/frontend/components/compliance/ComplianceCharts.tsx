@@ -4,6 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
+import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -44,11 +45,12 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
         
         const isEvaluated = assessment?.complianceStatus !== undefined;
         
-        let conformityStatus = 'Not Evaluated';
+        // Use string type because we generate dynamic strings like "In Evaluation [45%]"
+        let conformityStatus: string = CONFORMITY_STATUS.NOT_COMPLIANT;
         if (isEvaluated && assessment?.complianceStatus) {
           conformityStatus = assessment.complianceStatus;
         } else if (completionPercentage > 0 && completionPercentage < 100) {
-          conformityStatus = `In Evaluation [${completionPercentage}%]`;
+          conformityStatus = `${CONFORMITY_STATUS.IN_EVALUATION} [${completionPercentage}%]`;
         }
 
         allRequirements.push({
@@ -70,10 +72,10 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
     const evaluated = requirementsStatus.filter(r => r.isEvaluated).length;
     const notEvaluated = requirementsStatus.length - evaluated;
 
-    const compliant = requirementsStatus.filter(r => r.conformityStatus === 'Fully compliant').length;
-    const partiallyCompliant = requirementsStatus.filter(r => r.conformityStatus === 'Partially compliant').length;
-    const notCompliant = requirementsStatus.filter(r => r.conformityStatus === 'Not Compliant').length;
-    const notApplicable = requirementsStatus.filter(r => r.conformityStatus === 'Not Applicable').length;
+    const compliant = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.FULLY_COMPLIANT).length;
+    const partiallyCompliant = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.PARTIALLY_COMPLIANT).length;
+    const notCompliant = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_COMPLIANT).length;
+    const notApplicable = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_APPLICABLE).length;
 
     return {
       evaluation: {

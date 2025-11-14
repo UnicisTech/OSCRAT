@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
+import { CogIcon, HandRaisedIcon } from '@heroicons/react/24/outline';
 import type { Task, Team } from '@oscrat/model';
+import { TaskStatus } from '@oscrat/model';
 import { useTask } from '@/hooks/useTask';
-import statuses from '@/components/defaultLanding/data/statuses.json';
+import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
+import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
+import { useTeamMembers } from '@/hooks/useTeamMembers';
+import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { useFormik } from 'formik';
-import { taskUpdateSchema, type TaskUpdateData } from '@/lib/validation/task';
+import { taskUpdateSchema } from '@/lib/validation/task';
+import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 import type { ApiError } from '@/types';
 
 interface TaskDetailsFormProps {
@@ -13,62 +19,41 @@ interface TaskDetailsFormProps {
   team: Team;
 }
 
-// TODO: Update this once the DB is updated
-interface ExtendedFormData extends TaskUpdateData {
-  product?: string;
-  version?: string;
-  section?: string;
-  assignee?: string;
-}
-
-// Mock options - replace with actual data when available
-const mockProducts = [
-  { value: 'product-1', label: 'Product Alpha' },
-  { value: 'product-2', label: 'Product Beta' },
-  { value: 'product-3', label: 'Product Gamma' },
-];
-
-const mockVersions = [
-  { value: 'v1.0.0', label: 'v1.0.0' },
-  { value: 'v1.1.0', label: 'v1.1.0' },
-  { value: 'v1.2.0', label: 'v1.2.0' },
-];
-
-const mockSections = [
-  { value: 'development', label: 'Development' },
-  { value: 'testing', label: 'Testing' },
-  { value: 'deployment', label: 'Deployment' },
-];
-
-const mockAssignees = [
-  { value: '', label: 'Unassigned' },
-  { value: 'user-1', label: 'John Doe' },
-  { value: 'user-2', label: 'Jane Smith' },
-  { value: 'user-3', label: 'Mike Johnson' },
-];
-
 const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
   const { t } = useTranslation('common');
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
   
+  // Fetch team members for assignee dropdown
+  const { members } = useTeamMembers(team.slug);
+  
+  // Fetch product and version data if available
+  const { project: product } = useOscratProject(
+    team.slug,
+    task.productId || '',
+    { enabled: !!task.productId }
+  );
+  
+  const { version } = useOscratVersion(
+    team.slug,
+    task.productId || '',
+    task.versionId || '',
+    { enabled: !!task.productId && !!task.versionId }
+  );
+  
   const [isSaving, setIsSaving] = useState<{ [key: string]: boolean }>({});
   const debounceTimers = useRef<{ [key: string]: ReturnType<typeof setTimeout> }>({});
   
-  const initialValues: ExtendedFormData = useMemo(() => ({
+  const initialValues: UpdateTaskData = useMemo(() => ({
     title: task?.title || '',
-    status: task?.status || '',
+    status: task?.status,
     duedate: task?.duedate ? new Date(task.duedate) : undefined,
     description: task?.description || '',
-    // Mock data for fields not yet in API
-    product: 'product-1',
-    version: 'v1.2.0',
-    section: 'development',
-    assignee: '',
+    assigneeId: task?.assigneeId || null,
   }), [task]);
   
-  const [lastSavedValues, setLastSavedValues] = useState<ExtendedFormData>(initialValues);
+  const [lastSavedValues, setLastSavedValues] = useState<UpdateTaskData>(initialValues);
   
-  const formik = useFormik<ExtendedFormData>({
+  const formik = useFormik<UpdateTaskData>({
     initialValues,
     validationSchema: taskUpdateSchema,
     enableReinitialize: true,
@@ -85,7 +70,7 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
 
 
   // Debounced save function with Formik integration
-  const debouncedSave = useCallback(async (field: keyof ExtendedFormData, value: string | Date | undefined) => {
+  const debouncedSave = useCallback(async (field: keyof UpdateTaskData, value: UpdateTaskData[keyof UpdateTaskData]) => {
     // Clear any existing timer for this field
     if (debounceTimers.current[field]) {
       clearTimeout(debounceTimers.current[field]);
@@ -97,16 +82,7 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
       setIsSaving(prev => ({ ...prev, [field]: true }));
       
       try {
-        // Only update fields that exist in the API, remove after DB is updated
-        const apiFields = ['title', 'status', 'duedate', 'description'];
-        
-        if (!apiFields.includes(field as string)) {
-          // For mock fields, just show success without API call
-          setIsSaving(prev => ({ ...prev, [field]: false }));
-          return;
-        }
-
-        const updateData: TaskUpdateData = {
+        const updateData: UpdateTaskData = {
           [field]: value
         };
 
@@ -124,7 +100,7 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
     }, 1000);
   }, [updateTask, formik, lastSavedValues, t]);
 
-  const handleInputChange = (field: keyof ExtendedFormData) => (
+  const handleInputChange = (field: keyof UpdateTaskData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const newValue = e.target.value;
@@ -146,6 +122,15 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
       if (dateValue !== lastSavedValues[field]) {
         debouncedSave(field, dateValue);
       }
+    } else if (field === 'assigneeId') {
+      // Handle assigneeId - convert empty string to null
+      const assigneeValue = newValue || null;
+      formik.setFieldValue(field, assigneeValue);
+      
+      // Only trigger save if value has actually changed from last saved value
+      if (assigneeValue !== lastSavedValues[field]) {
+        debouncedSave(field, assigneeValue);
+      }
     } else {
       formik.setFieldValue(field, newValue);
       
@@ -166,7 +151,7 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
   }, []);
 
   const renderField = (
-    field: keyof ExtendedFormData,
+    field: keyof UpdateTaskData,
     label: string,
     type: 'input' | 'select' | 'textarea' = 'input',
     options: Array<{ value: string; label: string }> = [],
@@ -185,9 +170,6 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
         <div className="flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">
             {label}
-            {disabled && ['product', 'version', 'section', 'assignee'].includes(field as string) && (
-              <span className="ml-1 text-xs text-gray-400">({t('oscrat.ui.messages.coming-soon')})</span>
-            )}
           </label>
           {isFieldSaving && (
             <div className="flex items-center text-xs text-gray-500">
@@ -266,6 +248,13 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
     );
   };
 
+  const isAutomatic = task.originType === 'AUTOMATIC';
+  const OriginIcon = isAutomatic ? CogIcon : HandRaisedIcon;
+  const originLabel = isAutomatic ? t('oscrat.ui.task-origin-automatic') : t('oscrat.ui.task-origin-manual');
+  const originBadgeClass = isAutomatic 
+    ? 'bg-blue-100 text-blue-700 border-blue-200' 
+    : 'bg-amber-100 text-amber-700 border-amber-200';
+
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('task-details')}</h2>
@@ -273,20 +262,74 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* First Row */}
         {renderField('title', t('task-name'))}
-        {renderField('product', t('product'), 'select', mockProducts, true)}
-        {renderField('version', t('version'), 'select', mockVersions, true)}
         
-        {/* Second Row */}
-        {renderField('section', t('section'), 'select', mockSections, true)}
-        {renderField('assignee', t('assignee'), 'select', mockAssignees, true)}
-        {renderField('duedate', t('due-date'))}
-        
-        {/* Third Row - Status spans one column, Description spans remaining */}
-        <div className="lg:col-span-1">
-          {renderField('status', t('status'), 'select', statuses.map(s => ({ value: s.value, label: s.label })))}
+        {/* Origin Type - Read Only */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">{t('origin')}</label>
+          <div className={`w-full rounded-md border px-3 py-2 flex items-center gap-2 ${originBadgeClass}`}>
+            <OriginIcon className="h-4 w-4" />
+            <span className="font-medium">{originLabel}</span>
+          </div>
         </div>
         
-        <div className="lg:col-span-2">
+        {/* Show team only if no product/version */}
+        {!task.productId && !task.versionId && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">{t('team')}</label>
+            <input
+              type="text"
+              value={team.name}
+              readOnly
+              disabled
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+            />
+          </div>
+        )}
+        
+        {/* Show product if available */}
+        {task.productId && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">{t('product')}</label>
+            <input
+              type="text"
+              value={product?.name || '—'}
+              readOnly
+              disabled
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+            />
+          </div>
+        )}
+        
+        {/* Show version if available */}
+        {task.versionId && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">{t('version')}</label>
+            <input
+              type="text"
+              value={version?.version || '—'}
+              readOnly
+              disabled
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+            />
+          </div>
+        )}
+        {renderField('duedate', t('due-date'))}
+        {renderField('status', t('status'), 'select', Object.values(TaskStatus).map(s => ({ 
+          value: s, 
+          label: t(getTaskStatusTranslationKey(s))
+        })))}
+        
+        {/* Assignee field */}
+        {renderField('assigneeId', t('assignee'), 'select', [
+          { value: '', label: t('unassigned') },
+          ...(members?.map(member => ({
+            value: member.userId,
+            label: member.user.name
+          })) || [])
+        ])}
+        
+        {/* Third Row - Description spans full width */}
+        <div className="lg:col-span-3">
           {renderField('description', t('description'), 'textarea')}
         </div>
       </div>

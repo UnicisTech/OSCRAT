@@ -8,7 +8,7 @@ import { useAssessments } from '@/hooks/oscrat/useOscratAssessment';
 import { useFindAssessments, useGetAssessmentDetail } from '@/lib/api/hooks/oscrat/assessments';
 import { OscratAssessmentType, OscratAssessmentCreateRequest } from '@oscrat/model';
 import { FormState, RiskLevel } from '@/types/craForm';
-import { getProductCategoryFromRisk, transformFormStateToAssessmentData } from '@/utils/craForm';
+import { getProductCategoryFromRisk, transformFormStateToAssessmentData, clearFormState } from '@/utils/craForm';
 import { extractErrorMessage } from '@/lib/utils';
 import { CRAAssessmentRawData } from '@/types/assessmentRawData';
 
@@ -124,6 +124,8 @@ export function useForm({ teamSlug, productId }: UseFormOptions) {
 
       await createAssessment(assessmentData);
       toast.success(t('oscrat.ui.assessment-updated-successfully'));
+
+      clearFormState();
 
       await router.replace(`/teams/${teamSlug}/products/${productId}`);
     } catch (error) {

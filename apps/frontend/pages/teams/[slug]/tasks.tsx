@@ -6,6 +6,7 @@ import Header from '@/components/oscrat/shared/header';
 import { CreateTask } from '@/components/interfaces/Task';
 import TaskList from '@/components/oscrat/tasks/TaskList';
 import useTasks from '@/hooks/useTasks';
+import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
 
 const AllTasks = () => {
   const { teamContext } = useTeamContext();
@@ -22,8 +23,9 @@ const AllTasks = () => {
   }
 
   const { tasks, isLoading: tasksLoading } = useTasks(team.slug);
+  const { data: products, isLoading: productsLoading } = useSearchProducts(team.slug, { includeVersions: true });
 
-  if (!ready) {
+  if (!ready || !products || !tasks) {
     return null;
   }
 
@@ -38,9 +40,10 @@ const AllTasks = () => {
       
       <div className="mt-6">
           <TaskList 
-            tasks={tasks || []} 
+            tasks={tasks} 
             team={team}
-            isLoading={tasksLoading}
+            products={products}
+            isLoading={tasksLoading || productsLoading}
           />
       </div>
 

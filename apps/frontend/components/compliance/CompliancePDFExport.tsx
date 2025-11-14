@@ -2,15 +2,7 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { saveAs } from 'file-saver';
-
-const CONFORMITY_STATUS = {
-  FULLY_COMPLIANT: 'Fully compliant',
-  PARTIALLY_COMPLIANT: 'Partially compliant',
-  NOT_COMPLIANT: 'Not Compliant',
-  NOT_APPLICABLE: 'Not Applicable',
-  IN_EVALUATION: 'In Evaluation',
-  NOT_EVALUATED: 'Not Evaluated',
-};
+import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 
 const styles = StyleSheet.create({
   page: {
@@ -224,7 +216,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
         : 0;
       const isEvaluated = assessment?.complianceStatus !== undefined;
 
-      let conformityStatus: string = CONFORMITY_STATUS.NOT_EVALUATED;
+      let conformityStatus: string = CONFORMITY_STATUS.NOT_COMPLIANT;
       if (isEvaluated && assessment?.complianceStatus) {
         conformityStatus = assessment.complianceStatus;
       } else if (completionPercentage > 0 && completionPercentage < 100) {

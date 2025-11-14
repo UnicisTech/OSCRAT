@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
-import type { Task, Team } from '@oscrat/model';
+import type { Task, Team, OscratProductSearchResult } from '@oscrat/model';
 import TaskListFilters from './TaskListFilters';
 import TaskListTable from './TaskListTable';
 import TaskStatusDropdown from './TaskStatusDropdown';
@@ -8,53 +8,111 @@ import TaskStatusDropdown from './TaskStatusDropdown';
 interface TaskListProps {
   tasks: Task[];
   team: Team;
+  products: OscratProductSearchResult[];
   isLoading?: boolean;
 }
 
 interface FilterState {
-  status: string;
-  product: string;
+  status: string[];
+  productId: string[];
+  versionId: string[];
 }
 
-// Mock product data - replace with actual product data when available
-const mockProducts = [
-  { value: 'product-1', label: 'Product Alpha' },
-  { value: 'product-2', label: 'Product Beta' },
-  { value: 'product-3', label: 'Product Gamma' },
-];
-
-const TaskList: React.FC<TaskListProps> = ({ tasks, team, isLoading = false }) => {
+const TaskList: React.FC<TaskListProps> = ({ tasks, team, products, isLoading = false }) => {
   const { t, ready } = useTranslation('common');
   
   const [filters, setFilters] = useState<FilterState>({
-    status: '',
-    product: '',
+    status: [],
+    productId: [],
+    versionId: [],
   });
 
+  // Extract unique products from tasks and enrich with names from products prop
+  const productOptions = useMemo(() => {
+    const productMap = new Map<string, { value: string; label: string }>();
+    
+    if (products) {
+      tasks.forEach(task => {
+        if (task.productId && !productMap.has(task.productId)) {
+          const product = products.find(p => p.id === task.productId);
+          if (product) {
+            productMap.set(task.productId, {
+              value: task.productId,
+              label: product.name,
+            });
+          }
+        }
+      });
+    }
+    
+    return Array.from(productMap.values());
+  }, [tasks, products]);
 
-  const handleFilterChange = (filterType: keyof FilterState) => (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterType]: e.target.value,
-    }));
+  // Extract unique versions from tasks and enrich with version names
+  const versionOptions = useMemo(() => {
+    const versionMap = new Map<string, { value: string; label: string }>();
+    
+    tasks.forEach(task => {
+      const matchesProduct = filters.productId.length === 0 || 
+        (task.productId && filters.productId.includes(task.productId));
+      
+      if (task.versionId && matchesProduct && !versionMap.has(task.versionId)) {
+        const product = products?.find(p => p.id === task.productId);
+        const version = product?.versions?.find(v => v.id === task.versionId);
+        if (version) {
+          versionMap.set(version.id, {
+            value: version.id,
+            label: version.version,
+          });
+        }
+      }
+    });
+    
+    return Array.from(versionMap.values());
+  }, [tasks, products, filters.productId]);
+
+  const handleFilterToggle = (filterType: keyof FilterState, value: string) => {
+    setFilters(prev => {
+      const currentValues = prev[filterType];
+      const isSelected = currentValues.includes(value);
+      
+      const updated = {
+        ...prev,
+        [filterType]: isSelected
+          ? currentValues.filter(v => v !== value)
+          : [...currentValues, value],
+      };
+      
+      // If product filter changes, remove versions that don't belong to any selected products
+      if (filterType === 'productId' && prev.versionId.length > 0) {
+        updated.versionId = prev.versionId.filter(versionId =>
+          tasks.some(
+            task => updated.productId.includes(task.productId!) && task.versionId === versionId
+          )
+        );
+      }
+      
+      return updated;
+    });
   };
 
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
-      const matchesStatus = !filters.status || task.status === filters.status;
-      // For now, assuming all tasks match product filter since we don't have product data
-      const matchesProduct = !filters.product || true;
+      const matchesStatus = filters.status.length === 0 || filters.status.includes(task.status);
+      const matchesProduct = filters.productId.length === 0 || 
+        (task.productId && filters.productId.includes(task.productId));
+      const matchesVersion = filters.versionId.length === 0 || 
+        (task.versionId && filters.versionId.includes(task.versionId));
       
-      return matchesStatus && matchesProduct;
+      return matchesStatus && matchesProduct && matchesVersion;
     });
   }, [tasks, filters]);
 
   const clearFilters = () => {
     setFilters({
-      status: '',
-      product: '',
+      status: [],
+      productId: [],
+      versionId: [],
     });
   };
 
@@ -74,9 +132,10 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, team, isLoading = false }) =
         {/* Filters Section */}
         <TaskListFilters
           filters={filters}
-          onFilterChange={handleFilterChange}
+          onFilterToggle={handleFilterToggle}
           onClearFilters={clearFilters}
-          mockProducts={mockProducts}
+          products={productOptions}
+          versions={versionOptions}
         />
 
         {/* Table Section */}

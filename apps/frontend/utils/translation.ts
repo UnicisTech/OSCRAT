@@ -80,7 +80,7 @@ export const oscratRiskLevelTranslationMap = {
   CRITICAL: 'oscrat.risk.levels.critical',
 } as const;
 
-// Compliance Status mappings
+// Compliance Status mappings (product-level)
 export const oscratComplianceStatusTranslationMap = {
   NOT_ASSESSED: 'oscrat.compliance.status.not-assessed',
   IN_PROGRESS: 'oscrat.compliance.status.in-progress',

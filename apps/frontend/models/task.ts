@@ -1,14 +1,18 @@
 import { prisma } from '@/lib/prisma';
 import * as TaskOps from '@oscrat/model/operations';
 import * as TeamOps from '@oscrat/model/operations';
+import { TaskStatus, TaskOriginType } from '@oscrat/model';
 
 export const createTask = async (param: {
   authorId: string;
   teamId: string;
   title: string;
-  status: string;
-  duedate: string;
+  status: TaskStatus;
+  duedate?: string;
   description: string;
+  productId?: string;
+  versionId?: string;
+  originType?: TaskOriginType;
 }) => {
   const { teamId } = param;
   const team = await TeamOps.getTeamDetail(prisma, { id: teamId });
@@ -19,6 +23,7 @@ export const createTask = async (param: {
 
   const task = await TaskOps.createTask(prisma, {
     ...param,
+    duedate: param.duedate || new Date().toISOString(),
     taskNumber,
   });
 

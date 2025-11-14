@@ -3,6 +3,7 @@ import { createTask, getTeamTasks } from 'models/task';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
+import { DEFAULT_TASK_STATUS, DEFAULT_TASK_ORIGIN_TYPE } from '@/constants/taskStatuses';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -40,16 +41,19 @@ const handlePOST = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  const { title, status, duedate, description } = req.body;
+  const { title, status, duedate, description, productId, versionId, originType } = req.body;
   const { teamId } = teamMember;
 
   const task = await createTask({
     authorId: user.id,
     teamId,
     title,
-    status,
+    status: status || DEFAULT_TASK_STATUS,
     duedate,
-    description,
+    description: description || '',
+    productId,
+    versionId,
+    originType: originType || DEFAULT_TASK_ORIGIN_TYPE,
   });
 
   await sendEvent(teamMember.teamId, 'task.created', task);

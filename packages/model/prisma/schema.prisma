@@ -58,7 +58,8 @@ model User {
   Comment       Comment[]
   invitations   Invitation[]
   sessions      Session[]
-  Task          Task[]
+  authoredTasks Task[]       @relation("TaskAuthor")
+  assignedTasks Task[]       @relation("TaskAssignee")
   teamMembers   TeamMember[]
 
   createdOscratProducts           OscratProduct[]               @relation("OscratProductCreatedBy")
@@ -129,15 +130,26 @@ model Task {
   taskNumber  Int
   teamId      String
   authorId    String
+  assigneeId  String?
   title       String
-  status      String
+  status      TaskStatus   @default(TODO)
   duedate     String
   description String
   properties  Json
+  
+  productId   String?
+  versionId   String?
+  version     OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
+  
+  originType  TaskOriginType @default(MANUAL)
+  
   attachments Attachment[]
   comments    Comment[]
-  author      User         @relation(fields: [authorId], references: [id])
+  author      User         @relation("TaskAuthor", fields: [authorId], references: [id])
+  assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
   team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@index([taskNumber, teamId])
 }
 
 model Comment {
@@ -366,6 +378,17 @@ enum WorkerJobStatus {
   CANCELLED
 }
 
+enum TaskStatus {
+  TODO
+  PLANNED
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskOriginType {
+  MANUAL
+  AUTOMATIC
+}
 
 enum OscratProductVersionStatus {
   DRAFT
@@ -429,6 +452,7 @@ model OscratProductVersion {
   vulnerabilityScanReports VulnerabilityScanReport[]
   attachments              Attachment[]
   workerJobs               WorkerJob[]
+  tasks                    Task[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

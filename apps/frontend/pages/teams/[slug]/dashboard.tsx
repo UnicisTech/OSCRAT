@@ -95,6 +95,7 @@ const TeamDashboard = () => {
       lastUpdatedAt: new Date().toISOString(),
       completed: false,
       started: false,
+      finished: false,
     };
   }, [team.id, team.orgRoles, assessmentDetail]);
 

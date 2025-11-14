@@ -69,3 +69,23 @@ export interface OscratProductUpdate {
   reportingOrganizations?: OscratReportingOrganization[];
   updatedBy: string;
 }
+
+export interface OscratProductSearchRequest {
+  productIds?: string[];
+  includeVersions?: boolean;
+  includeDetails?: boolean;
+}
+
+export interface OscratProductSearchResult {
+  id: string;
+  name: string;
+  complianceStatus?: OscratProductComplianceStatus;
+  versions: {
+    id: string;
+    version: string;
+    status?: OscratProductVersionStatus;
+    openIncidents?: number;
+    openVulnerabilities?: number;
+    sbomReportsCount?: number;
+  }[];
+}

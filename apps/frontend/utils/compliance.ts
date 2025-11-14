@@ -19,6 +19,7 @@ export const transformComplianceStateToAssessmentData = (
       teamRole: state.teamRole,
       completed: state.completed,
       started: state.started,
+      finished: state.finished,
     },
   };
 };
@@ -49,6 +50,7 @@ export const transformOrgAssessmentToComplianceState = (
     lastUpdatedAt: results.lastUpdatedAt,
     completed: results.completed,
     started: results.started ?? false,
+    finished: results.finished ?? false,
   };
 };
 
@@ -79,5 +81,6 @@ export const transformVersionAssessmentToComplianceState = (
     lastUpdatedAt: results.lastUpdatedAt,
     completed: results.completed,
     started: results.started ?? false,
+    finished: results.finished ?? false,
   };
 };

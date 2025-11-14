@@ -79,7 +79,7 @@ const AreaList: React.FC<AreaListProps> = ({
                   : 'border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
                 }
               `}
-              onClick={() => !isCompleted && onAreaSelect(index)}
+              onClick={() => onAreaSelect(index)}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -113,28 +113,30 @@ const AreaList: React.FC<AreaListProps> = ({
                 </div>
                 
                 <div className="ml-4 flex-shrink-0">
-                  {isCompleted ? (
-                    <div className="flex flex-col items-center">
-                      <FaCheckCircle className="text-green-500 text-3xl mb-1" />
-                      <span className="text-xs text-green-600 font-medium">
-                        {t('completed')}
-                      </span>
-                    </div>
-                  ) : (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onAreaSelect(index);
                       }}
                       className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-200 transition-colors min-w-[70px]"
-                      aria-label={t('oscrat.ui.start-assessment-area', { area: t(area.areaOfRequirements, { ns: complianceNamespace }) })}
+                    aria-label={t(isCompleted ? 'edit' : 'oscrat.ui.start-assessment-area', { area: t(area.areaOfRequirements, { ns: complianceNamespace }) })}
                     >
+                    {isCompleted ? (
+                      <>
+                        <FaCheckCircle className="text-green-500 text-2xl mb-1" />
+                        <span className="text-xs text-green-600 font-medium">
+                          {t('edit')}
+                        </span>
+                      </>
+                    ) : (
+                      <>
                       <FaPlay className="text-blue-600 text-2xl mb-1" />
                       <span className="text-xs text-blue-600 font-medium whitespace-nowrap">
                         {isInProgress ? t('continue') : t('start')}
                       </span>
+                      </>
+                    )}
                     </button>
-                  )}
                 </div>
               </div>
             </div>
