@@ -58,6 +58,10 @@ export const queryKeys = {
       [...queryKeys.teams.detail(slug), 'api-keys'] as const,
   },
   oscrat: {
+    dashboard: {
+      all: (teamId: string) => ['teams', teamId, 'oscrat', 'dashboard'] as const,
+      summary: (teamId: string) => [...queryKeys.oscrat.dashboard.all(teamId), 'summary'] as const,
+    },
     organization: {
       summary: (teamId: string) =>
         ['teams', teamId, 'oscrat', 'organization', 'summary'] as const,

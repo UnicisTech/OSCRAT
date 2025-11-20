@@ -1,9 +1,8 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { useTeamContext } from '@/context/TeamContext';
 import { useTranslation } from 'next-i18next';
-import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
-import { OscratProductComplianceStatus, OscratProductVersionStatus } from '@oscrat/model';
+import { useDashboard } from '@/hooks/oscrat/useDashboard';
 
 const TasksSummaryCard = ({ data }) => {
   const { t, ready } = useTranslation('common');
@@ -80,78 +79,28 @@ export default function App() {
   const team = teamContext.team!;
   const { t } = useTranslation('common');
   
-  const { data: products, isLoading } = useSearchProducts(team.slug, { 
-    includeVersions: true, 
-    includeDetails: true 
-  });
+  const { summary, isLoading } = useDashboard(team.slug);
 
-  const tasksSummary = useMemo(() => {
-    if (!products) {
-      return {
-        totalOpen: 0,
-        categories: [
-          { label: t('oscrat.ui.vulnerabilities'), count: 0 },
-          { label: t('oscrat.ui.incidents'), count: 0 },
-          { label: 'SBOM', count: 0 },
-          { label: t('oscrat.ui.tech-documentation'), count: 0 },
-        ],
-      };
-    }
+  const openVulnerabilities = summary?.vulnerabilities.open || 0;
+  const openIncidents = summary?.incidents.open || 0;
+  const totalOpen = openVulnerabilities + openIncidents;
 
-    const totalVulnerabilities = products.reduce((sum, product) => {
-      return sum + product.versions.reduce((vSum, version) => {
-        return vSum + (version.openVulnerabilities || 0);
-      }, 0);
-    }, 0);
+  const tasksSummary = {
+    totalOpen,
+    categories: [
+      { label: t('oscrat.ui.vulnerabilities'), count: openVulnerabilities },
+      { label: t('oscrat.ui.incidents'), count: openIncidents },
+      { label: 'SBOM', count: summary?.sbomReports.total || 0 },
+      { label: t('oscrat.ui.tech-documentation'), count: summary?.techDocumentation.total || 0 },
+    ],
+  };
 
-    const totalIncidents = products.reduce((sum, product) => {
-      return sum + product.versions.reduce((vSum, version) => {
-        return vSum + (version.openIncidents || 0);
-      }, 0);
-    }, 0);
-
-    const totalSbomReports = products.reduce((sum, product) => {
-      return sum + product.versions.reduce((vSum, version) => {
-        return vSum + (version.sbomReportsCount || 0);
-      }, 0);
-    }, 0);
-
-    return {
-      totalOpen: totalVulnerabilities + totalIncidents,
-      categories: [
-        { label: t('oscrat.ui.vulnerabilities'), count: totalVulnerabilities },
-        { label: t('oscrat.ui.incidents'), count: totalIncidents },
-        { label: 'SBOM', count: totalSbomReports },
-        { label: t('oscrat.ui.tech-documentation'), count: 0 },
-      ],
-    };
-  }, [products, t]);
-
-  const productsSummary = useMemo(() => {
-    if (!products) {
-      return { total: 0, assessment: 0, active: 0, withdrawn: 0 };
-    }
-
-    const assessment = products.filter(
-      (p) => p.complianceStatus === OscratProductComplianceStatus.NOT_ASSESSED ||
-             p.complianceStatus === OscratProductComplianceStatus.IN_PROGRESS
-    ).length;
-
-    const active = products.filter(
-      (p) => p.versions.some(v => v.status === OscratProductVersionStatus.ACTIVE)
-    ).length;
-
-    const withdrawn = products.filter(
-      (p) => p.versions.some(v => v.status === OscratProductVersionStatus.WITHDRAWN)
-    ).length;
-
-    return {
-      total: products.length,
-      assessment,
-      active,
-      withdrawn,
-    };
-  }, [products]);
+  const productsSummary = {
+    total: summary?.products.total || 0,
+    assessment: summary?.products.inAssessment || 0,
+    active: summary?.products.active || 0,
+    withdrawn: summary?.products.withdrawn || 0,
+  };
 
   if (isLoading) {
     return (

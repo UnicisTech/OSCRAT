@@ -4,7 +4,7 @@ import { OscratOrganizationRole, OscratAssessmentType, OscratAssessmentCreateReq
 import { useAssessments, useOscratAssessment } from './useOscratAssessment';
 import { useLatestAssessment } from './useLatestAssessment';
 import { transformComplianceStateToAssessmentData, transformVersionAssessmentToComplianceState } from '@/utils/compliance';
-import { ASSESSMENT_SCHEMA_VERSION, STORAGE_KEY_PREFIX } from '@/lib/compliance/constants';
+import { ASSESSMENT_SCHEMA_VERSION } from '@/lib/compliance/constants';
 
 interface UseVersionComplianceOptions {
   teamSlug: string;
@@ -21,8 +21,6 @@ export function useVersionCompliance({
   teamRole,
   userId,
 }: UseVersionComplianceOptions) {
-  const storageKey = `${STORAGE_KEY_PREFIX.VERSION_COMPLIANCE}_${versionId}`;
-
   const { assessments, createAssessment, isCreating } = useAssessments(
     teamSlug,
     { productId, versionId },
@@ -52,30 +50,9 @@ export function useVersionCompliance({
       );
       if (state) {
         setComplianceState(state);
-        return;
       }
     }
-
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as ComplianceState;
-        setComplianceState(parsed);
-      } catch {
-        localStorage.removeItem(storageKey);
-        setComplianceState(null);
-      }
-    }
-  }, [assessmentDetail, storageKey, productId, teamRole]);
-
-  const saveToLocalStorage = useCallback(
-    (state: ComplianceState) => {
-      if (!state.completed) {
-        localStorage.setItem(storageKey, JSON.stringify(state));
-      }
-    },
-    [storageKey]
-  );
+  }, [assessmentDetail, productId, teamRole]);
 
   const saveToDatabase = useCallback(
     async (state: ComplianceState) => {
@@ -99,24 +76,20 @@ export function useVersionCompliance({
         };
         await createAssessment(assessmentData);
       }
-
-      localStorage.removeItem(storageKey);
     },
-    [userId, latestAssessmentId, updateAssessment, createAssessment, storageKey, productId, versionId]
+    [userId, latestAssessmentId, updateAssessment, createAssessment, productId, versionId]
   );
 
   const resetAssessment = useCallback(async () => {
     if (latestAssessmentId) {
       await deleteAssessment();
     }
-    localStorage.removeItem(storageKey);
     setComplianceState(null);
-  }, [latestAssessmentId, deleteAssessment, storageKey]);
+  }, [latestAssessmentId, deleteAssessment]);
 
   return {
     complianceState,
     setComplianceState,
-    saveToLocalStorage,
     saveToDatabase,
     resetAssessment,
     latestAssessmentId,

@@ -91,7 +91,6 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
 
   const {
     complianceState: hookComplianceState,
-    saveToLocalStorage,
     saveToDatabase,
     resetAssessment,
   } = isVersionCompliance ? versionComplianceHook : orgComplianceHook;
@@ -103,15 +102,21 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
 
   useEffect(() => {
     if (hookComplianceState) {
-      setLocalState(hookComplianceState);
+      setLocalState(prev => {
+        // If we're actively in the questionnaire, preserve navigation state
+        // but update the assessments and other data from the database
+        if (showQuestionnaire && prev.currentAreaIndex !== null && prev.currentRequirementIndex !== null) {
+          return {
+            ...hookComplianceState,
+            currentAreaIndex: prev.currentAreaIndex,
+            currentRequirementIndex: prev.currentRequirementIndex,
+          };
+        }
+        // Otherwise, use the state from the database as-is
+        return hookComplianceState;
+      });
     }
-  }, [hookComplianceState]);
-
-  useEffect(() => {
-    if (!localState.completed) {
-      saveToLocalStorage(localState);
-    }
-  }, [localState, saveToLocalStorage]);
+  }, [hookComplianceState, showQuestionnaire]);
 
   const handleAreaSelect = useCallback((areaIndex: number) => {
     setLocalState(prev => {
@@ -218,6 +223,13 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     const currentRequirement = currentArea.content[currentRequirementIndexJustCompleted];
     const nextRequirementIndex = updatedState.currentRequirementIndex!;
 
+    // Save to database after each requirement is completed
+    try {
+      await saveToDatabase(updatedState);
+    } catch {
+      toast.error(t('oscrat.ui.failed-to-save-assessment'));
+    }
+
     // Check if task should be generated for non-compliant requirement
     if (taskGeneration.shouldGenerateTask(assessment.complianceStatus!)) {
       const taskProposed = taskGeneration.proposeTask(currentRequirement, assessment);
@@ -270,16 +282,10 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       }));
       
       if (allAreasComplete) {
-        try {
-          await saveToDatabase(updatedState);
-          
-          if (updatedState.finished) {
-            toast.success(t('oscrat.ui.assessment-completed-finished'));
-          } else {
-            toast.success(t('oscrat.ui.assessment-saved-successfully'));
-          }
-        } catch {
-          toast.error(t('oscrat.ui.failed-to-save-assessment'));
+        if (updatedState.finished) {
+          toast.success(t('oscrat.ui.assessment-completed-finished'));
+        } else {
+          toast.success(t('oscrat.ui.assessment-saved-successfully'));
         }
       }
       

@@ -54,6 +54,7 @@ export * from './types/repository';
 export * from './types/team';
 export * from './types/craForm/form';
 export * from './types/jobPayloads';
+export * from './types/dashboard';
 
 // Export error utilities
 export { ERROR_CODES, type ErrorCode } from './constants/errorCodes';
