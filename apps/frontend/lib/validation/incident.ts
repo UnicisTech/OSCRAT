@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { productDescriptionSchema } from '@/lib/validation/inputs';
+import { productDescriptionSchema, incidentScopeSchema, incidentActionsSchema } from './inputs';
 import {
   IncidentStatus,
   IncidentClassification,
@@ -12,9 +12,6 @@ const INCIDENT_CLASSIFICATIONS = Object.values(IncidentClassification);
 const INCIDENT_ATTACK_TYPES = Object.values(IncidentAttackType);
 const INCIDENT_SEVERITIES = Object.values(IncidentSeverity);
 
-/**
- * Incident creation schema
- */
 export const incidentCreateSchema = Yup.object({
   status: Yup.string()
     .oneOf(INCIDENT_STATUSES, 'oscrat.ui.validation.incident-status-invalid')
@@ -43,17 +40,10 @@ export const incidentCreateSchema = Yup.object({
   description: productDescriptionSchema
     .required('oscrat.ui.validation.description-required'),
   
-  scope: Yup.string()
-    .trim()
-    .required('oscrat.ui.validation.incident-scope-required')
-    .min(1, 'oscrat.ui.validation.incident-scope-required')
-    .max(500, 'oscrat.ui.validation.description-max-length'),
+  scope: incidentScopeSchema
+    .required('oscrat.ui.validation.incident-scope-required'),
   
-  // Optional fields
-  assetDetails: Yup.string()
-    .trim()
-    .max(500, 'oscrat.ui.validation.description-max-length')
-    .optional(),
+  assetDetails: productDescriptionSchema.optional(),
   
   handlingDate: Yup.date()
     .optional()
@@ -65,28 +55,13 @@ export const incidentCreateSchema = Yup.object({
       return value >= dateOfDetection;
     }),
   
-  correctiveActions: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-actions-too-long')
-    .optional(),
+  correctiveActions: incidentActionsSchema.optional(),
+  rootCause: incidentActionsSchema.optional(),
+  preventiveActions: incidentActionsSchema.optional(),
   
-  rootCause: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-root-cause-too-long')
-    .optional(),
+  suspectedUnlawfulAct: Yup.boolean().optional().default(false),
   
-  preventiveActions: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-actions-too-long')
-    .optional(),
-  
-  suspectedUnlawfulAct: Yup.boolean()
-    .optional()
-    .default(false),
-  
-  unlawfulActDescription: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-unlawful-act-too-long')
+  unlawfulActDescription: incidentActionsSchema
     .optional()
     .when('suspectedUnlawfulAct', {
       is: true,
@@ -94,13 +69,9 @@ export const incidentCreateSchema = Yup.object({
       otherwise: (schema) => schema.nullable()
     }),
   
-  crossBorderImpact: Yup.boolean()
-    .optional()
-    .default(false),
+  crossBorderImpact: Yup.boolean().optional().default(false),
   
-  crossBorderImpactDetails: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-cross-border-details-too-long')
+  crossBorderImpactDetails: incidentActionsSchema
     .optional()
     .when('crossBorderImpact', {
       is: true,
@@ -108,14 +79,9 @@ export const incidentCreateSchema = Yup.object({
       otherwise: (schema) => schema.nullable()
     }),
   
-  attachmentIds: Yup.array()
-    .of(Yup.string())
-    .optional(),
+  attachmentIds: Yup.array().of(Yup.string()).optional(),
 });
 
-/**
- * Incident update schema (all fields optional except those that have dependencies)
- */
 export const incidentUpdateSchema = Yup.object({
   status: Yup.string()
     .oneOf(INCIDENT_STATUSES, 'oscrat.ui.validation.incident-status-invalid')
@@ -133,27 +99,15 @@ export const incidentUpdateSchema = Yup.object({
     .oneOf(INCIDENT_SEVERITIES, 'oscrat.ui.validation.incident-severity-invalid')
     .optional(),
   
-  reporterId: Yup.string()
-    .trim()
-    .optional(),
+  reporterId: Yup.string().trim().optional(),
   
   dateOfDetection: Yup.date()
     .optional()
     .max(new Date(), 'oscrat.ui.validation.date-cannot-be-future'),
   
-  description: productDescriptionSchema
-    .optional(),
-  
-  scope: Yup.string()
-    .trim()
-    .min(1, 'oscrat.ui.validation.incident-scope-required')
-    .max(500, 'oscrat.ui.validation.description-max-length')
-    .optional(),
-  
-  assetDetails: Yup.string()
-    .trim()
-    .max(500, 'oscrat.ui.validation.description-max-length')
-    .optional(),
+  description: productDescriptionSchema.optional(),
+  scope: incidentScopeSchema.optional(),
+  assetDetails: productDescriptionSchema.optional(),
   
   handlingDate: Yup.date()
     .optional()
@@ -165,27 +119,13 @@ export const incidentUpdateSchema = Yup.object({
       return value >= dateOfDetection;
     }),
   
-  correctiveActions: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-actions-too-long')
-    .optional(),
+  correctiveActions: incidentActionsSchema.optional(),
+  rootCause: incidentActionsSchema.optional(),
+  preventiveActions: incidentActionsSchema.optional(),
   
-  rootCause: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-root-cause-too-long')
-    .optional(),
+  suspectedUnlawfulAct: Yup.boolean().optional(),
   
-  preventiveActions: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-actions-too-long')
-    .optional(),
-  
-  suspectedUnlawfulAct: Yup.boolean()
-    .optional(),
-  
-  unlawfulActDescription: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-unlawful-act-too-long')
+  unlawfulActDescription: incidentActionsSchema
     .optional()
     .when('suspectedUnlawfulAct', {
       is: true,
@@ -193,12 +133,9 @@ export const incidentUpdateSchema = Yup.object({
       otherwise: (schema) => schema.nullable()
     }),
   
-  crossBorderImpact: Yup.boolean()
-    .optional(),
+  crossBorderImpact: Yup.boolean().optional(),
   
-  crossBorderImpactDetails: Yup.string()
-    .trim()
-    .max(1000, 'oscrat.ui.validation.incident-cross-border-details-too-long')
+  crossBorderImpactDetails: incidentActionsSchema
     .optional()
     .when('crossBorderImpact', {
       is: true,
@@ -206,8 +143,5 @@ export const incidentUpdateSchema = Yup.object({
       otherwise: (schema) => schema.nullable()
     }),
   
-  attachmentIds: Yup.array()
-    .of(Yup.string())
-    .optional(),
+  attachmentIds: Yup.array().of(Yup.string()).optional(),
 });
-

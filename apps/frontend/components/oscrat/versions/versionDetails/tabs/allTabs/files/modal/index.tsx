@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IoClose, IoCloudUpload } from 'react-icons/io5';
 import { useTranslation } from 'next-i18next';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { fileDescriptionSchema } from '@/lib/validation/inputs';
 
 interface AddFileModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddFile: (file: File, description?: string) => void;
 }
+
+const fileFormSchema = Yup.object({
+  description: fileDescriptionSchema.optional(),
+});
 
 const AddFileModal: React.FC<AddFileModalProps> = ({
   isOpen,
@@ -15,19 +22,27 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [description, setDescription] = useState('');
-
   const { t, ready } = useTranslation('common');
 
-  // Handle closing the modal when clicking outside of it.
+  const formik = useFormik({
+    initialValues: { description: '' },
+    validationSchema: fileFormSchema,
+    validateOnBlur: true,
+    validateOnChange: false,
+    onSubmit: (values) => {
+      if (!selectedFile) {
+        alert(t('please-select-file-to-upload'));
+        return;
+      }
+      onAddFile(selectedFile, values.description.trim() || undefined);
+      handleClose();
+    },
+  });
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
         onClose();
       }
     };
@@ -43,17 +58,15 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
     };
   }, [isOpen, onClose]);
 
-  // Reset form and close modal
   const handleClose = () => {
     setSelectedFile(null);
-    setDescription('');
+    formik.resetForm();
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
     onClose();
   };
 
-  // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -61,20 +74,7 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
     }
   };
 
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedFile) {
-      alert(t('please-select-file-to-upload'));
-      return;
-    }
-    onAddFile(selectedFile, description.trim() || undefined);
-    handleClose();
-  };
-
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen || !ready) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
@@ -86,16 +86,12 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
           <h2 className="text-lg font-semibold text-gray-800">
             {t('oscrat.ui.add-new-file')}
           </h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
             <IoClose size={24} />
           </button>
         </header>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={formik.handleSubmit}>
           <main className="space-y-4 p-6">
-            {/* File Upload Section */}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 {t('oscrat.ui.upload-file')}
@@ -117,17 +113,11 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
                     <IoCloudUpload className="mx-auto h-8 w-8 text-gray-400" />
                     <div className="text-sm text-gray-600">
                       {selectedFile ? (
-                        <span className="font-medium text-blue-600">
-                          {selectedFile.name}
-                        </span>
+                        <span className="font-medium text-blue-600">{selectedFile.name}</span>
                       ) : (
                         <>
-                          <span className="font-medium text-blue-600">
-                            {t('click-to-upload')}
-                          </span>{' '}
-                          <span className="text-gray-500">
-                            {t('oscrat.ui.or-drag-and-drop')}
-                          </span>
+                          <span className="font-medium text-blue-600">{t('click-to-upload')}</span>{' '}
+                          <span className="text-gray-500">{t('oscrat.ui.or-drag-and-drop')}</span>
                         </>
                       )}
                     </div>
@@ -136,22 +126,24 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
               </div>
             </div>
 
-            {/* Description */}
             <div>
-              <label
-                htmlFor="fileDescription"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                Description (optional)
+              <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-700">
+                {t('description')} ({t('optional')})
               </label>
               <textarea
-                id="fileDescription"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                id="description"
+                name="description"
+                value={formik.values.description}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                placeholder="Optional description for this file"
+                placeholder={t('oscrat.ui.file-description-placeholder')}
                 rows={3}
+                maxLength={200}
               />
+              {formik.touched.description && formik.errors.description && (
+                <p className="mt-1 text-sm text-red-600">{t(formik.errors.description)}</p>
+              )}
             </div>
           </main>
           <footer className="flex items-center justify-end space-x-3 rounded-b-lg border-t border-gray-200 bg-gray-50 p-4">

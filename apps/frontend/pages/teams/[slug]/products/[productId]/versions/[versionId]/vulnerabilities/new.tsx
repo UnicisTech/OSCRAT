@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { useSession } from 'next-auth/react';
+import { useFormik } from 'formik';
 import { useVersionContext } from '@/context/VersionContext';
 import { useProductContext } from '@/context/ProductContext';
 import { useTeamContext } from '@/context/TeamContext';
@@ -11,6 +12,7 @@ import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { withProductDetailLayout } from '@/lib/layout-helpers';
 import VulnerabilityFormFields, {
   type VulnerabilityFormData,
+  type VulnerabilityFormErrors,
 } from '@/components/oscrat/VulnerabilityFormFields';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
@@ -21,6 +23,7 @@ import {
   OscratProductVulnerabilitySeverity,
   type OscratVulnerabilityCreate
 } from '@oscrat/model';
+import { vulnerabilityFormSchema } from '@/lib/validation/vulnerability';
 
 const PAGE_STYLES = {
   sectionCard: 'rounded-lg border border-gray-300 bg-white p-6',
@@ -49,22 +52,56 @@ function NewVulnerabilityPage() {
 
   const currentUserId = session?.user?.id || '';
 
-  const [formData, setFormData] = useState<VulnerabilityFormData>({
-    name: '',
-    description: '',
-    severity: OscratProductVulnerabilitySeverity.LOW,
-    status: OscratProductVulnerabilityStatus.PENDING,
-    cve: '',
-    advisoryId: '',
-    dateOfDiscovery: new Date().toISOString().split('T')[0],
-    assigner: currentUserId,
-    hasOtherMemberStates: false,
-    affectedMemberStates: '',
-  });
-
   const [uploadedAttachmentIds, setUploadedAttachmentIds] = useState<string[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [isFromScanReport, setIsFromScanReport] = useState(false);
+
+  const formik = useFormik<VulnerabilityFormData>({
+    initialValues: {
+      name: '',
+      description: '',
+      severity: OscratProductVulnerabilitySeverity.LOW,
+      status: OscratProductVulnerabilityStatus.PENDING,
+      cve: '',
+      advisoryId: '',
+      dateOfDiscovery: new Date().toISOString().split('T')[0],
+      assigner: currentUserId,
+      hasOtherMemberStates: false,
+      affectedMemberStates: '',
+    },
+    validationSchema: vulnerabilityFormSchema,
+    validateOnBlur: true,
+    validateOnChange: false,
+    onSubmit: async (values) => {
+      try {
+        const affectedMemberStatesArray = values.hasOtherMemberStates && values.affectedMemberStates
+          ? values.affectedMemberStates
+              .split(',')
+              .map(s => s.trim())
+              .filter(s => s.length > 0)
+          : [];
+
+        const createData: OscratVulnerabilityCreate = {
+          name: values.name,
+          description: values.description,
+          severity: values.severity,
+          status: values.status,
+          cve: values.cve || undefined,
+          advisoryId: values.advisoryId || undefined,
+          dateOfDiscovery: new Date(values.dateOfDiscovery),
+          affectedMemberStates: affectedMemberStatesArray,
+          attachmentIds: uploadedAttachmentIds.length > 0 ? uploadedAttachmentIds : undefined,
+          createdBy: '',
+        };
+
+        await createVulnerability(createData);
+        toast.success(t('oscrat.ui.versions.vulnerabilities.created-successfully'));
+        router.push(`/teams/${slug}/products/${productId}/versions/${versionId}?tab=vulnerabilities`);
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('oscrat.ui.versions.vulnerabilities.failed-to-create')));
+      }
+    },
+  });
 
   // Handle query params for pre-filling from scan report
   useEffect(() => {
@@ -81,7 +118,7 @@ function NewVulnerabilityPage() {
         ? `${description as string}${ver ? ` (Package: ${pkg}@${ver})` : ''}`
         : `Vulnerability in package ${pkg}${ver ? `@${ver}` : ''}`;
 
-      setFormData({
+      formik.setValues({
         name: `${pkg} - ${cve}`,
         description: descriptionText,
         severity: mappedSeverity,
@@ -99,20 +136,14 @@ function NewVulnerabilityPage() {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    formik.handleChange(e);
   };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-      // Clear affectedMemberStates when checkbox is unchecked
-      ...(name === 'hasOtherMemberStates' && !checked ? { affectedMemberStates: '' } : {}),
-    }));
+    formik.setFieldValue(name, checked);
+    if (name === 'hasOtherMemberStates' && !checked) {
+      formik.setFieldValue('affectedMemberStates', '');
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,53 +159,6 @@ function NewVulnerabilityPage() {
       toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file')));
     } finally {
       setUploadingFile(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.name.trim()) {
-      toast.error(t('oscrat.ui.versions.vulnerabilities.name-required'));
-      return;
-    }
-
-    if (!formData.description.trim()) {
-      toast.error(t('oscrat.ui.versions.vulnerabilities.description-required'));
-      return;
-    }
-
-    if (!formData.dateOfDiscovery) {
-      toast.error(t('oscrat.ui.versions.vulnerabilities.date-discovery-required'));
-      return;
-    }
-
-    try {
-      const affectedMemberStatesArray = formData.hasOtherMemberStates && formData.affectedMemberStates
-        ? formData.affectedMemberStates
-            .split(',')
-            .map(s => s.trim())
-            .filter(s => s.length > 0)
-        : [];
-
-      const createData: OscratVulnerabilityCreate = {
-        name: formData.name,
-        description: formData.description,
-        severity: formData.severity,
-        status: formData.status,
-        cve: formData.cve || undefined,
-        advisoryId: formData.advisoryId || undefined,
-        dateOfDiscovery: new Date(formData.dateOfDiscovery),
-        affectedMemberStates: affectedMemberStatesArray,
-        attachmentIds: uploadedAttachmentIds.length > 0 ? uploadedAttachmentIds : undefined,
-        createdBy: '', // Will be set by the API
-      };
-
-      await createVulnerability(createData);
-      toast.success(t('oscrat.ui.versions.vulnerabilities.created-successfully'));
-      router.push(`/teams/${slug}/products/${productId}/versions/${versionId}?tab=vulnerabilities`);
-    } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.versions.vulnerabilities.failed-to-create')));
     }
   };
 
@@ -211,7 +195,7 @@ function NewVulnerabilityPage() {
           {t('oscrat.ui.versions.vulnerabilities.add-new')}
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={formik.handleSubmit} className="space-y-6">
           {/* Context Information (Read-Only) */}
           <div className={PAGE_STYLES.sectionCardGray}>
             <h2 className={PAGE_STYLES.sectionHeading}>
@@ -249,13 +233,16 @@ function NewVulnerabilityPage() {
               {t('oscrat.ui.versions.vulnerabilities.vulnerability-information')}
             </h2>
             <VulnerabilityFormFields
-              formData={formData}
+              formData={formik.values}
               onChange={handleInputChange}
+              onBlur={formik.handleBlur}
               onCheckboxChange={handleCheckboxChange}
               isFromScanReport={isFromScanReport}
               affectedProductName={project?.name}
               affectedVersionName={version?.version}
               teamMembers={members}
+              errors={formik.errors as VulnerabilityFormErrors}
+              touched={formik.touched as Record<string, boolean>}
             />
           </div>
 
@@ -302,10 +289,10 @@ function NewVulnerabilityPage() {
             </button>
             <button
               type="submit"
-              disabled={isCreating}
+              disabled={isCreating || formik.isSubmitting}
               className={PAGE_STYLES.buttonPrimary}
             >
-              {isCreating ? t('oscrat.ui.adding') : t('oscrat.ui.add')}
+              {isCreating || formik.isSubmitting ? t('oscrat.ui.adding') : t('oscrat.ui.add')}
             </button>
           </div>
         </form>

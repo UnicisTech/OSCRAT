@@ -30,6 +30,12 @@ function validateTaxIDAgainstAllCountries(taxID: string): boolean {
   return false;
 }
 
+// Safe patterns - alphanumeric with basic punctuation
+const SAFE_TEXT_REGEX = /^[a-zA-Z0-9\s\-_.,()'\u00C0-\u017F]*$/;
+const SAFE_FREETEXT_REGEX = /^[a-zA-Z0-9\s\-_.,()':;@#&+/\\!?\n\r\u00C0-\u017F]*$/;
+const SAFE_ACRONYM_REGEX = /^[a-zA-Z0-9\-_]+$/;
+const SAFE_IDENTIFIER_REGEX = /^[a-zA-Z0-9\-_]*$/;
+
 // Common field schemas
 export const nameSchema = Yup.string()
   .trim()
@@ -40,7 +46,8 @@ export const nameSchema = Yup.string()
 export const organizationNameSchema = Yup.string()
   .trim()
   .min(1, 'oscrat.ui.validation.organization-name-required')
-  .max(30, 'oscrat.ui.validation.organization-name-too-long');
+  .max(100, 'oscrat.ui.validation.organization-name-too-long')
+  .matches(SAFE_TEXT_REGEX, 'oscrat.ui.validation.invalid-characters');
 
 export const emailSchema = Yup.string()
   .trim()
@@ -53,10 +60,7 @@ export const emailSchema = Yup.string()
     if (!domain || !domain.includes('.')) return false;
 
     const parts = domain.split('.');
-    // Must have at least 2 parts: e.g. "domain" + "tld"
     if (parts.length < 2) return false;
-
-    // Each part must be non-empty, and last part (TLD) >= 2 chars
     if (parts.some(part => part.length === 0)) return false;
     if (parts[parts.length - 1].length < 2) return false;
 
@@ -67,7 +71,7 @@ export const emailSchema = Yup.string()
 
 export const phoneSchema = Yup.string()
   .test('phone-validation', 'oscrat.ui.validation.phone-invalid', function(value) {
-    if (!value) return true; // Allow empty values, use .required() separately if needed
+    if (!value) return true;
     
     const { parent } = this;
     const countryCode = parent.countryCode;
@@ -94,18 +98,20 @@ export const passwordSchema = Yup.string()
 export const postalAddressSchema = Yup.string()
   .trim()
   .min(1, 'oscrat.ui.validation.postal-address-required')
-  .max(100, 'oscrat.ui.validation.postal-address-too-long');
+  .max(200, 'oscrat.ui.validation.postal-address-too-long')
+  .matches(SAFE_FREETEXT_REGEX, 'oscrat.ui.validation.invalid-characters');
 
 export const taxIdSchema = Yup.string()
   .trim()
   .test('tax-id-validation', 'oscrat.ui.validation.tax-id-invalid', function(value) {
-    if (!value) return true; // Allow empty values, use .required() separately if needed
+    if (!value) return true;
     return validateTaxIDAgainstAllCountries(value);
   });
 
 export const additionalInfoSchema = Yup.string()
   .trim()
   .max(500, 'oscrat.ui.validation.additional-info-too-long')
+  .matches(SAFE_FREETEXT_REGEX, 'oscrat.ui.validation.invalid-characters')
   .transform((value) => {
     if (!value) return value;
     return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
@@ -114,21 +120,73 @@ export const additionalInfoSchema = Yup.string()
 export const productNameSchema = Yup.string()
   .trim()
   .min(1, 'oscrat.ui.validation.product-name-required')
-  .max(40, 'oscrat.ui.validation.product-name-too-long');
+  .max(60, 'oscrat.ui.validation.product-name-too-long')
+  .matches(SAFE_TEXT_REGEX, 'oscrat.ui.validation.invalid-characters');
 
 export const versionNameSchema = Yup.string()
   .trim()
   .min(1, 'oscrat.ui.validation.version-required')
-  .max(20, 'oscrat.ui.validation.version-max-length');
+  .max(20, 'oscrat.ui.validation.version-max-length')
+  .matches(SAFE_TEXT_REGEX, 'oscrat.ui.validation.invalid-characters');
 
 export const acronymSchema = Yup.string()
   .trim()
   .min(2, 'oscrat.ui.validation.acronym-min-length')
-  .max(10, 'oscrat.ui.validation.acronym-max-length');
+  .max(10, 'oscrat.ui.validation.acronym-max-length')
+  .matches(SAFE_ACRONYM_REGEX, 'oscrat.ui.validation.invalid-characters');
 
 export const productDescriptionSchema = Yup.string()
   .trim()
   .max(500, 'oscrat.ui.validation.description-max-length')
+  .matches(SAFE_FREETEXT_REGEX, 'oscrat.ui.validation.invalid-characters')
+  .transform((value) => {
+    if (!value) return value;
+    return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+  });
+
+// Generic reusable schemas for titles and descriptions
+export const titleSchema = Yup.string()
+  .trim()
+  .min(1, 'oscrat.ui.validation.title-required')
+  .max(100, 'oscrat.ui.validation.title-too-long')
+  .matches(SAFE_TEXT_REGEX, 'oscrat.ui.validation.invalid-characters');
+
+export const descriptionSchema = Yup.string()
+  .trim()
+  .max(500, 'oscrat.ui.validation.description-too-long')
+  .matches(SAFE_FREETEXT_REGEX, 'oscrat.ui.validation.invalid-characters')
+  .transform((value) => {
+    if (!value) return value;
+    return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+  });
+
+
+export const advisoryIdSchema = Yup.string()
+  .trim()
+  .max(100, 'oscrat.ui.validation.advisory-id-too-long')
+  .matches(SAFE_IDENTIFIER_REGEX, 'oscrat.ui.validation.invalid-characters');
+
+// Incident-specific schemas
+export const incidentScopeSchema = Yup.string()
+  .trim()
+  .min(1, 'oscrat.ui.validation.incident-scope-required')
+  .max(500, 'oscrat.ui.validation.incident-scope-too-long')
+  .matches(SAFE_FREETEXT_REGEX, 'oscrat.ui.validation.invalid-characters');
+
+export const incidentActionsSchema = Yup.string()
+  .trim()
+  .max(1000, 'oscrat.ui.validation.incident-actions-too-long')
+  .matches(SAFE_FREETEXT_REGEX, 'oscrat.ui.validation.invalid-characters')
+  .transform((value) => {
+    if (!value) return value;
+    return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
+  });
+
+// File description schema
+export const fileDescriptionSchema = Yup.string()
+  .trim()
+  .max(200, 'oscrat.ui.validation.file-description-too-long')
+  .matches(SAFE_FREETEXT_REGEX, 'oscrat.ui.validation.invalid-characters')
   .transform((value) => {
     if (!value) return value;
     return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });

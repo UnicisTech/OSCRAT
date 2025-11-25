@@ -6,8 +6,14 @@ import Incidents from './allTabs/incidents';
 import Vulnerabilities from './allTabs/vulnerabilities';
 import Scans from './allTabs/scans';
 import Task from './allTabs/task';
+import Compliance from './allTabs/compliance';
 
 const TABS_CONFIG = [
+  {
+    id: 'compliance',
+    label: 'oscrat.ui.versions.tabs.compliance',
+    component: <Compliance />,
+  },
   { id: 'files', label: 'oscrat.ui.versions.tabs.files', component: <Files /> },
   { id: 'sbom', label: 'oscrat.ui.versions.tabs.sbom', component: <Sbom /> },
   {

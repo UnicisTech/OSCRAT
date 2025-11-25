@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { OscratProductVersionStatus } from '@oscrat/model';
 import { FullScreenModal } from '@/components/shared';
-import type { OscratProductVersionCreate } from '@oscrat/model';
 import toast from 'react-hot-toast';
 import normalizeText from '@/utils/normalizeText';
 import { useOscratVersions } from '@/hooks/oscrat/useOscratVersion';
+import { useFormik } from 'formik';
+import { versionCreateSchema } from '@/lib/validation/version';
 
 interface CreateVersionModalProps {
   isOpen: boolean;
@@ -23,60 +24,46 @@ const Index: React.FC<CreateVersionModalProps> = ({
   createdBy,
 }) => {
   const { t, ready } = useTranslation('common');
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  // Use OSCRAT hook for version management
   const { createVersion, isLoading } = useOscratVersions(teamId, productId);
 
-  // Form state
-  const [versionName, setVersionName] = useState('');
-  const [status, setStatus] = useState<OscratProductVersionStatus>(
-    OscratProductVersionStatus.DRAFT
-  );
-
-  // Available status options
   const statusOptions = Object.values(OscratProductVersionStatus);
 
-  // Reset form when modal opens
+  const formik = useFormik({
+    initialValues: {
+      version: '',
+      status: OscratProductVersionStatus.DRAFT,
+    },
+    validationSchema: versionCreateSchema,
+    validateOnBlur: true,
+    validateOnChange: false,
+    enableReinitialize: true,
+    onSubmit: async (values) => {
+      try {
+        await createVersion({
+          version: values.version.trim(),
+          status: values.status,
+          productId,
+          createdBy,
+        });
+        toast.success(t('oscrat.ui.version-created-successfully'));
+        formik.resetForm();
+        onClose();
+      } catch (error) {
+        console.error('Failed to create version:', error);
+        toast.error(t('oscrat.ui.failed-to-create-version'));
+      }
+    },
+  });
+
   React.useEffect(() => {
     if (isOpen) {
-      setVersionName('');
-      setStatus(OscratProductVersionStatus.DRAFT);
-      setFormErrors({});
+      formik.resetForm();
     }
   }, [isOpen]);
 
-  // Handle save
-  const handleSave = async () => {
-    // Validate form
-    const errors: Record<string, string> = {};
-
-    if (!versionName.trim()) {
-      errors.version = 'Version name is required';
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-
-    try {
-      await createVersion({
-        version: versionName.trim(),
-        status,
-        productId,
-        createdBy,
-      });
-      toast.success('Version created successfully');
-      onClose();
-    } catch (error) {
-      console.error('Failed to create version:', error);
-      toast.error('Failed to create version');
-    }
-  };
-
   const handleClose = () => {
     if (!isLoading) {
+      formik.resetForm();
       onClose();
     }
   };
@@ -91,37 +78,40 @@ const Index: React.FC<CreateVersionModalProps> = ({
       cancelButtonText={t('cancel')}
       continueButtonText={t('create')}
       onCancel={handleClose}
-      onContinue={handleSave}
+      onContinue={formik.handleSubmit}
     >
       <div className="space-y-6">
         <div>
           <label className="mb-2 block text-sm font-medium dark:text-gray-300">
-            {t('oscrat.ui.version-name')}
+            {t('oscrat.ui.version-name')} *
           </label>
           <input
             type="text"
-            value={versionName}
-            onChange={(e) => setVersionName(e.target.value)}
+            name="version"
+            value={formik.values.version}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
             placeholder="e.g., 1.2.4"
             disabled={isLoading}
+            maxLength={20}
           />
-          {formErrors.version && (
+          {formik.touched.version && formik.errors.version && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {t(formErrors.version)}
+              {t(formik.errors.version)}
             </p>
           )}
         </div>
 
         <div>
           <label className="mb-2 block text-sm font-medium dark:text-gray-300">
-            {t('status')}
+            {t('status')} *
           </label>
           <select
-            value={status}
-            onChange={(e) =>
-              setStatus(e.target.value as OscratProductVersionStatus)
-            }
+            name="status"
+            value={formik.values.status}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
             disabled={isLoading}
           >
@@ -131,6 +121,11 @@ const Index: React.FC<CreateVersionModalProps> = ({
               </option>
             ))}
           </select>
+          {formik.touched.status && formik.errors.status && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              {t(formik.errors.status)}
+            </p>
+          )}
         </div>
       </div>
     </FullScreenModal>
