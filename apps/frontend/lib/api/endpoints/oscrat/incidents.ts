@@ -1,7 +1,7 @@
 import { api } from '@/lib/api/client';
 import {
-  OscratIncidentSummary,
   OscratIncidentDetail,
+  OscratIncidentSummary,
   OscratIncidentCreate,
   OscratIncidentUpdate,
 } from '@oscrat/model';

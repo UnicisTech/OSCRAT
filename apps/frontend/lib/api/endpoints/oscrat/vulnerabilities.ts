@@ -1,7 +1,7 @@
 import { api } from '@/lib/api/client';
 import {
-  OscratVulnerabilitySummary,
   OscratVulnerabilityDetail,
+  OscratVulnerabilitySummary,
   OscratVulnerabilityCreate,
   OscratVulnerabilityUpdate,
 } from '@oscrat/model';

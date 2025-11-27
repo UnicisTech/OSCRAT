@@ -59,6 +59,9 @@ export * from './types/dashboard';
 // Export error utilities
 export { ERROR_CODES, type ErrorCode } from './constants/errorCodes';
 
+// Export vulnerability constants for fronten
+export { OPEN_VULNERABILITY_STATUSES } from './constants/vulnerability';
+
 // Export specific operation types needed by frontend
 export type {
   SbomReportDetails,

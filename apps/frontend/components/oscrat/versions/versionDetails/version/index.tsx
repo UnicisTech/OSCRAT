@@ -3,6 +3,8 @@ import { BsExclamationCircleFill } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
 import { getBorderClass } from '@/lib/borderUtils';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
+import { useVulnerabilities } from '@/hooks/oscrat/useVulnerabilities';
+import { useIncidents } from '@/hooks/oscrat/useIncidents';
 import { useVersionContext } from '@/context/VersionContext';
 import { useProductContext } from '@/context/ProductContext';
 import toast from 'react-hot-toast';
@@ -23,6 +25,8 @@ const Index = () => {
     productId,
     versionId
   );
+  const { openCount: openVulnerabilitiesCount } = useVulnerabilities(teamId, productId, versionId);
+  const { openCount: openIncidentsCount } = useIncidents(teamId, productId, versionId);
 
   const router = useRouter();
 
@@ -36,13 +40,13 @@ const Index = () => {
   if (!ready) return null;
 
   const displayVulnerabilities =
-    version?.vulnerabilities && version.vulnerabilities.length > 0
-      ? `${version.vulnerabilities.length} ${t('oscrat.ui.open')}`
+    openVulnerabilitiesCount > 0
+      ? `${openVulnerabilitiesCount} ${t('oscrat.ui.open')}`
       : t('oscrat.ui.none');
 
   const displayIncidents =
-    version?.incidents && version.incidents.length > 0
-      ? `${version.incidents.length} ${t('oscrat.ui.open')}`
+    openIncidentsCount > 0
+      ? `${openIncidentsCount} ${t('oscrat.ui.open')}`
       : t('oscrat.ui.none');
 
   const handleEdit = async (updatedData: OscratProductVersionUpdate) => {
@@ -175,10 +179,10 @@ const Index = () => {
             <div
               className={`inline-flex font-semibold text-black dark:text-gray-100`}
             >
-              {version?.incidents && version.incidents.length > 0 ? (
+              {openIncidentsCount > 0 ? (
                 <div
                   className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                    version.incidents.length
+                    openIncidentsCount
                   )}`}
                 >
                   <BsExclamationCircleFill className="text-red-600" />
@@ -202,11 +206,10 @@ const Index = () => {
             <div
               className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}
             >
-              {version?.vulnerabilities &&
-              version.vulnerabilities.length > 0 ? (
+              {openVulnerabilitiesCount > 0 ? (
                 <div
                   className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                    version.vulnerabilities.length
+                    openVulnerabilitiesCount
                   )}`}
                 >
                   <BsExclamationCircleFill className="text-red-600" />

@@ -31,13 +31,13 @@ const handleGET = async (
 
   const { versionId } = req.query;
 
-  const vulnerabilities = await getVulnerabilities(
+  const result = await getVulnerabilities(
     prisma,
     teamMember.teamId,
     versionId as string
   );
 
-  res.status(200).json({ data: vulnerabilities });
+  res.status(200).json({ data: result });
 };
 
 const handlePOST = async (

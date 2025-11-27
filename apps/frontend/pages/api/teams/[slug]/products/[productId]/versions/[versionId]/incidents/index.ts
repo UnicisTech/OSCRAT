@@ -32,13 +32,13 @@ const handleGET = async (
 
   const { versionId } = req.query;
 
-  const incidents = await getIncidents(
+  const result = await getIncidents(
     prisma,
     teamMember.teamId,
     versionId as string
   );
 
-  res.status(200).json({ data: incidents });
+  res.status(200).json({ data: result });
 };
 
 // Create incident for a version

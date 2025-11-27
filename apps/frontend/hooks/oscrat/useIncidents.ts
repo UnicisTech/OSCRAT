@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   useGetIncidents,
   useGetIncidentDetail,
@@ -6,6 +7,7 @@ import {
   useDeleteIncident,
 } from '@/lib/api/hooks/oscrat/incidents';
 import type { OscratIncidentCreate, OscratIncidentUpdate } from '@oscrat/model';
+import { OPEN_INCIDENT_STATUSES, IncidentStatus } from '@oscrat/model';
 
 /**
  * Hook to fetch and manage incidents for a version
@@ -14,6 +16,9 @@ import type { OscratIncidentCreate, OscratIncidentUpdate } from '@oscrat/model';
  * @param versionId Version ID
  * @param incidentId Optional incident ID for detail operations
  */
+
+const OPEN_STATUSES = OPEN_INCIDENT_STATUSES as readonly IncidentStatus[];
+
 export function useIncidents(
   teamId: string,
   productId: string,
@@ -60,6 +65,11 @@ export function useIncidents(
     return deleteIncidentMutation.mutateAsync(idToDelete);
   };
 
+  const openCount = useMemo(() => {
+    if (!incidents) return 0;
+    return incidents.filter((i) => OPEN_STATUSES.includes(i.status)).length;
+  }, [incidents]);
+
   const isLoading =
     isFetchingIncidents ||
     isFetchingIncident ||
@@ -68,7 +78,8 @@ export function useIncidents(
     deleteIncidentMutation.isPending;
 
   return {
-    incidents,
+    incidents: incidents ?? [],
+    openCount,
     incident,
     isLoading,
     isListError,
