@@ -76,6 +76,7 @@ model User {
   reportedIncidents               OscratProductIncident[]       @relation("OscratProductIncidentReporter")
   triggeredWorkerJobs             WorkerJob[]                   @relation("WorkerJobTriggeredBy")
   createdAttachments              Attachment[]                  @relation("AttachmentCreatedBy")
+  updatedTeamData                 TeamData[]                    @relation("TeamDataUpdatedBy")
 }
 
 model PasswordReset {
@@ -123,6 +124,7 @@ model Team {
   workerJobs                  WorkerJob[]
   incidents                   OscratProductIncident[] @relation("TeamIncidents")
   assessments                 OscratAssessment[]
+  teamData                    TeamData[]
 }
 
 model Task {
@@ -725,6 +727,28 @@ model VulnerabilityScanReport {
   @@index([versionId, createdAt])
   @@index([productId, createdAt])
   @@index([sourceSbomReportId])
+}
+
+// TeamData Model - Generic JSON storage per team
+
+model TeamData {
+  id        String   @id @default(uuid())
+
+  dataKey   String
+  payload   Json
+
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy String
+
+  updatedByUser User @relation("TeamDataUpdatedBy", fields: [updatedBy], references: [id])
+
+  @@unique([teamId, dataKey])
+  @@index([teamId])
+  @@index([dataKey])
 }
 
 // File Models

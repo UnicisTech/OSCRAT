@@ -56,11 +56,18 @@ export const queryKeys = {
     },
     apiKeys: (slug: string) =>
       [...queryKeys.teams.detail(slug), 'api-keys'] as const,
+    data: {
+      all: (slug: string) => [...queryKeys.teams.detail(slug), 'data'] as const,
+      detail: (slug: string, dataKey: string) =>
+        [...queryKeys.teams.detail(slug), 'data', dataKey] as const,
+    },
   },
   oscrat: {
     dashboard: {
-      all: (teamId: string) => ['teams', teamId, 'oscrat', 'dashboard'] as const,
-      summary: (teamId: string) => [...queryKeys.oscrat.dashboard.all(teamId), 'summary'] as const,
+      all: (teamId: string) =>
+        ['teams', teamId, 'oscrat', 'dashboard'] as const,
+      summary: (teamId: string) =>
+        [...queryKeys.oscrat.dashboard.all(teamId), 'summary'] as const,
     },
     organization: {
       summary: (teamId: string) =>
@@ -69,9 +76,17 @@ export const queryKeys = {
         ['teams', teamId, 'oscrat', 'organization', 'detail'] as const,
     },
     assessments: {
-      all: (teamSlug: string) => [...queryKeys.teams.detail(teamSlug), 'oscrat', 'assessments'] as const,
-      find: (teamSlug: string, filters?: { productId?: string; versionId?: string }) =>
-        [...queryKeys.oscrat.assessments.all(teamSlug), 'find', ...(filters ? [filters] : [])] as const,
+      all: (teamSlug: string) =>
+        [...queryKeys.teams.detail(teamSlug), 'oscrat', 'assessments'] as const,
+      find: (
+        teamSlug: string,
+        filters?: { productId?: string; versionId?: string }
+      ) =>
+        [
+          ...queryKeys.oscrat.assessments.all(teamSlug),
+          'find',
+          ...(filters ? [filters] : []),
+        ] as const,
       detail: (teamSlug: string, assessmentId: string) =>
         [...queryKeys.oscrat.assessments.all(teamSlug), assessmentId] as const,
     },
@@ -176,7 +191,11 @@ export const queryKeys = {
               ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
               'vulnerabilities',
             ] as const,
-          detail: (teamId: string, versionId: string, vulnerabilityId: string) =>
+          detail: (
+            teamId: string,
+            versionId: string,
+            vulnerabilityId: string
+          ) =>
             [
               ...queryKeys.oscrat.projects.versions.vulnerabilities.all(
                 teamId,
@@ -235,11 +254,11 @@ export const queryKeys = {
     v2: (directory: string[]) => ['scim', 'v2.0', ...directory] as const,
   },
   compliance: {
-    data: (teamSlug: string, params: { role: string }) => 
+    data: (teamSlug: string, params: { role: string }) =>
       ['teams', teamSlug, 'compliance', 'data', params.role] as const,
   },
   teamCompliance: {
-    data: (teamSlug: string, params: { role: string }) => 
+    data: (teamSlug: string, params: { role: string }) =>
       ['teams', teamSlug, 'team-compliance', 'data', params.role] as const,
   },
 } as const;
