@@ -1,7 +1,7 @@
 'use client';
 
 // React
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
@@ -26,7 +26,7 @@ import ProductCreationForm from '@/components/oscrat/ProductCreationForm';
 
 // Utils
 import { getProductCategoryKey } from '@/utils/translation';
-import { existingProductSchema } from '@/lib/validation/product';
+import { createExistingProductSchema } from '@/lib/validation/product';
 import { withTeamLayout } from '@/lib/layout-helpers';
 
 export default function Existing() {
@@ -38,6 +38,12 @@ export default function Existing() {
   const { data: existingProducts } = useGetProducts(teamId);
   const { createProject, isLoading: isCreatingProject } = useOscratProject(teamId, '', { enabled: false });
 
+  // Create validation schema with uniqueness check
+  const validationSchema = useMemo(
+    () => createExistingProductSchema(existingProducts),
+    [existingProducts]
+  );
+
   const formik = useFormik({
     initialValues: {
       sourceProductId: '',
@@ -46,17 +52,12 @@ export default function Existing() {
       version: '',
       description: '',
     },
-    validationSchema: existingProductSchema,
+    validationSchema,
     validateOnMount: true,
+    validateOnBlur: true,
+    validateOnChange: true,
     onSubmit: async (values) => {
       try {
-        if (existingProducts?.some(
-          (product) => product.name.toLowerCase() === values.name.trim().toLowerCase()
-        )) {
-          toast.error(t('oscrat.ui.validation.product-name-already-exists'));
-          return;
-        }
-
         const userId = session?.user?.id;
 
         if (!userId) {

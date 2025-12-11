@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useTranslation } from 'next-i18next';
@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 
 import { useTeamContext } from '@/context/TeamContext';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
+import { useGetProducts } from '@/lib/api/hooks/oscrat/projects';
 
 // Models & Types
 import { OscratProductType, OscratProductVersionStatus, OscratAssessmentType } from '@oscrat/model';
@@ -18,7 +19,7 @@ import type { OscratProductCreate, OscratAssessmentCreateRequest } from '@oscrat
 import type { ApiError } from '@/types';
 
 // Utils
-import { cacheProductSchema, type CacheProductData } from '@/lib/validation/product';
+import { createCacheProductSchema, type CacheProductData } from '@/lib/validation/product';
 import { getProductCategoryFromRisk, transformFormStateToAssessmentData, loadFormState, clearFormState } from '@/utils/craForm';
 import normalizeText from '@/utils/normalizeText';
 import type { FormState } from '@/types/craForm';
@@ -44,6 +45,13 @@ export default function Cache() {
   const [assessmentSaveInitiated, setAssessmentSaveInitiated] = useState(false);
 
   const { createProject, isLoading: isCreatingProject } = useOscratProject(teamId, '', { enabled: false});
+  const { data: existingProducts } = useGetProducts(teamId);
+
+  // Create validation schema with uniqueness check
+  const validationSchema = useMemo(
+    () => createCacheProductSchema(existingProducts),
+    [existingProducts]
+  );
   
   // Create assessment hook - enabled when we have pending assessment
   const { createAssessment, isLoading: isCreatingAssessment } = useAssessments(
@@ -94,8 +102,10 @@ export default function Cache() {
       version: '',
       description: '',
     },
-    validationSchema: cacheProductSchema,
+    validationSchema,
     validateOnMount: true,
+    validateOnBlur: true,
+    validateOnChange: true,
     onSubmit: async (values) => {
       try {
         if (!session?.user?.id) {

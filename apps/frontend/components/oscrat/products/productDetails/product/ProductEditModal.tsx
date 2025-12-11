@@ -158,7 +158,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
         <div>
           <label className="mb-2 block text-sm font-medium dark:text-gray-300">
-            {t('oscrat.ui.role')}
+            {t('oscrat.ui.product-type')}
           </label>
           <select
             name="type"

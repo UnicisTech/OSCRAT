@@ -99,7 +99,7 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
         />
 
         <InfoField
-          label={t('oscrat.ui.role')}
+          label={t('oscrat.ui.product-type')}
           value={t(getProductTypeKey(project.type))}
         />
 

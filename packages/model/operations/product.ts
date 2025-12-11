@@ -213,6 +213,22 @@ export const createProduct = async (
   teamId: string,
   data: OscratProductCreate
 ): Promise<OscratProductDetail> => {
+  // Check if product with same name already exists in this team
+  const existingProduct = await prisma.oscratProduct.findFirst({
+    where: {
+      teamId,
+      name: {
+        equals: data.name.trim(),
+        mode: 'insensitive',
+      },
+    },
+    select: { id: true },
+  });
+
+  if (existingProduct) {
+    throw new Error('A product with this name already exists. Please choose a different name.');
+  }
+
   const product = await prisma.oscratProduct.create({
     data: {
       name: data.name,

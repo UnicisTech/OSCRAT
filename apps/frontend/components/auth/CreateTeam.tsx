@@ -321,13 +321,14 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               }
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              maxLength={100}
               required
             />
 
-            {/* Country Selection */}
+            {/* Phone Prefix Selection */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                {t('oscrat.ui.country')}
+                {t('oscrat.ui.phone-prefix')}
               </label>
               <Select
                 inputId="country-select"

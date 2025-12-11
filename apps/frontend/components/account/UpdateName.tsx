@@ -53,6 +53,7 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
                 : undefined
             }
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             required
           />
           <InputWithLabel
@@ -67,6 +68,7 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
                 : undefined
             }
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             required
           />
         </Card.Body>

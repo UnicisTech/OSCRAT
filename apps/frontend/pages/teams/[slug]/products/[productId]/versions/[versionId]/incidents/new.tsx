@@ -11,6 +11,7 @@ import { withProductDetailLayout } from '@/lib/layout-helpers';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
 import { Breadcrumb } from '@/components/shared';
+import { FaTrash } from 'react-icons/fa';
 import { 
   IncidentStatus,
   IncidentClassification,
@@ -37,7 +38,7 @@ function NewIncidentPage() {
   const version = versionContext.version;
   const project = productContext.project;
   const { members } = useTeamMembers(slug);
-  const { attachments, uploadAttachment } = useVersionAttachments(teamId, productId, versionId);
+  const { attachments, uploadAttachment, deleteAttachment } = useVersionAttachments(teamId, productId, versionId);
   const { createIncident, isCreating } = useIncidents(teamId, productId, versionId);
 
   const [formData, setFormData] = useState({
@@ -95,6 +96,16 @@ function NewIncidentPage() {
       toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file')));
     } finally {
       setUploadingFile(false);
+    }
+  };
+
+  const handleRemoveAttachment = async (attachmentId: string) => {
+    try {
+      await deleteAttachment(attachmentId);
+      setUploadedAttachmentIds(prev => prev.filter(id => id !== attachmentId));
+      toast.success(t('oscrat.ui.attachment-deleted'));
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-delete-attachment')));
     }
   };
 
@@ -491,8 +502,16 @@ function NewIncidentPage() {
                 {attachments
                   .filter(att => uploadedAttachmentIds.includes(att.id))
                   .map((attachment) => (
-                    <div key={attachment.id} className="flex items-center text-sm text-gray-700">
+                    <div key={attachment.id} className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
                       <span>{attachment.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAttachment(attachment.id)}
+                        className="ml-2 inline-flex items-center gap-1 text-red-600 hover:text-red-800"
+                        title={t('oscrat.ui.delete')}
+                      >
+                        <FaTrash size={12} />
+                      </button>
                     </div>
                   ))}
               </div>

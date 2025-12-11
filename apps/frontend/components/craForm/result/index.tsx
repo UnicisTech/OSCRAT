@@ -43,6 +43,13 @@ const Result: React.FC<ResultWithFormStateProps> = ({
   const handleAddProduct = () => {
     router.push(`/teams/${teamSlug}/products/add-product/cache`);
   };
+  const handleGoHome = () => {
+    if (isAuthenticated && teamSlug) {
+      router.push(`/teams/${teamSlug}/dashboard`);
+    } else {
+      router.push('/auth/login');
+    }
+  };
 
   // Render buttons based on eligibility
   const renderEligibleButtons = () => {
@@ -103,7 +110,7 @@ const Result: React.FC<ResultWithFormStateProps> = ({
           
           <div className="mb-8 flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
             <Button
-              onClick={handleLogin}
+              onClick={handleGoHome}
               className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
               text={t('oscrat.ui.go-home')}
               variant="normal"

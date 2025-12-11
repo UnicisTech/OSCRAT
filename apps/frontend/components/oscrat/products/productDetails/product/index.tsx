@@ -159,7 +159,7 @@ const Index: React.FC<ProductProps> = ({
           </div>
           <div className="flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.role')}:
+              {t('oscrat.ui.product-type')}:
             </span>
             <span className="font-semibold text-black dark:text-gray-100">
               {t(getProductTypeKey(project.type))}

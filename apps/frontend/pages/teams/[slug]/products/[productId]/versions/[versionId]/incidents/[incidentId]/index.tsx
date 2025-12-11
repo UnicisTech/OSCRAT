@@ -239,6 +239,33 @@ function IncidentDetailsPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-500">
+                {t('oscrat.ui.added-by')}
+              </label>
+              <p className="mt-1 text-base text-gray-900">
+                {incident.createdByUser?.name || '-'} {incident.createdByUser?.email && `(${incident.createdByUser.email})`}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-500">
+                {t('oscrat.ui.last-edited')}
+              </label>
+              <p className="mt-1 text-base text-gray-900">
+                {formatDateLong(incident.updatedAt)}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-500">
+                {t('oscrat.ui.edited-by')}
+              </label>
+              <p className="mt-1 text-base text-gray-900">
+                {incident.updatedByUser?.name || '-'} {incident.updatedByUser?.email && `(${incident.updatedByUser.email})`}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-500">
                 {t('oscrat.ui.versions.incidents.severity')}
               </label>
               <p className="mt-1 text-base font-semibold text-gray-900">
