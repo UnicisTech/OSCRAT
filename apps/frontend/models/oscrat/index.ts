@@ -8,3 +8,12 @@ export {
   saveFileAsVersionAttachment,
   checkExtensionAndMIMEType as checkVersionAttachmentFile,
 } from './versionAttachment';
+
+export {
+  uploadVersionCAR,
+  deleteVersionCAR,
+  getVersionCAR,
+  uploadVersionDoC,
+  deleteVersionDoC,
+  getVersionDoC,
+} from './versionDoc';

@@ -1,4 +1,4 @@
-import { OscratProductVersionStatus } from '@prisma/client';
+import { OscratProductVersionStatus, Attachment } from '@prisma/client'
 import { OscratVulnerabilitySummary } from './vulnerabilities';
 import { OscratIncidentSummary } from './incidents';
 import { OscratAssessmentSummary } from './assessment';
@@ -13,6 +13,8 @@ export interface OscratProductVersionSummary {
   openVulnerabilities: number;
   hasRepository: boolean;
   sbomReportsCount: number;
+  hasConformityAssessmentReport: boolean;
+  hasDeclarationOfConformity: boolean;
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
@@ -38,6 +40,8 @@ export interface OscratProductVersionDetail {
     targetCommit?: string;
   };
   sbomReportsCount: number;
+  conformityAssessmentReport?: Attachment;
+  declarationOfConformity?: Attachment;
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;

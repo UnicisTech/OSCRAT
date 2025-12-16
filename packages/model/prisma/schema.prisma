@@ -398,6 +398,7 @@ enum OscratProductVersionStatus {
   DEPRECATED
   ARCHIVED
   WITHDRAWN
+  SUPPORTED
 }
 
 
@@ -455,6 +456,14 @@ model OscratProductVersion {
   attachments              Attachment[]
   workerJobs               WorkerJob[]
   tasks                    Task[]
+
+  // Conformity Assessment Report (prerequisite for DoC)
+  conformityAssessmentReportId String?    @unique
+  conformityAssessmentReport   Attachment? @relation("VersionCAR", fields: [conformityAssessmentReportId], references: [id], onDelete: SetNull)
+
+  // Declaration of Conformity (final PDF)
+  declarationOfConformityId String?    @unique
+  declarationOfConformity   Attachment? @relation("VersionDoC", fields: [declarationOfConformityId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -798,6 +807,10 @@ model Attachment {
 
   vulnerabilityId String?
   vulnerability   OscratProductVulnerability? @relation(fields: [vulnerabilityId], references: [id], onDelete: Cascade)
+
+  // Reverse relations for CAR and DoC
+  versionAsCAR OscratProductVersion? @relation("VersionCAR")
+  versionAsDoC OscratProductVersion? @relation("VersionDoC")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

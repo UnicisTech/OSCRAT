@@ -64,4 +64,3 @@ export function createComplianceTranslator(
     return t(key, { ns: complianceNamespace });
   };
 }
-

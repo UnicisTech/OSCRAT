@@ -3,6 +3,7 @@ import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { saveAs } from 'file-saver';
 import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
+import type { PDFTranslations } from '@/lib/compliance/pdfTranslations';
 
 const styles = StyleSheet.create({
   page: {
@@ -151,42 +152,6 @@ const styles = StyleSheet.create({
     color: '#1f2937',
   },
 });
-
-interface PDFTranslations {
-  reportTitle: string;
-  product: string;
-  organization: string;
-  generated: string;
-  overallProgress: string;
-  complete: string;
-  of: string;
-  requirementsEvaluated: string;
-  summaryStatistics: string;
-  evaluated: string;
-  notEvaluated: string;
-  compliant: string;
-  partiallyCompliant: string;
-  notCompliant: string;
-  notApplicable: string;
-  requirementsStatusSummary: string;
-  id: string;
-  requirement: string;
-  status: string;
-  conformity: string;
-  page: string;
-  craReference: string;
-  hint: string;
-  questionsAndAnswers: string;
-  answer: string;
-  yes: string;
-  no: string;
-  additionalInfo: string;
-  evidence: string;
-  evidenceAttached: string;
-  noAnswerProvided: string;
-  detailedAssessment: string;
-  area: string;
-}
 
 interface CompliancePDFDocumentProps {
   complianceData: ComplianceArea[];
@@ -421,8 +386,9 @@ export const exportComplianceToPDF = async (
   organizationName: string,
   productName: string | undefined,
   translations: PDFTranslations,
-  translateComplianceFn: (key: string) => string
-) => {
+  translateComplianceFn: (key: string) => string,
+  returnBlob: boolean = false
+): Promise<Blob | void> => {
   const blob = await pdf(
     <CompliancePDFDocument
       complianceData={complianceData}
@@ -435,6 +401,10 @@ export const exportComplianceToPDF = async (
     />
   ).toBlob();
 
+  if (returnBlob) {
+    return blob;
+  }
+
   const timestamp = new Date().toISOString().split('T')[0];
   const namePart = productName 
     ? productName.replace(/[^a-z0-9]/gi, '-')
@@ -442,8 +412,6 @@ export const exportComplianceToPDF = async (
   const filename = `compliance-assessment-${namePart}-${timestamp}.pdf`
   saveAs(blob, filename);
 };
-
-export type { PDFTranslations };
 
 export default CompliancePDFDocument;
 

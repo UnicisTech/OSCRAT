@@ -244,6 +244,16 @@ export const queryKeys = {
               ...(filters ? [filters] : []),
             ] as const,
         },
+        car: (teamId: string, versionId: string) =>
+          [
+            ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+            'car',
+          ] as const,
+        doc: (teamId: string, versionId: string) =>
+          [
+            ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+            'doc',
+          ] as const,
       },
     },
   },

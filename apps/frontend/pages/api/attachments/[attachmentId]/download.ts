@@ -2,6 +2,7 @@ import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { getAttachmentWithFileById } from '@oscrat/model/operations';
 import { prisma } from '@/lib/prisma';
+import { ApiError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -11,7 +12,7 @@ export default function handler(
 
   switch (method) {
     case 'GET':
-      return withTeamAuth(['task', 'read'])(handleGET)(req, res);
+      return withTeamAuth(['team', 'read'])(handleGET)(req, res);
     default:
       res.setHeader('Allow', ['GET']);
       res.status(405).json({
@@ -25,50 +26,24 @@ const handleGET = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
-  const { teamMember } = req.teamContext;
   const { attachmentId } = req.query;
 
-  try {
-    const attachment = await getAttachmentWithFileById(prisma, attachmentId as string);
+  const attachment = await getAttachmentWithFileById(prisma, attachmentId as string);
 
-    if (!attachment) {
-      return res.status(404).json({
-        data: null,
-        error: { message: 'Attachment not found.' },
-      });
-    }
-
-    // TODO: Add permission verification
-    if (attachment.taskId) {
-      // TODO: Implement task permission check
-    } else if (attachment.versionId) {
-      // TODO: Implement version permission check
-    } else if (attachment.sbomReportId) {
-      // TODO: Implement SBOM report permission check
-    } else if (attachment.vulnerabilityScanReportId) {
-      // TODO: Implement vulnerability scan report permission check
-    } else {
-      return res.status(400).json({
-        data: null,
-        error: { message: 'Invalid attachment type.' },
-      });
-    }
-
-    const mimeType = attachment.mimeType || 'application/octet-stream';
-    res.setHeader('Content-Type', mimeType);
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename*=UTF-8''${encodeURIComponent(attachment.name)}`
-    );
-
-    // Stream the file data directly without temporary files
-    const fileBuffer = Buffer.from(attachment.file.fileData);
-    res.status(200).send(fileBuffer);
-  } catch (error) {
-    console.error('Error downloading attachment:', error);
-    res.status(500).json({
-      data: null,
-      error: { message: 'Internal server error.' },
-    });
+  if (!attachment) {
+    throw new ApiError(404, 'oscrat.ui.validation.attachment-not-found');
   }
+
+  // TODO: Implement proper access control based on attachment's linked entity
+  // For now, rely on team auth middleware for basic access control
+
+  const mimeType = attachment.mimeType || 'application/octet-stream';
+  res.setHeader('Content-Type', mimeType);
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename*=UTF-8''${encodeURIComponent(attachment.name)}`
+  );
+
+  const fileBuffer = Buffer.from(attachment.file.fileData);
+  res.status(200).send(fileBuffer);
 };

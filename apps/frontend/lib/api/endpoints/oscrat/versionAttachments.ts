@@ -34,9 +34,7 @@ export const versionAttachmentsEndpoints = {
     api.post<Attachment>(
       `/teams/${teamId}/products/${productId}/versions/${versionId}/attachments`,
       formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
+      { headers: { 'Content-Type': undefined } }
     ),
 
   deleteVersionAttachment: (

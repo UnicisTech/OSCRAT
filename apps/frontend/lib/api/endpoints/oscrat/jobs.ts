@@ -45,9 +45,7 @@ export const oscratJobEndpoints = {
     api.post<SbomReportDetails>(
       `/teams/${teamId}/products/${productId}/versions/${versionId}/sbom-reports/import`,
       formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
+      { headers: { 'Content-Type': undefined } }
     ),
 
   // Get SBOM report details by reportId

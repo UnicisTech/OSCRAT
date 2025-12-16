@@ -105,9 +105,7 @@ export const tasksEndpoints = {
     return api.post<{ url: string }>(
       `/teams/${slug}/tasks/${taskNumber}/attachments`,
       formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
+      { headers: { 'Content-Type': undefined } }
     );
   },
 

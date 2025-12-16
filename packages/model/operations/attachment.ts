@@ -225,3 +225,94 @@ export const deleteAttachment = async (
     );
   });
 };
+
+// Upsert attachment file parameters
+export interface UpsertAttachmentFileParams {
+  name: string;
+  fileData: Buffer;
+  fileSize: number;
+  mimeType?: string;
+  createdBy: string;
+}
+
+/**
+ * Upsert attachment file within a transaction.
+ * If existingAttachmentId is provided and valid, updates the file in place using nested update.
+ * Otherwise creates a new attachment with nested file creation.
+ * Returns the attachment ID.
+ */
+export const upsertAttachmentFileWithTx = async (
+  tx: Prisma.TransactionClient,
+  existingAttachmentId: string | null,
+  params: UpsertAttachmentFileParams
+): Promise<string> => {
+  if (existingAttachmentId) {
+    const existingAttachment = await tx.attachment.findUnique({
+      where: { id: existingAttachmentId },
+      select: { id: true, fileId: true },
+    });
+
+    if (existingAttachment) {
+      // Update attachment metadata
+      await tx.attachment.update({
+        where: { id: existingAttachmentId },
+        data: {
+          name: params.name,
+          fileSize: params.fileSize,
+          mimeType: params.mimeType,
+        },
+      });
+
+      // Update file data separately (required due to explicit fileId foreign key)
+      await tx.file.update({
+        where: { id: existingAttachment.fileId },
+        data: {
+          fileData: new Uint8Array(params.fileData),
+          fileSize: params.fileSize,
+          mimeType: params.mimeType,
+        },
+      });
+
+      return existingAttachmentId;
+    }
+  }
+
+  // Create file first, then attachment (required due to explicit fileId foreign key)
+  const file = await createFileInTransaction(tx, {
+    fileData: params.fileData,
+    fileSize: params.fileSize,
+    mimeType: params.mimeType,
+  });
+
+  const attachment = await tx.attachment.create({
+    data: {
+      name: params.name,
+      fileSize: params.fileSize,
+      mimeType: params.mimeType || 'application/octet-stream',
+      createdBy: params.createdBy,
+      fileId: file.id,
+    },
+  });
+
+  return attachment.id;
+};
+
+/**
+ * Delete attachment and its file within a transaction.
+ */
+export const deleteAttachmentWithTx = async (
+  tx: Prisma.TransactionClient,
+  attachmentId: string
+): Promise<void> => {
+  const attachment = await tx.attachment.findUnique({
+    where: { id: attachmentId },
+    select: { fileId: true },
+  });
+
+  if (attachment) {
+    await tx.attachment.delete({ where: { id: attachmentId } });
+    if (attachment.fileId) {
+      await tx.file.delete({ where: { id: attachment.fileId } });
+    }
+  }
+};

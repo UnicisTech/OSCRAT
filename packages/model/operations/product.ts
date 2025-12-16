@@ -58,6 +58,12 @@ const PRODUCT_DETAIL_INCLUDE = {
           id: true,
         },
       },
+      conformityAssessmentReport: {
+        select: { id: true },
+      },
+      declarationOfConformity: {
+        select: { id: true },
+      },
       _count: {
         select: {
           incidents: {
@@ -153,6 +159,8 @@ export const transformToProductDetail = (
       openVulnerabilities: version._count?.vulnerabilities || 0,
       hasRepository: !!version.repository,
       sbomReportsCount: version._count?.sbomReports || 0,
+      hasConformityAssessmentReport: !!version.conformityAssessmentReport,
+      hasDeclarationOfConformity: !!version.declarationOfConformity,
       createdAt: version.createdAt,
       updatedAt: version.updatedAt,
       createdBy: version.createdBy,

@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
 import { OscratOrganizationRole } from '@oscrat/model';
-import { AreaList, RequirementQuestionnaire } from '@/components/compliance';
+import { AreaList, RequirementQuestionnaire, exportComplianceToPDF } from '@/components/compliance';
 import toast from 'react-hot-toast';
 import { getComplianceNamespace, type ComplianceType } from '@/lib/compliance/translations';
+import { buildPDFTranslations } from '@/lib/compliance/pdfTranslations';
 import { useOrgCompliance } from '@/hooks/oscrat/useOrgCompliance';
 import { useVersionCompliance } from '@/hooks/oscrat/useVersionCompliance';
 import { useComplianceTaskGeneration } from '@/hooks/oscrat/useComplianceTaskGeneration';
+import { useDeclarationOfConformity } from '@/hooks/oscrat/useDeclarationOfConformity';
 import { COMPLIANCE_STATUS } from '@/constants/conformityStatuses';
+import { generateCARFilename } from '@/lib/utils/filename';
 
 interface ComplianceFormProps {
   complianceData: ComplianceArea[];
@@ -58,6 +62,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
   
   const { t, ready } = useTranslation(['common', complianceNamespace]);
   const { data: session } = useSession();
+  const router = useRouter();
   
   // Validate: both productId and versionId must be valid or both null/undefined
   const isVersionCompliance = !!(productId && versionId);
@@ -84,11 +89,18 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
 
   const taskGeneration = useComplianceTaskGeneration({
     teamSlug,
-    productId: productId || undefined,
-    versionId: versionId || undefined,
+    productId: isVersionCompliance ? productId : undefined,
+    versionId: isVersionCompliance ? versionId : undefined,
     userId: session?.user?.id as string,
     complianceNamespace,
   });
+
+  // For uploading CAR when assessment is finished (version compliance only)
+  const { uploadCAR } = useDeclarationOfConformity(
+    teamId,
+    isVersionCompliance ? productId : '',
+    isVersionCompliance ? versionId : ''
+  );
 
   const {
     complianceState: hookComplianceState,
@@ -283,7 +295,35 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       }));
       
       if (allAreasComplete) {
-        if (updatedState.finished) {
+        if (updatedState.finished && isVersionCompliance) {
+          // Generate CAR PDF and upload it, then navigate back
+          toast.success(t('oscrat.ui.assessment-completed-generating-car'));
+          
+          const pdfTranslations = buildPDFTranslations(t);
+
+          try {
+            const pdfBlob = await exportComplianceToPDF(
+              complianceData,
+              updatedState,
+              versionId!,
+              teamName,
+              productName,
+              pdfTranslations,
+              (key: string) => t(key, { ns: complianceNamespace }),
+              true // Return blob instead of downloading
+            );
+            
+            if (pdfBlob) {
+              const filename = generateCARFilename(productName);
+              const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+              await uploadCAR(file);
+              toast.success(t('oscrat.ui.car-generated-and-set'));
+              router.push(`/teams/${teamSlug}/products/${productId}/versions/${versionId}`);
+            }
+          } catch {
+            toast.error(t('oscrat.ui.car-generation-failed'));
+          }
+        } else if (updatedState.finished) {
           toast.success(t('oscrat.ui.assessment-completed-finished'));
         } else {
           toast.success(t('oscrat.ui.assessment-saved-successfully'));
@@ -301,6 +341,13 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     complianceNamespace,
     isVersionCompliance,
     taskGeneration,
+    uploadCAR,
+    router,
+    teamSlug,
+    productId,
+    versionId,
+    teamName,
+    productName,
   ]);
 
   const handleBack = useCallback(() => {

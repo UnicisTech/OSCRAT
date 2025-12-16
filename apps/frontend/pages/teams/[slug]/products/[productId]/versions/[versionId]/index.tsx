@@ -2,7 +2,7 @@ import TabsManager from '@/components/oscrat/versions/versionDetails/tabs/TabMan
 import { withProductDetailLayout } from '@/lib/layout-helpers';
 import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/tabs';
 import Version from '@/components/oscrat/versions/versionDetails/version';
-import ConformityRow from '@/components/oscrat/versions/versionDetails/conformityRow';
+import DocSection from '@/components/oscrat/versions/versionDetails/docSection';
 import { Breadcrumb } from '@/components/shared';
 import { useTranslation } from 'next-i18next';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
@@ -44,7 +44,7 @@ export default function Index() {
     <>
       <Breadcrumb items={breadcrumbItems} />
       <Version />
-      <ConformityRow />
+      <DocSection />
       <TabsManager tabs={TABS_CONFIG} />
     </>
   );

@@ -11,6 +11,10 @@ import type {
 } from '../types/version';
 import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
 import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
+import {
+  upsertAttachmentFileWithTx,
+  deleteAttachmentWithTx,
+} from './attachment';
 
 const VERSION_SUMMARY_INCLUDE = {
   _count: {
@@ -37,6 +41,8 @@ const VERSION_SUMMARY_INCLUDE = {
       id: true,
     },
   },
+  conformityAssessmentReport: true,
+  declarationOfConformity: true,
 };
 
 const VERSION_DETAIL_INCLUDE = {
@@ -65,6 +71,8 @@ const VERSION_DETAIL_INCLUDE = {
       targetCommit: true,
     },
   },
+  conformityAssessmentReport: true,
+  declarationOfConformity: true,
   _count: {
     select: {
       sbomReports: true,
@@ -92,6 +100,8 @@ export const transformToVersionSummary = (
   openVulnerabilities: version._count?.vulnerabilities || 0,
   hasRepository: !!version.repository,
   sbomReportsCount: version._count?.sbomReports || 0,
+  hasConformityAssessmentReport: !!version.conformityAssessmentReport,
+  hasDeclarationOfConformity: !!version.declarationOfConformity,
   createdAt: version.createdAt,
   updatedAt: version.updatedAt,
   createdBy: version.createdBy,
@@ -166,6 +176,8 @@ export const transformToVersionDetail = (
       }
     : undefined,
   sbomReportsCount: version._count?.sbomReports || 0,
+  conformityAssessmentReport: version.conformityAssessmentReport ?? undefined,
+  declarationOfConformity: version.declarationOfConformity ?? undefined,
   createdAt: version.createdAt,
   updatedAt: version.updatedAt,
   createdBy: version.createdBy,
@@ -260,4 +272,168 @@ export const deleteVersion = async (
       teamId: teamId,
     },
   });
+};
+
+// Shared base interface for CAR and DoC upsert params
+export interface UpsertVersionAttachmentParams {
+  name: string;
+  fileData: Buffer;
+  fileSize: number;
+  mimeType?: string;
+  createdBy: string;
+}
+
+// CAR (Conformity Assessment Report) operations
+
+export type UpsertVersionCARParams = UpsertVersionAttachmentParams;
+
+export const upsertVersionCAR = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string,
+  params: UpsertVersionCARParams
+): Promise<OscratProductVersionDetail> => {
+  return await prisma.$transaction(async (tx) => {
+    const current = await tx.oscratProductVersion.findFirst({
+      where: { id: versionId, teamId },
+      select: { conformityAssessmentReportId: true },
+    });
+
+    const attachmentId = await upsertAttachmentFileWithTx(
+      tx,
+      current?.conformityAssessmentReportId ?? null,
+      {
+        name: params.name,
+        fileData: params.fileData,
+        fileSize: params.fileSize,
+        mimeType: params.mimeType || 'application/octet-stream',
+        createdBy: params.createdBy,
+      }
+    );
+
+    const version = await tx.oscratProductVersion.update({
+      where: { id: versionId, teamId },
+      data: { conformityAssessmentReportId: attachmentId },
+      include: VERSION_DETAIL_INCLUDE,
+    });
+
+    return transformToVersionDetail(version);
+  });
+};
+
+export const removeVersionCAR = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string
+): Promise<OscratProductVersionDetail> => {
+  return await prisma.$transaction(async (tx) => {
+    const current = await tx.oscratProductVersion.findFirst({
+      where: { id: versionId, teamId },
+      select: { conformityAssessmentReportId: true },
+    });
+
+    if (current?.conformityAssessmentReportId) {
+      await deleteAttachmentWithTx(tx, current.conformityAssessmentReportId);
+    }
+
+    const version = await tx.oscratProductVersion.findFirstOrThrow({
+      where: { id: versionId, teamId },
+      include: VERSION_DETAIL_INCLUDE,
+    });
+
+    return transformToVersionDetail(version);
+  });
+};
+
+// DoC (Declaration of Conformity) operations
+
+export interface UpsertVersionDoCParams extends UpsertVersionAttachmentParams {
+  updateStatusToSupported?: boolean;
+}
+
+export const upsertVersionDoC = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string,
+  params: UpsertVersionDoCParams
+): Promise<OscratProductVersionDetail> => {
+  return await prisma.$transaction(async (tx) => {
+    const current = await tx.oscratProductVersion.findFirst({
+      where: { id: versionId, teamId },
+      select: { declarationOfConformityId: true },
+    });
+
+    const attachmentId = await upsertAttachmentFileWithTx(
+      tx,
+      current?.declarationOfConformityId ?? null,
+      {
+        name: params.name,
+        fileData: params.fileData,
+        fileSize: params.fileSize,
+        mimeType: params.mimeType || 'application/pdf',
+        createdBy: params.createdBy,
+      }
+    );
+
+    const version = await tx.oscratProductVersion.update({
+      where: { id: versionId, teamId },
+      data: {
+        declarationOfConformityId: attachmentId,
+        ...(params.updateStatusToSupported && {
+          status: OscratProductVersionStatus.SUPPORTED,
+        }),
+      },
+      include: VERSION_DETAIL_INCLUDE,
+    });
+
+    return transformToVersionDetail(version);
+  });
+};
+
+export const removeVersionDoC = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string
+): Promise<OscratProductVersionDetail> => {
+  return await prisma.$transaction(async (tx) => {
+    const current = await tx.oscratProductVersion.findFirst({
+      where: { id: versionId, teamId },
+      select: { declarationOfConformityId: true },
+    });
+
+    if (current?.declarationOfConformityId) {
+      await deleteAttachmentWithTx(tx, current.declarationOfConformityId);
+    }
+
+    const version = await tx.oscratProductVersion.findFirstOrThrow({
+      where: { id: versionId, teamId },
+      include: VERSION_DETAIL_INCLUDE,
+    });
+
+    return transformToVersionDetail(version);
+  });
+};
+
+export const getVersionCARAttachmentId = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string
+): Promise<string | null> => {
+  const version = await prisma.oscratProductVersion.findFirst({
+    where: { id: versionId, teamId },
+    select: { conformityAssessmentReportId: true },
+  });
+  return version?.conformityAssessmentReportId ?? null;
+};
+
+export const getVersionDoCAttachmentId = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string
+): Promise<string | null> => {
+  const version = await prisma.oscratProductVersion.findFirst({
+    where: { id: versionId, teamId },
+    select: { declarationOfConformityId: true },
+  });
+  return version?.declarationOfConformityId ?? null;
 };
