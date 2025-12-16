@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-const DATA_KEY_REGEX = /^[a-z0-9_-]+$/;
+const DATA_KEY_REGEX = /^[a-z0-9_:-]+$/;
 
 const jsonStringSchema = Yup.string()
   .required('Payload is required')
@@ -18,7 +18,7 @@ const dataKeySchema = Yup.string()
   .required('Data key is required')
   .max(100, 'Data key too long')
   .lowercase()
-  .matches(DATA_KEY_REGEX, 'Data key must be lowercase alphanumeric with hyphens/underscores');
+  .matches(DATA_KEY_REGEX, 'Data key must be lowercase alphanumeric with hyphens, underscores, and colons');
 
 export const teamDataCreateSchema = Yup.object({
   dataKey: dataKeySchema,

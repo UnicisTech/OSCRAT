@@ -7,9 +7,10 @@ import { useVersionContext } from '@/context/VersionContext';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { Loading } from '@/components/shared';
-import { ComplianceForm } from '@/components/compliance';
+import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { getRoleForTeam } from '@/lib/compliance/utils';
+import { COMPLIANCE_TYPES } from '@/lib/compliance/translations';
 
 const CompliancePage = () => {
   const { t, ready } = useTranslation('common');
@@ -24,7 +25,7 @@ const CompliancePage = () => {
   const { complianceData, isLoading } = useComplianceData({
     teamSlug: team.slug,
     teamRole: team.orgRoles[0],
-    complianceType: 'version',
+    complianceType: COMPLIANCE_TYPES.VERSION,
     enabled: !!team && !!versionData,
   });
 
@@ -45,7 +46,7 @@ const CompliancePage = () => {
         </p>
       </div>
 
-      <ComplianceForm
+      <ComplianceAssessmentWrapper
         complianceData={complianceData}
         productId={productId}
         versionId={versionId}
@@ -54,6 +55,7 @@ const CompliancePage = () => {
         teamRole={getRoleForTeam(team.orgRoles[0])}
         teamName={team.name}
         productName={`${project.name} (${versionData.version})`}
+        complianceType={COMPLIANCE_TYPES.VERSION}
       />
     </div>
   );

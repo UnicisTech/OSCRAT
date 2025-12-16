@@ -5,7 +5,7 @@ import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/
 import { OscratOrganizationRole } from '@oscrat/model';
 import { AreaList, RequirementQuestionnaire } from '@/components/compliance';
 import toast from 'react-hot-toast';
-import { getComplianceNamespace } from '@/lib/compliance/translations';
+import { getComplianceNamespace, type ComplianceType } from '@/lib/compliance/translations';
 import { useOrgCompliance } from '@/hooks/oscrat/useOrgCompliance';
 import { useVersionCompliance } from '@/hooks/oscrat/useVersionCompliance';
 import { useComplianceTaskGeneration } from '@/hooks/oscrat/useComplianceTaskGeneration';
@@ -20,7 +20,8 @@ interface ComplianceFormProps {
   teamRole: OscratOrganizationRole;
   teamName: string;
   productName: string;
-  storageKeyPrefix?: string;
+  complianceType: ComplianceType;
+  customTranslations?: Record<string, string> | null;
 }
 
 const createInitialState = (
@@ -50,9 +51,9 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
   teamRole,
   teamName,
   productName,
-  storageKeyPrefix = 'compliance',
+  complianceType,
+  customTranslations = null,
 }) => {
-  const complianceType = storageKeyPrefix === 'team_compliance' ? 'team' : 'version';
   const complianceNamespace = getComplianceNamespace(teamRole, complianceType);
   
   const { t, ready } = useTranslation(['common', complianceNamespace]);
@@ -361,6 +362,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         onComplete={handleRequirementComplete}
         onBack={handleBack}
         complianceNamespace={complianceNamespace}
+        customTranslations={customTranslations}
       />
     );
   }
@@ -377,6 +379,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       productName={productName}
       onReset={handleReset}
       complianceNamespace={complianceNamespace}
+      customTranslations={customTranslations}
     />
   );
 };

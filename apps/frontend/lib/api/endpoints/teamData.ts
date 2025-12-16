@@ -1,4 +1,6 @@
 import { api } from '@/lib/api/client';
+import { queryClient } from '@/lib/api/hooks';
+import { queryKeys } from '@/lib/api/queryKeys';
 import type {
   TeamData,
   TeamDataSummary,
@@ -33,4 +35,15 @@ export const teamDataEndpoints = {
 
   delete: (slug: string, dataKey: string) =>
     api.delete<void>(`/teams/${slug}/data/${encodeURIComponent(dataKey)}`),
+
+  getComplianceTemplate: (slug: string, namespace: string) =>
+    api.get<Record<string, string>>(
+      `/teams/${slug}/compliance-translation-template?namespace=${namespace}`
+    ),
+
+  fetchDataItem: (slug: string, dataKey: string) =>
+    queryClient.fetchQuery({
+      queryKey: queryKeys.teams.data.detail(slug, dataKey),
+      queryFn: () => teamDataEndpoints.get(slug, dataKey),
+    }),
 };

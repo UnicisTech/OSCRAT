@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ComplianceQuestion, ComplianceAnswer } from '@/types/compliance';
-import { ComplianceNamespace } from '@/lib/compliance/translations';
+import { ComplianceNamespace, createComplianceTranslator } from '@/lib/compliance/translations';
 import { FaUpload, FaFile, FaTimes, FaInfoCircle } from 'react-icons/fa';
 
 interface QuestionStepProps {
@@ -14,6 +14,7 @@ interface QuestionStepProps {
   isFirst: boolean;
   isLast: boolean;
   complianceNamespace: ComplianceNamespace;
+  customTranslations?: Record<string, string> | null;
 }
 
 const QuestionStep: React.FC<QuestionStepProps> = ({
@@ -26,9 +27,11 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
   isFirst,
   isLast,
   complianceNamespace,
+  customTranslations = null,
 }) => {
   const { t, ready } = useTranslation(['common', complianceNamespace]);
-  
+  const tr = createComplianceTranslator(t, complianceNamespace, customTranslations);
+
   const getInitialAnswer = () => {
     if (existingAnswer?.answer !== undefined) {
       return existingAnswer.answer;
@@ -106,7 +109,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
                   onChange={() => setAnswer(booleanValue)}
                   className="mr-3 text-blue-600 "
                 />
-                <span className="text-gray-700">{t(option, { ns: complianceNamespace })}</span>
+                <span className="text-gray-700">{tr(option)}</span>
               </label>
             );
           })}
@@ -177,7 +180,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
           </span>
         </div>
         <h3 className="text-lg font-medium text-gray-900">
-          {t(question.questionText, { ns: complianceNamespace })}
+          {tr(question.questionText)}
         </h3>
       </div>
 

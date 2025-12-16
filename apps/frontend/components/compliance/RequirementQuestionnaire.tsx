@@ -7,7 +7,7 @@ import {
   ComplianceAnswer,
   ComplianceStatus
 } from '@/types/compliance';
-import { ComplianceNamespace } from '@/lib/compliance/translations';
+import { ComplianceNamespace, createComplianceTranslator } from '@/lib/compliance/translations';
 import { QuestionStep, ComplianceStatusSelector } from '@/components/compliance';
 import { LuInfo } from 'react-icons/lu';
 
@@ -20,6 +20,7 @@ interface RequirementQuestionnaireProps {
   onComplete: (assessment: RequirementAssessment) => void;
   onBack: () => void;
   complianceNamespace: ComplianceNamespace;
+  customTranslations?: Record<string, string> | null;
 }
 
 const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
@@ -31,8 +32,10 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
   onComplete,
   onBack,
   complianceNamespace,
+  customTranslations = null,
 }) => {
   const { t, ready } = useTranslation(['common', complianceNamespace]);
+  const tr = createComplianceTranslator(t, complianceNamespace, customTranslations);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<ComplianceAnswer[]>(() => 
     existingAssessment?.requirementId === requirement.reqId 
@@ -101,9 +104,9 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
   const handleStatusSelect = (status: ComplianceStatus) => {
     const assessment: RequirementAssessment = {
       requirementId: requirement.reqId,
-      requirementText: t(requirement.requirement, { ns: complianceNamespace }),
+      requirementText: tr(requirement.requirement),
       areaId: area.id,
-      areaText: t(area.areaOfRequirements, { ns: complianceNamespace }),
+      areaText: tr(area.areaOfRequirements),
       answers,
       complianceStatus: status,
       assessedAt: new Date().toISOString(),
@@ -127,7 +130,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
           </h2>
           
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium text-gray-700 mb-2">{t(requirement.requirement, { ns: complianceNamespace })}</h3>
+            <h3 className="font-medium text-gray-700 mb-2">{tr(requirement.requirement)}</h3>
             <p className="text-sm text-gray-600">
               {t('oscrat.ui.answered-all-questions', { count: requirement.questions.length })}
             </p>
@@ -148,7 +151,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-xl font-semibold text-gray-800">
-            {t(area.areaOfRequirements, { ns: complianceNamespace })}
+            {tr(area.areaOfRequirements)}
           </h2>
           <span className="text-sm text-gray-600">
             {t('oscrat.ui.requirement-n-of-m', { 
@@ -172,7 +175,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {t(requirement.requirement, { ns: complianceNamespace })}
+              {tr(requirement.requirement)}
             </h3>
             <p className="text-sm text-gray-500">
               {t('oscrat.ui.cra-reference')}: {requirement.craReference}
@@ -192,7 +195,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
             {requirement.hint && (
               <>
                 <h4 className="font-medium text-blue-900 mb-2">{t('oscrat.ui.hint')}</h4>
-                <p className="text-sm text-blue-800 leading-relaxed">{t(requirement.hint, { ns: complianceNamespace })}</p>
+                <p className="text-sm text-blue-800 leading-relaxed">{tr(requirement.hint!)}</p>
               </>
             )}
             {requirement.genericTask && (
@@ -221,6 +224,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
         isFirst={currentQuestionIndex === 0}
         isLast={isLastQuestion}
         complianceNamespace={complianceNamespace}
+        customTranslations={customTranslations}
       />
     </div>
   );

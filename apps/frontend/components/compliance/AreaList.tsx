@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
-import { ComplianceNamespace } from '@/lib/compliance/translations';
+import { ComplianceNamespace, createComplianceTranslator } from '@/lib/compliance/translations';
 import { FaPlay, FaCheckCircle, FaRedo } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import FullScreenModal from '@/components/shared/FullScreenModal';
@@ -17,6 +17,7 @@ interface AreaListProps {
   productName: string;
   onReset: () => void;
   complianceNamespace: ComplianceNamespace;
+  customTranslations?: Record<string, string> | null;
 }
 
 const AreaList: React.FC<AreaListProps> = ({
@@ -30,8 +31,10 @@ const AreaList: React.FC<AreaListProps> = ({
   productName: _productName,
   onReset,
   complianceNamespace,
+  customTranslations = null,
 }) => { 
   const { t, ready } = useTranslation(['common', complianceNamespace]);
+  const tr = createComplianceTranslator(t, complianceNamespace, customTranslations);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleResetConfirm = () => {
@@ -84,7 +87,7 @@ const AreaList: React.FC<AreaListProps> = ({
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {t(area.areaOfRequirements, { ns: complianceNamespace })}
+                    {tr(area.areaOfRequirements)}
                   </h3>
                   <p className="text-sm text-gray-600">
                     {t('oscrat.ui.total-requirements', { count: area.content.length })}
@@ -119,7 +122,7 @@ const AreaList: React.FC<AreaListProps> = ({
                         onAreaSelect(index);
                       }}
                       className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-200 transition-colors min-w-[70px]"
-                    aria-label={t(isCompleted ? 'edit' : 'oscrat.ui.start-assessment-area', { area: t(area.areaOfRequirements, { ns: complianceNamespace }) })}
+                    aria-label={t(isCompleted ? 'edit' : 'oscrat.ui.start-assessment-area', { area: tr(area.areaOfRequirements) })}
                     >
                     {isCompleted ? (
                       <>

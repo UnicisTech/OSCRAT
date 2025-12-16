@@ -4,9 +4,10 @@ import { GetServerSidePropsContext } from 'next';
 import { withTeamLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
 import { Loading } from '@/components/shared';
-import { ComplianceForm } from '@/components/compliance';
+import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { getRoleForTeam } from '@/lib/compliance/utils';
+import { COMPLIANCE_TYPES } from '@/lib/compliance/translations';
 
 const TeamCompliancePage = () => {
   const { t, ready } = useTranslation('common');
@@ -18,7 +19,7 @@ const TeamCompliancePage = () => {
   const { complianceData, isLoading } = useComplianceData({
     teamSlug: team.slug,
     teamRole: team.orgRoles[0],
-    complianceType: 'team',
+    complianceType: COMPLIANCE_TYPES.TEAM,
     enabled: !!team,
   });
 
@@ -39,14 +40,14 @@ const TeamCompliancePage = () => {
         </p>
       </div>
 
-      <ComplianceForm
+      <ComplianceAssessmentWrapper
         complianceData={complianceData}
         teamSlug={team.slug}
         teamId={team.id}
         teamRole={getRoleForTeam(team.orgRoles[0])}
         teamName={team.name}
         productName={team.name}
-        storageKeyPrefix="team_compliance"
+        complianceType={COMPLIANCE_TYPES.TEAM}
       />
     </div>
   );

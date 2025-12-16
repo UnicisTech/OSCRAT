@@ -7,6 +7,7 @@ import {
   TeamSettings,
   TeamTab,
   CSCSettings,
+  ComplianceTranslationSettings,
 } from '@/components/team';
 import { useTeamContext } from '@/context/TeamContext';
 import type { GetServerSidePropsContext } from 'next';
@@ -22,6 +23,7 @@ const Settings = ({ teamFeatures }) => {
       <div className="space-y-6">
         <TeamSettings team={team} />
         <CSCSettings team={team} />
+        <ComplianceTranslationSettings team={team} />
         <AccessControl resource="team" actions={['delete']}>
           <RemoveTeam team={team} />
         </AccessControl>

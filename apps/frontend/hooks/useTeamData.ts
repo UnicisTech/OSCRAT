@@ -5,7 +5,7 @@ import {
   useUpsertTeamData,
   useDeleteTeamData,
 } from '@/lib/api/hooks/teamData';
-import type { TeamDataUpsertRequest } from '@/lib/api/endpoints/teamData';
+import { teamDataEndpoints, type TeamDataUpsertRequest } from '@/lib/api/endpoints/teamData';
 
 export const DATA_KEY_NAMESPACES = {
   COMPLIANCE: 'compliance',
@@ -46,6 +46,12 @@ export function useTeamData(slug: string) {
     return upsertMutation.mutateAsync(request);
   };
 
+  const fetchDataItem = (dataKey: string) =>
+    teamDataEndpoints.fetchDataItem(slug, dataKey);
+
+  const fetchComplianceTemplate = (namespace: string) =>
+    teamDataEndpoints.getComplianceTemplate(slug, namespace);
+
   const isLoading = isListLoading || upsertMutation.isPending;
 
   return {
@@ -55,6 +61,8 @@ export function useTeamData(slug: string) {
     isListError,
     listError,
     upsertData,
+    fetchDataItem,
+    fetchComplianceTemplate,
     isUpserting: upsertMutation.isPending,
     upsertError: upsertMutation.error,
   };

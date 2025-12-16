@@ -1247,6 +1247,32 @@
           "no-answer-provided": "No answer provided",
           "detailed-assessment": "Detailed Assessment"
         }
+      },
+      "compliance-translation": {
+        "title": "Compliance Assessment Translations",
+        "description": "Manage translations for compliance assessment questionnaires. Download the default English template, translate it, and upload for your desired language. These translations will be used when team members take assessments.",
+        "upload-new": "Upload New Translation",
+        "assessment-type": "Assessment Type",
+        "language": "Language",
+        "download-template": "Download English Template",
+        "download-existing": "Download Existing Translation",
+        "upload-translation": "Upload Translation",
+        "workflow-hint": "Workflow: 1) Select assessment type and target language, 2) Download the English template, 3) Translate the values (keep the keys unchanged), 4) Upload the translated JSON file.",
+        "existing-translations": "Existing Translations",
+        "no-translations": "No custom translations have been uploaded yet.",
+        "download": "Download",
+        "download-success": "Template downloaded successfully",
+        "download-error": "Failed to download template",
+        "upload-success": "Translation uploaded successfully",
+        "upload-error": "Failed to upload translation",
+        "invalid-json": "Invalid JSON file. Please ensure the file contains valid JSON.",
+        "invalid-format": "Invalid translation format. The file should be a JSON object with translation keys.",
+        "delete-confirm": "Are you sure you want to delete this translation?",
+        "delete-success": "Translation deleted successfully",
+        "delete-error": "Failed to delete translation",
+        "assessment-language": "Assessment Language",
+        "select-language": "Select Language",
+        "default-english": "Default (English)"
       }
     },
     "organization": {
