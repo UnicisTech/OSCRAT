@@ -19,9 +19,6 @@ module.exports = withConfig({
   reactStrictMode: false,
   transpilePackages: ['@oscrat/model'],
   serverExternalPackages: ['@prisma/client'],
-  images: {
-    domains: ['platform.unicis.tech'],
-  },
   i18n,
   webpack: (config, { isServer }) => {
     // Handle Prisma and node: imports

@@ -53,6 +53,11 @@
     "typescript": "5.4.5"
   },
   "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "next-auth>next": "16"
+      }
+    },
     "onlyBuiltDependencies": [
       "@prisma/client",
       "@prisma/engines",
