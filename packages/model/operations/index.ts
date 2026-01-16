@@ -16,3 +16,4 @@ export * from './task';
 export * from './comment';
 export * from './attachment';
 export * from './teamData';
+export * from './encryption';

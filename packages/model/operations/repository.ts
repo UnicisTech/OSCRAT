@@ -6,6 +6,9 @@ import type {
   OscratRepositoryDetail,
   OscratRepositoryWithRelations,
 } from '../types/repository';
+import { encryptToken } from './encryption';
+
+const MASKED_TOKEN = '••••••••';
 
 /** Include for repository summary queries */
 const REPOSITORY_SUMMARY_INCLUDE = {
@@ -66,7 +69,7 @@ const transformToRepositorySummary = (
   targetTag: repository.targetTag || undefined,
   targetCommit: repository.targetCommit || undefined,
   authType: repository.authType,
-  accessToken: repository.accessToken || undefined,
+  accessToken: repository.accessToken ? MASKED_TOKEN : undefined,
   teamId: repository.teamId,
   versionId: repository.versionId,
   productId: repository.productId,
@@ -89,7 +92,7 @@ const transformToRepositoryDetail = (
   targetTag: repository.targetTag || undefined,
   targetCommit: repository.targetCommit || undefined,
   authType: repository.authType,
-  accessToken: repository.accessToken || undefined,
+  accessToken: repository.accessToken ? MASKED_TOKEN : undefined,
   teamId: repository.teamId,
   versionId: repository.versionId,
   productId: repository.productId,
@@ -252,7 +255,6 @@ export const createRepository = async (
 
   console.log(`[Repository Operations] Creating repository in database...`);
 
-  // Create the repository
   const repository = await prisma.oscratRepository.create({
     data: {
       name: data.name,
@@ -263,7 +265,7 @@ export const createRepository = async (
       targetTag: data.targetTag,
       targetCommit: data.targetCommit,
       authType: data.authType,
-      accessToken: data.accessToken,
+      accessToken: data.accessToken ? encryptToken(data.accessToken) : null,
       teamId: teamId,
       versionId: versionId,
       productId: version.product.id,
@@ -302,7 +304,6 @@ export const updateRepository = async (
     throw new Error(`Repository ${repositoryId} not found for team: ${teamId}`);
   }
 
-  // Update the repository
   const updatedRepository = await prisma.oscratRepository.update({
     where: { id: repositoryId },
     data: {
@@ -314,7 +315,9 @@ export const updateRepository = async (
       targetTag: data.targetTag,
       targetCommit: data.targetCommit,
       authType: data.authType,
-      accessToken: data.accessToken,
+      ...(data.accessToken && data.accessToken !== MASKED_TOKEN
+        ? { accessToken: encryptToken(data.accessToken) }
+        : {}),
     },
     include: REPOSITORY_DETAIL_INCLUDE,
   });

@@ -2,6 +2,7 @@ import { $ } from 'zx';
 import * as path from 'path';
 import * as fs from 'fs';
 import { OscratRepositoryProvider } from '@oscrat/model';
+import { decryptToken } from '@oscrat/model/operations';
 import type { OscratRepositoryWithRelations } from '@oscrat/model/types/repository';
 import { ERROR_CODES } from '@oscrat/model/constants/errorCodes';
 import { translateError } from './errorTranslator';
@@ -31,22 +32,21 @@ function getAuthenticatedCloneUrl(
     }
   }
 
-  console.log(
-    `[Git Utils] Access token present: ${accessToken ? 'Yes' : 'No'}`
-  );
+  const token = decryptToken(accessToken);
+  console.log(`[Git Utils] Token decrypted successfully`);
 
   switch (provider) {
     case OscratRepositoryProvider.GITHUB:
       console.log(`[Git Utils] Using GitHub authentication format`);
-      return `https://x-access-token:${accessToken}@github.com/${user}/${name}.git`;
+      return `https://x-access-token:${token}@github.com/${user}/${name}.git`;
 
     case OscratRepositoryProvider.GITLAB:
       console.log(`[Git Utils] Using GitLab authentication format`);
-      return `https://oauth2:${accessToken}@gitlab.com/${user}/${name}.git`;
+      return `https://oauth2:${token}@gitlab.com/${user}/${name}.git`;
 
     case OscratRepositoryProvider.BITBUCKET:
       console.log(`[Git Utils] Using Bitbucket authentication format`);
-      return `https://x-token-auth:${accessToken}@bitbucket.org/${user}/${name}.git`;
+      return `https://x-token-auth:${token}@bitbucket.org/${user}/${name}.git`;
 
     default:
       console.error(`[Git Utils] Unsupported repository provider: ${provider}`);

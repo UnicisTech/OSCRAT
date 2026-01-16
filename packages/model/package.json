@@ -16,9 +16,11 @@
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
+    "cryptr": "^6.4.0",
     "date-fns": "^3.6.0"
   },
   "devDependencies": {
+    "@types/cryptr": "^4.0.3",
     "@types/node": "20.14.0",
     "dotenv-cli": "^10.0.0",
     "prisma": "^6.7.0",
