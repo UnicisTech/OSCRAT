@@ -14,6 +14,7 @@ import { useComplianceTaskGeneration } from '@/hooks/oscrat/useComplianceTaskGen
 import { useDeclarationOfConformity } from '@/hooks/oscrat/useDeclarationOfConformity';
 import { COMPLIANCE_STATUS } from '@/constants/conformityStatuses';
 import { generateCARFilename } from '@/lib/utils/filename';
+import { extractErrorMessage } from '@/lib/utils';
 
 interface ComplianceFormProps {
   complianceData: ComplianceArea[];
@@ -97,7 +98,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
 
   // For uploading CAR when assessment is finished (version compliance only)
   const { uploadCAR } = useDeclarationOfConformity(
-    teamId,
+    teamSlug,
     isVersionCompliance ? productId : '',
     isVersionCompliance ? versionId : ''
   );
@@ -260,8 +261,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
                     await taskGeneration.acceptTask();
                     toast.success(t('oscrat.ui.task-created-successfully'));
                     toast.dismiss(toastInstance.id);
-                  } catch {
-                    toast.error(t('oscrat.ui.task-creation-failed'));
+                  } catch (e) {
+                    toast.error(extractErrorMessage(e, 'Failed to create task'));
                     toast.dismiss(toastInstance.id);
                   }
                 }}

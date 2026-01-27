@@ -1,46 +1,78 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import { useVersionContext } from '@/context/VersionContext';
 import { useTeamContext } from '@/context/TeamContext';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useComplianceData } from '@/hooks/useComplianceData';
-import { useComplianceState } from '@/hooks/oscrat/useComplianceState';
+import { useVersionCompliance } from '@/hooks/oscrat/useVersionCompliance';
 import { ComplianceCharts, exportComplianceToPDF } from '@/components/compliance';
 import { TabHeader, TabActionButton, TabLoading } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import ConfirmationModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/repository/confirmationModal';
 import { getComplianceNamespace, COMPLIANCE_NAMESPACES } from '@/lib/compliance/translations';
 import { getRoleForTeam } from '@/lib/compliance/utils';
-import { FaDownload, FaPlayCircle } from 'react-icons/fa';
+import { FaDownload, FaPlayCircle, FaRedo } from 'react-icons/fa';
 import { OscratOrganizationRole } from '@oscrat/model';
 
 export default function Compliance() {
   const { t, ready } = useTranslation('common');
   const router = useRouter();
+  const { data: session } = useSession();
   const { teamId, productId, versionId } = useVersionContext();
-  const { teamContext } = useTeamContext();
+  const { teamContext, slug: teamSlug } = useTeamContext();
+  
+  const [isResetModalOpen, setResetModalOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const { project } = useOscratProject(teamId, productId);
   const { version: versionData } = useOscratVersion(teamId, productId, versionId);
 
   const team = teamContext.team;
 
-  const { complianceData, isLoading } = useComplianceData({
+  const { complianceData, isLoading: isLoadingData } = useComplianceData({
     teamSlug: team?.slug || '',
     teamRole: team?.orgRoles[0] || OscratOrganizationRole.MANUFACTURER,
     complianceType: 'version',
     enabled: !!team && !!versionData,
   });
 
-  const { complianceState } = useComplianceState({
+  const { complianceState: dbComplianceState, resetAssessment } = useVersionCompliance({
+    teamSlug,
+    productId,
     versionId,
     teamRole: team?.orgRoles[0] as OscratOrganizationRole,
+    userId: session?.user?.id,
   });
+
+  const isLoading = isLoadingData;
 
   const complianceNamespace = useMemo(() => {
     if (!team?.orgRoles[0]) return COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER;
     return getComplianceNamespace(getRoleForTeam(team.orgRoles[0]), 'version');
   }, [team]);
+
+  // Provide default empty state when no assessment exists in database
+  const complianceState = useMemo(() => {
+    if (dbComplianceState) return dbComplianceState;
+    if (!team?.orgRoles[0]) return null;
+    
+    return {
+      productId: versionId,
+      teamRole: team.orgRoles[0],
+      assessments: [],
+      currentAreaIndex: null,
+      currentRequirementIndex: null,
+      completedAreas: [],
+      completedRequirements: [],
+      startedAt: new Date().toISOString(),
+      lastUpdatedAt: new Date().toISOString(),
+      completed: false,
+      started: false,
+      finished: false,
+    };
+  }, [dbComplianceState, versionId, team?.orgRoles]);
 
   const handleNavigateToCompliance = () => {
     router.push(`/teams/${team?.slug}/products/${productId}/versions/${versionId}/compliance`);
@@ -96,6 +128,24 @@ export default function Compliance() {
     );
   };
 
+  const handleResetClick = () => {
+    setResetModalOpen(true);
+  };
+
+  const handleResetConfirm = async () => {
+    setIsResetting(true);
+    try {
+      await resetAssessment();
+    } finally {
+      setIsResetting(false);
+      setResetModalOpen(false);
+    }
+  };
+
+  const handleResetCancel = () => {
+    setResetModalOpen(false);
+  };
+
   if (!ready) return null;
 
   if (isLoading) {
@@ -127,12 +177,21 @@ export default function Compliance() {
             </TabActionButton>
           )}
           {complianceState.completed && (
-            <TabActionButton
-              onClick={handleExportPDF}
-              icon={<FaDownload />}
-            >
-              {t('oscrat.ui.dashboard.export-pdf')}
-            </TabActionButton>
+            <>
+              <TabActionButton
+                onClick={handleExportPDF}
+                icon={<FaDownload />}
+              >
+                {t('oscrat.ui.dashboard.export-pdf')}
+              </TabActionButton>
+              <TabActionButton
+                onClick={handleResetClick}
+                icon={<FaRedo />}
+                variant="secondary"
+              >
+                {t('oscrat.ui.dashboard.reset-assessment')}
+              </TabActionButton>
+            </>
           )}
         </TabHeader>
         <ComplianceCharts
@@ -141,6 +200,18 @@ export default function Compliance() {
           complianceNamespace={complianceNamespace}
         />
       </div>
+
+      <ConfirmationModal
+        isOpen={isResetModalOpen}
+        onClose={handleResetCancel}
+        onConfirm={handleResetConfirm}
+        title={t('oscrat.ui.dashboard.reset-assessment-title')}
+        message={t('oscrat.ui.dashboard.confirm-reset-assessment')}
+        confirmText={t('oscrat.ui.dashboard.reset-assessment')}
+        cancelText={t('cancel')}
+        isLoading={isResetting}
+        variant="warning"
+      />
     </div>
   );
 }

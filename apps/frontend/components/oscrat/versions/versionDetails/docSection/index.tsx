@@ -23,12 +23,12 @@ export default function DocSection() {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { versionId } = useVersionContext();
-  const { teamContext } = useTeamContext();
-  const { teamId, productId } = useProductContext();
+  const { teamContext, slug: teamSlug } = useTeamContext();
+  const { productId } = useProductContext();
 
   const team = teamContext.team;
-  const { project } = useOscratProject(teamId, productId);
-  const { version } = useOscratVersion(teamId, productId, versionId);
+  const { project } = useOscratProject(teamSlug, productId);
+  const { version } = useOscratVersion(teamSlug, productId, versionId);
 
   const {
     car,
@@ -44,7 +44,7 @@ export default function DocSection() {
     deleteDoC,
     isUploadingDoC,
     isLoading,
-  } = useDeclarationOfConformity(teamId, productId, versionId);
+  } = useDeclarationOfConformity(teamSlug, productId, versionId);
 
   const [showWizard, setShowWizard] = useState(false);
   const [showDeleteCARModal, setShowDeleteCARModal] = useState(false);

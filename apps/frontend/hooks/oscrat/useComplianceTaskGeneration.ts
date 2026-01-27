@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import { TaskStatus, TaskOriginType } from '@oscrat/model';
 import { ComplianceRequirement, RequirementAssessment, ComplianceStatus } from '@/types/compliance';
@@ -29,6 +29,9 @@ export function useComplianceTaskGeneration({
   const { t } = useTranslation(['common', complianceNamespace]);
   const [pendingTask, setPendingTask] = useState<PendingTask | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Use ref to avoid stale closure issues when acceptTask is called from toast
+  const pendingTaskRef = useRef<PendingTask | null>(null);
 
   const shouldGenerateTask = useCallback((status: ComplianceStatus): boolean => {
     return status === 'Not Compliant';
@@ -64,6 +67,7 @@ export function useComplianceTaskGeneration({
       const taskData = generateTaskData(requirement);
 
       const newPendingTask = { data: taskData, requirement, assessment };
+      pendingTaskRef.current = newPendingTask;
       setPendingTask(newPendingTask);
       return true;
     },
@@ -71,20 +75,24 @@ export function useComplianceTaskGeneration({
   );
 
   const acceptTask = useCallback(async () => {
-    if (!pendingTask) {
+    // Use ref to get latest value, avoiding stale closure in toast callbacks
+    const task = pendingTaskRef.current;
+    if (!task) {
       throw new Error('Cannot accept task: no pending task');
     }
 
     setIsGenerating(true);
     try {
-      await createTask(pendingTask.data);
+      await createTask(task.data);
+      pendingTaskRef.current = null;
       setPendingTask(null);
     } finally {
       setIsGenerating(false);
     }
-  }, [createTask, pendingTask]);
+  }, [createTask]);
 
   const rejectTask = useCallback(() => {
+    pendingTaskRef.current = null;
     setPendingTask(null);
   }, []);
 

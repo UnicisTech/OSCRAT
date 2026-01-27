@@ -6,7 +6,7 @@ interface TabActionButtonProps {
   icon?: React.ReactNode;
   children: React.ReactNode;
   title?: string;
-  variant?: 'primary' | 'icon-only';
+  variant?: 'primary' | 'secondary' | 'icon-only';
 }
 
 const TabActionButton: React.FC<TabActionButtonProps> = ({
@@ -22,6 +22,7 @@ const TabActionButton: React.FC<TabActionButtonProps> = ({
 
   const variantClasses = {
     primary: 'border-gray-300 px-4 py-2 text-gray-900',
+    secondary: 'border-gray-300 px-4 py-2 text-gray-600',
     'icon-only': 'border-gray-300 px-2.5 py-2 text-gray-700',
   };
 
