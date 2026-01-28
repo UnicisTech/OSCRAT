@@ -272,93 +272,6 @@
     "riskQuestions": [
         {
             "id": "1.13",
-            "question": "Does the product include software or hardware that performs data processing or computation?",
-            "hint": "Hints: CRA defines a product with digital elements as any hardware or software that contains a digital component and can be connected, directly or indirectly, to another device or network.",
-            "references": [
-                {
-                    "text": "Annex III part I point (19)",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "riskLevel": "OTHER",
-                    "skipToQuestion": "1.17"
-                },
-                {
-                    "text": "No",
-                    "riskLevel": "NONE"
-                }
-            ]
-        },
-        {
-            "id": "1.14",
-            "question": "Does the product contain embedded software, firmware, or an operating system that can receive updates (e.g., security updates, firmware updates)?",
-            "references": [
-                {
-                    "text": "Annex III part I point (19)",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "riskLevel": "OTHER",
-                    "skipToQuestion": "1.17"
-                },
-                {
-                    "text": "No",
-                    "riskLevel": "NONE"
-                }
-            ]
-        },
-        {
-            "id": "1.15",
-            "hint": "If the product requires access to a database, an API, or another data processing service provided by the manufacturer, such processing falls under the regulations. At the same time, the regulation does not cover general security measures for the manufacturer's entire IT infrastructure.",
-            "question": "Can the product connect to the internet or any other device via wired or wireless communication? (e.g., Wi-Fi, Bluetooth, USB, network cable, NFC, RFID, etc.)",
-            "references": [
-                {
-                    "text": "Annex III part I point (19)",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "riskLevel": "DEFAULT",
-                    "skipToQuestion": "1.17"
-                },
-                {
-                    "text": "No",
-                    "riskLevel": "NONE"
-                }
-            ]
-        },
-        {
-            "id": "1.16",
-            "hint": "If the product requires access to a database, an API, or another data processing service provided by the manufacturer, such processing falls under the regulations. At the same time, the regulation does not cover general security measures for the manufacturer's entire IT infrastructure.",
-            "question": "Does the product require a cloud service or remote data processing to perform one of its functions? (i.e., would the product fail to function without cloud/remote software support?)",
-            "references": [
-                {
-                    "text": "Annex III part I point (19)",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "riskLevel": "DEFAULT",
-                    "skipToQuestion": "1.17"
-                },
-                {
-                    "text": "No",
-                    "riskLevel": "NONE"
-                }
-            ]
-        },
-        {
-            "id": "1.17",
             "question": "Does your product fall into any of the following categories?",
             "answerType": "DROPDOWN",
             "references": [
@@ -650,6 +563,17 @@
                     "references": [
                         {
                             "text": "Annex III part I point (19)",
+                            "url": "https://www.cra.gov.uk/form"
+                        }
+                    ]
+                },
+                {
+                    "text": "Other",
+                    "riskLevel": "OTHER",
+                    "hint": "This relates to products that include software or hardware performing data processing or computation, but other than the above on the list. The category may include e.g.:\n- products containing embedded software, firmware, or an operating system that can receive updates (e.g., security updates, firmware updates),\n- products that connect to the internet or any other device via wired or wireless communication (e.g., Wi-Fi, Bluetooth, USB, network cable, NFC, RFID, etc.),\n- products that require a cloud service or remote data processing to perform one of their functions (i.e., would the product fail to function without cloud/remote software support?) - if the product requires access to a database, an API, or another data processing service provided by the manufacturer, such processing falls under the CRA regulations.\nAt the same time, the regulation does not cover general security measures for the manufacturer's entire IT infrastructure.\n\nClassification: Applicable - PDE Other than IMPORTANT or CRITICAL (standard product with digital elements).",
+                    "references": [
+                        {
+                            "text": "Annex III, Annex IV",
                             "url": "https://www.cra.gov.uk/form"
                         }
                     ]
