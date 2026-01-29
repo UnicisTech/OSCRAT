@@ -1,9 +1,10 @@
 import { ApiError } from '@/lib/errors';
+import { prisma } from '@/lib/prisma';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
-import { sendAudit } from '@/lib/retraced';
 import { findOrCreateApp, findWebhook, updateWebhook } from '@/lib/svix';
+import { logWebhookUpdated } from '@oscrat/model/operations';
 import type { NextApiResponse } from 'next';
-import { EndpointIn } from 'svix';
+import type { EndpointIn } from 'svix';
 import { recordMetric } from '@/lib/metrics';
 import env from '@/lib/env';
 
@@ -73,6 +74,8 @@ const handlePUT = async (
     throw new ApiError(200, 'Bad request.');
   }
 
+  const existing = await findWebhook(app.id, endpointId);
+
   const data: EndpointIn = {
     description: name,
     url,
@@ -85,12 +88,29 @@ const handlePUT = async (
 
   const webhook = await updateWebhook(app.id, endpointId, data);
 
-  sendAudit({
-    action: 'webhook.update',
-    crud: 'u',
-    user: user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  if (webhook && existing) {
+    await prisma.$transaction(async (tx) => {
+      await logWebhookUpdated(
+        tx,
+        {
+          id: existing.id,
+          name: existing.description,
+          url: existing.url,
+          eventTypes: existing.filterTypes,
+        },
+        {
+          id: webhook.id,
+          name,
+          url,
+          eventTypes,
+        },
+        {
+          user,
+          team: { id: teamMember.teamId, name: teamMember.teamName },
+        }
+      );
+    });
+  }
 
   recordMetric('webhook.updated');
 

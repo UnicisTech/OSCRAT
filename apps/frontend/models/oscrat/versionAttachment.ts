@@ -8,6 +8,7 @@ import {
 import formidable from 'formidable';
 import type { Attachment } from '@oscrat/model';
 import type { AttachmentEntityFilters } from '@oscrat/model/types/attachments';
+import type { AuditInfo } from '@oscrat/model/audit';
 
 export interface CreateVersionAttachmentParams {
   versionId: string;
@@ -17,21 +18,26 @@ export interface CreateVersionAttachmentParams {
   description?: string;
   vulnerabilityId?: string;
   incidentId?: string;
+  auditInfo?: AuditInfo;
 }
 
 export const createVersionAttachment = async (
   params: CreateVersionAttachmentParams
 ) => {
-  return await AttachmentOps.createAttachment(prisma, {
-    name: params.filename,
-    description: params.description,
-    fileData: params.fileData,
-    fileSize: params.fileData.length,
-    versionId: params.versionId,
-    createdBy: params.createdBy,
-    vulnerabilityId: params.vulnerabilityId,
-    incidentId: params.incidentId,
-  });
+  return await AttachmentOps.createAttachment(
+    prisma,
+    {
+      name: params.filename,
+      description: params.description,
+      fileData: params.fileData,
+      fileSize: params.fileData.length,
+      versionId: params.versionId,
+      createdBy: params.createdBy,
+      vulnerabilityId: params.vulnerabilityId,
+      incidentId: params.incidentId,
+    },
+    params.auditInfo
+  );
 };
 
 export const getVersionAttachments = async (
@@ -52,9 +58,10 @@ export const getVersionAttachmentWithData = async (attachmentId: string) => {
 };
 
 export const deleteVersionAttachment = async (
-  attachmentId: string
+  attachmentId: string,
+  auditInfo?: AuditInfo
 ): Promise<void> => {
-  return await AttachmentOps.deleteAttachment(prisma, attachmentId);
+  return await AttachmentOps.deleteAttachment(prisma, attachmentId, auditInfo);
 };
 
 // Use shared file handling utilities
@@ -67,6 +74,7 @@ export interface UploadVersionAttachmentParams {
   description?: string;
   vulnerabilityId?: string;
   incidentId?: string;
+  auditInfo?: AuditInfo;
 }
 
 export const saveFileAsVersionAttachment = async (
@@ -82,6 +90,7 @@ export const saveFileAsVersionAttachment = async (
     description: params.description,
     vulnerabilityId: params.vulnerabilityId,
     incidentId: params.incidentId,
+    auditInfo: params.auditInfo,
   });
 
   return attachment;

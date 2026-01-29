@@ -15,6 +15,7 @@ import {
   upsertAttachmentFileWithTx,
   deleteAttachmentWithTx,
 } from './attachment';
+import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 const VERSION_SUMMARY_INCLUDE = {
   _count: {
@@ -220,57 +221,95 @@ export const getVersionDetail = async (
 export const createVersion = async (
   prisma: PrismaClient,
   teamId: string,
-  data: OscratProductVersionCreate
+  data: OscratProductVersionCreate,
+  auditInfo: AuditInfo
 ): Promise<OscratProductVersionDetail> => {
-  const version = await prisma.oscratProductVersion.create({
-    data: {
-      version: data.version,
-      status: data.status || OscratProductVersionStatus.DRAFT,
-      supportEndDate: data.supportEndDate,
-      productId: data.productId,
-      teamId: teamId,
-      createdBy: data.createdBy,
-      updatedBy: data.createdBy,
-    },
-    include: VERSION_DETAIL_INCLUDE,
-  });
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  return transformToVersionDetail(version);
+    const version = await tx.oscratProductVersion.create({
+      data: {
+        version: data.version,
+        status: data.status || OscratProductVersionStatus.DRAFT,
+        supportEndDate: data.supportEndDate,
+        productId: data.productId,
+        teamId: teamId,
+        createdBy: data.createdBy,
+        updatedBy: data.createdBy,
+      },
+      include: VERSION_DETAIL_INCLUDE,
+    });
+
+    await logCreate(EntityType.ProductVersion, audit, { ...version, name: version.version });
+
+    return transformToVersionDetail(version);
+  });
 };
 
 export const updateVersion = async (
   prisma: PrismaClient,
   teamId: string,
   versionId: string,
-  data: OscratProductVersionUpdate
+  data: OscratProductVersionUpdate,
+  auditInfo: AuditInfo
 ): Promise<OscratProductVersionDetail> => {
-  const version = await prisma.oscratProductVersion.update({
-    where: {
-      id: versionId,
-      teamId: teamId,
-    },
-    data: {
-      version: data.version,
-      status: data.status,
-      supportEndDate: data.supportEndDate,
-      updatedBy: data.updatedBy,
-    },
-    include: VERSION_DETAIL_INCLUDE,
-  });
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  return transformToVersionDetail(version);
+    const existing = await tx.oscratProductVersion.findFirst({
+      where: { id: versionId, teamId },
+    });
+
+    if (!existing) {
+      throw new Error('Version not found or does not belong to team');
+    }
+
+    const version = await tx.oscratProductVersion.update({
+      where: {
+        id: versionId,
+        teamId: teamId,
+      },
+      data: {
+        version: data.version,
+        status: data.status,
+        supportEndDate: data.supportEndDate,
+        updatedBy: data.updatedBy,
+      },
+      include: VERSION_DETAIL_INCLUDE,
+    });
+
+    await logUpdate(EntityType.ProductVersion, audit, { ...existing, name: existing.version }, { ...version, name: version.version });
+
+    return transformToVersionDetail(version);
+  });
 };
 
 export const deleteVersion = async (
   prisma: PrismaClient,
   teamId: string,
-  versionId: string
+  versionId: string,
+  auditInfo: AuditInfo
 ): Promise<void> => {
-  await prisma.oscratProductVersion.delete({
-    where: {
-      id: versionId,
-      teamId: teamId,
-    },
+  await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const version = await tx.oscratProductVersion.findFirst({
+      where: { id: versionId, teamId },
+      select: { id: true, version: true },
+    });
+
+    if (!version) {
+      throw new Error('Version not found or does not belong to team');
+    }
+
+    await logDelete(EntityType.ProductVersion, audit, { id: version.id, name: version.version });
+
+    await tx.oscratProductVersion.delete({
+      where: {
+        id: versionId,
+        teamId: teamId,
+      },
+    });
   });
 };
 
@@ -291,17 +330,30 @@ export const upsertVersionCAR = async (
   prisma: PrismaClient,
   teamId: string,
   versionId: string,
-  params: UpsertVersionCARParams
+  params: UpsertVersionCARParams,
+  auditInfo: AuditInfo
 ): Promise<OscratProductVersionDetail> => {
   return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
     const current = await tx.oscratProductVersion.findFirst({
       where: { id: versionId, teamId },
       select: { conformityAssessmentReportId: true },
     });
 
+    const existingAttachmentId = current?.conformityAssessmentReportId ?? null;
+    const isUpdate = existingAttachmentId !== null;
+
+    let existingAttachment: { id: string; name: string; mimeType: string | null } | null = null;
+    if (isUpdate && existingAttachmentId) {
+      existingAttachment = await tx.attachment.findUnique({
+        where: { id: existingAttachmentId },
+        select: { id: true, name: true, mimeType: true },
+      });
+    }
+
     const attachmentId = await upsertAttachmentFileWithTx(
       tx,
-      current?.conformityAssessmentReportId ?? null,
+      existingAttachmentId,
       {
         name: params.name,
         fileData: params.fileData,
@@ -317,6 +369,18 @@ export const upsertVersionCAR = async (
       include: VERSION_DETAIL_INCLUDE,
     });
 
+    const newAttachmentData = {
+      id: attachmentId,
+      name: params.name,
+      mimeType: params.mimeType || 'application/octet-stream',
+    };
+
+    if (isUpdate && existingAttachment) {
+      await logUpdate(EntityType.File, audit, existingAttachment, newAttachmentData);
+    } else {
+      await logCreate(EntityType.File, audit, newAttachmentData);
+    }
+
     return transformToVersionDetail(version);
   });
 };
@@ -324,16 +388,27 @@ export const upsertVersionCAR = async (
 export const removeVersionCAR = async (
   prisma: PrismaClient,
   teamId: string,
-  versionId: string
+  versionId: string,
+  auditInfo: AuditInfo
 ): Promise<OscratProductVersionDetail> => {
   return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
     const current = await tx.oscratProductVersion.findFirst({
       where: { id: versionId, teamId },
       select: { conformityAssessmentReportId: true },
     });
 
     if (current?.conformityAssessmentReportId) {
+      const attachment = await tx.attachment.findUnique({
+        where: { id: current.conformityAssessmentReportId },
+        select: { id: true, name: true },
+      });
+
       await deleteAttachmentWithTx(tx, current.conformityAssessmentReportId);
+
+      if (attachment) {
+        await logDelete(EntityType.File, audit, attachment);
+      }
     }
 
     const version = await tx.oscratProductVersion.findFirstOrThrow({
@@ -355,17 +430,30 @@ export const upsertVersionDoC = async (
   prisma: PrismaClient,
   teamId: string,
   versionId: string,
-  params: UpsertVersionDoCParams
+  params: UpsertVersionDoCParams,
+  auditInfo: AuditInfo
 ): Promise<OscratProductVersionDetail> => {
   return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
     const current = await tx.oscratProductVersion.findFirst({
       where: { id: versionId, teamId },
       select: { declarationOfConformityId: true },
     });
 
+    const existingAttachmentId = current?.declarationOfConformityId ?? null;
+    const isUpdate = existingAttachmentId !== null;
+
+    let existingAttachment: { id: string; name: string; mimeType: string | null } | null = null;
+    if (isUpdate && existingAttachmentId) {
+      existingAttachment = await tx.attachment.findUnique({
+        where: { id: existingAttachmentId },
+        select: { id: true, name: true, mimeType: true },
+      });
+    }
+
     const attachmentId = await upsertAttachmentFileWithTx(
       tx,
-      current?.declarationOfConformityId ?? null,
+      existingAttachmentId,
       {
         name: params.name,
         fileData: params.fileData,
@@ -386,6 +474,18 @@ export const upsertVersionDoC = async (
       include: VERSION_DETAIL_INCLUDE,
     });
 
+    const newAttachmentData = {
+      id: attachmentId,
+      name: params.name,
+      mimeType: params.mimeType || 'application/pdf',
+    };
+
+    if (isUpdate && existingAttachment) {
+      await logUpdate(EntityType.File, audit, existingAttachment, newAttachmentData);
+    } else {
+      await logCreate(EntityType.File, audit, newAttachmentData);
+    }
+
     return transformToVersionDetail(version);
   });
 };
@@ -393,16 +493,27 @@ export const upsertVersionDoC = async (
 export const removeVersionDoC = async (
   prisma: PrismaClient,
   teamId: string,
-  versionId: string
+  versionId: string,
+  auditInfo: AuditInfo
 ): Promise<OscratProductVersionDetail> => {
   return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
     const current = await tx.oscratProductVersion.findFirst({
       where: { id: versionId, teamId },
       select: { declarationOfConformityId: true },
     });
 
     if (current?.declarationOfConformityId) {
+      const attachment = await tx.attachment.findUnique({
+        where: { id: current.declarationOfConformityId },
+        select: { id: true, name: true },
+      });
+
       await deleteAttachmentWithTx(tx, current.declarationOfConformityId);
+
+      if (attachment) {
+        await logDelete(EntityType.File, audit, attachment);
+      }
     }
 
     const version = await tx.oscratProductVersion.findFirstOrThrow({

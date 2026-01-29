@@ -102,6 +102,7 @@ const handlePOST = async (
           description: getFirstFieldValue(fields.description),
           vulnerabilityId: getFirstFieldValue(fields.vulnerabilityId),
           incidentId: getFirstFieldValue(fields.incidentId),
+          auditInfo: req.auditInfo,
         };
 
         const attachment = await saveFileAsVersionAttachment(uploadParams);
@@ -138,7 +139,6 @@ const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
-  const { teamMember } = req.teamContext;
   const { id } = req.query;
 
   try {
@@ -149,7 +149,7 @@ const handleDELETE = async (
       });
     }
 
-    await deleteVersionAttachment(id as string);
+    await deleteVersionAttachment(id as string, req.auditInfo);
 
     return res.status(200).json({
       data: {},

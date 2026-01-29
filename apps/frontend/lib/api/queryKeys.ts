@@ -56,6 +56,8 @@ export const queryKeys = {
     },
     apiKeys: (slug: string) =>
       [...queryKeys.teams.detail(slug), 'api-keys'] as const,
+    auditLogs: (slug: string, params?: Record<string, unknown>) =>
+      [...queryKeys.teams.detail(slug), 'audit-logs', params] as const,
     data: {
       all: (slug: string) => [...queryKeys.teams.detail(slug), 'data'] as const,
       detail: (slug: string, dataKey: string) =>

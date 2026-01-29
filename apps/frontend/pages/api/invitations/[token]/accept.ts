@@ -50,7 +50,11 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const teamMember = await addTeamMember(
     invitation.team.id,
     userId,
-    invitation.role
+    invitation.role,
+    {
+      user: { id: session.user.id, name: session.user.name },
+      team: { id: invitation.team.id, name: invitation.team.name },
+    }
   );
 
   await sendEvent(

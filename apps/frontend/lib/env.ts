@@ -76,15 +76,6 @@ const env = {
     clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`,
   },
 
-  // Retraced configuration
-  retraced: {
-    url: process.env.RETRACED_URL
-      ? `${process.env.RETRACED_URL}/auditlog`
-      : undefined,
-    apiKey: process.env.RETRACED_API_KEY,
-    projectId: process.env.RETRACED_PROJECT_ID,
-  },
-
   groupPrefix: process.env.GROUP_PREFIX,
 
   // Users will need to confirm their email before accessing the app feature

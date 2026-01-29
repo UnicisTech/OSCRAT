@@ -8,6 +8,7 @@ import type {
   OscratAssessmentSummary,
   OscratAssessmentDetail,
 } from '../types/assessment';
+import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 /** Select for assessment summary queries */
 const ASSESSMENT_SUMMARY_SELECT = {
@@ -117,54 +118,62 @@ export const getAssessmentDetail = async (
 export const createAssessment = async (
   prisma: PrismaClient,
   teamId: string,
-  data: OscratAssessmentCreate
+  data: OscratAssessmentCreate,
+  auditInfo: AuditInfo
 ): Promise<OscratAssessmentDetail> => {
-  // Validate ID combinations match assessment type
-  if (data.type === 'ORG' && (data.productId || data.versionId)) {
-    throw new Error('ORG assessments cannot have productId or versionId');
-  }
-  if (data.type === 'CRA' && (!data.productId || data.versionId)) {
-    throw new Error('CRA assessments require productId only');
-  }
-  if (data.type === 'COMPLIANCE' && (!data.productId || !data.versionId)) {
-    throw new Error('COMPLIANCE assessments require both productId and versionId');
-  }
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  // Verify product/version belong to team if provided
-  if (data.productId) {
-    const product = await prisma.oscratProduct.findFirst({
-      where: { id: data.productId, teamId },
-      select: { id: true },
-    });
-    if (!product) {
-      throw new Error(`Product ${data.productId} not found for team ${teamId}`);
+    if (data.type === 'ORG' && (data.productId || data.versionId)) {
+      throw new Error('ORG assessments cannot have productId or versionId');
     }
-  }
-
-  if (data.versionId) {
-    const version = await prisma.oscratProductVersion.findFirst({
-      where: { id: data.versionId, product: { teamId } },
-      select: { id: true },
-    });
-    if (!version) {
-      throw new Error(`Version ${data.versionId} not found for team ${teamId}`);
+    if (data.type === 'CRA' && (!data.productId || data.versionId)) {
+      throw new Error('CRA assessments require productId only');
     }
-  }
+    if (data.type === 'COMPLIANCE' && (!data.productId || !data.versionId)) {
+      throw new Error('COMPLIANCE assessments require both productId and versionId');
+    }
 
-  const assessment = await prisma.oscratAssessment.create({
-    data: {
-      type: data.type,
-      schemaVersion: data.schemaVersion,
-      rawData: data.rawData as Prisma.InputJsonValue,
-      teamId,
-      productId: data.productId ?? null,
-      versionId: data.versionId ?? null,
-      createdBy: data.createdBy,
-    },
-    select: ASSESSMENT_DETAIL_SELECT,
+    if (data.productId) {
+      const product = await tx.oscratProduct.findFirst({
+        where: { id: data.productId, teamId },
+        select: { id: true },
+      });
+      if (!product) {
+        throw new Error(`Product ${data.productId} not found for team ${teamId}`);
+      }
+    }
+
+    if (data.versionId) {
+      const version = await tx.oscratProductVersion.findFirst({
+        where: { id: data.versionId, product: { teamId } },
+        select: { id: true },
+      });
+      if (!version) {
+        throw new Error(`Version ${data.versionId} not found for team ${teamId}`);
+      }
+    }
+
+    const assessment = await tx.oscratAssessment.create({
+      data: {
+        type: data.type,
+        schemaVersion: data.schemaVersion,
+        rawData: data.rawData as Prisma.InputJsonValue,
+        teamId,
+        productId: data.productId ?? null,
+        versionId: data.versionId ?? null,
+        createdBy: data.createdBy,
+      },
+      select: ASSESSMENT_DETAIL_SELECT,
+    });
+
+    await logCreate(EntityType.Assessment, audit, {
+      ...assessment,
+      name: `${assessment.type}-${assessment.id.slice(0, 8)}`,
+    });
+
+    return transformToAssessmentDetail(assessment);
   });
-
-  return transformToAssessmentDetail(assessment);
 };
 
 /** Update an assessment */
@@ -172,27 +181,39 @@ export const updateAssessment = async (
   prisma: PrismaClient,
   teamId: string,
   assessmentId: string,
-  data: Partial<Pick<OscratAssessmentCreate, 'schemaVersion' | 'rawData'>>
+  data: Partial<Pick<OscratAssessmentCreate, 'schemaVersion' | 'rawData'>>,
+  auditInfo: AuditInfo
 ): Promise<OscratAssessmentDetail> => {
-  const existing = await prisma.oscratAssessment.findFirst({
-    where: { id: assessmentId, teamId },
-    select: { id: true },
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const existing = await tx.oscratAssessment.findFirst({
+      where: { id: assessmentId, teamId },
+      select: ASSESSMENT_DETAIL_SELECT,
+    });
+
+    if (!existing) {
+      throw new Error(`Assessment ${assessmentId} not found for team ${teamId}`);
+    }
+
+    const assessment = await tx.oscratAssessment.update({
+      where: { id: assessmentId },
+      data: {
+        ...(data.schemaVersion && { schemaVersion: data.schemaVersion }),
+        ...(data.rawData && { rawData: data.rawData as Prisma.InputJsonValue }),
+      },
+      select: ASSESSMENT_DETAIL_SELECT,
+    });
+
+    await logUpdate(
+      EntityType.Assessment,
+      audit,
+      { ...existing, name: `${existing.type}-${existing.id.slice(0, 8)}` },
+      { ...assessment, name: `${assessment.type}-${assessment.id.slice(0, 8)}` }
+    );
+
+    return transformToAssessmentDetail(assessment);
   });
-
-  if (!existing) {
-    throw new Error(`Assessment ${assessmentId} not found for team ${teamId}`);
-  }
-
-  const assessment = await prisma.oscratAssessment.update({
-    where: { id: assessmentId },
-    data: {
-      ...(data.schemaVersion && { schemaVersion: data.schemaVersion }),
-      ...(data.rawData && { rawData: data.rawData as Prisma.InputJsonValue }),
-    },
-    select: ASSESSMENT_DETAIL_SELECT,
-  });
-
-  return transformToAssessmentDetail(assessment);
 };
 
 // Mutation functions
@@ -200,18 +221,28 @@ export const updateAssessment = async (
 export const deleteAssessment = async (
   prisma: PrismaClient,
   teamId: string,
-  assessmentId: string
+  assessmentId: string,
+  auditInfo: AuditInfo
 ): Promise<void> => {
-  const assessment = await prisma.oscratAssessment.findFirst({
-    where: { id: assessmentId, teamId },
-    select: { id: true },
-  });
+  await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  if (!assessment) {
-    throw new Error(`Assessment ${assessmentId} not found for team ${teamId}`);
-  }
+    const assessment = await tx.oscratAssessment.findFirst({
+      where: { id: assessmentId, teamId },
+      select: { id: true, type: true },
+    });
 
-  await prisma.oscratAssessment.delete({
-    where: { id: assessmentId },
+    if (!assessment) {
+      throw new Error(`Assessment ${assessmentId} not found for team ${teamId}`);
+    }
+
+    await logDelete(EntityType.Assessment, audit, {
+      id: assessment.id,
+      name: `${assessment.type}-${assessment.id.slice(0, 8)}`,
+    });
+
+    await tx.oscratAssessment.delete({
+      where: { id: assessmentId },
+    });
   });
 };

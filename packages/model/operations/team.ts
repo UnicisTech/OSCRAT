@@ -20,6 +20,7 @@ import type {
 } from '../types/team';
 import { transformToProductSummary } from './product';
 import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
+import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 /** Include for team summary queries */
 const TEAM_SUMMARY_INCLUDE = {
@@ -264,23 +265,54 @@ export const getTeamDetail = async (
 export const updateTeam = async (
   prisma: PrismaClient,
   key: { id: string } | { slug: string },
-  data: TeamUpdate
+  data: TeamUpdate,
+  auditInfo?: AuditInfo
 ): Promise<Team> => {
-  const team = await prisma.team.update({
-    where: key,
-    data,
-  });
+  return await prisma.$transaction(async (tx) => {
+    const existing = await tx.team.findUnique({ where: key });
 
-  return transformToTeam(team);
+    if (!existing) {
+      throw new Error('Team not found');
+    }
+
+    const team = await tx.team.update({
+      where: key,
+      data,
+    });
+
+    if (auditInfo) {
+      const audit = createAuditContextWithTx(tx, auditInfo);
+      await logUpdate(EntityType.Team, audit, existing, team);
+    }
+
+    return transformToTeam(team);
+  });
 };
 
 /** Delete a team */
 export const deleteTeam = async (
   prisma: PrismaClient,
-  key: { id: string } | { slug: string }
+  key: { id: string } | { slug: string },
+  auditInfo?: AuditInfo
 ): Promise<void> => {
-  await prisma.team.delete({
-    where: key,
+  await prisma.$transaction(async (tx) => {
+    const team = await tx.team.findUnique({
+      where: key,
+      select: { id: true, name: true },
+    });
+
+    if (!team) {
+      throw new Error('Team not found');
+    }
+
+    if (auditInfo) {
+      const audit = createAuditContextWithTx(tx, auditInfo);
+      await logDelete(EntityType.Team, audit, team);
+    }
+
+    await tx.team.delete({
+      where: key,
+    });
   });
 };
 
@@ -329,51 +361,144 @@ export const addTeamMember = async (
   prisma: PrismaClient,
   teamId: string,
   userId: string,
-  role: Role
+  role: Role,
+  auditInfo: AuditInfo
 ): Promise<TeamMemberSummary> => {
-  const member = await prisma.teamMember.upsert({
-    create: {
-      teamId,
-      userId,
-      role,
-    },
-    update: {
-      role,
-    },
-    where: {
-      teamId_userId: {
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const member = await tx.teamMember.upsert({
+      create: {
         teamId,
         userId,
+        role,
       },
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          image: true,
+      update: {
+        role,
+      },
+      where: {
+        teamId_userId: {
+          teamId,
+          userId,
         },
       },
-    },
-  });
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
 
-  return transformToTeamMemberSummary(member);
+    await logCreate(EntityType.TeamMember, audit, {
+      id: member.id,
+      name: member.user.name || member.user.email || userId,
+      role: member.role,
+    });
+
+    return transformToTeamMemberSummary(member);
+  });
 };
 
 /** Remove a member from a team */
 export const removeTeamMember = async (
   prisma: PrismaClient,
   teamId: string,
-  userId: string
+  userId: string,
+  auditInfo: AuditInfo
 ): Promise<void> => {
-  await prisma.teamMember.delete({
-    where: {
-      teamId_userId: {
-        teamId,
-        userId,
+  await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const member = await tx.teamMember.findUnique({
+      where: {
+        teamId_userId: {
+          teamId,
+          userId,
+        },
       },
-    },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    if (!member) {
+      throw new Error('Team member not found');
+    }
+
+    await logDelete(EntityType.TeamMember, audit, {
+      id: member.id,
+      name: member.user.name || member.user.email || userId,
+    });
+
+    await tx.teamMember.delete({
+      where: {
+        teamId_userId: {
+          teamId,
+          userId,
+        },
+      },
+    });
+  });
+};
+
+export const updateTeamMemberRole = async (
+  prisma: PrismaClient,
+  teamId: string,
+  userId: string,
+  role: Role,
+  auditInfo: AuditInfo
+): Promise<TeamMemberSummary> => {
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const existing = await tx.teamMember.findUnique({
+      where: {
+        teamId_userId: {
+          teamId,
+          userId,
+        },
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true },
+        },
+      },
+    });
+
+    if (!existing) {
+      throw new Error('Team member not found');
+    }
+
+    const member = await tx.teamMember.update({
+      where: {
+        teamId_userId: {
+          teamId,
+          userId,
+        },
+      },
+      data: {
+        role,
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true },
+        },
+      },
+    });
+
+    await logUpdate(EntityType.TeamMember, audit,
+      { id: existing.id, name: existing.user.name || existing.user.email || userId, role: existing.role, userId },
+      { id: member.id, name: member.user.name || member.user.email || userId, role: member.role, userId }
+    );
+
+    return transformToTeamMemberSummary(member);
   });
 };
 

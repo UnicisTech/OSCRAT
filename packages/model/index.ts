@@ -41,6 +41,7 @@ export {
   WorkerJobStatus,
   TaskStatus,
   TaskOriginType,
+  AuditUserType,
 } from '@prisma/client';
 
 // Export shared application types (these are safe for client)
@@ -55,9 +56,12 @@ export * from './types/team';
 export * from './types/craForm/form';
 export * from './types/jobPayloads';
 export * from './types/dashboard';
+export * from './types/auditLog';
 
 // Export error utilities
 export { ERROR_CODES, type ErrorCode } from './constants/errorCodes';
+
+export * from './audit';
 
 // Export vulnerability constants for fronten
 export { OPEN_VULNERABILITY_STATUSES } from './constants/vulnerability';

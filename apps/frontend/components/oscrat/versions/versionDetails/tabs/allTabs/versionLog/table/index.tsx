@@ -1,24 +1,37 @@
 import React from 'react';
-import { FaRegEye } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { TabHeader, TableWrapper, TableHeader, TableRow } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { tableStyles } from '@/components/oscrat/tableStyles';
+import usePagination from '@/hooks/usePagination';
+import PaginationControls from '@/components/shared/PaginationControls';
+import { formatTimestamp } from '@/lib/auditUtils';
+import { getAuditActionTranslationKey } from '@/utils/translation';
+import type { OscratAuditLog } from '@oscrat/model';
 
-// --- TYPE DEFINITIONS ---
-interface EventData {
-  id: string;
-  dateAdded: string;
-  type: string;
+const ITEMS_PER_PAGE = 15;
+
+interface VersionLogTableProps {
+  logs: OscratAuditLog[];
 }
 
-interface EventLogTableProps {
-  events: EventData[];
-  onPreview: (id: string) => void;
-}
-
-const Table: React.FC<EventLogTableProps> = ({ events, onPreview }) => {
-  const tableHeaders = ['Dated Added', 'Type', ''];
+const Table: React.FC<VersionLogTableProps> = ({ logs }) => {
   const { t, ready } = useTranslation('common');
+  const {
+    currentPage,
+    totalPages,
+    pageData,
+    goToPreviousPage,
+    goToNextPage,
+    prevButtonDisabled,
+    nextButtonDisabled,
+  } = usePagination<OscratAuditLog>(logs || [], ITEMS_PER_PAGE);
+
+  const tableHeaders = [
+    t('timestamp'),
+    t('user'),
+    t('action'),
+    t('target'),
+  ];
 
   if (!ready) return null;
 
@@ -32,33 +45,62 @@ const Table: React.FC<EventLogTableProps> = ({ events, onPreview }) => {
             columns={tableHeaders.map((header) => ({ label: header }))}
           />
           <tbody className={tableStyles.tbody}>
-            {(!events || events.length === 0) && (
+            {(!logs || logs.length === 0) && (
               <tr>
-                <td colSpan={3} className="px-6 py-8 text-center text-sm text-gray-500">
+                <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
                   {t('oscrat.ui.no-version-logs')}
                 </td>
               </tr>
             )}
-            {events.map((event) => (
-              <TableRow key={event.id}>
-                <td className={tableStyles.td}>
-                  {event.dateAdded}
-                </td>
-                <td className={tableStyles.td}>{event.type}</td>
-                <td className={`${tableStyles.td} text-right`}>
-                  <button
-                    onClick={() => onPreview(event.id)}
-                    className="flex items-center text-xs font-medium text-gray-900 hover:text-blue-600"
-                  >
-                    <FaRegEye className="mr-2" />
-                    {t('preview')}
-                  </button>
-                </td>
-              </TableRow>
+            {pageData.map((log) => (
+                <TableRow key={log.id}>
+                  <td className={tableStyles.td}>
+                    <span className="text-sm text-gray-600">
+                      {formatTimestamp(log.createdAt)}
+                    </span>
+                  </td>
+                  <td className={tableStyles.td}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {log.userName || log.userId}
+                      </span>
+                      {log.userEmail && (
+                        <span className="text-xs text-gray-500">{log.userEmail}</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className={tableStyles.td}>
+                    <span className="text-sm">
+                      {t(getAuditActionTranslationKey(log.action), { defaultValue: log.action })}
+                    </span>
+                  </td>
+                  <td className={tableStyles.td}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{log.targetType}</span>
+                      {log.targetName && (
+                        <span className="text-xs text-gray-500">{log.targetName}</span>
+                      )}
+                    </div>
+                  </td>
+                </TableRow>
             ))}
           </tbody>
         </table>
       </TableWrapper>
+
+      {logs && logs.length > ITEMS_PER_PAGE && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          prevButtonDisabled={prevButtonDisabled}
+          nextButtonDisabled={nextButtonDisabled}
+          goToPreviousPage={goToPreviousPage}
+          goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={logs.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+        />
+      )}
     </div>
   );
 };

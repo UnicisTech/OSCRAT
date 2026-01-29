@@ -100,17 +100,17 @@ model Team {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now())
   properties         Json                @default("{}")
-  
+
   type               OscratOrganizationType   @default(OTHER)
   size               OscratOrganizationSize   @default(SMALL_ENTERPRISE)
   orgRoles           OscratOrganizationRole[] @default([MANUFACTURER])
-  
+
   taxId              String?
   postalAddress      String?
   contactEmail       String?
   contactPhone       String?
   additionalInformation String?
-  
+
   apiKeys            ApiKey[]
   invitations        Invitation[]
   tasks              Task[]
@@ -125,6 +125,7 @@ model Team {
   incidents                   OscratProductIncident[] @relation("TeamIncidents")
   assessments                 OscratAssessment[]
   teamData                    TeamData[]
+  auditLogs                   AuditLog[]
 }
 
 model Task {
@@ -390,6 +391,12 @@ enum TaskStatus {
 enum TaskOriginType {
   MANUAL
   AUTOMATIC
+}
+
+enum AuditUserType {
+  USER
+  API_KEY
+  SYSTEM
 }
 
 enum OscratProductVersionStatus {
@@ -825,4 +832,39 @@ model Attachment {
   @@index([incidentId])
   @@index([vulnerabilityId])
   @@index([name])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+
+  userId      String
+  userType    AuditUserType @default(USER)
+  userName    String?
+  userEmail   String?
+
+  action      String
+  crud        String
+  targetType  String
+  targetId    String?
+  targetName  String?
+
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  productId   String?
+  productName String?
+  versionId   String?
+  versionName String?
+  metadata    Json?
+
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([teamId, createdAt(sort: Desc)])
+  @@index([teamId, action])
+  @@index([teamId, targetType])
+  @@index([teamId, productId])
+  @@index([teamId, versionId])
+  @@index([userId])
+  @@index([targetType, targetId])
 }

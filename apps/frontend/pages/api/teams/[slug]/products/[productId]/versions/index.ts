@@ -61,7 +61,7 @@ const handlePOST = async (
     createdBy: teamMember.userId,
   };
 
-  const version = await createVersion(prisma, teamMember.teamId, createData);
+  const version = await createVersion(prisma, teamMember.teamId, createData, req.auditInfo);
 
   console.log(
     `[OSCRAT] version created, versionId: ${version.id}, productId: ${productId}, version: ${versionData.version}, createdBy: ${teamMember.userId}`

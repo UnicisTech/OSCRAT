@@ -91,7 +91,8 @@ const handlePOST = async (
       prisma,
       teamMember.teamId,
       versionId as string,
-      repositoryData
+      repositoryData,
+      req.auditInfo
     );
 
     console.log(

@@ -1,4 +1,5 @@
 import { PrismaClient, TaskStatus, TaskOriginType } from '@prisma/client';
+import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 /** Create a new task */
 export const createTask = async (
@@ -14,25 +15,33 @@ export const createTask = async (
     productId?: string;
     versionId?: string;
     originType?: TaskOriginType;
-  }
+  },
+  auditInfo: AuditInfo
 ) => {
-  const { authorId, teamId, title, status, duedate, description, taskNumber, productId, versionId, originType } =
-    param;
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+    const { authorId, teamId, title, status, duedate, description, taskNumber, productId, versionId, originType } =
+      param;
 
-  return await prisma.task.create({
-    data: {
-      authorId,
-      taskNumber,
-      teamId,
-      title,
-      status: status,
-      duedate,
-      description,
-      properties: {},
-      productId,
-      versionId,
-      originType: originType,
-    },
+    const task = await tx.task.create({
+      data: {
+        authorId,
+        taskNumber,
+        teamId,
+        title,
+        status: status,
+        duedate,
+        description,
+        properties: {},
+        productId,
+        versionId,
+        originType: originType,
+      },
+    });
+
+    await logCreate(EntityType.Task, audit, { ...task, id: String(task.id), name: task.title });
+
+    return task;
   });
 };
 
@@ -41,26 +50,35 @@ export const updateTask = async (
   prisma: PrismaClient,
   taskNumber: number,
   slug: string,
-  data: any
+  data: any,
+  auditInfo: AuditInfo
 ) => {
-  const taskToEdit = await prisma.task.findFirst({
-    where: {
-      taskNumber,
-      team: {
-        slug,
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const taskToEdit = await tx.task.findFirst({
+      where: {
+        taskNumber,
+        team: {
+          slug,
+        },
       },
-    },
-  });
+    });
 
-  if (!taskToEdit) {
-    return null;
-  }
+    if (!taskToEdit) {
+      return null;
+    }
 
-  return await prisma.task.update({
-    where: {
-      id: taskToEdit.id,
-    },
-    data: data,
+    const updatedTask = await tx.task.update({
+      where: {
+        id: taskToEdit.id,
+      },
+      data: data,
+    });
+
+    await logUpdate(EntityType.Task, audit, { ...taskToEdit, id: String(taskToEdit.id), name: taskToEdit.title }, { ...updatedTask, id: String(updatedTask.id), name: updatedTask.title });
+
+    return updatedTask;
   });
 };
 
@@ -68,25 +86,33 @@ export const updateTask = async (
 export const deleteTask = async (
   prisma: PrismaClient,
   taskNumber: number,
-  slug: string
+  slug: string,
+  auditInfo: AuditInfo
 ) => {
-  const taskToDelete = await prisma.task.findFirst({
-    where: {
-      taskNumber,
-      team: {
-        slug,
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const taskToDelete = await tx.task.findFirst({
+      where: {
+        taskNumber,
+        team: {
+          slug,
+        },
       },
-    },
-  });
+      select: { id: true, title: true },
+    });
 
-  if (!taskToDelete) {
-    return null;
-  }
+    if (!taskToDelete) {
+      return null;
+    }
 
-  return await prisma.task.delete({
-    where: {
-      id: taskToDelete.id,
-    },
+    await logDelete(EntityType.Task, audit, { id: String(taskToDelete.id), name: taskToDelete.title });
+
+    return await tx.task.delete({
+      where: {
+        id: taskToDelete.id,
+      },
+    });
   });
 };
 

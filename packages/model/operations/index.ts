@@ -17,3 +17,7 @@ export * from './comment';
 export * from './attachment';
 export * from './teamData';
 export * from './encryption';
+export * from './auditLog';
+export * from './webhook';
+export * from './ssoConnection';
+export * from './directorySync';

@@ -1,14 +1,16 @@
 import { ApiError } from '@/lib/errors';
-import { sendAudit } from '@/lib/retraced';
+import { prisma } from '@/lib/prisma';
 import {
   createWebhook,
   deleteWebhook,
   findOrCreateApp,
+  findWebhook,
   listWebhooks,
 } from '@/lib/svix';
+import { logWebhookCreated, logWebhookDeleted } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import { EndpointIn } from 'svix';
+import type { EndpointIn } from 'svix';
 import { recordMetric } from '@/lib/metrics';
 import env from '@/lib/env';
 
@@ -46,7 +48,9 @@ const handlePOST = async (
 
   const app = await findOrCreateApp(teamMember.teamName, teamMember.teamId);
 
-  // TODO: The endpoint URL must be HTTPS.
+  if (!app) {
+    throw new ApiError(400, 'Bad request.');
+  }
 
   const data: EndpointIn = {
     description: name,
@@ -58,18 +62,20 @@ const handlePOST = async (
     data['filterTypes'] = eventTypes;
   }
 
-  if (!app) {
-    throw new ApiError(400, 'Bad request.');
-  }
-
   const endpoint = await createWebhook(app.id, data);
 
-  sendAudit({
-    action: 'webhook.create',
-    crud: 'c',
-    user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  if (endpoint) {
+    await prisma.$transaction(async (tx) => {
+      await logWebhookCreated(
+        tx,
+        { id: endpoint.id, name, url, eventTypes },
+        {
+          user,
+          team: { id: teamMember.teamId, name: teamMember.teamName },
+        }
+      );
+    });
+  }
 
   recordMetric('webhook.created');
 
@@ -119,14 +125,27 @@ const handleDELETE = async (
     throw new ApiError(400, 'Bad request.');
   }
 
+  const existing = await findWebhook(app.id, webhookId);
+
   await deleteWebhook(app.id, webhookId);
 
-  sendAudit({
-    action: 'webhook.delete',
-    crud: 'd',
-    user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  if (existing) {
+    await prisma.$transaction(async (tx) => {
+      await logWebhookDeleted(
+        tx,
+        {
+          id: existing.id,
+          name: existing.description,
+          url: existing.url,
+          eventTypes: existing.filterTypes,
+        },
+        {
+          user,
+          team: { id: teamMember.teamId, name: teamMember.teamName },
+        }
+      );
+    });
+  }
 
   recordMetric('webhook.removed');
 

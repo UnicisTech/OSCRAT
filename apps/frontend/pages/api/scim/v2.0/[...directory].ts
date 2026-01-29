@@ -8,7 +8,7 @@ import type {
   DirectorySyncRequest,
 } from '@boxyhq/saml-jackson';
 import { Role } from '@oscrat/model';
-import { addTeamMember } from 'models/team';
+import { addTeamMember, getTeam } from 'models/team';
 import { deleteUser, getUser } from 'models/user';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -58,17 +58,21 @@ const handleEvents = async (event: DirectorySyncEvent) => {
 
   // User has been created
   if (action === 'user.created' && 'email' in data) {
+    const team = await getTeam({ id: teamId });
+    if (!team) return;
+
+    const userName = `${data.first_name} ${data.last_name}`;
     const user = await prisma.user.upsert({
       where: {
         email: data.email,
       },
       update: {
-        name: `${data.first_name} ${data.last_name}`,
+        name: userName,
         firstName: data.first_name,
         lastName: data.last_name,
       },
       create: {
-        name: `${data.first_name} ${data.last_name}`,
+        name: userName,
         firstName: data.first_name,
         lastName: data.last_name,
         email: data.email,
@@ -76,23 +80,30 @@ const handleEvents = async (event: DirectorySyncEvent) => {
       },
     });
 
-    await addTeamMember(teamId, user.id, Role.MEMBER);
+    await addTeamMember(teamId, user.id, Role.MEMBER, {
+      user: { id: user.id, name: userName },
+      team: { id: teamId, name: team.name },
+    });
   }
 
   // User has been updated
   if (action === 'user.updated' && 'email' in data) {
     if (data.active === true) {
+      const team = await getTeam({ id: teamId });
+      if (!team) return;
+
+      const userName = `${data.first_name} ${data.last_name}`;
       const user = await prisma.user.upsert({
         where: {
           email: data.email,
         },
         update: {
-          name: `${data.first_name} ${data.last_name}`,
+          name: userName,
           firstName: data.first_name,
           lastName: data.last_name,
         },
         create: {
-          name: `${data.first_name} ${data.last_name}`,
+          name: userName,
           firstName: data.first_name,
           lastName: data.last_name,
           email: data.email,
@@ -100,7 +111,10 @@ const handleEvents = async (event: DirectorySyncEvent) => {
         },
       });
 
-      await addTeamMember(teamId, user.id, Role.MEMBER);
+      await addTeamMember(teamId, user.id, Role.MEMBER, {
+        user: { id: user.id, name: userName },
+        team: { id: teamId, name: team.name },
+      });
 
       return;
     }

@@ -43,7 +43,7 @@ const handlePOST = async (
 
   const productData = req.body as OscratProductCreate;
 
-  const product = await createProduct(prisma, teamMember.teamId, productData);
+  const product = await createProduct(prisma, teamMember.teamId, productData, req.auditInfo);
 
   console.log(
     `[OSCRAT] product created, productId: ${product.id}, name: ${productData.name}, teamId: ${teamMember.teamId}`

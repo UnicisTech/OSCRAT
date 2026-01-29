@@ -1,73 +1,24 @@
-import React, { useState } from 'react';
-import { FaRegEye } from 'react-icons/fa';
+import React from 'react';
 import { useTranslation } from 'next-i18next';
+import { useRecentActivities } from '@/lib/api/hooks/auditLogs';
+import { useTeamContext } from '@/context/TeamContext';
+import { getAuditActionTranslationKey } from '@/utils/translation';
 
-const MOCK_ACTIVITIES = [
-  {
-    id: 'act-1',
-    dated: '02.05.2025',
-    product: 'N5 5nm - 9 7950x',
-    version: 'Version 1.2',
-    type: 'New Incident Reported',
-  },
-  {
-    id: 'act-2',
-    dated: '23.04.2025',
-    product: 'N5 4nm - MTD 9200',
-    version: 'Version 12.3.b',
-    type: 'New Vulnerability Reported',
-  },
-  {
-    id: 'act-3',
-    dated: '12.04.2025',
-    product: '02.05.N5 5nm - 9 7950x',
-    version: 'Version 7.9',
-    type: 'External Reporting Added',
-  },
-  {
-    id: 'act-4',
-    dated: '06.04.2025',
-    product: 'N5 5nm - 9 7950x',
-    version: '02.05.Version 1.2',
-    type: 'New Vulnerability Reported',
-  },
-  {
-    id: 'act-5',
-    dated: '18.03.2025',
-    product: '02.N5 5nm - 9 7950x.2025',
-    version: 'Version 7.9',
-    type: 'Vulnerability Closed',
-  },
-  {
-    id: 'act-6',
-    dated: '12.03.2025',
-    product: 'N5 4nm - MTD 9200',
-    version: 'Version 12.3.b',
-    type: 'New Vulnerability Reported',
-  },
-  {
-    id: 'act-7',
-    dated: '18.03.2025',
-    product: '02.N5 5nm - 9 7950x.2025',
-    version: 'Version 7.9',
-    type: 'Vulnerability Closed',
-  },
-];
-
-export default function App() {
-  const [activities, setActivities] = useState(MOCK_ACTIVITIES);
+export default function RecentActivities() {
   const { t, ready } = useTranslation('common');
+  const { slug } = useTeamContext();
 
-  const handlePreview = (activityId) => {
-    const activity = activities.find((a) => a.id === activityId);
-    alert(`"Preview" clicked for: ${activity?.type}`);
-  };
+  const { data, isLoading } = useRecentActivities(slug);
 
-  const handleViewAll = () => {
-    alert('"View all" clicked. Functionality not yet implemented.');
-  };
+  const logs = data?.data ?? [];
 
-  const tableHeaders = ['Dated', 'Product', 'Version', 'Type', ''];
+  const tableHeaders = [
+    t('date'),
+    t('product'),
+    t('version'),
+    t('user'),
+    t('action'),
+  ];
 
   if (!ready) return null;
 
@@ -79,55 +30,55 @@ export default function App() {
           <h1 className="text-lg font-bold text-gray-800">
             {t('recent-activities')}
           </h1>
-          <button
-            onClick={handleViewAll}
-            className="rounded-md border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            {t('view-all')}
-          </button>
         </div>
 
         {/* Activities Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-700">
-            <thead className="border-b bg-gray-50 text-xs font-semibold text-gray-900">
-              <tr>
-                {tableHeaders.map((header) => (
-                  <th
-                    key={header}
-                    scope="col"
-                    className="px-6 py-3 font-medium"
-                  >
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {activities.map((activity) => (
-                <tr
-                  key={activity.id}
-                  className="border-b bg-white last:border-b-0 hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4 font-medium text-gray-900">
-                    {activity.dated}
-                  </td>
-                  <td className="px-6 py-4">{activity.product}</td>
-                  <td className="px-6 py-4">{activity.version}</td>
-                  <td className="px-6 py-4">{activity.type}</td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handlePreview(activity.id)}
-                      className="hover:blue flex items-center text-sm font-medium text-gray-500"
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-500">{t('loading')}</div>
+            </div>
+          ) : logs.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-500">{t('no-recent-activities')}</div>
+            </div>
+          ) : (
+            <table className="w-full text-left text-sm text-gray-700">
+              <thead className="border-b bg-gray-50 text-xs font-semibold text-gray-900">
+                <tr>
+                  {tableHeaders.map((header) => (
+                    <th
+                      key={header}
+                      scope="col"
+                      className="px-6 py-3 font-medium"
                     >
-                      <FaRegEye className="mr-2" />
-                      {t('preview')}
-                    </button>
-                  </td>
+                      {header}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {logs.map((log) => (
+                    <tr
+                      key={log.id}
+                      className="border-b bg-white last:border-b-0 hover:bg-gray-50"
+                    >
+                      <td className="px-6 py-4 font-medium text-gray-900">
+                        {new Date(log.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4">{log.productName ?? '—'}</td>
+                      <td className="px-6 py-4">{log.versionName ?? '—'}</td>
+                      <td className="px-6 py-4">{log.userName ?? log.userId}</td>
+                      <td className="px-6 py-4 text-sm">
+                        {t(getAuditActionTranslationKey(log.action), {
+                          defaultValue: log.action,
+                        })}
+                      </td>
+                    </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

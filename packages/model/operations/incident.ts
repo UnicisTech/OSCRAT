@@ -5,6 +5,7 @@ import type {
   OscratIncidentSummary,
   OscratIncidentDetail,
 } from '../types/incidents';
+import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 const USER_SELECT = {
   id: true,
@@ -186,20 +187,41 @@ export const createIncident = async (
   teamId: string,
   productId: string,
   versionId: string,
-  data: OscratIncidentCreate
+  data: OscratIncidentCreate,
+  auditInfo: AuditInfo
 ): Promise<OscratIncidentDetail> => {
-  // Validate attachments if provided
-  if (data.attachmentIds) {
-    await validateAttachmentsForIncident(
-      prisma,
-      data.attachmentIds,
-      versionId
-    );
-  }
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  // Create incident and link attachments in a transaction
-  const incident = await prisma.$transaction(async (tx) => {
-    // Destructure attachmentIds out of data since it's not a Prisma field
+    if (data.attachmentIds) {
+      const attachments = await tx.attachment.findMany({
+        where: {
+          id: { in: data.attachmentIds },
+        },
+        select: {
+          id: true,
+          versionId: true,
+          incidentId: true,
+        },
+      });
+
+      if (attachments.length !== data.attachmentIds.length) {
+        throw new Error('One or more attachments not found');
+      }
+
+      const invalidAttachments = attachments.filter(
+        (att) => att.versionId !== versionId
+      );
+      if (invalidAttachments.length > 0) {
+        throw new Error('All attachments must belong to the same version as the incident');
+      }
+
+      const alreadyLinked = attachments.filter((att) => att.incidentId !== null);
+      if (alreadyLinked.length > 0) {
+        throw new Error('One or more attachments are already linked to another incident');
+      }
+    }
+
     const { attachmentIds, ...createData } = data;
 
     const newIncident = await tx.oscratProductIncident.create({
@@ -227,13 +249,15 @@ export const createIncident = async (
     }
 
     // Fetch incident with all relations
-    return tx.oscratProductIncident.findUnique({
+    const incident = await tx.oscratProductIncident.findUnique({
       where: { id: newIncident.id },
       include: INCIDENT_DETAIL_INCLUDE,
     });
-  });
 
-  return transformToIncidentDetail(incident!);
+    await logCreate(EntityType.Incident, audit, incident!);
+
+    return transformToIncidentDetail(incident!);
+  });
 };
 
 export const updateIncident = async (
@@ -241,21 +265,54 @@ export const updateIncident = async (
   teamId: string,
   versionId: string,
   incidentId: string,
-  data: OscratIncidentUpdate
+  data: OscratIncidentUpdate,
+  auditInfo: AuditInfo
 ): Promise<OscratIncidentDetail> => {
-  // Validate attachments if provided
-  if (data.attachmentIds) {
-    await validateAttachmentsForIncident(
-      prisma,
-      data.attachmentIds,
-      versionId,
-      incidentId
-    );
-  }
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  // Update incident and manage attachments in a transaction
-  const incident = await prisma.$transaction(async (tx) => {
-    // Destructure attachmentIds out of data since it's not a Prisma field
+    const existing = await tx.oscratProductIncident.findFirst({
+      where: {
+        id: incidentId,
+        teamId: teamId,
+      },
+    });
+
+    if (!existing) {
+      throw new Error('Incident not found or does not belong to team');
+    }
+
+    if (data.attachmentIds) {
+      const attachments = await tx.attachment.findMany({
+        where: {
+          id: { in: data.attachmentIds },
+        },
+        select: {
+          id: true,
+          versionId: true,
+          incidentId: true,
+        },
+      });
+
+      if (attachments.length !== data.attachmentIds.length) {
+        throw new Error('One or more attachments not found');
+      }
+
+      const invalidAttachments = attachments.filter(
+        (att) => att.versionId !== versionId
+      );
+      if (invalidAttachments.length > 0) {
+        throw new Error('All attachments must belong to the same version as the incident');
+      }
+
+      const alreadyLinked = attachments.filter((att) =>
+        att.incidentId !== null && att.incidentId !== incidentId
+      );
+      if (alreadyLinked.length > 0) {
+        throw new Error('One or more attachments are already linked to another incident');
+      }
+    }
+
     const { attachmentIds, ...updateData } = data;
 
     // Update incident data
@@ -293,24 +350,45 @@ export const updateIncident = async (
     }
 
     // Fetch incident with all relations
-    return tx.oscratProductIncident.findUnique({
+    const incident = await tx.oscratProductIncident.findUnique({
       where: { id: incidentId },
       include: INCIDENT_DETAIL_INCLUDE,
     });
-  });
 
-  return transformToIncidentDetail(incident!);
+    await logUpdate(EntityType.Incident, audit, existing, incident!);
+
+    return transformToIncidentDetail(incident!);
+  });
 };
 
 export const deleteIncident = async (
   prisma: PrismaClient,
   teamId: string,
-  incidentId: string
+  incidentId: string,
+  auditInfo: AuditInfo
 ): Promise<void> => {
-  await prisma.oscratProductIncident.delete({
-    where: {
-      id: incidentId,
-      teamId: teamId,
-    },
+  await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const incident = await tx.oscratProductIncident.findFirst({
+      where: {
+        id: incidentId,
+        teamId: teamId,
+      },
+      select: { id: true, description: true },
+    });
+
+    if (!incident) {
+      throw new Error('Incident not found or does not belong to team');
+    }
+
+    await logDelete(EntityType.Incident, audit, { id: incident.id, name: incident.description });
+
+    await tx.oscratProductIncident.delete({
+      where: {
+        id: incidentId,
+        teamId: teamId,
+      },
+    });
   });
 };

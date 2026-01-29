@@ -8,6 +8,7 @@ import {
 import formidable from 'formidable';
 import { NextApiRequest } from 'next';
 import { v4 as uuidv4 } from 'uuid';
+import type { AuditInfo } from '@oscrat/model/audit';
 
 export const createAttachment = async (
   taskId: number,
@@ -16,25 +17,30 @@ export const createAttachment = async (
   url: string,
   attachmentId: string,
   createdBy: string,
-  description?: string
+  description?: string,
+  auditInfo?: AuditInfo
 ) => {
-  return await AttachmentOps.createAttachment(prisma, {
-    name: filename,
-    description,
-    url,
-    fileData,
-    fileSize: fileData.length,
-    taskId,
-    createdBy,
-  });
+  return await AttachmentOps.createAttachment(
+    prisma,
+    {
+      name: filename,
+      description,
+      url,
+      fileData,
+      fileSize: fileData.length,
+      taskId,
+      createdBy,
+    },
+    auditInfo
+  );
 };
 
 export const findAttachmentById = async (id: string) => {
   return await AttachmentOps.getAttachmentById(prisma, id);
 };
 
-export const deleteAttachment = async (id: string) => {
-  return await AttachmentOps.deleteAttachment(prisma, id);
+export const deleteAttachment = async (id: string, auditInfo?: AuditInfo) => {
+  return await AttachmentOps.deleteAttachment(prisma, id, auditInfo);
 };
 
 // Use shared file handling utilities
@@ -45,6 +51,7 @@ export interface UploadAttachmentParams {
   file: formidable.File;
   createdBy: string;
   description?: string;
+  auditInfo?: AuditInfo;
 }
 
 export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
@@ -59,7 +66,8 @@ export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
     url,
     attachmentId,
     params.createdBy,
-    params.description
+    params.description,
+    params.auditInfo
   );
 
   return url;

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import * as TaskOps from '@oscrat/model/operations';
 import * as TeamOps from '@oscrat/model/operations';
-import { TaskStatus, TaskOriginType } from '@oscrat/model';
+import { TaskStatus, TaskOriginType, type AuditInfo } from '@oscrat/model';
 
 export const createTask = async (param: {
   authorId: string;
@@ -13,7 +13,7 @@ export const createTask = async (param: {
   productId?: string;
   versionId?: string;
   originType?: TaskOriginType;
-}) => {
+}, audit: AuditInfo) => {
   const { teamId } = param;
   const team = await TeamOps.getTeamDetail(prisma, { id: teamId });
   if (!team) {
@@ -25,7 +25,7 @@ export const createTask = async (param: {
     ...param,
     duedate: param.duedate || new Date().toISOString(),
     taskNumber,
-  });
+  }, audit);
 
   await TeamOps.incrementTaskIndex(prisma, teamId);
 
@@ -35,13 +35,14 @@ export const createTask = async (param: {
 export const updateTask = async (
   taskNumber: number,
   slug: string,
-  data: any
+  data: any,
+  audit: AuditInfo
 ) => {
-  return await TaskOps.updateTask(prisma, taskNumber, slug, data);
+  return await TaskOps.updateTask(prisma, taskNumber, slug, data, audit);
 };
 
-export const deleteTask = async (taskNumber: number, slug: string) => {
-  return await TaskOps.deleteTask(prisma, taskNumber, slug);
+export const deleteTask = async (taskNumber: number, slug: string, audit: AuditInfo) => {
+  return await TaskOps.deleteTask(prisma, taskNumber, slug, audit);
 };
 
 export const getTasks = async (userId: string) => {

@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Action, Resource, permissions } from '@/lib/permissions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { Session } from 'next-auth';
-import type { Role, TeamMemberDetail } from '@oscrat/model';
+import type { Role, TeamMemberDetail, AuditInfo } from '@oscrat/model';
 import * as TeamOps from '@oscrat/model/operations';
 import { randomUUID } from 'crypto';
 
@@ -18,6 +18,7 @@ export interface AuthenticatedUserContext {
 
 export interface AuthenticatedTeamRequest extends NextApiRequest {
   teamContext: AuthenticatedTeamContext;
+  auditInfo: AuditInfo;
 }
 
 export interface AuthenticatedUserRequest extends NextApiRequest {
@@ -131,6 +132,13 @@ export function withTeamAuth<T = any>(resourceAction?: [Resource, Action]) {
       context: AuthenticatedTeamContext
     ) => {
       (req as AuthenticatedTeamRequest).teamContext = context;
+      const { productId, versionId } = req.query;
+      (req as AuthenticatedTeamRequest).auditInfo = {
+        user: { id: context.user.id, name: context.user.name },
+        team: { id: context.teamMember.teamId, name: context.teamMember.teamName },
+        ...(productId && { productId: productId as string }),
+        ...(versionId && { versionId: versionId as string }),
+      };
     };
 
     return createMiddleware<T>(authFn, contextAttacher, 'team')(handler);

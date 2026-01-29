@@ -1,7 +1,6 @@
 import { sendTeamInviteEmail } from '@/lib/email/sendTeamInviteEmail';
 import { ApiError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
-import { sendAudit } from '@/lib/retraced';
 import { getSession } from '@/lib/session';
 import { sendEvent } from '@/lib/svix';
 import {
@@ -78,29 +77,21 @@ const handlePOST = async (
     throw new ApiError(400, 'This user already in your team.');
   }
 
-  const invitation = await createInvitation({
-    teamId: teamMember.teamId,
-    invitedBy: user.id,
-    email,
-    role,
-  });
+  const invitation = await createInvitation(
+    {
+      teamId: teamMember.teamId,
+      invitedBy: user.id,
+      email,
+      role,
+    },
+    req.auditInfo
+  );
 
   await sendEvent(teamMember.teamId, 'invitation.created', invitation);
 
   await sendTeamInviteEmail(teamMember.teamName, invitation);
 
-  sendAudit({
-    action: 'member.invitation.create',
-    crud: 'c',
-    user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
-
   recordMetric('invitation.created');
-
-  console.log(
-    `[Invitation] sent, email: ${email}, role: ${role}, teamId: ${teamMember.teamId}`
-  );
 
   res.status(200).json({ data: invitation });
 };
@@ -145,18 +136,11 @@ const handleDELETE = async (
   }
 
   try {
-    await deleteInvitation({ id });
+    await deleteInvitation({ id }, req.auditInfo);
   } catch (error) {
     console.error('Error deleting invitation:', error);
     throw new ApiError(500, 'Failed to delete invitation.');
   }
-
-  sendAudit({
-    action: 'member.invitation.delete',
-    crud: 'd',
-    user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
 
   await sendEvent(teamMember.teamId, 'invitation.removed', invitation);
 
@@ -191,7 +175,11 @@ const handlePUT = async (
   const teamMember = await addTeamMember(
     invitation.team.id,
     userId,
-    invitation.role
+    invitation.role,
+    {
+      user: { id: session.user.id, name: session.user.name },
+      team: { id: invitation.team.id, name: invitation.team.name },
+    }
   );
 
   await sendEvent(

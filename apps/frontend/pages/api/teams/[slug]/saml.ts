@@ -1,9 +1,23 @@
 import env from '@/lib/env';
 import { ApiError } from '@/lib/errors';
+import { prisma } from '@/lib/prisma';
 import jackson from '@/lib/jackson';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
-import { sendAudit } from '@/lib/retraced';
+import {
+  logSsoConnectionCreated,
+  logSsoConnectionUpdated,
+  logSsoConnectionDeleted,
+  type SsoConnectionAuditData,
+} from '@oscrat/model/operations';
 import type { NextApiResponse } from 'next';
+import type { SAMLSSORecord } from '@boxyhq/saml-jackson';
+
+const getConnectionAuditData = (connection: SAMLSSORecord): SsoConnectionAuditData => ({
+  id: connection.clientID,
+  name: connection.name,
+  issuer: connection.idpMetadata?.entityID,
+  isActive: !connection.deactivated,
+});
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -69,11 +83,15 @@ const handlePOST = async (
     product: env.product,
   });
 
-  sendAudit({
-    action: 'sso.connection.create',
-    crud: 'c',
-    user: user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
+  await prisma.$transaction(async (tx) => {
+    await logSsoConnectionCreated(
+      tx,
+      getConnectionAuditData(connection),
+      {
+        user,
+        team: { id: teamMember.teamId, name: teamMember.teamName },
+      }
+    );
   });
 
   res.status(201).json({ data: connection });
@@ -95,7 +113,13 @@ const handlePATCH = async (
 
   const { apiController } = await jackson();
 
-  const connection = await apiController.updateSAMLConnection({
+  const existingConnections = await apiController.getConnections({
+    tenant: teamMember.teamId,
+    product: env.product,
+  }) as SAMLSSORecord[];
+  const existing = existingConnections.find(c => c.clientID === clientID);
+
+  await apiController.updateSAMLConnection({
     clientID,
     clientSecret,
     encodedRawMetadata,
@@ -107,14 +131,27 @@ const handlePATCH = async (
     product: env.product,
   });
 
-  sendAudit({
-    action: 'sso.connection.patch',
-    crud: 'u',
-    user: user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  const updatedConnections = await apiController.getConnections({
+    tenant: teamMember.teamId,
+    product: env.product,
+  }) as SAMLSSORecord[];
+  const updated = updatedConnections.find(c => c.clientID === clientID);
 
-  res.status(200).json({ data: connection });
+  if (existing && updated) {
+    await prisma.$transaction(async (tx) => {
+      await logSsoConnectionUpdated(
+        tx,
+        getConnectionAuditData(existing),
+        getConnectionAuditData(updated),
+        {
+          user,
+          team: { id: teamMember.teamId, name: teamMember.teamName },
+        }
+      );
+    });
+  }
+
+  res.status(200).json({ data: updated });
 };
 
 const handleDELETE = async (
@@ -130,14 +167,26 @@ const handleDELETE = async (
 
   const { apiController } = await jackson();
 
+  const existingConnections = await apiController.getConnections({
+    tenant: teamMember.teamId,
+    product: env.product,
+  }) as SAMLSSORecord[];
+  const existing = existingConnections.find(c => c.clientID === clientID);
+
   await apiController.deleteConnections({ clientID, clientSecret });
 
-  sendAudit({
-    action: 'sso.connection.delete',
-    crud: 'c',
-    user: user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  if (existing) {
+    await prisma.$transaction(async (tx) => {
+      await logSsoConnectionDeleted(
+        tx,
+        getConnectionAuditData(existing),
+        {
+          user,
+          team: { id: teamMember.teamId, name: teamMember.teamName },
+        }
+      );
+    });
+  }
 
   res.json({ data: {} });
 };

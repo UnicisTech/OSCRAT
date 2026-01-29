@@ -87,7 +87,7 @@ const handlePOST = async (
       },
       triggeredByUserId: teamMember.userId,
       teamId: teamMember.teamId,
-    });
+    }, req.auditInfo);
 
     console.log(
       `[SBOM Reports API] File-based report created: reportId: ${report.id}, filename: ${fileUpload.filename}`

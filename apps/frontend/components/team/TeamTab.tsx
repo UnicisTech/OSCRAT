@@ -1,6 +1,5 @@
 import {
   Cog6ToothIcon,
-  DocumentMagnifyingGlassIcon,
   KeyIcon,
   PaperAirplaneIcon,
   ShieldExclamationIcon,
@@ -62,18 +61,6 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
       href: `/teams/${teamSlug}/directory-sync`,
       active: activeTab === 'directory-sync',
       icon: UserPlusIcon,
-    });
-  }
-
-  if (
-    teamFeatures.auditLog &&
-    canAccess('team_audit_log', ['create', 'update', 'read', 'delete'])
-  ) {
-    navigations.push({
-      name: 'Audit Logs',
-      href: `/teams/${teamSlug}/audit-logs`,
-      active: activeTab === 'audit-logs',
-      icon: DocumentMagnifyingGlassIcon,
     });
   }
 

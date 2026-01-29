@@ -103,6 +103,7 @@ const handlePOST = async (
             ? description[0]
             : description,
           createdBy: teamMember.userId,
+          auditInfo: req.auditInfo,
         };
 
         const url = await saveFileAsAttachment(uploadParams);
@@ -130,7 +131,6 @@ const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
-  const { teamMember } = req.teamContext;
   const { id } = req.query;
 
   try {
@@ -138,7 +138,7 @@ const handleDELETE = async (
       throw new ApiError(400, 'Attachment ID is required');
     }
 
-    await deleteAttachment(id as string);
+    await deleteAttachment(id as string, req.auditInfo);
 
     return res.status(200).json({ data: {}, error: null });
   } catch (error: any) {

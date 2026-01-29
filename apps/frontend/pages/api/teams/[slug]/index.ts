@@ -1,4 +1,3 @@
-import { sendAudit } from '@/lib/retraced';
 import { deleteTeam, getTeamDetail, updateTeam } from 'models/team';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
@@ -61,12 +60,8 @@ const handlePUT = async (
   }
 
   // Update team - Prisma will ignore undefined fields
-  const updatedTeam = await updateTeam(teamMember.teamSlug, updateData);
-
-  sendAudit({
-    action: 'team.update',
-    crud: 'u',
-    user: user,
+  const updatedTeam = await updateTeam(teamMember.teamSlug, updateData, {
+    user,
     team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 
@@ -82,12 +77,8 @@ const handleDELETE = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  await deleteTeam({ id: teamMember.teamId });
-
-  sendAudit({
-    action: 'team.delete',
-    crud: 'd',
-    user: user,
+  await deleteTeam({ id: teamMember.teamId }, {
+    user,
     team: { id: teamMember.teamId, name: teamMember.teamName },
   });
 

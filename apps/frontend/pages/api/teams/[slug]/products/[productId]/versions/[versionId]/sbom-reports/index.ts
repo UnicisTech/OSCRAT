@@ -65,7 +65,7 @@ const handlePOST = async (
     jobPayload: { repositoryId },
     triggeredByUserId: teamMember.userId,
     teamId: teamMember.teamId,
-  });
+  }, req.auditInfo);
 
   console.log(
     `[SBOM Reports API] Created repo-based SBOM report, teamId: ${teamMember.teamId}, reportId: ${report.id}, repositoryId: ${repositoryId}`

@@ -60,7 +60,8 @@ const handlePUT = async (
     prisma,
     teamMember.teamId,
     assessmentId as string,
-    req.body
+    req.body,
+    req.auditInfo
   );
 
   console.log(
@@ -81,7 +82,8 @@ const handleDELETE = async (
   await deleteAssessment(
     prisma,
     teamMember.teamId,
-    assessmentId as string
+    assessmentId as string,
+    req.auditInfo
   );
 
   console.log(

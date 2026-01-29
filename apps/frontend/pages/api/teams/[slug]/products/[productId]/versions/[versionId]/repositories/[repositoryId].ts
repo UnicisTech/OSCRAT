@@ -96,7 +96,8 @@ const handlePUT = async (
       prisma,
       teamMember.teamId,
       repositoryId as string,
-      repositoryData
+      repositoryData,
+      req.auditInfo
     );
 
     res.status(200).json({ data: repository });
@@ -130,7 +131,7 @@ const handleDELETE = async (
 
   const { repositoryId } = req.query;
 
-  await deleteRepository(prisma, teamMember.teamId, repositoryId as string);
+  await deleteRepository(prisma, teamMember.teamId, repositoryId as string, req.auditInfo);
 
   res.status(200).json({ data: {} });
 };

@@ -1,36 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSearchAuditLogs } from '@/lib/api/hooks/auditLogs';
+import { useVersionContext } from '@/context/VersionContext';
+import { useTeamContext } from '@/context/TeamContext';
 import Table from './table';
+import { TabLoading } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 
-// --- TYPE DEFINITIONS ---
-interface EventData {
-  id: string;
-  dateAdded: string;
-  type: string;
-}
-
-// TODO: Wait for BE implementation
 export default function Index() {
-  const initialEventData: EventData[] = [
-    { id: '1', dateAdded: '02.05.2025', type: 'New Incident Reported' },
-    { id: '2', dateAdded: '23.04.2025', type: 'New Vulnerability Reported' },
-    { id: '3', dateAdded: '12.04.2025', type: 'External Reporting Added' },
-    { id: '4', dateAdded: '06.04.2025', type: 'New Vulnerability Reported' },
-    { id: '5', dateAdded: '18.03.2025', type: 'Vulnerability Closed' },
-    { id: '6', dateAdded: '12.03.2025', type: 'New Vulnerability Reported' },
-    { id: '7', dateAdded: '04.02.2025', type: 'New Incident Reported' },
-    { id: '8', dateAdded: '01.01.2025', type: 'Version Created' },
-  ];
+  const { slug } = useTeamContext();
+  const { versionId } = useVersionContext();
 
-  const [events, setEvents] = useState<EventData[]>(initialEventData);
+  const { data, isLoading } = useSearchAuditLogs(slug, { versionId });
 
-  const handlePreview = (id: string) => {
-    alert(`Preview for item ${id} is not yet implemented.`);
-  };
+  if (isLoading) {
+    return <TabLoading />;
+  }
 
   return (
     <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
       <div className="w-full">
-        <Table events={events} onPreview={handlePreview} />
+        <Table logs={data?.data || []} />
       </div>
     </div>
   );

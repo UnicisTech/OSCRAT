@@ -62,7 +62,8 @@ const handlePOST = async (
     teamMember.teamId,
     productId as string,
     versionId as string,
-    createData
+    createData,
+    req.auditInfo
   );
 
   res.status(201).json({ data: incident });

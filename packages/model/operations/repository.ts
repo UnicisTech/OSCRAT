@@ -7,6 +7,7 @@ import type {
   OscratRepositoryWithRelations,
 } from '../types/repository';
 import { encryptToken } from './encryption';
+import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 const MASKED_TOKEN = '••••••••';
 
@@ -191,7 +192,8 @@ export const createRepository = async (
   prisma: PrismaClient,
   teamId: string,
   versionId: string,
-  data: OscratRepositoryCreate
+  data: OscratRepositoryCreate,
+  auditInfo: AuditInfo
 ): Promise<OscratRepositoryDetail> => {
   console.log(
     `[Repository Operations] Creating repository for team: ${teamId}, version: ${versionId}`
@@ -205,83 +207,87 @@ export const createRepository = async (
     hasAccessToken: !!data.accessToken,
   });
 
-  // Verify version exists and belongs to team, and get organization and product info
-  const version = await prisma.oscratProductVersion.findFirst({
-    where: {
-      id: versionId,
-      product: {
-        teamId,
-      },
-    },
-    include: {
-      product: {
-        select: {
-          id: true,
-          teamId: true,
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const version = await tx.oscratProductVersion.findFirst({
+      where: {
+        id: versionId,
+        product: {
+          teamId,
         },
       },
-    },
-  });
-
-  console.log(`[Repository Operations] Version found:`, version ? 'Yes' : 'No');
-  if (version) {
-    console.log(`[Repository Operations] Version details:`, {
-      id: version.id,
-      version: version.version,
-      productId: version.product.id,
-      teamId: version.product.teamId,
+      include: {
+        product: {
+          select: {
+            id: true,
+            teamId: true,
+          },
+        },
+      },
     });
-  }
 
-  if (!version) {
-    console.error(
-      `[Repository Operations] Version ${versionId} not found for team: ${teamId}`
-    );
-    throw new Error(`Version ${versionId} not found for team: ${teamId}`);
-  }
+    console.log(`[Repository Operations] Version found:`, version ? 'Yes' : 'No');
+    if (version) {
+      console.log(`[Repository Operations] Version details:`, {
+        id: version.id,
+        version: version.version,
+        productId: version.product.id,
+        teamId: version.product.teamId,
+      });
+    }
 
-  // Check if version already has a repository
-  const existingRepository = await prisma.oscratRepository.findFirst({
-    where: { versionId },
-    select: { id: true },
+    if (!version) {
+      console.error(
+        `[Repository Operations] Version ${versionId} not found for team: ${teamId}`
+      );
+      throw new Error(`Version ${versionId} not found for team: ${teamId}`);
+    }
+
+    const existingRepository = await tx.oscratRepository.findFirst({
+      where: { versionId },
+      select: { id: true },
+    });
+
+    if (existingRepository) {
+      console.error(
+        `[Repository Operations] Version ${versionId} already has a repository with ID: ${existingRepository.id}`
+      );
+      throw new Error(`Version ${versionId} already has a repository`);
+    }
+
+    console.log(`[Repository Operations] Creating repository in database...`);
+
+    const repository = await tx.oscratRepository.create({
+      data: {
+        name: data.name,
+        provider: data.provider,
+        repositoryUrl: data.repositoryUrl,
+        user: data.user,
+        targetBranch: data.targetBranch,
+        targetTag: data.targetTag,
+        targetCommit: data.targetCommit,
+        authType: data.authType,
+        accessToken: data.accessToken ? encryptToken(data.accessToken) : null,
+        teamId: teamId,
+        versionId: versionId,
+        productId: version.product.id,
+      },
+      include: REPOSITORY_DETAIL_INCLUDE,
+    });
+
+    console.log(`[Repository Operations] Repository created successfully:`, {
+      id: repository.id,
+      name: repository.name,
+      provider: repository.provider,
+      teamId: repository.teamId,
+      versionId: repository.versionId,
+    });
+
+    await logCreate(EntityType.Repository, audit, repository);
+
+    return transformToRepositoryDetail(repository);
   });
-
-  if (existingRepository) {
-    console.error(
-      `[Repository Operations] Version ${versionId} already has a repository with ID: ${existingRepository.id}`
-    );
-    throw new Error(`Version ${versionId} already has a repository`);
-  }
-
-  console.log(`[Repository Operations] Creating repository in database...`);
-
-  const repository = await prisma.oscratRepository.create({
-    data: {
-      name: data.name,
-      provider: data.provider,
-      repositoryUrl: data.repositoryUrl,
-      user: data.user,
-      targetBranch: data.targetBranch,
-      targetTag: data.targetTag,
-      targetCommit: data.targetCommit,
-      authType: data.authType,
-      accessToken: data.accessToken ? encryptToken(data.accessToken) : null,
-      teamId: teamId,
-      versionId: versionId,
-      productId: version.product.id,
-    },
-    include: REPOSITORY_DETAIL_INCLUDE,
-  });
-
-  console.log(`[Repository Operations] Repository created successfully:`, {
-    id: repository.id,
-    name: repository.name,
-    provider: repository.provider,
-    teamId: repository.teamId,
-    versionId: repository.versionId,
-  });
-
-  return transformToRepositoryDetail(repository);
 };
 
 /** Update an existing repository */
@@ -289,64 +295,74 @@ export const updateRepository = async (
   prisma: PrismaClient,
   teamId: string,
   repositoryId: string,
-  data: OscratRepositoryUpdate
+  data: OscratRepositoryUpdate,
+  auditInfo: AuditInfo
 ): Promise<OscratRepositoryDetail> => {
-  // Verify repository ownership first
-  const repository = await prisma.oscratRepository.findFirst({
-    where: {
-      id: repositoryId,
-      teamId,
-    },
-    select: { id: true },
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const existing = await tx.oscratRepository.findFirst({
+      where: {
+        id: repositoryId,
+        teamId,
+      },
+    });
+
+    if (!existing) {
+      throw new Error(`Repository ${repositoryId} not found for team: ${teamId}`);
+    }
+
+    const updatedRepository = await tx.oscratRepository.update({
+      where: { id: repositoryId },
+      data: {
+        name: data.name,
+        provider: data.provider,
+        repositoryUrl: data.repositoryUrl,
+        user: data.user,
+        targetBranch: data.targetBranch,
+        targetTag: data.targetTag,
+        targetCommit: data.targetCommit,
+        authType: data.authType,
+        ...(data.accessToken && data.accessToken !== MASKED_TOKEN
+          ? { accessToken: encryptToken(data.accessToken) }
+          : {}),
+      },
+      include: REPOSITORY_DETAIL_INCLUDE,
+    });
+
+    await logUpdate(EntityType.Repository, audit, existing, updatedRepository);
+
+    return transformToRepositoryDetail(updatedRepository);
   });
-
-  if (!repository) {
-    throw new Error(`Repository ${repositoryId} not found for team: ${teamId}`);
-  }
-
-  const updatedRepository = await prisma.oscratRepository.update({
-    where: { id: repositoryId },
-    data: {
-      name: data.name,
-      provider: data.provider,
-      repositoryUrl: data.repositoryUrl,
-      user: data.user,
-      targetBranch: data.targetBranch,
-      targetTag: data.targetTag,
-      targetCommit: data.targetCommit,
-      authType: data.authType,
-      ...(data.accessToken && data.accessToken !== MASKED_TOKEN
-        ? { accessToken: encryptToken(data.accessToken) }
-        : {}),
-    },
-    include: REPOSITORY_DETAIL_INCLUDE,
-  });
-
-  return transformToRepositoryDetail(updatedRepository);
 };
 
 /** Delete a repository */
 export const deleteRepository = async (
   prisma: PrismaClient,
   teamId: string,
-  repositoryId: string
+  repositoryId: string,
+  auditInfo: AuditInfo
 ): Promise<void> => {
-  // Verify repository ownership first
-  const repository = await prisma.oscratRepository.findFirst({
-    where: {
-      id: repositoryId,
-      teamId,
-    },
-    select: { id: true },
-  });
+  await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  if (!repository) {
-    throw new Error(`Repository ${repositoryId} not found for team: ${teamId}`);
-  }
+    const repository = await tx.oscratRepository.findFirst({
+      where: {
+        id: repositoryId,
+        teamId,
+      },
+      select: { id: true, name: true },
+    });
 
-  // Delete the repository
-  await prisma.oscratRepository.delete({
-    where: { id: repositoryId },
+    if (!repository) {
+      throw new Error(`Repository ${repositoryId} not found for team: ${teamId}`);
+    }
+
+    await logDelete(EntityType.Repository, audit, repository);
+
+    await tx.oscratRepository.delete({
+      where: { id: repositoryId },
+    });
   });
 };
 
@@ -355,7 +371,8 @@ export const createProductRepository = async (
   prisma: PrismaClient,
   teamId: string,
   productId: string,
-  data: OscratRepositoryCreate
+  data: OscratRepositoryCreate,
+  auditInfo: AuditInfo
 ): Promise<OscratRepositoryDetail> => {
   // Find the active version of the product
   const product = await prisma.oscratProduct.findFirst({
@@ -381,5 +398,5 @@ export const createProductRepository = async (
     throw new Error(`No active version found for product ${productId}`);
   }
 
-  return createRepository(prisma, teamId, activeVersion.id, data);
+  return createRepository(prisma, teamId, activeVersion.id, data, auditInfo);
 };

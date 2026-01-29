@@ -73,7 +73,8 @@ const handlePUT = async (
     prisma,
     teamMember.teamId,
     versionId as string,
-    updateData
+    updateData,
+    req.auditInfo
   );
 
   res.status(200).json({ data: version });
@@ -88,7 +89,7 @@ const handleDELETE = async (
 
   const { versionId } = req.query;
 
-  await deleteVersion(prisma, teamMember.teamId, versionId as string);
+  await deleteVersion(prisma, teamMember.teamId, versionId as string, req.auditInfo);
 
   res.status(200).json({ data: {} });
 };

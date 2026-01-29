@@ -211,7 +211,7 @@ export const authOptions: NextAuthOptions = {
         await linkAccount(newUser, account);
 
         if (account.provider === 'boxyhq-saml' && profile) {
-          await linkToTeam(profile, newUser.id);
+          await linkToTeam(profile, newUser.id, newUser.name);
         }
 
         return true;
@@ -261,7 +261,7 @@ export const authOptions: NextAuthOptions = {
 
 export default NextAuth(authOptions);
 
-const linkToTeam = async (profile: Profile, userId: string) => {
+const linkToTeam = async (profile: Profile, userId: string, userName?: string | null) => {
   const team = await getTeamDetail({
     id: profile.requested.tenant,
   });
@@ -292,7 +292,10 @@ const linkToTeam = async (profile: Profile, userId: string) => {
     }
   }
 
-  await addTeamMember(team.id, userId, userRole);
+  await addTeamMember(team.id, userId, userRole, {
+    user: { id: userId, name: userName },
+    team: { id: team.id, name: team.name },
+  });
 };
 
 const linkAccount = async (user: User, account: Account) => {

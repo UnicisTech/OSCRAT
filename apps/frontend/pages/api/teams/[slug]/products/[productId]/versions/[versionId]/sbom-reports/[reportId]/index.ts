@@ -61,7 +61,7 @@ const handleDELETE = async (
     throw new ApiError(400, 'Report ID is required');
   }
 
-  await deleteSbomReport(prisma, teamMember.teamId, reportId as string);
+  await deleteSbomReport(prisma, teamMember.teamId, reportId as string, req.auditInfo);
 
   console.log(
     `[SBOM Reports API] Deleted report: reportId: ${reportId}, teamId: ${teamMember.teamId}`

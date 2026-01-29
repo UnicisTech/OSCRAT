@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { createAttachmentWithTx } from './attachment';
 import { slugify } from '../utils/slugify';
 import { SbomSource, createWorkerJobWithTx } from './workerJob';
+import { createAuditContextWithTx, logCreate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 export interface SbomReportSummary {
   id: string;
@@ -378,7 +379,8 @@ export interface CreateSbomReportWithJobParams {
 
 export const createSbomReportWithJob = async (
   prisma: PrismaClient,
-  params: CreateSbomReportWithJobParams
+  params: CreateSbomReportWithJobParams,
+  auditInfo: AuditInfo
 ): Promise<SbomReportDetails> => {
   console.log(`[SBOM Report Operations] Creating SBOM report with job:`, {
     versionId: params.versionId,
@@ -388,6 +390,8 @@ export const createSbomReportWithJob = async (
   });
 
   const result = await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
     // 1. Pre-generate the report ID
     const reportId = randomUUID();
 
@@ -423,6 +427,8 @@ export const createSbomReportWithJob = async (
     if (!completeReport) {
       throw new Error(`SBOM report ${sbomReport.id} not found after creation`);
     }
+
+    await logCreate(EntityType.SbomReport, audit, { id: completeReport.id, name: completeReport.attachment?.name || completeReport.id });
 
     console.log(`[SBOM Report Operations] Created SBOM report and job:`, {
       reportId: completeReport.id,
@@ -555,34 +561,44 @@ export const updateSbomReport = async (
 export const deleteSbomReport = async (
   prisma: PrismaClient,
   teamId: string,
-  reportId: string
+  reportId: string,
+  auditInfo: AuditInfo
 ): Promise<void> => {
   console.log(`[SBOM Report Operations] Deleting SBOM report:`, {
     teamId,
     reportId,
   });
 
-  const report = await prisma.sbomReport.findFirst({
-    where: {
-      id: reportId,
-      version: {
-        product: {
-          teamId,
+  await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const report = await tx.sbomReport.findFirst({
+      where: {
+        id: reportId,
+        version: {
+          product: {
+            teamId,
+          },
         },
       },
-    },
-    select: { id: true },
-  });
+      include: {
+        attachment: {
+          select: { name: true },
+        },
+      },
+    });
 
-  if (!report) {
-    throw new Error(
-      `SBOM report ${reportId} not found or not accessible for team ${teamId}`
-    );
-  }
+    if (!report) {
+      throw new Error(
+        `SBOM report ${reportId} not found or not accessible for team ${teamId}`
+      );
+    }
 
-  // Delete the report (cascade will handle job, attachment, file, and vulnerability scans)
-  await prisma.sbomReport.delete({
-    where: { id: reportId },
+    await logDelete(EntityType.SbomReport, audit, { id: report.id, name: report.attachment?.name || report.id });
+
+    await tx.sbomReport.delete({
+      where: { id: reportId },
+    });
   });
 
   console.log(

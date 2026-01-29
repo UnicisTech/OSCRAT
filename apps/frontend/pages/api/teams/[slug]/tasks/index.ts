@@ -54,7 +54,7 @@ const handlePOST = async (
     productId,
     versionId,
     originType: originType || DEFAULT_TASK_ORIGIN_TYPE,
-  });
+  }, req.auditInfo);
 
   await sendEvent(teamMember.teamId, 'task.created', task);
 

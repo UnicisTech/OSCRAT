@@ -198,3 +198,7 @@ export const getIncidentStatusKey = (
 export const getProductVersionStatusKey = (
   status: keyof typeof oscratProductVersionStatusTranslationMap
 ) => oscratProductVersionStatusTranslationMap[status];
+
+export const getAuditActionTranslationKey = (action: string): string => {
+  return `oscrat.audit.actions.${action}`;
+};

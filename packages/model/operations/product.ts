@@ -13,6 +13,7 @@ import type {
 } from '../types/product';
 import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
 import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
+import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 /** Include for product summary queries (lightweight with counts) */
 const PRODUCT_SUMMARY_INCLUDE = {
@@ -219,88 +220,125 @@ export const getProductDetail = async (
 export const createProduct = async (
   prisma: PrismaClient,
   teamId: string,
-  data: OscratProductCreate
+  data: OscratProductCreate,
+  auditInfo: AuditInfo
 ): Promise<OscratProductDetail> => {
-  // Check if product with same name already exists in this team
-  const existingProduct = await prisma.oscratProduct.findFirst({
-    where: {
-      teamId,
-      name: {
-        equals: data.name.trim(),
-        mode: 'insensitive',
-      },
-    },
-    select: { id: true },
-  });
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  if (existingProduct) {
-    throw new Error('A product with this name already exists. Please choose a different name.');
-  }
-
-  const product = await prisma.oscratProduct.create({
-    data: {
-      name: data.name,
-      acronym: data.acronym,
-      description: data.description,
-      type: data.type,
-      productCategory: data.productCategory,
-      teamId: teamId,
-      createdBy: data.createdBy,
-      updatedBy: data.createdBy,
-      ...(data.initialVersion && {
-        versions: {
-          create: {
-            version: data.initialVersion.version,
-            status:
-              data.initialVersion.status || OscratProductVersionStatus.ACTIVE,
-            teamId: teamId,
-            createdBy: data.createdBy,
-            updatedBy: data.createdBy,
-          },
+    const existingProduct = await tx.oscratProduct.findFirst({
+      where: {
+        teamId,
+        name: {
+          equals: data.name.trim(),
+          mode: 'insensitive',
         },
-      }),
-    },
-    include: PRODUCT_DETAIL_INCLUDE,
-  });
+      },
+      select: { id: true },
+    });
 
-  return transformToProductDetail(product);
+    if (existingProduct) {
+      throw new Error('A product with this name already exists. Please choose a different name.');
+    }
+
+    const product = await tx.oscratProduct.create({
+      data: {
+        name: data.name,
+        acronym: data.acronym,
+        description: data.description,
+        type: data.type,
+        productCategory: data.productCategory,
+        teamId: teamId,
+        createdBy: data.createdBy,
+        updatedBy: data.createdBy,
+        ...(data.initialVersion && {
+          versions: {
+            create: {
+              version: data.initialVersion.version,
+              status:
+                data.initialVersion.status || OscratProductVersionStatus.ACTIVE,
+              teamId: teamId,
+              createdBy: data.createdBy,
+              updatedBy: data.createdBy,
+            },
+          },
+        }),
+      },
+      include: PRODUCT_DETAIL_INCLUDE,
+    });
+
+    await logCreate(EntityType.Product, audit, product);
+
+    return transformToProductDetail(product);
+  });
 };
 
 export const updateProduct = async (
   prisma: PrismaClient,
   teamId: string,
   productId: string,
-  data: Partial<OscratProductUpdate>
+  data: Partial<OscratProductUpdate>,
+  auditInfo: AuditInfo
 ): Promise<OscratProductDetail> => {
-  const product = await prisma.oscratProduct.update({
-    where: {
-      id: productId,
-      teamId: teamId,
-    },
-    data: {
-      name: data.name,
-      acronym: data.acronym,
-      description: data.description,
-      type: data.type,
-      productCategory: data.productCategory,
-      updatedBy: data.updatedBy,
-    },
-    include: PRODUCT_DETAIL_INCLUDE,
-  });
+  return await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
 
-  return transformToProductDetail(product);
+    const existing = await tx.oscratProduct.findFirst({
+      where: { id: productId, teamId },
+    });
+
+    if (!existing) {
+      throw new Error('Product not found or does not belong to team');
+    }
+
+    const product = await tx.oscratProduct.update({
+      where: {
+        id: productId,
+        teamId: teamId,
+      },
+      data: {
+        name: data.name,
+        acronym: data.acronym,
+        description: data.description,
+        type: data.type,
+        productCategory: data.productCategory,
+        updatedBy: data.updatedBy,
+      },
+      include: PRODUCT_DETAIL_INCLUDE,
+    });
+
+    await logUpdate(EntityType.Product, audit, existing, product);
+
+    return transformToProductDetail(product);
+  });
 };
 
 export const deleteProduct = async (
   prisma: PrismaClient,
   teamId: string,
-  productId: string
+  productId: string,
+  auditInfo: AuditInfo
 ): Promise<void> => {
-  await prisma.oscratProduct.delete({
-    where: {
-      id: productId,
-      teamId: teamId,
-    },
+  await prisma.$transaction(async (tx) => {
+    const audit = createAuditContextWithTx(tx, auditInfo);
+
+    const product = await tx.oscratProduct.findFirst({
+      where: { id: productId, teamId },
+      select: { id: true, name: true },
+    });
+
+    if (!product) {
+      throw new Error('Product not found or does not belong to team');
+    }
+
+    await logDelete(EntityType.Product, audit, product);
+
+    await tx.oscratProduct.delete({
+      where: {
+        id: productId,
+        teamId: teamId,
+      },
+    });
   });
 };
 

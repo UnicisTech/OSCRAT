@@ -1,7 +1,8 @@
 import env from '@/lib/env';
+import { prisma } from '@/lib/prisma';
 import jackson from '@/lib/jackson';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
-import { sendAudit } from '@/lib/retraced';
+import { logDirectorySyncCreated, logDirectorySyncDeleted } from '@oscrat/model/operations';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 
@@ -71,12 +72,23 @@ const handlePOST = async (
     throw error;
   }
 
-  sendAudit({
-    action: 'dsync.connection.create',
-    crud: 'c',
-    user: user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  if (data) {
+    await prisma.$transaction(async (tx) => {
+      await logDirectorySyncCreated(
+        tx,
+        {
+          id: data.id,
+          name,
+          type: provider,
+          isActive: !data.deactivated,
+        },
+        {
+          user,
+          team: { id: teamMember.teamId, name: teamMember.teamName },
+        }
+      );
+    });
+  }
 
   res.status(201).json({ data });
 };
@@ -91,14 +103,27 @@ const handleDELETE = async (
 
   const { directorySync } = await jackson();
 
+  const { data: existing } = await directorySync.directories.get(dsyncId);
+
   await directorySync.directories.delete(dsyncId);
 
-  sendAudit({
-    action: 'dsync.connection.delete',
-    crud: 'd',
-    user: user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  if (existing) {
+    await prisma.$transaction(async (tx) => {
+      await logDirectorySyncDeleted(
+        tx,
+        {
+          id: existing.id,
+          name: existing.name,
+          type: existing.type,
+          isActive: !existing.deactivated,
+        },
+        {
+          user,
+          team: { id: teamMember.teamId, name: teamMember.teamName },
+        }
+      );
+    });
+  }
 
   res.status(200).json({ data: {} });
 };

@@ -83,6 +83,7 @@ const handlePOST = async (
     versionId: versionId as string,
     file,
     createdBy: teamMember.userId,
+    audit: req.auditInfo,
   });
 
   res.status(200).json({
@@ -102,7 +103,7 @@ const handleDELETE = async (
   const { teamMember } = req.teamContext;
   const { versionId } = req.query;
 
-  const version = await deleteVersionCAR(teamMember.teamId, versionId as string);
+  const version = await deleteVersionCAR(teamMember.teamId, versionId as string, req.auditInfo);
 
   res.status(200).json({ data: { version }, error: null });
 };

@@ -60,7 +60,8 @@ const handlePUT = async (
     prisma,
     teamMember.teamId,
     productId as string,
-    projectData
+    projectData,
+    req.auditInfo
   );
 
   res.status(200).json({ data: project });
@@ -75,7 +76,7 @@ const handleDELETE = async (
 
   const { productId } = req.query;
 
-  await deleteProduct(prisma, teamMember.teamId, productId as string);
+  await deleteProduct(prisma, teamMember.teamId, productId as string, req.auditInfo);
 
   console.log(
     `[OSCRAT] project deleted, productId: ${productId}, teamId: ${teamMember.teamId}`

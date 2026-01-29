@@ -1,6 +1,8 @@
 import { PrismaClient, Attachment, File, Prisma } from '@prisma/client';
 import { createFileInTransaction } from './file';
 import { AttachmentEntityFilters } from '../types/attachments';
+import { createAuditContextWithTx, logCreate, logDelete, EntityType } from '../audit';
+import type { AuditInfo } from '../audit';
 
 // Attachment with file data for downloads
 export interface AttachmentWithFile extends Attachment {
@@ -80,7 +82,8 @@ export const createAttachmentWithTx = async (
 /** Create a new attachment for any entity type with tx */
 export const createAttachment = async (
   prisma: PrismaClient,
-  params: CreateAttachmentParams
+  params: CreateAttachmentParams,
+  auditInfo?: AuditInfo
 ): Promise<AttachmentWithFile> => {
   console.log(`[Attachment Operations] Creating attachment:`, {
     name: params.name,
@@ -94,7 +97,23 @@ export const createAttachment = async (
   });
 
   const result = await prisma.$transaction(async (tx) => {
-    return await createAttachmentWithTx(tx, params);
+    const attachment = await createAttachmentWithTx(tx, params);
+
+    if (auditInfo) {
+      const audit = createAuditContextWithTx(tx, auditInfo);
+      await logCreate(EntityType.Attachment, audit, {
+        id: attachment.id,
+        name: attachment.name,
+        mimeType: attachment.mimeType,
+        description: attachment.description,
+        taskId: attachment.taskId,
+        versionId: attachment.versionId,
+        vulnerabilityId: attachment.vulnerabilityId,
+        incidentId: attachment.incidentId,
+      });
+    }
+
+    return attachment;
   });
 
   console.log(`[Attachment Operations] Attachment created:`, {
@@ -202,18 +221,24 @@ export const getSbomReportAttachment = async (
 
 export const deleteAttachment = async (
   prisma: PrismaClient,
-  attachmentId: string
+  attachmentId: string,
+  auditInfo?: AuditInfo
 ): Promise<void> => {
   console.log(`[Attachment Operations] Deleting attachment: ${attachmentId}`);
 
   await prisma.$transaction(async (tx) => {
     const attachment = await tx.attachment.findUnique({
       where: { id: attachmentId },
-      select: { fileId: true },
+      select: { id: true, name: true, fileId: true },
     });
 
     if (!attachment) {
       throw new Error(`Attachment ${attachmentId} not found`);
+    }
+
+    if (auditInfo) {
+      const audit = createAuditContextWithTx(tx, auditInfo);
+      await logDelete(EntityType.Attachment, audit, { id: attachment.id, name: attachment.name });
     }
 
     await tx.attachment.delete({

@@ -31,7 +31,8 @@ const handlePOST = async (
   const assessment = await createAssessment(
     prisma,
     teamMember.teamId,
-    { ...assessmentData, teamId: teamMember.teamId }
+    { ...assessmentData, teamId: teamMember.teamId },
+    req.auditInfo
   );
 
   console.log(

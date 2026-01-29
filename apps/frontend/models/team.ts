@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { getCscStatusesProp, getCscControlsProp } from '@/lib/csc';
 import { findOrCreateApp } from '@/lib/svix';
-import { Role, TeamCreateData } from '@oscrat/model';
+import { Role, TeamCreateData, type AuditInfo } from '@oscrat/model';
 import * as TeamOps from '@oscrat/model/operations';
 import { controls } from '@/components/defaultLanding/data/configs/csc';
 import type { TeamProperties, TaskProperties, ISO } from 'types';
@@ -35,20 +35,37 @@ export const getTeamDetail = async (key: { id: string } | { slug: string }) => {
   return await TeamOps.getTeamDetail(prisma, key);
 };
 
-export const deleteTeam = async (key: { id: string } | { slug: string }) => {
-  return await TeamOps.deleteTeam(prisma, key);
+export const deleteTeam = async (
+  key: { id: string } | { slug: string },
+  auditInfo?: AuditInfo
+) => {
+  return await TeamOps.deleteTeam(prisma, key, auditInfo);
 };
 
 export const addTeamMember = async (
   teamId: string,
   userId: string,
-  role: Role
+  role: Role,
+  auditInfo: AuditInfo
 ) => {
-  return await TeamOps.addTeamMember(prisma, teamId, userId, role);
+  return await TeamOps.addTeamMember(prisma, teamId, userId, role, auditInfo);
 };
 
-export const removeTeamMember = async (teamId: string, userId: string) => {
-  return await TeamOps.removeTeamMember(prisma, teamId, userId);
+export const removeTeamMember = async (
+  teamId: string,
+  userId: string,
+  auditInfo: AuditInfo
+) => {
+  return await TeamOps.removeTeamMember(prisma, teamId, userId, auditInfo);
+};
+
+export const updateTeamMemberRole = async (
+  teamId: string,
+  userId: string,
+  role: Role,
+  auditInfo: AuditInfo
+) => {
+  return await TeamOps.updateTeamMemberRole(prisma, teamId, userId, role, auditInfo);
 };
 
 export const getTeams = async (userId: string) => {
@@ -77,8 +94,12 @@ export const getTeamMembers = async (slug: string) => {
   return await TeamOps.getTeamMembers(prisma, slug);
 };
 
-export const updateTeam = async (slug: string, data: any) => {
-  return await TeamOps.updateTeam(prisma, { slug }, data);
+export const updateTeam = async (
+  slug: string,
+  data: any,
+  auditInfo?: AuditInfo
+) => {
+  return await TeamOps.updateTeam(prisma, { slug }, data, auditInfo);
 };
 
 export const isTeamExists = async (condition: any) => {

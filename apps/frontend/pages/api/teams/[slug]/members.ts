@@ -1,9 +1,8 @@
 import { ApiError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
-import { sendAudit } from '@/lib/retraced';
 import { sendEvent } from '@/lib/svix';
 import { Role } from '@oscrat/model';
-import { getTeamMembers, removeTeamMember } from 'models/team';
+import { getTeamMembers, removeTeamMember, updateTeamMemberRole } from 'models/team';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
@@ -70,7 +69,7 @@ const handleDELETE = async (
   }
 
   try {
-    await removeTeamMember(teamMember.teamId, userId);
+    await removeTeamMember(teamMember.teamId, userId, req.auditInfo);
   } catch (error) {
     console.error('Error removing team member:', error);
     throw new ApiError(500, 'Failed to remove team member.');
@@ -78,18 +77,7 @@ const handleDELETE = async (
 
   await sendEvent(teamMember.teamId, 'member.removed', existingMember);
 
-  sendAudit({
-    action: 'member.remove',
-    crud: 'd',
-    user: user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
-
   recordMetric('member.removed');
-
-  console.log(
-    `[Team] member removed, userId: ${userId}, teamId: ${teamMember.teamId}, removedBy: ${user.id}`
-  );
 
   res.status(200).json({ data: {} });
 };
@@ -112,7 +100,7 @@ const handlePUT = async (
     throw new ApiError(400, 'A team should have at least one owner.');
   }
 
-  await removeTeamMember(teamMember.teamId, user.id);
+  await removeTeamMember(teamMember.teamId, user.id, req.auditInfo);
 
   recordMetric('member.left');
 
@@ -128,24 +116,12 @@ const handlePATCH = async (
 
   const { memberId, role } = req.body as { memberId: string; role: Role };
 
-  const memberUpdated = await prisma.teamMember.update({
-    where: {
-      teamId_userId: {
-        teamId: teamMember.teamId,
-        userId: memberId,
-      },
-    },
-    data: {
-      role,
-    },
-  });
-
-  sendAudit({
-    action: 'member.update',
-    crud: 'u',
-    user: user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  const memberUpdated = await updateTeamMemberRole(
+    teamMember.teamId,
+    memberId,
+    role,
+    req.auditInfo
+  );
 
   recordMetric('member.role.updated');
 
