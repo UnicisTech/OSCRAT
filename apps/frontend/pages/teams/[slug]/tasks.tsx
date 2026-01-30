@@ -32,7 +32,7 @@ const AllTasks = () => {
   return (
     <>
       <Header
-        title={t('oscrat.ui.tasks')}
+        title={t('oscrat.ui.tasks.title')}
         subtitle={t('oscrat.ui.add-edit-review-tasks')}
         buttonText={t('oscrat.ui.add-task')}
         onButtonClick={() => setCreateTaskVisible(true)}

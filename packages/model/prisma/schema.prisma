@@ -77,6 +77,8 @@ model User {
   triggeredWorkerJobs             WorkerJob[]                   @relation("WorkerJobTriggeredBy")
   createdAttachments              Attachment[]                  @relation("AttachmentCreatedBy")
   updatedTeamData                 TeamData[]                    @relation("TeamDataUpdatedBy")
+  createdDocumentation            Documentation[]               @relation("DocumentationCreatedBy")
+  updatedDocumentation            Documentation[]               @relation("DocumentationUpdatedBy")
 }
 
 model PasswordReset {
@@ -126,6 +128,7 @@ model Team {
   assessments                 OscratAssessment[]
   teamData                    TeamData[]
   auditLogs                   AuditLog[]
+  documentation               Documentation[]
 }
 
 model Task {
@@ -151,6 +154,8 @@ model Task {
   author      User         @relation("TaskAuthor", fields: [authorId], references: [id])
   assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
   team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  linkedDocumentation DocumentationTask[]
   
   @@index([taskNumber, teamId])
 }
@@ -393,6 +398,17 @@ enum TaskOriginType {
   AUTOMATIC
 }
 
+enum DocumentationVisibility {
+  PRIVATE
+  PUBLIC
+}
+
+enum DocumentationStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 enum AuditUserType {
   USER
   API_KEY
@@ -431,6 +447,7 @@ model OscratProduct {
   versions               OscratProductVersion[]
   workerJobs             WorkerJob[]
   status                 OscratProductStatus           @default(ACTIVE)
+  documentation          Documentation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -463,6 +480,7 @@ model OscratProductVersion {
   attachments              Attachment[]
   workerJobs               WorkerJob[]
   tasks                    Task[]
+  documentation            Documentation[]
 
   // Conformity Assessment Report (prerequisite for DoC)
   conformityAssessmentReportId String?    @unique
@@ -815,6 +833,9 @@ model Attachment {
   vulnerabilityId String?
   vulnerability   OscratProductVulnerability? @relation(fields: [vulnerabilityId], references: [id], onDelete: Cascade)
 
+  documentationId String?
+  documentation   Documentation? @relation(fields: [documentationId], references: [id], onDelete: Cascade)
+
   // Reverse relations for CAR and DoC
   versionAsCAR OscratProductVersion? @relation("VersionCAR")
   versionAsDoC OscratProductVersion? @relation("VersionDoC")
@@ -831,7 +852,71 @@ model Attachment {
   @@index([vulnerabilityScanReportId])
   @@index([incidentId])
   @@index([vulnerabilityId])
+  @@index([documentationId])
   @@index([name])
+}
+
+// Documentation Models
+
+model Documentation {
+  id          String   @id @default(uuid())
+  slug        String
+
+  title       String
+  content     String   @default("")
+
+  visibility  DocumentationVisibility @default(PRIVATE)
+  status      DocumentationStatus     @default(DRAFT)
+
+  // Version tracking (simple incrementing version number)
+  version     Int      @default(1)
+
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  // Optional product/version association (for PRODUCT level)
+  productId   String?
+  product     OscratProduct? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  versionId   String?
+  productVersion OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  // Task backlinks (many-to-many)
+  linkedTasks DocumentationTask[]
+
+  // Attachments
+  attachments Attachment[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  updatedBy   String
+
+  createdByUser User @relation("DocumentationCreatedBy", fields: [createdBy], references: [id])
+  updatedByUser User @relation("DocumentationUpdatedBy", fields: [updatedBy], references: [id])
+
+  @@unique([teamId, slug])
+  @@index([teamId])
+  @@index([teamId, status])
+  @@index([productId])
+  @@index([versionId])
+}
+
+// Junction table for Documentation <-> Task many-to-many relationship
+model DocumentationTask {
+  id              String   @id @default(uuid())
+
+  documentationId String
+  documentation   Documentation @relation(fields: [documentationId], references: [id], onDelete: Cascade)
+
+  taskId          Int
+  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+
+  @@unique([documentationId, taskId])
+  @@index([documentationId])
+  @@index([taskId])
 }
 
 model AuditLog {

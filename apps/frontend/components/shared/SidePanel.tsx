@@ -10,6 +10,7 @@ import {
   DocumentCheckIcon,
   ChartBarIcon,
   ClipboardDocumentCheckIcon,
+  DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 import app from '@/lib/app';
 import TeamDropdown from './TeamDropdown';
@@ -61,10 +62,16 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
       active: activePathname?.includes(`/teams/${slug}/products`),
     },
     {
-      name: t('oscrat.ui.tasks'),
+      name: t('oscrat.ui.tasks.title'),
       href: `/teams/${slug}/tasks`,
       icon: DocumentCheckIcon,
       active: activePathname?.includes(`/teams/${slug}/tasks`),
+    },
+    {
+      name: t('documentation'),
+      href: `/teams/${slug}/documentation`,
+      icon: DocumentTextIcon,
+      active: activePathname?.includes(`/teams/${slug}/documentation`),
     },
     {
       name: t('settings'),

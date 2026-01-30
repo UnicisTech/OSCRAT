@@ -14,19 +14,23 @@ import { taskCreateSchema, type TaskCreateData } from '@/lib/validation/task';
 import type { ApiError } from '@/types';
 import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
 
+interface CreateTaskProps {
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
+  team: Team;
+  defaultProductId?: string;
+  defaultVersionId?: string;
+  onSuccess?: (taskId: number) => void;
+}
+
 const CreateTask = ({
   visible,
   setVisible,
   team,
   defaultProductId,
   defaultVersionId,
-}: {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  team: Team;
-  defaultProductId?: string;
-  defaultVersionId?: string;
-}) => {
+  onSuccess,
+}: CreateTaskProps) => {
   const { t, ready } = useTranslation('common');
   const { createTask } = useTasks(team.slug);
   const { data: products } = useSearchProducts(team.slug, { includeVersions: true });
@@ -48,7 +52,7 @@ const CreateTask = ({
     validateOnBlur: false,
     onSubmit: async (values) => {
       try {
-        await createTask({
+        const result = await createTask({
           title: values.title.trim(),
           status: values.status as TaskStatus,
           duedate: values.duedate,
@@ -60,6 +64,11 @@ const CreateTask = ({
         toast.success(t('task-created'));
         formik.resetForm();
         setVisible(false);
+        
+        // Call onSuccess callback if provided (e.g., to link task to documentation)
+        if (onSuccess && result?.id) {
+          onSuccess(result.id);
+        }
       } catch (error: unknown) {
         const apiError = error as ApiError;
         toast.error(apiError.message);

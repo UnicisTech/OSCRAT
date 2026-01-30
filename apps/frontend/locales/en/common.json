@@ -271,6 +271,9 @@
   "due-date": "Due Date",
   "title": "Title",
   "status": "Status",
+  "visibility": "Visibility",
+  "updated": "Updated",
+  "content": "Content",
   "assignee": "Assignee",
   "unassigned": "Unassigned",
   "all": "All",
@@ -375,7 +378,6 @@
   "classification": "Classification",
   "attack-type": "Attack Type",
   "asset-details": "Asset Details",
-  "scope": "Scope",
   "repository": "Repository",
   "preventive-action": "Preventive Action",
   "id": "ID",
@@ -515,7 +517,90 @@
       "last-edited": "Last Edited",
       "edited-by": "Edited by",
       "actions": "Actions",
-      "tasks": "Tasks",
+      "tasks": {
+        "title": "Tasks",
+        "linked-documentation": "Linked Documentation",
+        "no-linked-documentation": "No documentation linked to this task yet."
+      },
+      "documentation": {
+        "title": "Documentation",
+        "description": "Create and manage technical documentation for your organization and products.",
+        "add": "Add Documentation",
+        "create": "Create Documentation",
+        "created": "Documentation created successfully",
+        "saved": "Documentation saved successfully",
+        "deleted": "Documentation deleted successfully",
+        "doc-version": "Documentation Version",
+        "published": "Documentation published successfully",
+        "archived": "Documentation archived successfully",
+        "publish": "Publish",
+        "not-found": "Documentation not found",
+        "no-documents": "No documentation has been created yet",
+        "title-placeholder": "Enter documentation title...",
+        "summary": "Summary",
+        "linked-tasks": "Linked Tasks",
+        "link-task": "Link a Task",
+        "select-task": "Select a task to link...",
+        "link-button": "Link",
+        "unlink-task": "Unlink this task",
+        "task-linked": "Task linked successfully",
+        "task-unlinked": "Task unlinked successfully",
+        "task-created-and-linked": "Task created and linked successfully",
+        "no-linked-tasks": "No tasks linked to this documentation yet.",
+        "no-tasks-available": "No tasks available to link",
+        "new-task": "New Task",
+        "backlinks-hidden-public": "Note: Linked tasks are not shown on the public view of this documentation.",
+        "public-url": "Public URL",
+        "copy-url": "Copy URL",
+        "url-copied": "URL copied to clipboard",
+        "public": {
+          "header": "Public Documentation",
+          "not-found": "This documentation is not available or not publicly accessible.",
+          "version": "Version {{version}}",
+          "updated": "Last updated: {{date}}",
+          "footer": "Powered by {{appName}}"
+        },
+        "level": {
+          "label": "Level",
+          "organization": "Organization",
+          "product": "Product"
+        },
+        "visibility": {
+          "label": "Visibility",
+          "public": "Public",
+          "private": "Private",
+          "public-checkbox": "Make this documentation publicly accessible",
+          "public-hint": "This documentation will be accessible to external users via a public URL.",
+          "private-hint": "This documentation is only visible to organization members."
+        },
+        "status": {
+          "draft": "Draft",
+          "published": "Published",
+          "archived": "Archived"
+        },
+        "template": {
+          "label": "Template",
+          "empty": "Empty (Start from scratch)",
+          "risk-assessment": "Risk Assessment",
+          "vdp": "Vulnerability Disclosure Policy",
+          "vulnerability-report": "Vulnerability Report",
+          "incident-report": "Incident Report",
+          "doc": "Declaration of Conformity"
+        },
+        "error": {
+          "title-required": "Title is required",
+          "product-required": "Product is required for product-level documentation"
+        },
+        "delete": {
+          "title": "Delete Documentation",
+          "confirm": "Are you sure you want to delete \"{{title}}\"?",
+          "warning": "This action cannot be undone. All content and linked tasks will be unlinked."
+        },
+        "archive": {
+          "action": "Archive",
+          "confirm": "Are you sure you want to archive this documentation? Archived documentation cannot be modified."
+        }
+      },
       "files": "Files",
       "version-log": "Version Log",
       "version": "Version",
@@ -550,6 +635,7 @@
       "all-versions": "All Versions",
       "no-product": "No product",
       "no-version": "No version",
+      "select-product": "Select a product",
       "task-origin-automatic": "Automatically generated",
       "task-origin-automatic-short": "Auto",
       "task-origin-manual": "Manually created",
@@ -983,6 +1069,7 @@
           "vulnerabilities": "Vulnerabilities",
           "incidents": "Incidents",
           "task": "Task",
+          "documentation": "Documentation",
           "version-log": "Version Log",
           "repository": "Repository"
         },

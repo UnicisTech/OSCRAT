@@ -40,7 +40,7 @@ const TaskDetails = () => {
 
   const breadcrumbItems = [
     {
-      label: t('oscrat.ui.tasks'),
+      label: t('oscrat.ui.tasks.title'),
       href: `/teams/${team.slug}/tasks`,
     },
     {

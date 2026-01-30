@@ -4,7 +4,18 @@ import {
   Attachment,
 } from '@/types';
 import { api } from '@/lib/api/client';
-import { Task, TaskStatus, TaskOriginType } from '@oscrat/model';
+import { Task, TaskStatus, TaskOriginType, DocumentationStatus } from '@oscrat/model';
+
+export interface TaskLinkedDocumentation {
+  id: string;
+  slug: string;
+  title: string;
+  status: DocumentationStatus;
+  visibility: 'PUBLIC' | 'PRIVATE';
+  productName?: string;
+  versionName?: string;
+  updatedAt: string;
+}
 
 export type CreateTaskData = {
   title: string;
@@ -113,4 +124,8 @@ export const tasksEndpoints = {
     api.delete<void>(`/teams/${slug}/tasks/${taskNumber}/attachments`, {
       params: { id },
     }),
+
+  // Linked Documentation
+  getLinkedDocumentation: (slug: string, taskNumber: number) =>
+    api.get<TaskLinkedDocumentation[]>(`/teams/${slug}/tasks/${taskNumber}/documentation`),
 };

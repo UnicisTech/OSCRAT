@@ -54,7 +54,7 @@ const TaskTable: React.FC<TaskTableProps> = ({
 
   return (
     <div className="w-full">
-      <TabHeader title={t('oscrat.ui.tasks')}>
+      <TabHeader title={t('oscrat.ui.tasks.title')}>
         <div className="flex items-center space-x-2">
           <label
             htmlFor="status-filter"

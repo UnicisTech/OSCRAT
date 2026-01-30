@@ -1,4 +1,5 @@
 import type { NextApiRequest } from 'next';
+import toast from 'react-hot-toast';
 import { ApiError } from '@/types';
 
 export const getIpAddress = (req: NextApiRequest): string => {
@@ -45,6 +46,47 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/**
+ * Wraps an async operation with toast notifications for success/error handling
+ * @param operation The async operation to execute
+ * @param successMessage The message to show on success
+ * @param errorFallback The fallback message to show if error message extraction fails
+ * @returns The result of the operation, or null if it failed
+ */
+export async function asyncWithToast<T>(
+  operation: () => Promise<T>,
+  successMessage: string,
+  errorFallback: string
+): Promise<T | null> {
+  try {
+    const result = await operation();
+    toast.success(successMessage);
+    return result;
+  } catch (error: unknown) {
+    toast.error(extractErrorMessage(error, errorFallback));
+    return null;
+  }
+}
+
+/**
+ * Wraps an async operation with error toast only (no success message)
+ * Useful when the success handling has side effects like navigation
+ * @param operation The async operation to execute
+ * @param errorFallback The fallback message to show if error message extraction fails
+ * @returns The result of the operation, or null if it failed
+ */
+export async function asyncWithErrorToast<T>(
+  operation: () => Promise<T>,
+  errorFallback: string
+): Promise<T | null> {
+  try {
+    return await operation();
+  } catch (error: unknown) {
+    toast.error(extractErrorMessage(error, errorFallback));
+    return null;
+  }
 }
 
 const UUID_REGEX =

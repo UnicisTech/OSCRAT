@@ -167,3 +167,12 @@ export function useDeleteTaskAttachment(slug: string, taskNumber: string) {
     },
   });
 }
+
+// Linked Documentation
+export function useGetTaskLinkedDocumentation(slug: string, taskNumber: string) {
+  return useQuery({
+    queryKey: queryKeys.teams.tasks.documentation(slug, taskNumber),
+    queryFn: () => tasksEndpoints.getLinkedDocumentation(slug, Number(taskNumber)),
+    enabled: !!slug && !!taskNumber,
+  });
+}

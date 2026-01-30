@@ -42,6 +42,8 @@ export {
   TaskStatus,
   TaskOriginType,
   AuditUserType,
+  DocumentationVisibility,
+  DocumentationStatus,
 } from '@prisma/client';
 
 // Export shared application types (these are safe for client)
@@ -57,6 +59,7 @@ export * from './types/craForm/form';
 export * from './types/jobPayloads';
 export * from './types/dashboard';
 export * from './types/auditLog';
+export * from './types/documentation';
 
 // Export error utilities
 export { ERROR_CODES, type ErrorCode } from './constants/errorCodes';

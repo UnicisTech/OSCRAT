@@ -6,6 +6,7 @@ import Incidents from './allTabs/incidents';
 import Vulnerabilities from './allTabs/vulnerabilities';
 import Scans from './allTabs/scans';
 import Task from './allTabs/task';
+import Documentation from './allTabs/documentation';
 import Compliance from './allTabs/compliance';
 
 const TABS_CONFIG = [
@@ -32,6 +33,11 @@ const TABS_CONFIG = [
     component: <Incidents />,
   },
   { id: 'task', label: 'oscrat.ui.versions.tabs.task', component: <Task /> },
+  {
+    id: 'documentation',
+    label: 'oscrat.ui.versions.tabs.documentation',
+    component: <Documentation />,
+  },
   {
     id: 'version-log',
     label: 'oscrat.ui.versions.tabs.version-log',

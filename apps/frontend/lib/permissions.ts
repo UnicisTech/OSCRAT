@@ -11,7 +11,8 @@ export type Resource =
   | 'team_audit_log'
   | 'team_webhook'
   | 'team_api_key'
-  | 'task';
+  | 'task'
+  | 'documentation';
 
 export type RolePermissions = {
   [role in RoleType]: Permission[];
@@ -79,6 +80,10 @@ export const permissions: RolePermissions = {
       resource: 'task',
       actions: '*',
     },
+    {
+      resource: 'documentation',
+      actions: '*',
+    },
   ],
   ADMIN: [
     {
@@ -117,6 +122,10 @@ export const permissions: RolePermissions = {
       resource: 'task',
       actions: '*',
     },
+    {
+      resource: 'documentation',
+      actions: '*',
+    },
   ],
   MEMBER: [
     {
@@ -131,6 +140,10 @@ export const permissions: RolePermissions = {
       resource: 'task',
       actions: '*',
     },
+    {
+      resource: 'documentation',
+      actions: '*',
+    },
   ],
   AUDITOR: [
     {
@@ -143,6 +156,10 @@ export const permissions: RolePermissions = {
     },
     {
       resource: 'task',
+      actions: ['read'],
+    },
+    {
+      resource: 'documentation',
       actions: ['read'],
     },
   ],

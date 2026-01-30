@@ -156,6 +156,7 @@ export const EntityType = {
   ApiKey: 'ApiKey',
   Assessment: 'Assessment',
   Attachment: 'Attachment',
+  Documentation: 'Documentation',
 } as const;
 
 export type EntityType = (typeof EntityType)[keyof typeof EntityType];
@@ -179,6 +180,7 @@ const TRACKED_FIELDS: Record<EntityType, string[]> = {
   ApiKey: ['name', 'expiresAt'],
   Assessment: ['type', 'schemaVersion'],
   Attachment: ['name', 'mimeType', 'description', 'taskId', 'versionId', 'vulnerabilityId', 'incidentId'],
+  Documentation: ['title', 'level', 'visibility', 'status', 'version', 'productId', 'versionId'],
 };
 
 function pick<T extends Record<string, unknown>>(obj: T, fields: string[]): Partial<T> {

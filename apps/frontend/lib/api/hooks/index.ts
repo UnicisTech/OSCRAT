@@ -28,3 +28,4 @@ export * from './webhooks';
 export * from './comments';
 export * from './compliance';
 export * from './teamData';
+export * from './documentation';

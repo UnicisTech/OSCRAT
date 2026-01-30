@@ -15,6 +15,8 @@ const unAuthenticatedRoutes = [
   '/invitations/*',
   '/api/invitations/*',
   '/terms-condition',
+  '/teams/*/public/**',
+  '/api/teams/*/public/**',
 ];
 
 export default async function middleware(req: NextRequest) {

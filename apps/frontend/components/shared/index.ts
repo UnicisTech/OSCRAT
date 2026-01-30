@@ -20,3 +20,5 @@ export { default as SidePanel } from './SidePanel';
 export { default as Divider } from './Divider';
 export { default as PaginationControls } from './PaginationControls';
 export { default as ShortUuidButton } from './ShortUuidButton';
+export { default as FilterDropdown } from './FilterDropdown';
+export type { FilterOption } from './FilterDropdown';

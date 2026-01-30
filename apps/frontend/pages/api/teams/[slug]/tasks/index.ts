@@ -58,5 +58,5 @@ const handlePOST = async (
 
   await sendEvent(teamMember.teamId, 'task.created', task);
 
-  return res.status(200).json({ data: {}, error: null });
+  return res.status(200).json({ data: task, error: null });
 };
