@@ -46,3 +46,22 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Returns shortened UUID (first 5 chars) if value is a UUID, otherwise the original value */
+export function shortenUuid(value: string): string {
+  return UUID_REGEX.test(value) ? value.slice(0, 5) : value;
+}
+
+/** Formats a name, shortening UUIDs to "id: xxxxx" via translation */
+export function formatNameWithUuidFallback(
+  value: string,
+  t: (key: string, options?: Record<string, unknown>) => string
+): string {
+  if (UUID_REGEX.test(value)) {
+    return t('id-short', { id: shortenUuid(value) });
+  }
+  return value;
+}

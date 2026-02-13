@@ -34,6 +34,14 @@ export interface OscratAuditLogQueryParams {
   productId?: string;
   versionId?: string;
   hasProductOrVersion?: boolean; // Filter where productId OR versionId is not null
+  crud?: string; // 'c', 'u', or 'd'
+  startDate?: string; // ISO date string (YYYY-MM-DD)
+  endDate?: string; // ISO date string (YYYY-MM-DD)
+}
+
+export interface AuditLogFilterOptions {
+  users: Array<{ userId: string; userName: string | null; userEmail: string | null }>;
+  targetTypes: string[]; // Distinct entity types from team's audit logs
 }
 
 export interface OscratPaginatedAuditLogs {

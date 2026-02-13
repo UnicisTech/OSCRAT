@@ -4,6 +4,7 @@ import {
   PaperAirplaneIcon,
   ShieldExclamationIcon,
   UserPlusIcon,
+  ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
 import type { Team } from '@oscrat/model';
 import classNames from 'classnames';
@@ -85,6 +86,18 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
       href: `/teams/${teamSlug}/api-keys`,
       active: activeTab === 'api-keys',
       icon: KeyIcon,
+    });
+  }
+
+  if (
+    teamFeatures.auditLog &&
+    canAccess('team_audit_log', ['read'])
+  ) {
+    navigations.push({
+      name: 'Audit Logs',
+      href: `/teams/${teamSlug}/audit-logs`,
+      active: activeTab === 'audit-logs',
+      icon: ClipboardDocumentListIcon,
     });
   }
 

@@ -10,7 +10,6 @@ import {
   DocumentCheckIcon,
   ChartBarIcon,
   ClipboardDocumentCheckIcon,
-  DocumentMagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import app from '@/lib/app';
 import TeamDropdown from './TeamDropdown';
@@ -72,12 +71,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
       href: `/teams/${slug}/settings`,
       icon: Cog6ToothIcon,
       active: activePathname?.includes(`/teams/${slug}/settings`),
-    },
-    {
-      name: t('audit-logs'),
-      href: `/teams/${slug}/audit-logs`,
-      icon: DocumentMagnifyingGlassIcon,
-      active: activePathname?.includes(`/teams/${slug}/audit-logs`),
     },
     {
       name: t('reports'),

@@ -14,7 +14,9 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import type { NextPageWithLayout } from 'types';
 import { useAuditLogs } from '@/hooks/useAuditLogs';
+import { useAuditLogFilterOptions } from '@/lib/api/hooks/auditLogs';
 import AuditLogsTable from '@/components/team/AuditLogsTable';
+import AuditLogsFilters from '@/components/team/AuditLogsFilters';
 import PaginationControls from '@/components/shared/PaginationControls';
 
 interface AuditLogsPageProps {
@@ -41,10 +43,15 @@ const AuditLogsPage: NextPageWithLayout<AuditLogsPageProps> = ({
     goToPreviousPage,
     prevButtonDisabled,
     nextButtonDisabled,
+    filters,
+    updateFilters,
     isLoading,
     isError,
     error,
   } = useAuditLogs(slug as string);
+
+  const { data: filterOptions, isLoading: isLoadingOptions } =
+    useAuditLogFilterOptions(slug as string);
 
   if (!canAccess('team_audit_log', ['read'])) {
     return <Error message={t('unauthorized')} />;
@@ -59,7 +66,15 @@ const AuditLogsPage: NextPageWithLayout<AuditLogsPageProps> = ({
       <TeamTab activeTab="audit-logs" team={team} teamFeatures={teamFeatures} />
       <Card>
         <Card.Body>
-          <h2 className="mb-4 text-lg font-semibold">{t('audit-logs')}</h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">{t('audit-logs')}</h2>
+            <AuditLogsFilters
+              filters={filters}
+              onFilterChange={updateFilters}
+              filterOptions={filterOptions}
+              isLoadingOptions={isLoadingOptions}
+            />
+          </div>
           <AuditLogsTable logs={auditLogs} isLoading={isLoading} />
           {total > pageSize && (
             <PaginationControls

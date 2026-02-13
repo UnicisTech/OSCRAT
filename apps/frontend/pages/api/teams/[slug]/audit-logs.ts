@@ -2,8 +2,9 @@ import { prisma } from '@/lib/prisma';
 import { getAuditLogs } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import type { OscratAuditLogQueryParams } from '@oscrat/model';
 import { ApiError } from '@/lib/errors';
+import { auditLogQuerySchema } from '@/lib/validation/auditLog';
+import * as Yup from 'yup';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -25,9 +26,27 @@ const handlePOST = async (
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-  const searchParams = req.body as OscratAuditLogQueryParams;
 
-  const result = await getAuditLogs(prisma, teamMember.teamId, searchParams);
+  try {
+    const validatedParams = await auditLogQuerySchema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
 
-  res.status(200).json({ data: result });
+    const result = await getAuditLogs(prisma, teamMember.teamId, validatedParams);
+    res.status(200).json({ data: result });
+  } catch (error) {
+    if (error instanceof Yup.ValidationError) {
+      return res.status(400).json({
+        error: {
+          message: 'Validation failed',
+          fields: error.inner.map((e) => ({
+            path: e.path,
+            message: e.message,
+          })),
+        },
+      });
+    }
+    throw error;
+  }
 };

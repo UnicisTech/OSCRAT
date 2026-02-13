@@ -129,6 +129,14 @@ export const createAuditContextWithTx = (
   log: createAuditLoggerWithTx(tx, request),
 });
 
+export const CrudType = {
+  Create: 'c',
+  Update: 'u',
+  Delete: 'd',
+} as const;
+
+export type CrudType = (typeof CrudType)[keyof typeof CrudType];
+
 export const EntityType = {
   Vulnerability: 'Vulnerability',
   Incident: 'Incident',
@@ -187,7 +195,7 @@ export async function logCreate(
   const tracked = pick(entity, TRACKED_FIELDS[type]);
   await ctx.log({
     action: `${type.toLowerCase()}.create`,
-    crud: 'c',
+    crud: CrudType.Create,
     user: ctx.user,
     team: ctx.team,
     target: { id: entity.id, name: entity.name || entity.id, type },
@@ -209,7 +217,7 @@ export async function logUpdate(
 
   await ctx.log({
     action: `${type.toLowerCase()}.update`,
-    crud: 'u',
+    crud: CrudType.Update,
     user: ctx.user,
     team: ctx.team,
     target: { id: current.id, name: current.name || current.id, type },
@@ -226,7 +234,7 @@ export async function logDelete(
 ): Promise<void> {
   await ctx.log({
     action: `${type.toLowerCase()}.delete`,
-    crud: 'd',
+    crud: CrudType.Delete,
     user: ctx.user,
     team: ctx.team,
     target: { id: entity.id, name: entity.name || entity.id, type },

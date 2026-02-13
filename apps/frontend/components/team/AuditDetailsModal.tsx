@@ -3,8 +3,9 @@ import { Modal } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import Button from '@atlaskit/button';
 import type { OscratAuditLog } from '@oscrat/model';
-import { getAuditActionTranslationKey } from '@/utils/translation';
+import { getAuditActionTranslationKey, oscratEntityTypeTranslationMap } from '@/utils/translation';
 import { getCrudConfig, formatTimestamp } from '@/lib/auditUtils';
+import { formatNameWithUuidFallback } from '@/lib/utils';
 
 interface AuditDetailsModalProps {
   log: OscratAuditLog | null;
@@ -148,8 +149,8 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
   const hasMetadataData = metadataData !== null && metadataData !== undefined;
 
   return (
-    <Modal open={isOpen}>
-      <Modal.Header className="font-bold">Audit Log Details</Modal.Header>
+    <Modal open={isOpen} className="bg-white text-gray-900">
+      <Modal.Header className="font-bold text-gray-900">{t('audit-log-details')}</Modal.Header>
 
       <Modal.Body>
         <div className="max-h-[60vh] overflow-y-auto space-y-6">
@@ -203,10 +204,10 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
               <div className="text-sm font-medium text-gray-500">
                 {t('target')}
               </div>
-              <div className="mt-1 text-sm text-gray-900">{log.targetType}</div>
+              <div className="mt-1 text-sm text-gray-900">{t(oscratEntityTypeTranslationMap[log.targetType], { defaultValue: log.targetType })}</div>
               {log.targetName && (
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {log.targetName}
+                  {formatNameWithUuidFallback(log.targetName, t)}
                 </div>
               )}
             </div>

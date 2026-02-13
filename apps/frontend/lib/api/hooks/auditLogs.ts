@@ -31,4 +31,16 @@ export function useRecentActivities(
   );
 }
 
+export function useAuditLogFilterOptions(
+  teamSlug: string,
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: [...queryKeys.teams.detail(teamSlug), 'audit-logs', 'filter-options'],
+    queryFn: () => auditLogEndpoints.getFilterOptions(teamSlug),
+    enabled: options?.enabled !== false,
+    staleTime: 5 * 60 * 1000, // 5 min cache
+  });
+}
+
 export const useGetAuditLogs = useSearchAuditLogs;

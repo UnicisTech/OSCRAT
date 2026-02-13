@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto';
 import { createAttachmentWithTx } from './attachment';
 import { slugify } from '../utils/slugify';
 import { SbomSource, createWorkerJobWithTx } from './workerJob';
-import { createAuditContextWithTx, logCreate, logDelete, EntityType, type AuditInfo } from '../audit';
+import { createAuditContextWithTx, logCreate, logDelete, EntityType, CrudType, type AuditInfo } from '../audit';
 
 export interface SbomReportSummary {
   id: string;
@@ -428,7 +428,17 @@ export const createSbomReportWithJob = async (
       throw new Error(`SBOM report ${sbomReport.id} not found after creation`);
     }
 
-    await logCreate(EntityType.SbomReport, audit, { id: completeReport.id, name: completeReport.attachment?.name || completeReport.id });
+    const action = params.jobType === 'REPO_GENERATE_SBOM' ? 'sbomreport.generate' : 'sbomreport.import';
+    await audit.log({
+      action,
+      crud: CrudType.Create,
+      user: audit.user,
+      team: audit.team,
+      target: { id: completeReport.id, name: completeReport.attachment?.name || completeReport.id, type: EntityType.SbomReport },
+      productId: audit.productId,
+      versionId: audit.versionId,
+      metadata: { snapshot: JSON.stringify({ id: completeReport.id }) },
+    });
 
     console.log(`[SBOM Report Operations] Created SBOM report and job:`, {
       reportId: completeReport.id,

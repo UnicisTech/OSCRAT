@@ -202,3 +202,26 @@ export const getProductVersionStatusKey = (
 export const getAuditActionTranslationKey = (action: string): string => {
   return `oscrat.audit.actions.${action}`;
 };
+
+// Entity Type mappings (for audit logs targetType)
+export const oscratEntityTypeTranslationMap: Record<string, string> = {
+  Vulnerability: 'oscrat.entity-types.vulnerability',
+  Incident: 'oscrat.entity-types.incident',
+  Repository: 'oscrat.entity-types.repository',
+  Task: 'oscrat.entity-types.task',
+  Product: 'oscrat.entity-types.product',
+  ProductVersion: 'oscrat.entity-types.product-version',
+  SbomReport: 'oscrat.entity-types.sbom-report',
+  VulnerabilityScanReport: 'oscrat.entity-types.vulnerability-scan-report',
+  File: 'oscrat.entity-types.file',
+  Team: 'oscrat.entity-types.team',
+  TeamMember: 'oscrat.entity-types.team-member',
+  Invitation: 'oscrat.entity-types.invitation',
+  SsoConnection: 'oscrat.entity-types.sso-connection',
+  DirectorySync: 'oscrat.entity-types.directory-sync',
+  Webhook: 'oscrat.entity-types.webhook',
+  ApiKey: 'oscrat.entity-types.api-key',
+  Assessment: 'oscrat.entity-types.assessment',
+  Attachment: 'oscrat.entity-types.attachment',
+};
+

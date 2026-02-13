@@ -3,8 +3,9 @@ import Table from '@/components/shared/Table';
 import { useTranslation } from 'next-i18next';
 import type { OscratAuditLog } from '@oscrat/model';
 import AuditDetailsModal from './AuditDetailsModal';
-import { getAuditActionTranslationKey } from '@/utils/translation';
+import { getAuditActionTranslationKey, oscratEntityTypeTranslationMap } from '@/utils/translation';
 import { getCrudConfig, formatTimestamp } from '@/lib/auditUtils';
+import { formatNameWithUuidFallback } from '@/lib/utils';
 
 interface AuditLogsTableProps {
   logs: OscratAuditLog[];
@@ -88,9 +89,11 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
             </Table.td>
             <Table.td>
               <div className="flex flex-col">
-                <span className="font-medium">{log.targetType}</span>
+                <span className="font-medium">{t(oscratEntityTypeTranslationMap[log.targetType], { defaultValue: log.targetType })}</span>
                 {log.targetName && (
-                  <span className="text-xs text-gray-500">{log.targetName}</span>
+                  <span className="text-xs text-gray-500">
+                    {formatNameWithUuidFallback(log.targetName, t)}
+                  </span>
                 )}
               </div>
             </Table.td>
