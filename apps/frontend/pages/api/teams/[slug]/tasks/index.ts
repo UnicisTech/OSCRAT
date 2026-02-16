@@ -1,4 +1,3 @@
-import { sendEvent } from '@/lib/svix';
 import { createTask, getTeamTasks } from 'models/task';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
@@ -55,8 +54,6 @@ const handlePOST = async (
     versionId,
     originType: originType || DEFAULT_TASK_ORIGIN_TYPE,
   }, req.auditInfo);
-
-  await sendEvent(teamMember.teamId, 'task.created', task);
 
   return res.status(200).json({ data: task, error: null });
 };

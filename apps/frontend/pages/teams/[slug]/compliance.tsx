@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { GetServerSidePropsContext } from 'next';
 import { withTeamLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
-import { Loading } from '@/components/shared';
+import { Loading, Breadcrumb } from '@/components/shared';
 import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { getRoleForTeam } from '@/lib/compliance/utils';
@@ -27,13 +27,25 @@ const TeamCompliancePage = () => {
     return <Loading />;
   }
 
+  const breadcrumbItems = [
+    {
+      label: team.name,
+      href: `/teams/${team.slug}/products`,
+    },
+    {
+      label: t('oscrat.ui.team-compliance-assessment'),
+      current: true,
+    },
+  ];
+
   return (
     <div className="max-w-7xl p-6">
+      <Breadcrumb items={breadcrumbItems} />
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-white">
           {t('oscrat.ui.team-compliance-assessment')}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           {t('oscrat.ui.team-compliance-assessment-description', { 
             teamName: team.name
           })}

@@ -3,10 +3,28 @@ import { EndpointIn, Svix } from 'svix';
 import env from './env';
 import type { AppEvent } from 'types';
 
-const svix = new Svix(env.svix.apiKey);
+// Check if Svix is properly configured (not empty, not "undefined" string)
+const isSvixEnabled = (): boolean => {
+  const apiKey = env.svix.apiKey;
+  return Boolean(apiKey && apiKey !== 'undefined' && apiKey.trim() !== '');
+};
+
+// Lazy initialization of Svix client - only create when actually needed
+let svixClient: Svix | null = null;
+
+const getSvixClient = (): Svix | null => {
+  if (!isSvixEnabled()) {
+    return null;
+  }
+  if (!svixClient) {
+    svixClient = new Svix(env.svix.apiKey);
+  }
+  return svixClient;
+};
 
 export const findOrCreateApp = async (name: string, uid: string) => {
-  if (!env.svix.apiKey) {
+  const svix = getSvixClient();
+  if (!svix) {
     return;
   }
 
@@ -14,7 +32,8 @@ export const findOrCreateApp = async (name: string, uid: string) => {
 };
 
 export const createWebhook = async (appId: string, data: EndpointIn) => {
-  if (!env.svix.apiKey) {
+  const svix = getSvixClient();
+  if (!svix) {
     return;
   }
 
@@ -26,7 +45,8 @@ export const updateWebhook = async (
   endpointId: string,
   data: EndpointIn
 ) => {
-  if (!env.svix.apiKey) {
+  const svix = getSvixClient();
+  if (!svix) {
     return;
   }
 
@@ -34,7 +54,8 @@ export const updateWebhook = async (
 };
 
 export const findWebhook = async (appId: string, endpointId: string) => {
-  if (!env.svix.apiKey) {
+  const svix = getSvixClient();
+  if (!svix) {
     return;
   }
 
@@ -42,7 +63,8 @@ export const findWebhook = async (appId: string, endpointId: string) => {
 };
 
 export const listWebhooks = async (appId: string) => {
-  if (!env.svix.apiKey) {
+  const svix = getSvixClient();
+  if (!svix) {
     return;
   }
 
@@ -50,7 +72,8 @@ export const listWebhooks = async (appId: string) => {
 };
 
 export const deleteWebhook = async (appId: string, endpointId: string) => {
-  if (!env.svix.apiKey) {
+  const svix = getSvixClient();
+  if (!svix) {
     return;
   }
 
@@ -62,7 +85,8 @@ export const sendEvent = async (
   eventType: AppEvent,
   payload: Record<string, unknown>
 ) => {
-  if (!env.svix.apiKey) {
+  const svix = getSvixClient();
+  if (!svix) {
     return;
   }
 

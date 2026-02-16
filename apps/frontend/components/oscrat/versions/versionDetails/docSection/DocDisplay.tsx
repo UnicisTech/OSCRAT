@@ -27,8 +27,28 @@ export default function DocDisplay({
   const { t } = useTranslation('common');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handlePrint = () => {
-    window.open(downloadUrl, '_blank');
+  const handlePrint = async () => {
+    try {
+      const response = await fetch(downloadUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      const printWindow = window.open(blobUrl, '_blank');
+      
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.focus();
+          printWindow.print();
+        };
+        
+        setTimeout(() => {
+          printWindow.focus();
+          printWindow.print();
+        }, 1000);
+      }
+    } catch {
+      window.open(downloadUrl, '_blank');
+    }
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {

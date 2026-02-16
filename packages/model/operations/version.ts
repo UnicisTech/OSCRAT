@@ -395,7 +395,7 @@ export const removeVersionCAR = async (
     const audit = createAuditContextWithTx(tx, auditInfo);
     const current = await tx.oscratProductVersion.findFirst({
       where: { id: versionId, teamId },
-      select: { conformityAssessmentReportId: true },
+      select: { conformityAssessmentReportId: true, declarationOfConformityId: true, status: true },
     });
 
     if (current?.conformityAssessmentReportId) {
@@ -411,8 +411,29 @@ export const removeVersionCAR = async (
       }
     }
 
-    const version = await tx.oscratProductVersion.findFirstOrThrow({
+    if (current?.declarationOfConformityId) {
+      const docAttachment = await tx.attachment.findUnique({
+        where: { id: current.declarationOfConformityId },
+        select: { id: true, name: true },
+      });
+
+      await deleteAttachmentWithTx(tx, current.declarationOfConformityId);
+
+      if (docAttachment) {
+        await logDelete(EntityType.File, audit, docAttachment);
+      }
+    }
+
+    // Update version: clear both CAR and DoC, reset status if SUPPORTED
+    const version = await tx.oscratProductVersion.update({
       where: { id: versionId, teamId },
+      data: {
+        conformityAssessmentReportId: null,
+        declarationOfConformityId: null,
+        ...(current?.status === OscratProductVersionStatus.SUPPORTED && {
+          status: OscratProductVersionStatus.ACTIVE,
+        }),
+      },
       include: VERSION_DETAIL_INCLUDE,
     });
 
@@ -500,7 +521,7 @@ export const removeVersionDoC = async (
     const audit = createAuditContextWithTx(tx, auditInfo);
     const current = await tx.oscratProductVersion.findFirst({
       where: { id: versionId, teamId },
-      select: { declarationOfConformityId: true },
+      select: { declarationOfConformityId: true, status: true },
     });
 
     if (current?.declarationOfConformityId) {
@@ -516,8 +537,15 @@ export const removeVersionDoC = async (
       }
     }
 
-    const version = await tx.oscratProductVersion.findFirstOrThrow({
+    // Reset status from SUPPORTED to ACTIVE and clear declarationOfConformityId
+    const version = await tx.oscratProductVersion.update({
       where: { id: versionId, teamId },
+      data: {
+        declarationOfConformityId: null,
+        ...(current?.status === OscratProductVersionStatus.SUPPORTED && {
+          status: OscratProductVersionStatus.ACTIVE,
+        }),
+      },
       include: VERSION_DETAIL_INCLUDE,
     });
 

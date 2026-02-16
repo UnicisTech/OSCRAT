@@ -14,6 +14,7 @@ import VersionEditModal from './VersionEditModal';
 import VersionActionModal from './VersionActionModal';
 import type { OscratProductVersionUpdate } from '@oscrat/model';
 import { extractErrorMessage } from '@/lib/utils';
+import { getProductVersionStatusKey } from '@/utils/translation';
 
 const Index = () => {
   const { t, ready } = useTranslation('common');
@@ -158,8 +159,8 @@ const Index = () => {
               {t('status')}:
             </span>
             <div className="inline-flex font-semibold text-black dark:text-gray-100">
-              <p className="rounded-full bg-green-100 px-2 py-0.5">
-                {version?.status}
+              <p className="rounded-full bg-green-100 px-2 py-0.5 dark:bg-green-900">
+                {t(getProductVersionStatusKey(version.status))}
               </p>
             </div>
           </div>

@@ -6,7 +6,7 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useVersionContext } from '@/context/VersionContext';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
-import { Loading } from '@/components/shared';
+import { Loading, Breadcrumb } from '@/components/shared';
 import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { getRoleForTeam } from '@/lib/compliance/utils';
@@ -33,13 +33,33 @@ const CompliancePage = () => {
     return <Loading />;
   }
 
+  const breadcrumbItems = [
+    {
+      label: t('oscrat.ui.products'),
+      href: `/teams/${team.slug}/products`,
+    },
+    {
+      label: project.name,
+      href: `/teams/${team.slug}/products/${productId}`,
+    },
+    {
+      label: versionData.version,
+      href: `/teams/${team.slug}/products/${productId}/versions/${versionId}`,
+    },
+    {
+      label: t('oscrat.ui.compliance-assessment'),
+      current: true,
+    },
+  ];
+
   return (
     <div className="max-w-7xl p-6">
+      <Breadcrumb items={breadcrumbItems} />
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-white">
           {t('oscrat.ui.compliance-assessment')}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           {t('oscrat.ui.compliance-assessment-description', { 
             productName: `${project.name} (${versionData.version})`
           })}

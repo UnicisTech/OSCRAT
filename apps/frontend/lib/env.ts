@@ -61,8 +61,8 @@ const env = {
 
   // Svix
   svix: {
-    url: `${process.env.SVIX_URL}`,
-    apiKey: `${process.env.SVIX_API_KEY}`,
+    url: process.env.SVIX_URL || '',
+    apiKey: process.env.SVIX_API_KEY || '',
   },
 
   //Social login: Github
