@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import type { Task, Team, OscratProductSearchResult } from '@oscrat/model';
 import TaskListFilters from './TaskListFilters';
 import TaskListTable from './TaskListTable';
 import TaskStatusDropdown from './TaskStatusDropdown';
+import PaginationControls from '@/components/shared/PaginationControls';
 
 interface TaskListProps {
   tasks: Task[];
@@ -18,6 +19,8 @@ interface FilterState {
   versionId: string[];
 }
 
+const ITEMS_PER_PAGE = 15;
+
 const TaskList: React.FC<TaskListProps> = ({ tasks, team, products, isLoading = false }) => {
   const { t, ready } = useTranslation('common');
   
@@ -26,6 +29,8 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, team, products, isLoading = 
     productId: [],
     versionId: [],
   });
+  
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Extract unique products from tasks and enrich with names from products prop
   const productOptions = useMemo(() => {
@@ -97,16 +102,34 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, team, products, isLoading = 
   };
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter(task => {
-      const matchesStatus = filters.status.length === 0 || filters.status.includes(task.status);
-      const matchesProduct = filters.productId.length === 0 || 
-        (task.productId && filters.productId.includes(task.productId));
-      const matchesVersion = filters.versionId.length === 0 || 
-        (task.versionId && filters.versionId.includes(task.versionId));
-      
-      return matchesStatus && matchesProduct && matchesVersion;
-    });
+    return tasks
+      .filter(task => {
+        const matchesStatus = filters.status.length === 0 || filters.status.includes(task.status);
+        const matchesProduct = filters.productId.length === 0 || 
+          (task.productId && filters.productId.includes(task.productId));
+        const matchesVersion = filters.versionId.length === 0 || 
+          (task.versionId && filters.versionId.includes(task.versionId));
+        
+        return matchesStatus && matchesProduct && matchesVersion;
+      })
+      .sort((a, b) => b.taskNumber - a.taskNumber);
   }, [tasks, filters]);
+
+  const totalPages = Math.ceil(filteredTasks.length / ITEMS_PER_PAGE);
+  const safeTotalPages = Math.max(totalPages, 1);
+  
+  const paginatedTasks = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredTasks.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredTasks, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
+  useEffect(() => {
+    setCurrentPage((prevPage) => Math.min(prevPage, safeTotalPages));
+  }, [safeTotalPages]);
 
   const clearFilters = () => {
     setFilters({
@@ -140,10 +163,25 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, team, products, isLoading = 
 
         {/* Table Section */}
         <TaskListTable
-          tasks={filteredTasks.length === 0 && tasks.length > 0 ? [] : filteredTasks}
+          tasks={paginatedTasks.length === 0 && tasks.length > 0 ? [] : paginatedTasks}
           team={team}
           statusDropdown={TaskStatusDropdown}
         />
+
+        {/* Pagination */}
+        {filteredTasks.length > ITEMS_PER_PAGE && (
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={safeTotalPages}
+            prevButtonDisabled={currentPage === 1}
+            nextButtonDisabled={currentPage === safeTotalPages}
+            goToPreviousPage={() => setCurrentPage(p => Math.max(1, p - 1))}
+            goToNextPage={() => setCurrentPage(p => Math.min(safeTotalPages, p + 1))}
+            showItemCount
+            totalItems={filteredTasks.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+          />
+        )}
       </div>
     </div>
   );

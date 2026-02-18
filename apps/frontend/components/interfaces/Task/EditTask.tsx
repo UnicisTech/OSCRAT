@@ -10,8 +10,9 @@ import { TaskStatus } from '@oscrat/model';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { useTask } from 'hooks/useTask';
 import { useFormik } from 'formik';
-import { taskUpdateSchema, type TaskUpdateData } from '@/lib/validation/task';
+import { createTaskUpdateSchema, type TaskUpdateData } from '@/lib/validation/task';
 import type { ApiError } from '@/types';
+import { useGetTeamTasks } from '@/lib/api/hooks';
 
 const EditTask = ({
   visible,
@@ -26,6 +27,12 @@ const EditTask = ({
 }) => {
   const { t, ready } = useTranslation('common');
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
+  const { data: existingTasks } = useGetTeamTasks(team.slug);
+
+  const validationSchema = useMemo(
+    () => createTaskUpdateSchema(existingTasks, task.id),
+    [existingTasks, task.id]
+  );
   
   const initialValues: TaskUpdateData = useMemo(() => ({
     title: task?.title || '',
@@ -36,9 +43,10 @@ const EditTask = ({
   
   const formik = useFormik<TaskUpdateData>({
     initialValues,
-    validationSchema: taskUpdateSchema,
+    validationSchema,
     enableReinitialize: true,
-    validateOnBlur: false,
+    validateOnChange: true,
+    validateOnBlur: true,
     onSubmit: async (values) => {
       try {
         const updateData: TaskUpdateData = {

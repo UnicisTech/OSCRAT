@@ -1015,6 +1015,7 @@
         "task-status-invalid": "Please select a valid task status",
         "task-due-date-required": "Due date is required",
         "task-due-date-past": "Due date cannot be in the past",
+        "task-title-already-exists": "A task with this title already exists",
         "vulnerability-name-required": "Vulnerability name is required",
         "vulnerability-name-too-long": "Vulnerability name must be 100 characters or less",
         "cve-invalid-format": "Must be in format CVE-YYYY-NNNN or GHSA-xxxx-xxxx-xxxx",

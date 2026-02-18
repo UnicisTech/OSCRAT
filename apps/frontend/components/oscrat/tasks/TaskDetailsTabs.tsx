@@ -10,7 +10,7 @@ interface TaskDetailsTabsProps {
   team: Team;
 }
 
-type TabKey = 'files' | 'auditLog' | 'comments' | 'documentation';
+type TabKey = 'documentation';
 
 interface Tab {
   id: TabKey;
@@ -20,7 +20,7 @@ interface Tab {
 const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
   const { t, ready } = useTranslation('common');
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabKey>('files');
+  const [activeTab, setActiveTab] = useState<TabKey>('documentation');
 
   const { data: linkedDocs, isLoading: isLoadingDocs } = useGetTaskLinkedDocumentation(
     team.slug,
@@ -28,18 +28,6 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
   );
 
   const tabs: Tab[] = [
-    {
-      id: 'files',
-      label: t('files'),
-    },
-    {
-      id: 'auditLog',
-      label: t('audit-log'),
-    },
-    {
-      id: 'comments',
-      label: t('comments'),
-    },
     {
       id: 'documentation',
       label: t('oscrat.ui.documentation.title'),
@@ -54,27 +42,8 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     router.push(`/teams/${team.slug}/documentation/${docId}`);
   };
 
-  // TODO: Implement tab content for files, auditLog, comments
   const renderTabContent = (tabId: TabKey) => {
     switch (tabId) {
-      case 'files':
-        return (
-          <div className="p-6 text-center text-gray-500">
-            <p>{t('files-tab-coming-soon')}</p>
-          </div>
-        );
-      case 'auditLog':
-        return (
-          <div className="p-6 text-center text-gray-500">
-            <p>{t('audit-log-tab-coming-soon')}</p>
-          </div>
-        );
-      case 'comments':
-        return (
-          <div className="p-6 text-center text-gray-500">
-            <p>{t('comments-tab-coming-soon')}</p>
-          </div>
-        );
       case 'documentation':
         if (isLoadingDocs) {
           return (

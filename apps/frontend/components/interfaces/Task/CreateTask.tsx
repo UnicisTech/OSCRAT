@@ -10,7 +10,7 @@ import { DEFAULT_TASK_STATUS, getTaskStatusTranslationKey } from '@/constants/ta
 import { getCurrentStringDate } from '@/components/services/taskService';
 import useTasks from '@/hooks/useTasks';
 import { useFormik } from 'formik';
-import { taskCreateSchema, type TaskCreateData } from '@/lib/validation/task';
+import { createTaskCreateSchema, type TaskCreateData } from '@/lib/validation/task';
 import type { ApiError } from '@/types';
 import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
 
@@ -32,8 +32,13 @@ const CreateTask = ({
   onSuccess,
 }: CreateTaskProps) => {
   const { t, ready } = useTranslation('common');
-  const { createTask } = useTasks(team.slug);
+  const { createTask, tasks: existingTasks } = useTasks(team.slug);
   const { data: products } = useSearchProducts(team.slug, { includeVersions: true });
+
+  const validationSchema = useMemo(
+    () => createTaskCreateSchema(existingTasks),
+    [existingTasks]
+  );
   
   const initialValues: TaskCreateData = {
     title: '',
@@ -46,10 +51,10 @@ const CreateTask = ({
   
   const formik = useFormik<TaskCreateData>({
     initialValues,
-    validationSchema: taskCreateSchema,
+    validationSchema,
     enableReinitialize: true,
-    validateOnChange: false,
-    validateOnBlur: false,
+    validateOnChange: true,
+    validateOnBlur: true,
     onSubmit: async (values) => {
       try {
         const result = await createTask({
