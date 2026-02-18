@@ -1,21 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
 import { Button } from 'react-daisyui';
-import dynamic from 'next/dynamic';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
+import MarkdownEditor from '@/components/shared/MarkdownEditorDynamic';
 import PublicUrlDisplay from './PublicUrlDisplay';
 import LinkedTasksSection from './LinkedTasksSection';
 import DeleteDocumentationModal from './DeleteDocumentationModal';
 import { DocumentationStatus, DocumentationVisibility } from '@oscrat/model';
 import type { TeamDetail } from '@oscrat/model';
-
-import '@uiw/react-md-editor/markdown-editor.css';
-import '@uiw/react-markdown-preview/markdown.css';
-
-const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 interface DocumentationEditorViewProps {
   documentation: {
@@ -35,6 +28,7 @@ interface DocumentationEditorViewProps {
   visibility: DocumentationVisibility;
   hasChanges: boolean;
   canEdit: boolean;
+  canManage: boolean;
   canDelete: boolean;
   isArchived: boolean;
   isUpdating: boolean;
@@ -64,6 +58,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
   visibility,
   hasChanges,
   canEdit,
+  canManage,
   canDelete,
   isArchived,
   isUpdating,
@@ -115,7 +110,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
         </div>
 
         <div className="flex gap-2">
-          {canEdit && hasChanges && (
+          {canManage && hasChanges && (
             <Button
               color="primary"
               size="sm"
@@ -125,7 +120,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
               {t('save-changes')}
             </Button>
           )}
-          {canEdit && !isArchived && (
+          {canManage && !isArchived && (
             <Button
               color="warning"
               size="sm"
@@ -163,7 +158,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
           label={t('status')}
           value={status}
           onChange={onStatusChange}
-          disabled={!canEdit || isArchived}
+          disabled={!canManage || isArchived}
           options={[
             {
               value: DocumentationStatus.DRAFT,
@@ -201,7 +196,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
                       : DocumentationVisibility.PRIVATE
                   );
                 }}
-                disabled={!canEdit}
+                disabled={!canManage}
                 className="h-4 w-4 rounded border-gray-300"
               />
               <label htmlFor="public" className="text-sm">
@@ -227,19 +222,24 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
           />
         )}
 
-      <div data-color-mode="light">
+      <div>
         <label className="mb-2 block text-sm font-medium">{t('content')}</label>
-        {isArchived ? (
-          <div className="prose max-w-none rounded-md border p-4 min-h-[400px] max-h-[600px] overflow-y-auto bg-white">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        {canEdit ? (
+          <div className="rounded-md border border-gray-200">
+            <MarkdownEditor
+              markdown={content}
+              onChange={(value) => onContentChange(value)}
+              minHeight={500}
+            />
           </div>
         ) : (
-          <MDEditor
-            value={content}
-            onChange={onContentChange}
-            height={500}
-            preview={canEdit ? 'live' : 'preview'}
-          />
+          <div className="rounded-md border border-gray-200 bg-gray-50 opacity-75 max-h-[600px] overflow-y-auto">
+            <MarkdownEditor
+              markdown={content}
+              readOnly
+              minHeight={400}
+            />
+          </div>
         )}
       </div>
 

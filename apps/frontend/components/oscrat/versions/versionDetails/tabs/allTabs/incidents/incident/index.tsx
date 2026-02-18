@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import StatusPill from '@/components/shared/StatusPill';
+import StatusPill, { VULNERABILITY_STATUS_CLASSES } from '@/components/shared/StatusPill';
 import DetailItem from '@/components/shared/DetailItem';
 
 type VulnerabilityStatus = 'Pending' | 'Active' | 'Closed';
@@ -14,12 +14,6 @@ interface VulnerabilityDetailsData {
   affectedProduct: string;
   affectedVersion: string;
 }
-
-const STATUS_CLASSES: Record<VulnerabilityStatus, string> = {
-  Pending: 'bg-yellow-100 text-yellow-800',
-  Active: 'bg-blue-100 text-blue-800',
-  Closed: 'bg-gray-100 text-gray-800',
-};
 
 export default function Index() {
   const { t, ready } = useTranslation('common');
@@ -75,7 +69,7 @@ export default function Index() {
         <main className="grid grid-cols-2 gap-x-6 gap-y-4 pt-6 sm:grid-cols-3 md:grid-cols-5">
           <DetailItem
             label="Status"
-            value={<StatusPill label={vulnerability.status} className={STATUS_CLASSES[vulnerability.status]} />}
+            value={<StatusPill label={vulnerability.status} className={VULNERABILITY_STATUS_CLASSES[vulnerability.status]} />}
           />
           <DetailItem label="Severity" value={vulnerability.severity} />
           <DetailItem

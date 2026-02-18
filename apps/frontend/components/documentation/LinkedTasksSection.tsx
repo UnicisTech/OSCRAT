@@ -103,9 +103,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
           <Button
             size="sm"
             color="primary"
-            variant="outline"
             onClick={handleLinkTask}
-            disabled={!selectedTaskId || isLinking}
             loading={isLinking}
             className="h-8"
           >

@@ -60,9 +60,9 @@ const ProductsSummaryCard = ({ data }) => {
         {t('products')} ({data.total})
       </h2>
       <div className="flex items-center justify-between space-x-6">
-        <DetailItem label="Assessment" value={data.assessment} labelClassName="mb-1 text-sm text-gray-600" valueClassName="text-xl font-bold text-gray-800" />
-        <DetailItem label="Active" value={data.active} labelClassName="mb-1 text-sm text-gray-600" valueClassName="text-xl font-bold text-gray-800" />
-        <DetailItem label="Withdrawn" value={data.withdrawn} labelClassName="mb-1 text-sm text-gray-600" valueClassName="text-xl font-bold text-gray-800" />
+        <DetailItem label="Assessment" value={data.assessment} variant="large" />
+        <DetailItem label="Active" value={data.active} variant="large" />
+        <DetailItem label="Withdrawn" value={data.withdrawn} variant="large" />
       </div>
     </div>
   );

@@ -14,9 +14,7 @@ import { useTask } from 'hooks/useTask';
 import useCanAccess from '@/hooks/useCanAccess';
 import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 
-import 'react-quill/dist/quill.snow.css';
-import dynamic from 'next/dynamic';
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import TextArea from '@atlaskit/textarea';
 
 interface FormData {
   title: string;
@@ -173,12 +171,12 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
               >
                 {({ fieldProps }: any) => (
                   <Fragment>
-                    <ReactQuill
-                      theme="snow"
+                    <TextArea
                       {...fieldProps}
-                      onChange={(value) => {
+                      minimumRows={4}
+                      onChange={(e) => {
                         checkFormChanges();
-                        fieldProps.onChange(value);
+                        fieldProps.onChange(e);
                       }}
                     />
                   </Fragment>

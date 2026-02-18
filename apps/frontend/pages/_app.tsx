@@ -10,6 +10,7 @@ import { ReactQueryProvider } from '@/utils/queryClient';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import '@boxyhq/react-ui/dist/style.css';
 import '../styles/globals.css';
+import '@mdxeditor/editor/style.css';
 import { Themer } from '@boxyhq/react-ui/shared';
 import AccountLayout from '@/components/layouts/AccountLayout';
 

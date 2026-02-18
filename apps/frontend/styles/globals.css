@@ -73,9 +73,19 @@ a {
   box-shadow: none !important;
 }
 
+
 .card {
   position: relative;
   display: flex;
   flex-direction: column;
   border-radius: 0px;
+}
+
+/* MDXEditor containment - prevent overflow issues */
+.mdxeditor {
+  position: relative;
+}
+
+.mdxeditor [role="textbox"] {
+  outline: none;
 }

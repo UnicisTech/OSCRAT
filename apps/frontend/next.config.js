@@ -17,10 +17,15 @@ const redirects = [
 /** @type {import('next').NextConfig} */
 module.exports = withConfig({
   reactStrictMode: false,
-  transpilePackages: ['@oscrat/model'],
+  transpilePackages: ['@oscrat/model', '@mdxeditor/editor'],
   serverExternalPackages: ['@prisma/client'],
   i18n,
   webpack: (config, { isServer }) => {
+    config.experiments = {
+      ...config.experiments,
+      topLevelAwait: true,
+    };
+
     // Handle Prisma and node: imports
     if (!isServer) {
       // Client-side: prevent bundling server-only packages

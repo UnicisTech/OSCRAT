@@ -676,6 +676,7 @@
       "no-incidents-added": "No incidents have been added yet",
       "failed-to-load-incidents": "Failed to load incidents",
       "loading": "Loading...",
+      "loading-editor": "Loading editor...",
       "uploading": "Uploading...",
       "adding": "Adding...",
       "file-uploaded-successfully": "File uploaded successfully",
@@ -1676,7 +1677,8 @@
       "webhook": "Webhook",
       "api-key": "API Key",
       "assessment": "Assessment",
-      "attachment": "Attachment"
+      "attachment": "Attachment",
+      "documentation": "Documentation"
     },
     "incident": {
       "types": {

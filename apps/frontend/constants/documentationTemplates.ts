@@ -55,14 +55,43 @@ _Hint: Details of the incident commander._
 **Incident details**  
 Hint: Detailed information about incident.
 
-| Incident description |   |
+***Classification***
+
+- [ ] Critical
+- [ ] High
+- [ ] Medium
+- [ ] Low N/A
+- [ ] False Positive
+
+***Timeline & Key Dates***
+
+| Field | Value |
 | :---- | :---- |
-| Classification | [] Critical <br> [] High <br>  [] Medium <br> [] Low N/A <br> [] False Positive |
-| Timeline & Key Dates Occurrence Time: [Date Picker] (Est. start of the event) <br>  Detection Time: [Date Picker] (When you found out)   | Date/Time of Occurrence: The estimated timestamp when the incident actually started (based on logs or evidence). <br>  Date/Time of Detection: The exact timestamp when the organization became aware of the incident.<br> Note: This starts the regulatory clock for mandatory notifications (e.g., 24-hour Early Warning). <br>  Date/Time of Reporting: When the incident was officially logged in the system.  <br> Date/Time of Closure: When the incident was resolved and the ticket closed.   Total Downtime: (Optional/Auto-calculated) Duration of service unavailability. |
+| Date/Time of Occurrence | Est. start of the event |
+| Date/Time of Detection | When you found out |
+| Date/Time of Reporting | When the incident was officially logged |
+| Date/Time of Closure | When the incident was resolved |
+| Total Downtime | Duration of service unavailability |
+
+> **Note:** Date of Detection starts the regulatory clock for mandatory notifications (e.g., 24-hour Early Warning).
+
+| Field | Value |
+| :---- | :---- |
 | Affected Components/Assets |   |
-| Detection Method: How was the incident discovered? Options: Automated Alert (SIEM/IDS), Internal User Report, External Notification (Customer/Researcher), Audit/Review.   |   |
-| Regulatory Reporting Required? (Yes/No) – Does this incident meet the threshold for notification to authorities (CSIRT/ENSIA)? |   |
-| Incident Status | [] New: The incident has been logged but is not yet assigned or analyzed. <br> [] Under Investigation: The team is actively analyzingthe root cause, scope, and severity of the event. <br> [] In Progress: Containment measures are being executed to stop the threat from spreading. <br> [] In Remediation: Long-term fixes (patches, configuration changes) are being applied to resolve the root cause. <br> [] Monitoring: The system is under observation to ensure stability and prevent recurrence after the fix. <br> [] Resolved: Technical issues are fixed and services are restored, pending final documentation. <br> [] Closed: All post-incident activities, including reporting and lessons learned, are completed. <br> [] False Positive: Investigation confirmed the event was not a security incident; no further action required. <br> [] On Hold: Resolution is temporarily paused awaiting external input (e.g., vendor patch, legal advice). |
+| Detection Method | Options: Automated Alert (SIEM/IDS), Internal User Report, External Notification (Customer/Researcher), Audit/Review |
+| Regulatory Reporting Required? (Yes/No) | Does this incident meet the threshold for notification to authorities (CSIRT/ENSIA)? |
+
+***Incident Status***
+
+- [ ] New: The incident has been logged but is not yet assigned or analyzed.
+- [ ] Under Investigation: The team is actively analyzing the root cause, scope, and severity.
+- [ ] In Progress: Containment measures are being executed.
+- [ ] In Remediation: Long-term fixes (patches, configuration changes) are being applied.
+- [ ] Monitoring: The system is under observation to ensure stability.
+- [ ] Resolved: Technical issues are fixed and services are restored, pending final documentation.
+- [ ] Closed: All post-incident activities, including reporting and lessons learned, are completed.
+- [ ] False Positive: Investigation confirmed the event was not a security incident.
+- [ ] On Hold: Resolution is temporarily paused awaiting external input.
 
    
    

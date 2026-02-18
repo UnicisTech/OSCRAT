@@ -47,6 +47,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
   const [status, setStatus] = useState<DocumentationStatus>(DocumentationStatus.DRAFT);
   const [hasChanges, setHasChanges] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (documentation) {
@@ -55,6 +56,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
       setVisibility(documentation.visibility);
       setStatus(documentation.status);
       setHasChanges(false);
+      setIsInitialized(true);
     }
   }, [documentation]);
 
@@ -123,7 +125,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
     if (result) setStatus(DocumentationStatus.ARCHIVED);
   };
 
-  if (isLoading) {
+  if (isLoading || !isInitialized) {
     return <Loading />;
   }
 
@@ -136,7 +138,9 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
   }
 
   const isArchived = status === DocumentationStatus.ARCHIVED;
-  const canEdit = canAccess('documentation', ['update']) && !isArchived;
+  const isPublished = status === DocumentationStatus.PUBLISHED;
+  const canManage = canAccess('documentation', ['update']) && !isArchived;
+  const canEdit = canManage && !isPublished;
 
   return (
     <DocumentationEditorView
@@ -148,6 +152,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
       visibility={visibility}
       hasChanges={hasChanges}
       canEdit={canEdit}
+      canManage={canManage}
       canDelete={canAccess('documentation', ['delete'])}
       isArchived={isArchived}
       isUpdating={isUpdating}

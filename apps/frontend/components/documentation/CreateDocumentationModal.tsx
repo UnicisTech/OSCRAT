@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 import Modal from '@/components/shared/Modal';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
-import { getTemplateOptions, type TemplateType } from '@/constants/documentationTemplates';
+import { getTemplateOptions, DOCUMENTATION_TEMPLATES, type TemplateType } from '@/constants/documentationTemplates';
 import { useCreateDocumentationWizard } from './hooks/useCreateDocumentationWizard';
 
 interface Props {
@@ -122,7 +122,7 @@ const CreateDocumentationModal: React.FC<Props> = ({
                   </li>
                 )}
                 <li>
-                  {t('oscrat.ui.documentation.template.label')}: {t(`oscrat.ui.documentation.template.${wizard.template === 'empty' ? 'empty' : wizard.template}`)}
+                  {t('oscrat.ui.documentation.template.label')}: {DOCUMENTATION_TEMPLATES[wizard.template].name}
                 </li>
               </ul>
             </div>

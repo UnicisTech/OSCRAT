@@ -223,5 +223,6 @@ export const oscratEntityTypeTranslationMap: Record<string, string> = {
   ApiKey: 'oscrat.entity-types.api-key',
   Assessment: 'oscrat.entity-types.assessment',
   Attachment: 'oscrat.entity-types.attachment',
+  Documentation: 'oscrat.entity-types.documentation',
 };
 
