@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import { FiChevronDown } from 'react-icons/fi';
 import Link from 'next/link';
@@ -6,7 +6,7 @@ import Link from 'next/link';
 export interface MenuItem {
   name: string;
   href?: string;
-  icon?: any;
+  icon?: React.ComponentType<{ className?: string }>;
   active?: boolean;
   items?: Omit<MenuItem, 'icon' | 'items'>[];
   className?: string;

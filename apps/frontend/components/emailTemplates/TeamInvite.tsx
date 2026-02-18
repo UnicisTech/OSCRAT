@@ -14,12 +14,13 @@ interface TeamInviteEmailProps {
   userFirstname?: string;
 }
 
-const TeamInviteEmail = ({ teamName, invitationLink }: TeamInviteEmailProps) => {
+const TeamInviteEmail = ({ teamName, invitationLink, userFirstname }: TeamInviteEmailProps) => {
   return (
     <Html>
       <Head />
       <Preview>Team Invitation</Preview>
       <EmailLayout>
+        {userFirstname && <Text>Hi {userFirstname},</Text>}
         <Text>You have been invited to join the team at {teamName}.</Text>
         <Text>
           Click the link below to accept the invitation and join the team:

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IoClose, IoSearch } from 'react-icons/io5';
 import { useTranslation } from 'react-i18next';
+import FormField from '@/components/shared/FormField';
 
 interface NewTaskFormData {
   name: string;
@@ -16,18 +17,6 @@ interface AddNewTaskModalProps {
   onAddTask: (taskData: NewTaskFormData) => void;
   initialData: NewTaskFormData;
 }
-
-const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({
-  label,
-  children,
-}) => (
-  <div>
-    <label className="mb-1 block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    {children}
-  </div>
-);
 
 const AddNewTaskModal: React.FC<AddNewTaskModalProps> = ({
   isOpen,

@@ -2,9 +2,10 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
+import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
 import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
+import { computeRequirementsStatus } from '@/utils/compliance';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -14,16 +15,6 @@ interface ComplianceChartsProps {
   complianceNamespace: ComplianceNamespace;
 }
 
-interface RequirementStatus {
-  id: string;
-  name: string;
-  areaName: string;
-  isEvaluated: boolean;
-  conformityStatus: string;
-  completionPercentage: number;
-  assessment?: RequirementAssessment;
-}
-
 const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
   complianceData,
   state,
@@ -31,42 +22,10 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
 }) => {
   const { t, ready } = useTranslation(['common', complianceNamespace]);
 
-  const requirementsStatus = useMemo((): RequirementStatus[] => {
-    const allRequirements: RequirementStatus[] = [];
-
-    complianceData.forEach(area => {
-      area.content.forEach(req => {
-        const assessment = state.assessments.find(a => a.requirementId === req.reqId);
-        const totalQuestions = req.questions.length;
-        const answeredQuestions = assessment?.answers.length || 0;
-        const completionPercentage = totalQuestions > 0 
-          ? Math.round((answeredQuestions / totalQuestions) * 100) 
-          : 0;
-        
-        const isEvaluated = assessment?.complianceStatus !== undefined;
-        
-        // Use string type because we generate dynamic strings like "In Evaluation [45%]"
-        let conformityStatus: string = CONFORMITY_STATUS.NOT_COMPLIANT;
-        if (isEvaluated && assessment?.complianceStatus) {
-          conformityStatus = assessment.complianceStatus;
-        } else if (completionPercentage > 0 && completionPercentage < 100) {
-          conformityStatus = `${CONFORMITY_STATUS.IN_EVALUATION} [${completionPercentage}%]`;
-        }
-
-        allRequirements.push({
-          id: req.reqId,
-          name: t(req.requirement, { ns: complianceNamespace }),
-          areaName: t(area.areaOfRequirements, { ns: complianceNamespace }),
-          isEvaluated,
-          conformityStatus,
-          completionPercentage,
-          assessment,
-        });
-      });
-    });
-
-    return allRequirements;
-  }, [complianceData, state.assessments, t, complianceNamespace]);
+  const requirementsStatus = useMemo(
+    () => computeRequirementsStatus(complianceData, state.assessments, t, complianceNamespace),
+    [complianceData, state.assessments, t, complianceNamespace]
+  );
 
   const chartData = useMemo(() => {
     const evaluated = requirementsStatus.filter(r => r.isEvaluated).length;

@@ -1,7 +1,11 @@
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 
-const AgreeMessage = ({ text }) => {
+interface Props {
+  text: string;
+}
+
+const AgreeMessage = ({ text }: Props) => {
   const { t } = useTranslation('common');
 
   return (

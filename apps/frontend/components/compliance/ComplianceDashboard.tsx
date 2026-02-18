@@ -1,25 +1,16 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
-import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
+import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
 import { FaDownload, FaCheckCircle, FaExclamationCircle, FaClock } from 'react-icons/fa';
 import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
+import { computeRequirementsStatus, getStatusBadgeColor } from '@/utils/compliance';
 
 interface ComplianceDashboardProps {
   complianceData: ComplianceArea[];
   state: ComplianceState;
   onExportPDF: () => void;
   complianceNamespace: ComplianceNamespace;
-}
-
-interface RequirementStatus {
-  id: string;
-  name: string;
-  areaName: string;
-  isEvaluated: boolean;
-  conformityStatus: string;
-  completionPercentage: number;
-  assessment?: RequirementAssessment;
 }
 
 const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
@@ -30,44 +21,10 @@ const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
 }) => {
   const { t, ready } = useTranslation(['common', complianceNamespace]);
 
-  const requirementsStatus = useMemo((): RequirementStatus[] => {
-    const allRequirements: RequirementStatus[] = [];
-
-    complianceData.forEach(area => {
-      area.content.forEach(req => {
-        const assessment = state.assessments.find(a => a.requirementId === req.reqId);
-        const totalQuestions = req.questions.length;
-        const answeredQuestions = assessment?.answers.length || 0;
-        const completionPercentage = totalQuestions > 0 
-          ? Math.round((answeredQuestions / totalQuestions) * 100) 
-          : 0;
-        
-        const isEvaluated = assessment?.complianceStatus !== undefined;
-        
-        // Use string type because we generate dynamic strings like "In Evaluation [45%]"
-        let conformityStatus: string = CONFORMITY_STATUS.NOT_COMPLIANT;
-        if (isEvaluated && assessment?.complianceStatus) {
-          conformityStatus = assessment.complianceStatus;
-        } else if (completionPercentage > 0 && completionPercentage < 100) {
-          conformityStatus = `${CONFORMITY_STATUS.IN_EVALUATION} [${completionPercentage}%]`;
-        }
-
-        allRequirements.push({
-          id: req.reqId,
-          name: t(req.requirement, { ns: complianceNamespace }),
-          areaName: t(area.areaOfRequirements, { ns: complianceNamespace }),
-          isEvaluated,
-          conformityStatus,
-          completionPercentage,
-          assessment,
-        });
-      });
-    });
-
-    return allRequirements;
-  }, [complianceData, state.assessments, t, complianceNamespace]);
-
-
+  const requirementsStatus = useMemo(
+    () => computeRequirementsStatus(complianceData, state.assessments, t, complianceNamespace),
+    [complianceData, state.assessments, t, complianceNamespace]
+  );
 
   const getStatusIcon = (status: string) => {
     if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) {
@@ -80,15 +37,6 @@ const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
       return <FaExclamationCircle className="text-red-500" />;
     }
     return null;
-  };
-
-  const getStatusBadgeColor = (status: string) => {
-    if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) return 'bg-green-100 text-green-800';
-    if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT) return 'bg-yellow-100 text-yellow-800';
-    if (status === CONFORMITY_STATUS.NOT_COMPLIANT) return 'bg-red-100 text-red-800';
-    if (status === CONFORMITY_STATUS.NOT_APPLICABLE) return 'bg-gray-100 text-gray-800';
-    if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) return 'bg-blue-100 text-blue-800';
-    return 'bg-gray-100 text-gray-600';
   };
 
   if (!ready) return null;

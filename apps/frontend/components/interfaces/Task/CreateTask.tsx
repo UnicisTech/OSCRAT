@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
 import { DEFAULT_TASK_STATUS, getTaskStatusTranslationKey } from '@/constants/taskStatuses';
-import { getCurrentStringDate } from '@/components/services/taskService';
+import { getCurrentStringDate } from '@/utils/dateFormat';
 import useTasks from '@/hooks/useTasks';
 import { useFormik } from 'formik';
 import { createTaskCreateSchema, type TaskCreateData } from '@/lib/validation/task';

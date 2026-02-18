@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-// --- TYPE DEFINITIONS ---
+import FormField from '@/components/shared/FormField';
 
 interface TaskDetailsData {
   name: string;
@@ -12,9 +11,6 @@ interface TaskDetailsData {
   availableAssignees: string[];
 }
 
-// --- REUSABLE COMPONENTS ---
-
-// TaskDetails Component
 interface TaskDetailsProps {
   task: TaskDetailsData;
 }
@@ -25,26 +21,12 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
   const [assignee, setAssignee] = useState(task.assignee);
   const [details, setDetails] = useState(task.details);
 
-  // If the task prop changes from the parent, update the component's state.
   useEffect(() => {
     setName(task.name);
     setSection(task.section);
     setAssignee(task.assignee);
     setDetails(task.details);
   }, [task]);
-
-  // Helper component for a form field with a label
-  const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({
-    label,
-    children,
-  }) => (
-    <div>
-      <label className="mb-1 block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
 
   return (
     <div className="w-full rounded-lg border border-gray-400 bg-white p-4">

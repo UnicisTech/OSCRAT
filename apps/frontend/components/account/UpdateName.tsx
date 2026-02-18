@@ -1,36 +1,24 @@
-import { useFormik } from 'formik';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { Button } from 'react-daisyui';
-import { User } from '@oscrat/model';
+import type { User } from '@oscrat/model';
 
 import { Card, InputWithLabel } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
-import { extractErrorMessage } from '@/lib/utils';
 import { updateNameSchema } from '@/lib/validation/auth';
+import { useAccountForm } from '@/hooks/useAccountForm';
 
 const UpdateName = ({ user }: { user: Partial<User> }) => {
   const { t } = useTranslation('common');
   const { updateUser, isUpdateUserLoading } = useAccount();
 
-  const formik = useFormik({
+  const formik = useAccountForm({
     initialValues: {
       firstName: user.firstName,
       lastName: user.lastName,
     },
-    enableReinitialize: true,
     validationSchema: updateNameSchema,
-    onSubmit: async (values) => {
-      const result = await updateUser(values);
-
-      if (result.success) {
-        toast.success(t('successfully-updated'));
-      } else {
-        toast.error(
-          extractErrorMessage(result.error, t('error.update-failed'))
-        );
-      }
-    },
+    submitFn: updateUser,
+    enableReinitialize: true,
   });
 
   return (

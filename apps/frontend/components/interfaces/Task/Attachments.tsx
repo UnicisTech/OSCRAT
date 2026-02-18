@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import type { Task } from '@oscrat/model';
 import AttachmentsCard from './AttachmentCard';
-import { checkExtensionAndMIMEType } from '@/components/services/taskService';
+import { checkExtensionAndMIMEType } from '@/utils/fileValidation';
 import useCanAccess from '@/hooks/useCanAccess';
 import { useTranslation } from 'next-i18next';
 import { EmptyState } from '@/components/shared';

@@ -1,13 +1,11 @@
-import { useFormik } from 'formik';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { Button, Input } from 'react-daisyui';
 
 import { Card } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
-import { extractErrorMessage } from '@/lib/utils';
 import type { User } from '@oscrat/model';
 import { updateEmailSchema } from '@/lib/validation/auth';
+import { useAccountForm } from '@/hooks/useAccountForm';
 
 interface UpdateEmailProps {
   user: Partial<User>;
@@ -18,23 +16,11 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
   const { t } = useTranslation('common');
   const { updateUser, isUpdateUserLoading } = useAccount();
 
-  const formik = useFormik({
-    initialValues: {
-      email: user.email,
-    },
-    enableReinitialize: true,
+  const formik = useAccountForm({
+    initialValues: { email: user.email },
     validationSchema: updateEmailSchema,
-    onSubmit: async (values) => {
-      const result = await updateUser(values);
-
-      if (result.success) {
-        toast.success(t('successfully-updated'));
-      } else {
-        toast.error(
-          extractErrorMessage(result.error, t('error.update-failed'))
-        );
-      }
-    },
+    submitFn: updateUser,
+    enableReinitialize: true,
   });
 
   return (

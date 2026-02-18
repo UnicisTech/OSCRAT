@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-// --- TYPE DEFINITIONS ---
+import StatusPill from '@/components/shared/StatusPill';
+import DetailItem from '@/components/shared/DetailItem';
 
 type VulnerabilityStatus = 'Pending' | 'Active' | 'Closed';
 
@@ -15,12 +15,15 @@ interface VulnerabilityDetailsData {
   affectedVersion: string;
 }
 
-// --- MAIN APP COMPONENT ---
+const STATUS_CLASSES: Record<VulnerabilityStatus, string> = {
+  Pending: 'bg-yellow-100 text-yellow-800',
+  Active: 'bg-blue-100 text-blue-800',
+  Closed: 'bg-gray-100 text-gray-800',
+};
 
 export default function Index() {
   const { t, ready } = useTranslation('common');
 
-  // --- MOCK DATA ---
   const mockVulnerability: VulnerabilityDetailsData = {
     id: 'vuln-23.4b',
     title: 'Vulnerability - 23.4b',
@@ -31,12 +34,11 @@ export default function Index() {
     affectedVersion: 'v2.3',
   };
 
-  const [vulnerability, setVulnerability] =
+  const [vulnerability] =
     useState<VulnerabilityDetailsData>(mockVulnerability);
 
   if (!ready) return null;
 
-  // --- HANDLERS ---
   const handleEdit = () => {
     alert(t('edit-button-clicked-not-implemented'));
   };
@@ -44,36 +46,6 @@ export default function Index() {
   const handleClose = () => {
     alert(t('close-button-clicked-not-implemented'));
   };
-
-  // --- SUB-COMPONENTS
-
-  const StatusPill: React.FC<{ status: VulnerabilityStatus }> = ({
-    status,
-  }) => {
-    const pillClasses =
-      status === 'Pending'
-        ? 'bg-yellow-100 text-yellow-800'
-        : status === 'Active'
-          ? 'bg-blue-100 text-blue-800'
-          : 'bg-gray-100 text-gray-800';
-    return (
-      <span
-        className={`rounded-full px-3 py-1 text-sm font-semibold ${pillClasses}`}
-      >
-        {status}
-      </span>
-    );
-  };
-
-  const DetailItem: React.FC<{ label: string; value: React.ReactNode }> = ({
-    label,
-    value,
-  }) => (
-    <div>
-      <div className="mb-1 text-xs text-gray-500">{label}</div>
-      <div className="text-sm font-semibold text-gray-800">{value}</div>
-    </div>
-  );
 
   return (
     <div className="flex w-full justify-center">
@@ -103,7 +75,7 @@ export default function Index() {
         <main className="grid grid-cols-2 gap-x-6 gap-y-4 pt-6 sm:grid-cols-3 md:grid-cols-5">
           <DetailItem
             label="Status"
-            value={<StatusPill status={vulnerability.status} />}
+            value={<StatusPill label={vulnerability.status} className={STATUS_CLASSES[vulnerability.status]} />}
           />
           <DetailItem label="Severity" value={vulnerability.severity} />
           <DetailItem

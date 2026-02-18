@@ -8,6 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { signOut } from 'next-auth/react';
+import { useTranslation } from 'next-i18next';
 
 interface HeaderProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -15,6 +16,7 @@ interface HeaderProps {
 
 const Header = ({ setSidebarOpen }: HeaderProps) => {
   const { status, data } = useSession();
+  const { t } = useTranslation('common');
 
   if (status === 'loading' || !data) {
     return null;
@@ -66,7 +68,7 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
                   className="block cursor-pointer px-2 py-1 text-sm leading-6 text-gray-900 dark:text-gray-400"
                 >
                   <div className="flex items-center">
-                    <UserCircleIcon className="mr-1 h-5 w-5" /> Account
+                    <UserCircleIcon className="mr-1 h-5 w-5" /> {t('account')}
                   </div>
                 </Link>
               </li>
@@ -79,7 +81,7 @@ const Header = ({ setSidebarOpen }: HeaderProps) => {
                 >
                   <div className="flex items-center">
                     <ArrowRightOnRectangleIcon className="mr-1 h-5 w-5" />
-                    Logout
+                    {t('sign-out')}
                   </div>
                 </button>
               </li>

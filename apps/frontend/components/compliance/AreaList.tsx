@@ -11,10 +11,7 @@ interface AreaListProps {
   completedAreas: Array<{ id: number; text: string }>;
   onAreaSelect: (areaIndex: number) => void;
   getAreaProgress: (areaId: number) => number;
-  complianceState: ComplianceState;
-  productId?: string;
-  teamName: string;
-  productName: string;
+  complianceState?: ComplianceState;
   onReset: () => void;
   complianceNamespace: ComplianceNamespace;
   customTranslations?: Record<string, string> | null;
@@ -25,10 +22,6 @@ const AreaList: React.FC<AreaListProps> = ({
   completedAreas,
   onAreaSelect,
   getAreaProgress,
-  complianceState: _complianceState,
-  productId: _productId,
-  teamName: _teamName,
-  productName: _productName,
   onReset,
   complianceNamespace,
   customTranslations = null,
