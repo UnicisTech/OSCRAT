@@ -3,6 +3,7 @@ import { Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
+import * as Yup from 'yup';
 import Modal from '@/components/shared/Modal';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
@@ -11,6 +12,7 @@ import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
 import { DocumentationStatus } from '@oscrat/model';
 import { getTemplateContent, getTemplateOptions, type TemplateType } from '@/constants/documentationTemplates';
 import { extractErrorMessage } from '@/lib/utils';
+import { titleSchema } from '@/lib/validation/inputs';
 
 interface Props {
   visible: boolean;
@@ -66,6 +68,10 @@ const CreateDocumentationModal: React.FC<Props> = ({
       setError(t('oscrat.ui.documentation.error.product-required'));
       return;
     }
+    if (isProductLevel && productId && !versionId) {
+      setError(t('oscrat.ui.documentation.error.version-required'));
+      return;
+    }
     setError(null);
     setStep('editor');
   };
@@ -76,8 +82,12 @@ const CreateDocumentationModal: React.FC<Props> = ({
   };
 
   const handleCreate = async () => {
-    if (!title.trim()) {
-      setError(t('oscrat.ui.documentation.error.title-required'));
+    try {
+      await titleSchema.validate(title.trim());
+    } catch (validationError) {
+      if (validationError instanceof Yup.ValidationError) {
+        setError(t(validationError.message));
+      }
       return;
     }
 
@@ -96,7 +106,8 @@ const CreateDocumentationModal: React.FC<Props> = ({
       handleClose();
       router.push(`/teams/${slug}/documentation/${doc.id}`);
     } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('error')));
+      const errorMessage = extractErrorMessage(error, t('error'));
+      toast.error(t(errorMessage, { defaultValue: errorMessage }));
     }
   };
 
@@ -157,12 +168,13 @@ const CreateDocumentationModal: React.FC<Props> = ({
                     onChange={(e) => setVersionId(e.target.value)}
                     disabled={!!defaultVersionId}
                     options={[
-                      { value: '', label: t('oscrat.ui.all-versions') },
+                      { value: '', label: t('oscrat.ui.select-version') },
                       ...availableVersions.map((version) => ({
                         value: version.id,
                         label: version.version,
                       })),
                     ]}
+                    required
                   />
                 )}
               </>

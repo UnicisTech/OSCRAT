@@ -138,6 +138,18 @@ export const createDocumentation = async (
   return await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
 
+    const existingDoc = await tx.documentation.findFirst({
+      where: {
+        teamId,
+        title: input.title,
+        productId: input.productId || null,
+        versionId: input.versionId || null,
+      },
+    });
+    if (existingDoc) {
+      throw new Error('A documentation with this title already exists');
+    }
+
     const slug = generateSlug(input.title);
 
     // Let FK constraints handle product/version validation - insert will fail if IDs are invalid
@@ -185,6 +197,22 @@ export const updateDocumentation = async (
 
     if (existing.status === DocumentationStatus.ARCHIVED) {
       throw new Error('Archived documentation cannot be modified');
+    }
+
+    // Check title uniqueness if title is being changed
+    if (input.title !== undefined && input.title !== existing.title) {
+      const duplicateDoc = await tx.documentation.findFirst({
+        where: {
+          teamId,
+          title: input.title,
+          productId: existing.productId,
+          versionId: existing.versionId,
+          id: { not: documentationId },
+        },
+      });
+      if (duplicateDoc) {
+        throw new Error('A documentation with this title already exists');
+      }
     }
 
     // Increment version on substantive changes (content or title)
@@ -284,7 +312,7 @@ export const listDocumentation = async (
   const docs = await prisma.documentation.findMany({
     where,
     include: summaryInclude,
-    orderBy: { updatedAt: 'desc' },
+    orderBy: { createdAt: 'desc' },
   });
 
   return docs.map(toSummary);

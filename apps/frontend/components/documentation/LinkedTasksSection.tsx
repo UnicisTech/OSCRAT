@@ -104,7 +104,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
             <select
               value={selectedTaskId}
               onChange={(e) => setSelectedTaskId(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full h-8 rounded-md border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               disabled={!filteredAvailableTasks || filteredAvailableTasks.length === 0}
             >
               <option value="">
@@ -126,6 +126,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
             onClick={handleLinkTask}
             disabled={!selectedTaskId || isLinking}
             loading={isLinking}
+            className="h-8"
           >
             {t('oscrat.ui.documentation.link-button')}
           </Button>
@@ -134,7 +135,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
             color="success"
             variant="outline"
             onClick={() => setCreateTaskVisible(true)}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 h-8"
             disabled={isLinking}
           >
             <PlusIcon className="h-4 w-4" />

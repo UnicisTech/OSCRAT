@@ -481,7 +481,10 @@
         "ssoconnection.update": "Updated SSO connection",
         "ssoconnection.delete": "Deleted SSO connection",
         "directorysync.create": "Created directory sync",
-        "directorysync.delete": "Deleted directory sync"
+        "directorysync.delete": "Deleted directory sync",
+        "documentation.create": "Created documentation",
+        "documentation.update": "Updated documentation",
+        "documentation.delete": "Deleted documentation"
       }
     },
     "ui": {
@@ -563,7 +566,7 @@
         "level": {
           "label": "Level",
           "organization": "Organization",
-          "product": "Product"
+          "product": "Version"
         },
         "visibility": {
           "label": "Visibility",
@@ -589,7 +592,9 @@
         },
         "error": {
           "title-required": "Title is required",
-          "product-required": "Product is required for product-level documentation"
+          "product-required": "Product is required for version-level documentation",
+          "version-required": "Version is required when a product is selected",
+          "title-duplicate": "A documentation with this title already exists"
         },
         "delete": {
           "title": "Delete Documentation",
@@ -636,6 +641,7 @@
       "no-product": "No product",
       "no-version": "No version",
       "select-product": "Select a product",
+      "select-version": "Select a version",
       "task-origin-automatic": "Automatically generated",
       "task-origin-automatic-short": "Auto",
       "task-origin-manual": "Manually created",

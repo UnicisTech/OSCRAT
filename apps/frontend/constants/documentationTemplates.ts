@@ -1,5 +1,3 @@
-import { marked } from 'marked';
-
 export type TemplateType =
   | 'empty'
   | 'vulnerability-report'
@@ -625,17 +623,9 @@ const TEMPLATES_RAW: Record<TemplateType, DocumentationTemplate> = {
   },
 };
 
-// Pre-compute HTML versions of all templates at module load time
-const TEMPLATES_HTML_CACHE: Record<TemplateType, string> = Object.fromEntries(
-  Object.entries(TEMPLATES_RAW).map(([key, template]) => [
-    key,
-    template.markdown ? (marked.parse(template.markdown) as string) : '',
-  ])
-) as Record<TemplateType, string>;
-
-// Get pre-computed HTML content for a template
+// Get raw Markdown content for a template
 export const getTemplateContent = (templateType: TemplateType): string => {
-  return TEMPLATES_HTML_CACHE[templateType] || '';
+  return TEMPLATES_RAW[templateType]?.markdown || '';
 };
 
 export const DOCUMENTATION_TEMPLATES = TEMPLATES_RAW;

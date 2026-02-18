@@ -1,8 +1,8 @@
 import { useTranslation } from 'next-i18next';
-import { useSession } from 'next-auth/react';
 import Head from 'next/head';
 import Link from 'next/link';
-import DOMPurify from 'dompurify';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Loading } from '@/components/shared';
 import app from '@/lib/app';
 
@@ -35,8 +35,6 @@ const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
   productBadge,
 }) => {
   const { t } = useTranslation('common');
-  const { status: sessionStatus } = useSession();
-  const isAuthenticated = sessionStatus === 'authenticated';
 
   if (isLoading) {
     return (
@@ -80,18 +78,11 @@ const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
         {/* Header */}
         <header className="border-b bg-white shadow-sm">
           <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <img src={app.logoUrl} alt={app.name} className="h-10" />
-                <span className="text-lg font-medium text-gray-700">
-                  {t('oscrat.ui.documentation.public.header')}
-                </span>
-              </div>
-              {!isAuthenticated && (
-                <Link href="/auth/login" className="text-sm text-blue-600 hover:underline">
-                  {t('sign-in')}
-                </Link>
-              )}
+            <div className="flex items-center gap-4">
+              <img src={app.logoUrl} alt={app.name} className="h-10" />
+              <span className="text-lg font-medium text-gray-700">
+                {t('oscrat.ui.documentation.public.header')}
+              </span>
             </div>
           </div>
         </header>
@@ -120,10 +111,9 @@ const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
             </header>
 
             {/* Document Content */}
-            <div
-              className="prose prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(doc.content) }}
-            />
+            <div className="prose prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{doc.content}</ReactMarkdown>
+            </div>
           </article>
 
           {/* Footer */}

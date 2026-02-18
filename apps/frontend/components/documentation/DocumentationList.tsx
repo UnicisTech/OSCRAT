@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { StatusBadge, WithLoadingAndError, FilterDropdown } from '@/components/shared';
+import { StatusBadge, WithLoadingAndError, FilterDropdown, PaginationControls } from '@/components/shared';
 import { useDocumentationList } from '@/hooks/useDocumentation';
+
+const ITEMS_PER_PAGE = 15;
 
 const DocumentationList = () => {
   const router = useRouter();
@@ -11,8 +13,13 @@ const DocumentationList = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [levelFilter, setLevelFilter] = useState<string>('all');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { t } = useTranslation('common');
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, levelFilter]);
 
   const statusOptions = useMemo(
     () => [
@@ -33,13 +40,20 @@ const DocumentationList = () => {
     [t]
   );
 
-  const filteredDocs = documentation?.filter((doc) => {
-    if (statusFilter !== 'all' && doc.status !== statusFilter) return false;
-    // Level is computed from productId presence
-    const docLevel = doc.productId ? 'PRODUCT' : 'ORGANIZATION';
-    if (levelFilter !== 'all' && docLevel !== levelFilter) return false;
-    return true;
-  });
+  const filteredDocs = useMemo(() => {
+    return documentation?.filter((doc) => {
+      if (statusFilter !== 'all' && doc.status !== statusFilter) return false;
+      const docLevel = doc.productId ? 'PRODUCT' : 'ORGANIZATION';
+      if (levelFilter !== 'all' && docLevel !== levelFilter) return false;
+      return true;
+    }) || [];
+  }, [documentation, statusFilter, levelFilter]);
+
+  const totalPages = Math.ceil(filteredDocs.length / ITEMS_PER_PAGE);
+  const paginatedDocs = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredDocs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredDocs, currentPage]);
 
   const handleRowClick = (docId: string) => {
     router.push(`/teams/${slug}/documentation/${docId}`);
@@ -83,7 +97,7 @@ const DocumentationList = () => {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-lg bg-white shadow-sm min-h-[400px]">
             <table className="min-w-full divide-y divide-gray-200 text-left text-sm text-gray-600">
               <thead className="bg-gray-50">
                 <tr>
@@ -105,8 +119,8 @@ const DocumentationList = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {filteredDocs && filteredDocs.length > 0 ? (
-                  filteredDocs.map((doc) => (
+                {paginatedDocs.length > 0 ? (
+                  paginatedDocs.map((doc) => (
                     <tr
                       key={doc.id}
                       className="hover:bg-gray-50 cursor-pointer"
@@ -160,6 +174,19 @@ const DocumentationList = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages || 1}
+            prevButtonDisabled={currentPage === 1}
+            nextButtonDisabled={currentPage >= totalPages}
+            goToPreviousPage={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            goToNextPage={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            showItemCount
+            totalItems={filteredDocs.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+          />
         </div>
       </div>
     </WithLoadingAndError>

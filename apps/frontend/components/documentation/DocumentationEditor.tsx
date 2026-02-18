@@ -4,7 +4,9 @@ import { useRouter } from 'next/router';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import DOMPurify from 'dompurify';
+import * as Yup from 'yup';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useDocumentationDetail } from '@/hooks/useDocumentation';
 import useCanAccess from '@/hooks/useCanAccess';
 import useTasks from '@/hooks/useTasks';
@@ -17,10 +19,12 @@ import LinkedTasksSection from './LinkedTasksSection';
 import DeleteDocumentationModal from './DeleteDocumentationModal';
 import { DocumentationStatus, DocumentationVisibility } from '@oscrat/model';
 import { asyncWithToast } from '@/lib/utils';
+import { titleSchema } from '@/lib/validation/inputs';
 
-import 'react-quill/dist/quill.snow.css';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 interface Props {
   docId: string;
@@ -67,8 +71,8 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
     }
   }, [documentation]);
 
-  const handleContentChange = useCallback((value: string) => {
-    setContent(value);
+  const handleContentChange = useCallback((value?: string) => {
+    setContent(value || '');
     setHasChanges(true);
   }, []);
 
@@ -83,8 +87,12 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
   }, []);
 
   const handleSave = async () => {
-    if (!title.trim()) {
-      toast.error(t('oscrat.ui.documentation.error.title-required'));
+    try {
+      await titleSchema.validate(title.trim());
+    } catch (validationError) {
+      if (validationError instanceof Yup.ValidationError) {
+        toast.error(t(validationError.message));
+      }
       return;
     }
 
@@ -263,20 +271,18 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
         )}
 
       {/* Editor */}
-      <div className="min-h-[500px]">
+      <div data-color-mode="light">
         <label className="mb-2 block text-sm font-medium">{t('content')}</label>
         {isArchived ? (
-          <div
-            className="quill-view-mode prose max-w-none rounded-md border p-4"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
-          />
+          <div className="prose max-w-none rounded-md border p-4 min-h-[400px] max-h-[600px] overflow-y-auto bg-white">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+          </div>
         ) : (
-          <ReactQuill
-            theme="snow"
+          <MDEditor
             value={content}
             onChange={handleContentChange}
-            readOnly={!canEdit}
-            style={{ minHeight: '400px' }}
+            height={500}
+            preview={canEdit ? 'live' : 'preview'}
           />
         )}
       </div>
