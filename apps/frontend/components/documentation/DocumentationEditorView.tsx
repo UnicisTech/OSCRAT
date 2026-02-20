@@ -24,6 +24,7 @@ interface DocumentationEditorViewProps {
   slug: string;
   title: string;
   content: string;
+  editorKey: number;
   status: DocumentationStatus;
   visibility: DocumentationVisibility;
   hasChanges: boolean;
@@ -42,6 +43,7 @@ interface DocumentationEditorViewProps {
   onStatusChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onVisibilityChange: (visibility: DocumentationVisibility) => void;
   onSave: () => void;
+  onUndo: () => void;
   onDelete: () => void;
   onArchive: () => void;
   onShowDeleteModal: (show: boolean) => void;
@@ -54,6 +56,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
   slug,
   title,
   content,
+  editorKey,
   status,
   visibility,
   hasChanges,
@@ -72,6 +75,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
   onStatusChange,
   onVisibilityChange,
   onSave,
+  onUndo,
   onDelete,
   onArchive,
   onShowDeleteModal,
@@ -111,14 +115,24 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
 
         <div className="flex gap-2">
           {canManage && hasChanges && (
-            <Button
-              color="primary"
-              size="sm"
-              onClick={onSave}
-              loading={isUpdating}
-            >
-              {t('save-changes')}
-            </Button>
+            <>
+              <Button
+                color="ghost"
+                size="sm"
+                onClick={onUndo}
+                disabled={isUpdating}
+              >
+                {t('undo')}
+              </Button>
+              <Button
+                color="primary"
+                size="sm"
+                onClick={onSave}
+                loading={isUpdating}
+              >
+                {t('save-changes')}
+              </Button>
+            </>
           )}
           {canManage && !isArchived && (
             <Button
@@ -227,6 +241,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
         {canEdit ? (
           <div className="rounded-md border border-gray-200 max-h-[600px] overflow-y-auto">
             <MarkdownEditor
+              key={editorKey}
               markdown={content}
               onChange={(value) => onContentChange(value)}
               minHeight={500}
@@ -235,6 +250,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
         ) : (
           <div className="rounded-md border border-gray-200 bg-gray-50 opacity-75 max-h-[600px] overflow-y-auto">
             <MarkdownEditor
+              key={editorKey}
               markdown={content}
               readOnly
               minHeight={400}

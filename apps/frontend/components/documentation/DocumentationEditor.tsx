@@ -48,6 +48,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
   const [hasChanges, setHasChanges] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [editorKey, setEditorKey] = useState(0);
 
   useEffect(() => {
     if (documentation) {
@@ -88,6 +89,17 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
     },
     []
   );
+
+  const handleUndo = useCallback(() => {
+    if (documentation) {
+      setTitle(documentation.title);
+      setContent(documentation.content);
+      setVisibility(documentation.visibility);
+      setStatus(documentation.status);
+      setHasChanges(false);
+      setEditorKey((k) => k + 1);
+    }
+  }, [documentation]);
 
   const handleSave = async () => {
     try {
@@ -148,6 +160,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
       slug={slug}
       title={title}
       content={content}
+      editorKey={editorKey}
       status={status}
       visibility={visibility}
       hasChanges={hasChanges}
@@ -166,6 +179,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
       onStatusChange={handleStatusChange}
       onVisibilityChange={handleVisibilityChange}
       onSave={handleSave}
+      onUndo={handleUndo}
       onDelete={handleDelete}
       onArchive={handleArchive}
       onShowDeleteModal={setShowDeleteModal}
