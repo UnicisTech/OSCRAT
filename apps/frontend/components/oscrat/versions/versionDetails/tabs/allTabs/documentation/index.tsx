@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import {
@@ -15,7 +15,11 @@ import { useVersionContext } from '@/context/VersionContext';
 import { useTeamContext } from '@/context/TeamContext';
 import { useListDocumentation } from '@/lib/api/hooks';
 import { CreateDocumentationModal } from '@/components/documentation';
+import { DocumentationStatus, DocumentationVisibility } from '@oscrat/model';
 
+const STATUS_OPTIONS = Object.values(DocumentationStatus);
+const VISIBILITY_OPTIONS = Object.values(DocumentationVisibility);
+type SortOrder = 'newest' | 'oldest';
 
 export default function Documentation() {
   const router = useRouter();
@@ -26,11 +30,36 @@ export default function Documentation() {
   const slug = team?.slug || '';
 
   const [createVisible, setCreateVisible] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [visibilityFilter, setVisibilityFilter] = useState<string>('All');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 
   const { data: documentation, isLoading } = useListDocumentation(slug, {
     productId,
     versionId,
   });
+
+  const filteredDocumentation = useMemo(() => {
+    if (!documentation) return [];
+    
+    let filtered = [...documentation];
+    
+    if (statusFilter !== 'All') {
+      filtered = filtered.filter((doc) => doc.status === statusFilter);
+    }
+    
+    if (visibilityFilter !== 'All') {
+      filtered = filtered.filter((doc) => doc.visibility === visibilityFilter);
+    }
+    
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.updatedAt).getTime();
+      const dateB = new Date(b.updatedAt).getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+    
+    return filtered;
+  }, [documentation, statusFilter, visibilityFilter, sortOrder]);
 
   const tableHeaders = [
     t('title'),
@@ -40,66 +69,133 @@ export default function Documentation() {
   ];
 
   if (isLoading || !team) {
-    return <TabLoading />;
+    return (
+      <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+        <TabLoading />
+      </div>
+    );
   }
 
   return (
-    <div className="w-full">
-      <TabHeader title={t('oscrat.ui.documentation.title')}>
-        <TabActionButton onClick={() => setCreateVisible(true)}>
-          {t('oscrat.ui.documentation.add')}
-        </TabActionButton>
-      </TabHeader>
+    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+      <div className="w-full">
+        <TabHeader title={t('oscrat.ui.documentation.title')}>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <label
+                htmlFor="status-filter"
+                className="text-sm font-medium text-gray-900"
+              >
+                {t('status')}
+              </label>
+              <select
+                id="status-filter"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-md border border-gray-300 px-1 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="All">{t('all')}</option>
+                {STATUS_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {t(`oscrat.ui.documentation.status.${opt.toLowerCase()}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <label
+                htmlFor="visibility-filter"
+                className="text-sm font-medium text-gray-900"
+              >
+                {t('visibility')}
+              </label>
+              <select
+                id="visibility-filter"
+                value={visibilityFilter}
+                onChange={(e) => setVisibilityFilter(e.target.value)}
+                className="rounded-md border border-gray-300 px-1 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="All">{t('all')}</option>
+                {VISIBILITY_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {t(`oscrat.ui.documentation.visibility.${opt.toLowerCase()}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <label
+                htmlFor="sort-order"
+                className="text-sm font-medium text-gray-900"
+              >
+                {t('updated')}
+              </label>
+              <select
+                id="sort-order"
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+                className="rounded-md border border-gray-300 px-1 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                <option value="newest">{t('newest-first')}</option>
+                <option value="oldest">{t('oldest-first')}</option>
+              </select>
+            </div>
+          </div>
+          <TabActionButton onClick={() => setCreateVisible(true)}>
+            {t('oscrat.ui.documentation.add')}
+          </TabActionButton>
+        </TabHeader>
 
-      <TableWrapper>
-        <table className={tableStyles.table}>
-          <TableHeader columns={tableHeaders.map((h) => ({ label: h }))} />
-          <tbody className={tableStyles.tbody}>
-            {documentation && documentation.length > 0 ? (
-              documentation.map((doc) => (
-                <TableRow
-                  key={doc.id}
-                  onClick={() => router.push(`/teams/${slug}/documentation/${doc.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-gray-50"
-                >
-                  <td className={tableStyles.td}>
-                    <div className="font-medium">{doc.title}</div>
-                    <div className="text-xs text-gray-500">v{doc.version}</div>
+        <TableWrapper>
+          <table className={tableStyles.table}>
+            <TableHeader columns={tableHeaders.map((h) => ({ label: h }))} />
+            <tbody className={tableStyles.tbody}>
+              {filteredDocumentation.length > 0 ? (
+                filteredDocumentation.map((doc) => (
+                  <TableRow
+                    key={doc.id}
+                    onClick={() => router.push(`/teams/${slug}/documentation/${doc.id}`)}
+                    className="cursor-pointer transition-colors hover:bg-gray-50"
+                  >
+                    <td className={tableStyles.td}>
+                      <div className="font-medium">{doc.title}</div>
+                      <div className="text-xs text-gray-500">v{doc.version}</div>
+                    </td>
+                    <td className={tableStyles.td}>
+                      <StatusBadge
+                        value={doc.status}
+                        label={t(`oscrat.ui.documentation.status.${doc.status.toLowerCase()}`)}
+                      />
+                    </td>
+                    <td className={tableStyles.td}>
+                      <span
+                        className={`text-sm ${
+                          doc.visibility === 'PUBLIC' ? 'text-green-600' : 'text-gray-500'
+                        }`}
+                      >
+                        {doc.visibility === 'PUBLIC'
+                          ? t('oscrat.ui.documentation.visibility.public')
+                          : t('oscrat.ui.documentation.visibility.private')}
+                      </span>
+                    </td>
+                    <td className={tableStyles.td}>
+                      <span className="text-sm text-gray-500">
+                        {new Date(doc.updatedAt).toLocaleDateString()}
+                      </span>
+                    </td>
+                  </TableRow>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                    {t('oscrat.ui.documentation.no-documents')}
                   </td>
-                  <td className={tableStyles.td}>
-                    <StatusBadge
-                      value={doc.status}
-                      label={t(`oscrat.ui.documentation.status.${doc.status.toLowerCase()}`)}
-                    />
-                  </td>
-                  <td className={tableStyles.td}>
-                    <span
-                      className={`text-sm ${
-                        doc.visibility === 'PUBLIC' ? 'text-green-600' : 'text-gray-500'
-                      }`}
-                    >
-                      {doc.visibility === 'PUBLIC'
-                        ? t('oscrat.ui.documentation.visibility.public')
-                        : t('oscrat.ui.documentation.visibility.private')}
-                    </span>
-                  </td>
-                  <td className={tableStyles.td}>
-                    <span className="text-sm text-gray-500">
-                      {new Date(doc.updatedAt).toLocaleDateString()}
-                    </span>
-                  </td>
-                </TableRow>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                  {t('oscrat.ui.documentation.no-documents')}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </TableWrapper>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </TableWrapper>
+      </div>
 
       <CreateDocumentationModal
         visible={createVisible}

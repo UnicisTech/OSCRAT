@@ -277,6 +277,8 @@
   "assignee": "Assignee",
   "unassigned": "Unassigned",
   "all": "All",
+  "newest-first": "Newest first",
+  "oldest-first": "Oldest first",
   "previous": "Previous",
   "select-status": "Select status",
   "select-product": "Select product",
@@ -1076,7 +1078,7 @@
           "scans": "Scans",
           "vulnerabilities": "Vulnerabilities",
           "incidents": "Incidents",
-          "task": "Task",
+          "task": "Tasks",
           "documentation": "Documentation",
           "version-log": "Version Log",
           "repository": "Repository"

@@ -225,7 +225,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
       <div>
         <label className="mb-2 block text-sm font-medium">{t('content')}</label>
         {canEdit ? (
-          <div className="rounded-md border border-gray-200">
+          <div className="rounded-md border border-gray-200 max-h-[600px] overflow-y-auto">
             <MarkdownEditor
               markdown={content}
               onChange={(value) => onContentChange(value)}
