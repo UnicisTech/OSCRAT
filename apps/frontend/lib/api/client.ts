@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { signIn } from 'next-auth/react';
 import { ApiError, ApiResponse } from '@/types';
 
 class ApiClient {
@@ -9,6 +10,18 @@ class ApiClient {
       baseURL,
       headers: { 'Content-Type': 'application/json' },
     });
+
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          if (typeof window !== 'undefined') {
+            signIn();
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
   }
 
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {

@@ -1,6 +1,7 @@
 import { verifyPassword } from '@/lib/auth';
 import { isBusinessEmail } from '@/lib/email/utils';
 import env from '@/lib/env';
+import { ApiError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { Role } from '@oscrat/model';
@@ -229,21 +230,26 @@ export const authOptions: NextAuthOptions = {
 
     async session({ session, token }) {
       if (token && session && token.sub) {
-        session.user.id = token.sub;
-
-        // Fetch complete user data from database
+        let user;
         try {
-          const user = await getUser({ id: token.sub });
-          if (user) {
-            session.user.name = user.name;
-            session.user.email = user.email;
-            session.user.image = user.image;
-            session.user.firstName = user.firstName;
-            session.user.lastName = user.lastName;
-          }
+          user = await getUser({ id: token.sub });
         } catch (error) {
-          console.error('Error fetching user data in session callback:', error);
+          // DB unreachable — return session with token data only
+          console.error('Database error in session callback:', error);
+          session.user.id = token.sub;
+          return session;
         }
+
+        if (!user) {
+          throw new ApiError(401, 'User not found');
+        }
+
+        session.user.id = token.sub;
+        session.user.name = user.name;
+        session.user.email = user.email;
+        session.user.image = user.image;
+        session.user.firstName = user.firstName;
+        session.user.lastName = user.lastName;
       }
 
       return session;

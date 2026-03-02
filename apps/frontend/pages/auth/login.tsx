@@ -140,7 +140,7 @@ const Login: NextPageWithLayout<
       )}
       <div className="rounded border p-6">
 
-        {authProviders.credentials && (
+        {authProviders?.credentials && (
           <form onSubmit={formik.handleSubmit}>
             <div className="space-y-3">
               <InputWithLabel
@@ -219,12 +219,12 @@ const Login: NextPageWithLayout<
           </form>
         )}
 
-        {(authProviders.email || authProviders.saml) && (
+        {(authProviders?.email || authProviders?.saml) && (
           <div className="divider"></div>
         )}
 
         <div className="space-y-3">
-          {authProviders.email && (
+          {authProviders?.email && (
             <Link
               href={`/auth/magic-link${params}`}
               className="block w-full rounded-md border-[1px] border-[#BDBDBD] bg-white px-2 py-3 text-center text-sm font-medium text-[#212121] transition-colors duration-200 disabled:cursor-not-allowed"
@@ -233,7 +233,7 @@ const Login: NextPageWithLayout<
             </Link>
           )}
 
-          {authProviders.saml && (
+          {authProviders?.saml && (
             <Link href="/auth/sso" className="btn btn-outline w-full">
               &nbsp;{t('continue-with-saml-sso')}
             </Link>

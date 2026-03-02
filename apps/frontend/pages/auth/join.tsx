@@ -47,7 +47,7 @@ const Signup: NextPageWithLayout<
         <title>{t('sign-up-title')}</title>
       </Head>
       <div className="rounded border p-6">
-        {authProviders.credentials && (
+        {authProviders?.credentials && (
           <>
             {token ? (
               <JoinWithInvitation

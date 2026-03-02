@@ -10,14 +10,10 @@ interface AccountLayoutProps {
 }
 
 export default function AccountLayout({ children, showSidePanel = true }: AccountLayoutProps) {
-  const { status } = useSession();
+  const { status } = useSession({ required: true });
 
   if (status === 'loading') {
     return <Loading />;
-  }
-
-  if (status === 'unauthenticated') {
-    return <p>Access Denied</p>;
   }
 
   if (showSidePanel) {

@@ -323,6 +323,7 @@
   "wise-payment": "Wise Payment",
   "wise-payment-details": "Payment link will be added as soon as your request is processed.",
   "pay-now": "Pay Now",
+  "SessionRequired": "Your session has expired. Please sign in again.",
   "auth-limited": "Too many login attempts. Please try again in 1 minute.",
   "loading-project-details": "Loading project details...",
   "project-not-found": "Project not found",
