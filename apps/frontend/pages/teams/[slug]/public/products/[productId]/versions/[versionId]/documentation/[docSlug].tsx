@@ -22,7 +22,7 @@ function PublicProductDocumentationPage() {
     enabled: !!slug && !!productId && !!versionId && !!docSlug,
   });
 
-  const productBadge = doc ? `${doc.productName} v${doc.versionName}` : undefined;
+  const productBadge = doc ? `${doc.productName} ${doc.versionName}` : undefined;
 
   return (
     <PublicDocumentationLayout
@@ -30,11 +30,11 @@ function PublicProductDocumentationPage() {
       isLoading={isLoading}
       isError={isError}
       metaTitle={
-        doc ? `${doc.title} | ${doc.productName} v${doc.versionName} | ${app.name}` : app.name
+        doc ? `${doc.title} | ${doc.productName} ${doc.versionName} | ${app.name}` : app.name
       }
       metaDescription={
         doc
-          ? `${doc.title} - ${doc.productName} v${doc.versionName} Technical Documentation`
+          ? `${doc.title} - ${doc.productName} ${doc.versionName} Technical Documentation`
           : ''
       }
       productBadge={productBadge}

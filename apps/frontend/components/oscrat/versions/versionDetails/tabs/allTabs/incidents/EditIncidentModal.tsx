@@ -535,9 +535,9 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
                           onClick={() => handleRemovePendingFile(index)}
                           disabled={saving}
                           icon={<FaTrash size={12} />}
-                          title={t('oscrat.ui.remove')}
+                          title={t('remove')}
                         >
-                          {t('oscrat.ui.remove')}
+                          {t('remove')}
                         </ActionButton>
                       </div>
                     ))}

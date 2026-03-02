@@ -28,16 +28,35 @@ const DocumentationDetailPage = () => {
     return <div>{t('loading')}</div>;
   }
 
-  const breadcrumbItems = [
-    {
-      label: t('oscrat.ui.documentation.title'),
-      href: `/teams/${slug}/documentation`,
-    },
-    {
-      label: documentation?.title || '...',
-      current: true,
-    },
-  ];
+  const breadcrumbItems = documentation?.productId && documentation?.versionId
+    ? [
+        {
+          label: t('oscrat.ui.products'),
+          href: `/teams/${slug}/products`,
+        },
+        {
+          label: documentation.productName || '...',
+          href: `/teams/${slug}/products/${documentation.productId}`,
+        },
+        {
+          label: documentation.versionName || '...',
+          href: `/teams/${slug}/products/${documentation.productId}/versions/${documentation.versionId}`,
+        },
+        {
+          label: documentation.title || '...',
+          current: true,
+        },
+      ]
+    : [
+        {
+          label: t('oscrat.ui.documentation.title'),
+          href: `/teams/${slug}/documentation`,
+        },
+        {
+          label: documentation?.title || '...',
+          current: true,
+        },
+      ];
 
   return (
     <div className="space-y-6">

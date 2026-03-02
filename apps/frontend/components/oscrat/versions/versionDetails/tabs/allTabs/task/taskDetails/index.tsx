@@ -1,9 +1,13 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { useTeamContext } from '@/context/TeamContext';
+import { useProductContext } from '@/context/ProductContext';
+import { useVersionContext } from '@/context/VersionContext';
 import { useTask } from '@/hooks/useTask';
 import { TaskDetailsForm } from '@/components/oscrat/tasks';
-import { Task, Team } from '@oscrat/model';
+import { Breadcrumb } from '@/components/shared';
+import { Team } from '@oscrat/model';
 // import TabsManager from '@/components/shared/TabsManager';
 // import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/allTabs/task/taskDetails/tabs';
 
@@ -11,14 +15,15 @@ interface TaskDetailsProps {
   taskNumber: string;
 }
 
-export default function TaskDetails({ taskNumber }: TaskDetailsProps) {
+function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: string; team: Team }) {
   const { t } = useTranslation('common');
-  const { teamContext } = useTeamContext();
-  const { team } = teamContext as { team: Team };
-
+  const router = useRouter();
+  const { productId: routeProductId, versionId: routeVersionId } = router.query as { productId: string; versionId: string };
+  const { productContext } = useProductContext();
+  const { versionContext } = useVersionContext();
   const { task, isLoading, isError } = useTask(team.slug, taskNumber);
 
-  if (!team || isLoading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col p-4">
         <div className="text-center text-gray-500">{t('loading-task-details')}</div>
@@ -34,10 +39,90 @@ export default function TaskDetails({ taskNumber }: TaskDetailsProps) {
     );
   }
 
+  const breadcrumbItems = [
+    {
+      label: t('oscrat.ui.products'),
+      href: `/teams/${team.slug}/products`,
+    },
+    {
+      label: productContext.project?.name || '...',
+      href: `/teams/${team.slug}/products/${routeProductId}`,
+    },
+    {
+      label: versionContext.version?.version || '...',
+      href: `/teams/${team.slug}/products/${routeProductId}/versions/${routeVersionId}`,
+    },
+    {
+      label: task.title || t('task-details'),
+      current: true,
+    },
+  ];
+
   return (
     <div className="flex flex-col space-y-6">
+      <Breadcrumb items={breadcrumbItems} />
       <TaskDetailsForm task={task} team={team} />
-      {/*<TabsManager tabs={TABS_CONFIG} />*/}
     </div>
   );
+}
+
+function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team: Team }) {
+  const { t } = useTranslation('common');
+  const { task, isLoading, isError } = useTask(team.slug, taskNumber);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col p-4">
+        <div className="text-center text-gray-500">{t('loading-task-details')}</div>
+      </div>
+    );
+  }
+
+  if (isError || !task) {
+    return (
+      <div className="flex flex-col p-4">
+        <div className="text-center text-red-500">{t('task-not-found')}</div>
+      </div>
+    );
+  }
+
+  const breadcrumbItems = [
+    {
+      label: t('oscrat.ui.tasks.title'),
+      href: `/teams/${team.slug}/tasks`,
+    },
+    {
+      label: task.title || t('task-details'),
+      current: true,
+    },
+  ];
+
+  return (
+    <div className="flex flex-col space-y-6">
+      <Breadcrumb items={breadcrumbItems} />
+      <TaskDetailsForm task={task} team={team} />
+    </div>
+  );
+}
+
+export default function TaskDetails({ taskNumber }: TaskDetailsProps) {
+  const router = useRouter();
+  const { productId, versionId } = router.query as { productId?: string; versionId?: string };
+  const { teamContext } = useTeamContext();
+  const { team } = teamContext as { team: Team };
+  const { t } = useTranslation('common');
+
+  if (!team) {
+    return (
+      <div className="flex flex-col p-4">
+        <div className="text-center text-gray-500">{t('loading-task-details')}</div>
+      </div>
+    );
+  }
+
+  if (productId && versionId) {
+    return <TaskDetailsWithVersionContext taskNumber={taskNumber} team={team} />;
+  }
+
+  return <TaskDetailsStandalone taskNumber={taskNumber} team={team} />;
 }

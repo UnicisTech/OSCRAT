@@ -64,7 +64,7 @@ const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
   const displayBadge =
     productBadge ??
     (doc.productName
-      ? `${doc.productName}${doc.versionName ? ` v${doc.versionName}` : ''}`
+      ? `${doc.productName}${doc.versionName ? ` ${doc.versionName}` : ''}`
       : undefined);
 
   return (

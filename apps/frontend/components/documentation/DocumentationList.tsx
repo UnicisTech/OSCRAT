@@ -132,7 +132,7 @@ const DocumentationList = () => {
                           {doc.productName && (
                             <span className="text-xs text-gray-500">
                               {doc.productName}
-                              {doc.versionName && ` v${doc.versionName}`}
+                              {doc.versionName && ` ${doc.versionName}`}
                             </span>
                           )}
                         </div>

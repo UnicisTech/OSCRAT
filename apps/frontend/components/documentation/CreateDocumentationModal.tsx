@@ -118,7 +118,7 @@ const CreateDocumentationModal: React.FC<Props> = ({
                 {wizard.isProductLevel && wizard.productId && (
                   <li>
                     {t('product')}: {wizard.products?.find((p) => p.id === wizard.productId)?.name}
-                    {wizard.versionId && ` (v${wizard.availableVersions.find((v) => v.id === wizard.versionId)?.version})`}
+                    {wizard.versionId && ` (${wizard.availableVersions.find((v) => v.id === wizard.versionId)?.version})`}
                   </li>
                 )}
                 <li>

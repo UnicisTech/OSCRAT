@@ -16,6 +16,16 @@ import type { OscratProductVersionUpdate } from '@oscrat/model';
 import { extractErrorMessage } from '@/lib/utils';
 import { getProductVersionStatusKey } from '@/utils/translation';
 
+const STATUS_COLORS: Record<string, string> = {
+  ACTIVE: 'bg-green-100 dark:bg-green-900',
+  ARCHIVED: 'bg-red-100 dark:bg-red-900',
+  DEPRECATED: 'bg-gray-200 dark:bg-orange-900',
+  DEFAULT: 'bg-gray-100 dark:bg-gray-900',
+};
+
+const getStatusColorClass = (status: string): string => 
+  STATUS_COLORS[status] || STATUS_COLORS.DEFAULT;
+
 const Index = () => {
   const { t, ready } = useTranslation('common');
   const { slug } = useTeamContext();
@@ -153,13 +163,13 @@ const Index = () => {
 
         <div className="my-2 w-full border-b border-gray-200 dark:border-gray-600" />
 
-        <div className="grid grid-cols-6 gap-4 text-sm text-gray-700 dark:text-gray-300">
+        <div className="grid grid-cols-6 items-start gap-4 text-sm text-gray-700 dark:text-gray-300">
           <div className="flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
               {t('status')}:
             </span>
             <div className="inline-flex font-semibold text-black dark:text-gray-100">
-              <p className="rounded-full bg-green-100 px-2 py-0.5 dark:bg-green-900">
+              <p className={`rounded-full px-2 py-0.5 ${getStatusColorClass(version.status)}`}>
                 {t(getProductVersionStatusKey(version.status))}
               </p>
             </div>

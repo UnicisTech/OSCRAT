@@ -30,7 +30,7 @@ const TeamCompliancePage = () => {
   const breadcrumbItems = [
     {
       label: team.name,
-      href: `/teams/${team.slug}/products`,
+      href: `/teams/${team.slug}`,
     },
     {
       label: t('oscrat.ui.team-compliance-assessment'),

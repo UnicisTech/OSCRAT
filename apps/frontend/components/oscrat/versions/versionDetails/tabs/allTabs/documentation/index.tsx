@@ -159,7 +159,7 @@ export default function Documentation() {
                   >
                     <td className={tableStyles.td}>
                       <div className="font-medium">{doc.title}</div>
-                      <div className="text-xs text-gray-500">v{doc.version}</div>
+                      <div className="text-xs text-gray-500">{doc.version}</div>
                     </td>
                     <td className={tableStyles.td}>
                       <StatusBadge

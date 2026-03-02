@@ -4,6 +4,17 @@ import { getBorderClass } from '@/lib/borderUtils';
 import { usePathname, useRouter } from 'next/navigation';
 import type { OscratProductVersionSummary } from '@oscrat/model';
 import React from 'react';
+import { getProductVersionStatusKey } from '@/utils/translation';
+
+const STATUS_COLORS: Record<string, string> = {
+  ACTIVE: 'bg-green-100 dark:bg-green-900',
+  ARCHIVED: 'bg-red-100 dark:bg-red-900',
+  DEPRECATED: 'bg-gray-200 dark:bg-orange-900',
+  DEFAULT: 'bg-gray-100 dark:bg-gray-900',
+};
+
+const getStatusColorClass = (status: string): string =>
+  STATUS_COLORS[status] || STATUS_COLORS.DEFAULT;
 
 interface VersionProps {
   data: OscratProductVersionSummary;
@@ -43,17 +54,9 @@ const Version: React.FC<VersionProps> = ({
                 {t('status')}
               </span>
               <span
-                className={`inline-flex w-fit rounded-full px-2 py-1 text-sm font-semibold capitalize text-black ${
-                  status === 'ACTIVE'
-                    ? 'bg-green-100 dark:bg-green-900'
-                    : status === 'ARCHIVED'
-                      ? 'bg-red-100 dark:bg-red-900'
-                      : status === 'DEPRECATED'
-                        ? 'bg-gray-200 dark:bg-orange-900'
-                        : 'bg-gray-100 dark:bg-gray-900'
-                }`}
+                className={`inline-flex w-fit rounded-full px-2 py-1 text-sm font-semibold capitalize text-black ${getStatusColorClass(status)}`}
               >
-                {status === 'DEPRECATED' ? 'not supported' : status}
+                {t(getProductVersionStatusKey(status))}
               </span>
             </div>
           </div>
@@ -89,15 +92,9 @@ const Version: React.FC<VersionProps> = ({
               {t('status')}
             </span>
             <span
-              className={`inline-flex w-fit rounded-full px-2 py-1 text-sm font-semibold capitalize text-black ${
-                status === 'ACTIVE'
-                  ? 'bg-green-100 dark:bg-green-900'
-                  : status === 'ARCHIVED'
-                    ? 'bg-red-100 dark:bg-red-900'
-                    : 'bg-gray-100 dark:bg-gray-900'
-              }`}
+              className={`inline-flex w-fit rounded-full px-2 py-1 text-sm font-semibold capitalize text-black ${getStatusColorClass(status)}`}
             >
-              {status}
+              {t(getProductVersionStatusKey(status))}
             </span>
           </div>
           <div className="flex flex-col">
