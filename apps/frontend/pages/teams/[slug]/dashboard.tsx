@@ -5,7 +5,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { withTeamLayout } from '@/lib/layout-helpers';
 import CompletedAppCheck from '@/components/oscrat/dashboard/CompletedAppCheck';
-import TasksAndProducts from '@/components/oscrat/dashboard/TasksAndProducts';
+// import TasksAndProducts from '@/components/oscrat/dashboard/TasksAndProducts';
 import RecentActivities from '@/components/oscrat/dashboard/RecentActivities';
 import { ComplianceCharts, exportComplianceToPDF } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
@@ -203,7 +203,7 @@ const TeamDashboard = () => {
             />
           </div>
         )}
-        <TasksAndProducts />
+        {/* <TasksAndProducts /> */}
         <RecentActivities />
       </div>
     </>
