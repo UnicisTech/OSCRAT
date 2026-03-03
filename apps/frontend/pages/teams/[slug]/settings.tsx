@@ -6,7 +6,6 @@ import {
   RemoveTeam,
   TeamSettings,
   TeamTab,
-  CSCSettings,
   ComplianceTranslationSettings,
 } from '@/components/team';
 import { useTeamContext } from '@/context/TeamContext';
@@ -22,7 +21,6 @@ const Settings = ({ teamFeatures }) => {
       <TeamTab activeTab="settings" team={team} teamFeatures={teamFeatures} />
       <div className="space-y-6">
         <TeamSettings team={team} />
-        <CSCSettings team={team} />
         <ComplianceTranslationSettings team={team} />
         <AccessControl resource="team" actions={['delete']}>
           <RemoveTeam team={team} />

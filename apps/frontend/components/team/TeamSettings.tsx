@@ -21,16 +21,12 @@ const TeamSettings = ({ team }: { team: Team }) => {
     initialValues: {
       name: team.name,
       slug: team.slug,
-      domain: team.domain,
     },
     validationSchema: teamSettingsSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {
-        const response = await updateTeam({
-          ...values,
-          domain: values.domain || undefined,
-        });
+        const response = await updateTeam(values);
 
         toast.success(t('successfully-updated'));
         router.push(`/teams/${response.slug}/settings`);
@@ -63,13 +59,6 @@ const TeamSettings = ({ team }: { team: Team }) => {
                 value={formik.values.slug}
                 onChange={formik.handleChange}
                 error={formik.errors.slug ? t(formik.errors.slug) : undefined}
-              />
-              <InputWithLabel
-                name="domain"
-                label={t('team-domain')}
-                value={formik.values.domain ? formik.values.domain : ''}
-                onChange={formik.handleChange}
-                error={formik.errors.domain ? t(formik.errors.domain) : undefined}
               />
             </div>
           </Card.Body>

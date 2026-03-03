@@ -55,13 +55,6 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
             activePathname?.startsWith(`/teams/${slug}`) &&
             activePathname.includes('products'),
         },
-        {
-          name: t('reports'),
-          href: `/teams/${slug}/oscrat/reports`,
-          active:
-            activePathname?.startsWith(`/teams/${slug}`) &&
-            activePathname.includes('reports'),
-        },
       ],
     },
     {
@@ -98,9 +91,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
       className: 'stroke-blue-600',
       active:
         activePathname?.startsWith(`/teams/${slug}`) &&
-        /(settings|members|saml|directory-sync|audit-logs|webhooks|api-keys)/.test(
-          activePathname
-        ),
+        /(settings|members|audit-logs)/.test(activePathname),
     },
   ];
 

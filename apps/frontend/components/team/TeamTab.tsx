@@ -1,8 +1,5 @@
 import {
   Cog6ToothIcon,
-  KeyIcon,
-  PaperAirplaneIcon,
-  ShieldExclamationIcon,
   UserPlusIcon,
   ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
@@ -38,54 +35,6 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
       href: `/teams/${teamSlug}/members`,
       active: activeTab === 'members',
       icon: UserPlusIcon,
-    });
-  }
-
-  if (
-    teamFeatures.sso &&
-    canAccess('team_sso', ['create', 'update', 'read', 'delete'])
-  ) {
-    navigations.push({
-      name: 'Single Sign-On',
-      href: `/teams/${teamSlug}/saml`,
-      active: activeTab === 'saml',
-      icon: ShieldExclamationIcon,
-    });
-  }
-
-  if (
-    teamFeatures.dsync &&
-    canAccess('team_dsync', ['create', 'update', 'read', 'delete'])
-  ) {
-    navigations.push({
-      name: 'Directory Sync',
-      href: `/teams/${teamSlug}/directory-sync`,
-      active: activeTab === 'directory-sync',
-      icon: UserPlusIcon,
-    });
-  }
-
-  if (
-    teamFeatures.webhook &&
-    canAccess('team_webhook', ['create', 'update', 'read', 'delete'])
-  ) {
-    navigations.push({
-      name: 'Webhooks',
-      href: `/teams/${teamSlug}/webhooks`,
-      active: activeTab === 'webhooks',
-      icon: PaperAirplaneIcon,
-    });
-  }
-
-  if (
-    teamFeatures.apiKey &&
-    canAccess('team_api_key', ['create', 'update', 'read', 'delete'])
-  ) {
-    navigations.push({
-      name: 'API Keys',
-      href: `/teams/${teamSlug}/api-keys`,
-      active: activeTab === 'api-keys',
-      icon: KeyIcon,
     });
   }
 

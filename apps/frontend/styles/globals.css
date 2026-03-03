@@ -89,3 +89,16 @@ a {
 .mdxeditor [role="textbox"] {
   outline: none;
 }
+
+/* Fix MDXEditor link dialog positioning - always center */
+[data-radix-popper-content-wrapper]:has([class*="_linkDialogPopoverContent_"]) {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999 !important;
+}
+
+[class*="_linkDialogPopoverContent_"] {
+  max-width: 90vw;
+}
