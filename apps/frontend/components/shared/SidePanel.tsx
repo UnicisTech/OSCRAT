@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   RectangleStackIcon,
   Cog6ToothIcon,
-  ExclamationCircleIcon,
   UserCircleIcon,
   DocumentCheckIcon,
   ChartBarIcon,
@@ -78,11 +77,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
       href: `/teams/${slug}/settings`,
       icon: Cog6ToothIcon,
       active: activePathname?.includes(`/teams/${slug}/settings`),
-    },
-    {
-      name: t('reports'),
-      href: '#',
-      icon: ExclamationCircleIcon,
     },
     {
       name: t('compliance'),
