@@ -25,8 +25,13 @@ export default function SimpleDocTemplate({ data }: SimpleDocTemplateProps) {
 
         <p>
           {t('oscrat.ui.doc.simple-declaration-text-4')}{' '}
-          <a href="#" className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400">
-            [URL]
+          <a 
+            href="https://europa.eu/youreurope/business/product-requirements/compliance/signing-declaration-conformity/index_en.htm" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400"
+          >
+            https://europa.eu/youreurope/business/product-requirements/compliance/signing-declaration-conformity/index_en.htm
           </a>
         </p>
       </div>

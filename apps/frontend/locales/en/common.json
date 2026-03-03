@@ -1442,7 +1442,7 @@
           "signed-for-on-behalf": "Signed for and on behalf of",
           "place-and-date": "Place and date",
           "signature-line": "Signature",
-          "simple-declaration-text": "Hereby, {{manufacturer}} declares that the product with digital elements type {{product}} {{version}} is in compliance with Regulation (EU) 2024/2847.\n\nThe full text of the EU declaration of conformity is available at the following internet address: [URL]",
+          "simple-declaration-text": "Hereby, {{manufacturer}} declares that the product with digital elements type {{product}} {{version}} is in compliance with Regulation (EU) 2024/2847.\n\nThe full text of the EU declaration of conformity is available at the following internet address: https://europa.eu/youreurope/business/product-requirements/compliance/signing-declaration-conformity/index_en.htm",
           "not-provided": "[Not provided]"
         }
       },
