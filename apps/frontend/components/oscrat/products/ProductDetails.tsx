@@ -53,10 +53,6 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
     }
   };
 
-  const handleWithdraw = () => {
-    //TODO: Implement withdraw functionality
-  };
-
   const handleEdit = async (updatedData: OscratProductUpdate) => {
     try {
       await updateProject(updatedData);
@@ -76,7 +72,6 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
         key={project?.id}
         project={project as OscratProductDetail}
         onDelete={handleDelete}
-        onWithdraw={handleWithdraw}
         onEdit={handleEdit}
       />
       {project && (

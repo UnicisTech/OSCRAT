@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import type { Task } from '@oscrat/model';
+import type { Attachment } from 'types';
 import AttachmentsCard from './AttachmentCard';
 import { checkExtensionAndMIMEType } from '@/utils/fileValidation';
 import useCanAccess from '@/hooks/useCanAccess';
@@ -10,18 +11,25 @@ import { EmptyState } from '@/components/shared';
 import { useTaskAttachments } from '@/hooks/useTaskAttachments';
 import { extractErrorMessage } from '@/lib/utils';
 
+type TaskWithAttachments = Task & {
+  attachments?: Attachment[];
+};
+
 const Attachments = ({ task }: { task: Task }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { t } = useTranslation('common');
-  const { slug, taskNumber } = router.query;
+  const { slug, taskNumber, task: taskParam } = router.query;
+  const routeTaskNumber = Array.isArray(taskNumber)
+    ? taskNumber[0]
+    : taskNumber || (Array.isArray(taskParam) ? taskParam[0] : taskParam) || '';
   const { canAccess } = useCanAccess(slug as string);
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { uploadAttachment } = useTaskAttachments(
     slug as string,
-    taskNumber as string
+    routeTaskNumber
   );
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -76,7 +84,7 @@ const Attachments = ({ task }: { task: Task }) => {
 
   useEffect(() => {
     const uploadFile = async () => {
-      if (selectedFile && typeof slug === 'string') {
+      if (selectedFile && typeof slug === 'string' && routeTaskNumber) {
         try {
           await uploadAttachment({
             file: selectedFile,
@@ -92,11 +100,11 @@ const Attachments = ({ task }: { task: Task }) => {
     };
 
     uploadFile();
-  }, [selectedFile]);
+  }, [routeTaskNumber, selectedFile, slug, task.id, uploadAttachment]);
 
   // TODO: refactoring after attachments added in DB
-  const attachments = (task as any).attachments || [];
-  if(task) {
+  const attachments = (task as TaskWithAttachments).attachments || [];
+  if (!task) {
     return null;
   }
 
@@ -112,11 +120,11 @@ const Attachments = ({ task }: { task: Task }) => {
                 isDragOver ? 'border-blue-400' : 'border-gray-300'
               } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
             >
-              {attachments.map((attachment: any, index: number) => (
+              {attachments.map((attachment, index: number) => (
                 <AttachmentsCard
                   key={index}
                   attachment={attachment}
-                  taskNumber={taskNumber as string}
+                  taskNumber={routeTaskNumber}
                   teamSlug={slug as string}
                 />
               ))}
@@ -144,11 +152,11 @@ const Attachments = ({ task }: { task: Task }) => {
         onClick={handleClick}
       >
         {attachments.length ? (
-          attachments.map((attachment: any, index: number) => (
+          attachments.map((attachment, index: number) => (
             <AttachmentsCard
               key={index}
               attachment={attachment}
-              taskNumber={taskNumber as string}
+              taskNumber={routeTaskNumber}
               teamSlug={slug as string}
             />
           ))

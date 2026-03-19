@@ -2,6 +2,7 @@ import {
   PrismaClient,
   type Prisma,
   OscratProductVersionStatus,
+  TaskStatus,
 } from '@prisma/client';
 import type {
   OscratProductCreate,
@@ -81,6 +82,13 @@ const PRODUCT_DETAIL_INCLUDE = {
               },
             },
           },
+          tasks: {
+            where: {
+              status: {
+                in: [TaskStatus.TODO, TaskStatus.PLANNED, TaskStatus.IN_PROGRESS],
+              },
+            },
+          },
           sbomReports: true,
         },
       },
@@ -155,9 +163,12 @@ export const transformToProductDetail = (
       id: version.id,
       version: version.version,
       status: version.status,
+      releaseDate: version.releaseDate || undefined,
+      supportEndDate: version.supportEndDate || undefined,
       productId: version.productId,
       openIncidents: version._count?.incidents || 0,
       openVulnerabilities: version._count?.vulnerabilities || 0,
+      openTasks: version._count?.tasks || 0,
       hasRepository: !!version.repository,
       sbomReportsCount: version._count?.sbomReports || 0,
       hasConformityAssessmentReport: !!version.conformityAssessmentReport,

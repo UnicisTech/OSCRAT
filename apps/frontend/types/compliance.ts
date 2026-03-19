@@ -45,6 +45,7 @@ export interface ComplianceAnswer {
   answer: string | boolean;
   additionalInformation?: string;
   evidence?: File | null;
+  evidenceFileName?: string;
 }
 
 export interface RequirementAssessment {

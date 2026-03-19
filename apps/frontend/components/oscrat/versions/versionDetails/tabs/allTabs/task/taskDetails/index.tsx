@@ -5,7 +5,7 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useProductContext } from '@/context/ProductContext';
 import { useVersionContext } from '@/context/VersionContext';
 import { useTask } from '@/hooks/useTask';
-import { TaskDetailsForm } from '@/components/oscrat/tasks';
+import { TaskDetailsForm, TaskDetailsTabs } from '@/components/oscrat/tasks';
 import { Breadcrumb } from '@/components/shared';
 import { Team } from '@oscrat/model';
 // import TabsManager from '@/components/shared/TabsManager';
@@ -62,6 +62,7 @@ function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: strin
     <div className="flex flex-col space-y-6">
       <Breadcrumb items={breadcrumbItems} />
       <TaskDetailsForm task={task} team={team} />
+      <TaskDetailsTabs task={task} team={team} />
     </div>
   );
 }
@@ -101,6 +102,7 @@ function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team:
     <div className="flex flex-col space-y-6">
       <Breadcrumb items={breadcrumbItems} />
       <TaskDetailsForm task={task} team={team} />
+      <TaskDetailsTabs task={task} team={team} />
     </div>
   );
 }

@@ -172,10 +172,10 @@ const Index: React.FC<ProductProps> = ({
             <div
               className={`inline-flex font-semibold text-black dark:text-gray-100`}
             >
-              {project.versions?.reduce(
+              {(project.versions?.reduce(
                 (total, version) => total + version.openIncidents,
                 0
-              ) || 0 > 0 ? (
+              ) || 0) > 0 ? (
                 <div
                   className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
                     project.versions?.reduce(
@@ -210,10 +210,10 @@ const Index: React.FC<ProductProps> = ({
             <div
               className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}
             >
-              {project.versions?.reduce(
+              {(project.versions?.reduce(
                 (total, version) => total + version.openVulnerabilities,
                 0
-              ) || 0 > 0 ? (
+              ) || 0) > 0 ? (
                 <div
                   className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
                     project.versions?.reduce(

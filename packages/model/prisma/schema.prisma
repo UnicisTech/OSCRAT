@@ -463,6 +463,7 @@ model OscratProductVersion {
 
   version String
   status  OscratProductVersionStatus @default(DRAFT)
+  releaseDate    DateTime?
   supportEndDate DateTime?
 
   productId String
@@ -554,11 +555,13 @@ model OscratReportingOrganization {
 model OscratProductVulnerability {
   id String @id @default(uuid())
 
-  name        String
-  description String
-  severity    OscratProductVulnerabilitySeverity
-  status      OscratProductVulnerabilityStatus
-  cve         String?
+  name           String
+  description    String
+  severity       OscratProductVulnerabilitySeverity
+  status         OscratProductVulnerabilityStatus
+  cve            String?
+  affectedVendor String?
+  references     String[]
 
   advisoryId            String?
   dateOfDiscovery       DateTime

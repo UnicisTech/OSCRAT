@@ -1,17 +1,23 @@
 /**
  * Normalizes SCREAMING_SNAKE_CASE text to human-readable format.
+ * Preserves known uppercase tokens like Roman numerals.
  *
  * @example
+ * normalizeText('SUPPLY_CHAIN_INCIDENT')  // "Supply Chain Incident"
+ * normalizeText('IMPORTANT_CLASS_II')     // "Important Class II"
+ **/
 
- * normalizeText('SUPPLY_CHAIN_INCIDENT') // Returns: "Supply Chain Incident"
- * **/
+const PRESERVE_UPPERCASE = new Set(['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'ID', 'CVE', 'CRA', 'SBOM', 'EU']);
 
-// Normalize the status and type text for display
 const normalizeText = (text: string): string => {
   return text
     .split('_')
-    .filter((word) => word.length > 0) // Remove empty strings from consecutive underscores
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .filter((word) => word.length > 0)
+    .map((word) => {
+      const upper = word.toUpperCase();
+      if (PRESERVE_UPPERCASE.has(upper)) return upper;
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
     .join(' ');
 };
 

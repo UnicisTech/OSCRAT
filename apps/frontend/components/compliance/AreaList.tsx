@@ -82,30 +82,46 @@ const AreaList: React.FC<AreaListProps> = ({
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     {tr(area.areaOfRequirements)}
                   </h3>
-                  <p className="text-sm text-gray-600">
-                    {t('oscrat.ui.total-requirements', { count: area.content.length })}
-                  </p>
-                  
-                  {(isInProgress || isCompleted) && (
-                    <div className="mt-3">
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-gray-600">
-                          {t('oscrat.ui.progress')}
-                        </span>
-                        <span className="font-medium">
-                          {Math.floor(progress)}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            isCompleted ? 'bg-green-500' : 'bg-blue-500'
-                          }`}
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
+                  {(() => {
+                    const totalCount = area.content.length;
+                    const actualCompleted = Math.round((progress / 100) * totalCount);
+
+                    return (
+                      <>
+                        <p className="text-sm text-gray-600">
+                          {t('oscrat.ui.assessments-completed-of-total', {
+                            completed: actualCompleted,
+                            total: totalCount,
+                          })}
+                        </p>
+                        
+                        {(isInProgress || isCompleted) && (
+                          <div className="mt-3">
+                            <div className="flex items-center justify-between text-sm mb-1">
+                              <span className="text-gray-600">
+                                {isCompleted
+                                  ? t('oscrat.ui.area-complete')
+                                  : t('oscrat.ui.assessments-remaining', {
+                                      count: totalCount - actualCompleted,
+                                    })}
+                              </span>
+                              <span className="font-medium">
+                                {Math.floor(progress)}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all duration-300 ${
+                                  isCompleted ? 'bg-green-500' : 'bg-blue-500'
+                                }`}
+                                style={{ width: `${progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
                 
                 <div className="ml-4 flex-shrink-0">

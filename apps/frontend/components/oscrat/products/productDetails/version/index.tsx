@@ -76,18 +76,15 @@ const Version: React.FC<VersionProps> = ({
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-gray-400 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-      <div className="flex items-center">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
         <div className="flex flex-1 flex-col justify-center">
           <div className="font-bold text-black dark:text-gray-100">
             <div className="text-[16px]">{title}</div>
           </div>
         </div>
 
-        <div
-          className="flex justify-between text-sm text-gray-700 dark:text-gray-300"
-          style={{ width: '40%' }}
-        >
-          <div className="flex flex-col">
+        <div className="grid w-full grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300 md:w-[50%] md:grid-cols-4">
+          <div className="min-w-0 flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
               {t('status')}
             </span>
@@ -97,7 +94,7 @@ const Version: React.FC<VersionProps> = ({
               {t(getProductVersionStatusKey(status))}
             </span>
           </div>
-          <div className="flex flex-col">
+          <div className="min-w-0 flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
               {t('oscrat.ui.incidents')}
             </span>
@@ -126,7 +123,7 @@ const Version: React.FC<VersionProps> = ({
               )}
             </div>
           </div>
-          <div className="flex flex-col">
+          <div className="min-w-0 flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
               {t('oscrat.ui.vulnerabilities')}
             </span>
@@ -155,34 +152,35 @@ const Version: React.FC<VersionProps> = ({
               )}
             </div>
           </div>
-          {/*  TODO: Wait for task implementation in DB*/}
-          {/*  <div className="flex flex-col">*/}
-          {/*    <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">*/}
-          {/*      {t('oscrat.ui.tasks')}*/}
-          {/*    </span>*/}
-          {/*    <div*/}
-          {/*      className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}*/}
-          {/*    >*/}
-          {/*      {openTasks > 0 ? (*/}
-          {/*        <div*/}
-          {/*          className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(*/}
-          {/*            openTasks*/}
-          {/*          )}`}*/}
-          {/*        >*/}
-          {/*          <BsExclamationCircleFill className="text-blue-600" />*/}
-          {/*          <p>{displayTasks}</p>*/}
-          {/*        </div>*/}
-          {/*      ) : (*/}
-          {/*        <p*/}
-          {/*          className={`rounded-full border px-2 py-0.5 ${getBorderClass(*/}
-          {/*            openTasks*/}
-          {/*          )}`}*/}
-          {/*        >*/}
-          {/*          {displayTasks}*/}
-          {/*        </p>*/}
-          {/*      )}*/}
-          {/*    </div>*/}
-          {/*  </div>*/}
+          <div className="min-w-0 flex flex-col">
+            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
+              {t('oscrat.ui.tasks')}
+            </span>
+            <div
+              className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}
+            >
+              {data.openTasks > 0 ? (
+                <div
+                  className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
+                    data.openTasks
+                  )}`}
+                >
+                  <BsExclamationCircleFill className="text-blue-600" />
+                  <p>
+                    {data.openTasks} {t('oscrat.ui.open')}
+                  </p>
+                </div>
+              ) : (
+                <p
+                  className={`rounded-full border px-2 py-0.5 ${getBorderClass(
+                    data.openTasks
+                  )}`}
+                >
+                  {t('oscrat.ui.none')}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="ml-12 flex flex-1 justify-end font-medium text-gray-600">

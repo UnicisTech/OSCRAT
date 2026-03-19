@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { useVersionContext } from '@/context/VersionContext';
@@ -10,6 +10,8 @@ import Table from './table';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
 import FullScreenModal from '@/components/shared/FullScreenModal';
+import { IncidentStatus } from '@oscrat/model';
+import normalizeText from '@/utils/normalizeText';
 
 export default function Index() {
   const { t, ready } = useTranslation('common');
@@ -20,12 +22,18 @@ export default function Index() {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [incidentToDelete, setIncidentToDelete] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('All');
 
   const { incidents, isLoading, isListError, listError, deleteIncident } = useIncidents(
     teamId,
     productId,
     versionId
   );
+
+  const filteredIncidents = useMemo(() => {
+    if (!incidents || statusFilter === 'All') return incidents || [];
+    return incidents.filter((i) => i.status === statusFilter);
+  }, [incidents, statusFilter]);
 
   const handleDelete = (incidentId: string) => {
     setIncidentToDelete(incidentId);
@@ -76,12 +84,30 @@ export default function Index() {
     <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
       <div className="w-full">
         <TabHeader title={t('oscrat.ui.versions.incidents.title')}>
+          <div className="flex items-center space-x-2">
+            <label htmlFor="incident-status-filter" className="text-sm font-medium text-gray-900">
+              {t('status')}
+            </label>
+            <select
+              id="incident-status-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="rounded-md border border-gray-300 px-1 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+              <option value="All">{t('all')}</option>
+              {Object.values(IncidentStatus).map((status) => (
+                <option key={status} value={status}>
+                  {normalizeText(status)}
+                </option>
+              ))}
+            </select>
+          </div>
           <TabActionButton onClick={handleAddIncident}>
             {t('oscrat.ui.add-incident')}
           </TabActionButton>
         </TabHeader>
 
-        <Table incidents={incidents} onDelete={handleDelete} />
+        <Table incidents={filteredIncidents} onDelete={handleDelete} />
       </div>
 
       <FullScreenModal

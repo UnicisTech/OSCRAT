@@ -17,6 +17,42 @@ interface QuestionStepProps {
   customTranslations?: Record<string, string> | null;
 }
 
+const MAX_EVIDENCE_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const EVIDENCE_ALLOWED_EXTENSIONS = new Set([
+  'pdf',
+  'doc',
+  'docx',
+  'txt',
+  'csv',
+  'json',
+  'xml',
+  'yml',
+  'yaml',
+  'zip',
+  'tar',
+  'gz',
+  'tgz',
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+]);
+const BLOCKED_EXTENSIONS = new Set([
+  'exe', 'bat', 'cmd', 'com', 'msi', 'scr', 'pif', 'vbs', 'vbe',
+  'js', 'jse', 'ws', 'wsf', 'wsc', 'wsh', 'ps1', 'ps2', 'psc1',
+  'psc2', 'reg', 'inf', 'lnk', 'dll', 'sys', 'sh', 'cpl', 'hta',
+]);
+const EVIDENCE_FILE_ACCEPT =
+  '.pdf,.doc,.docx,.txt,.csv,.json,.xml,.yml,.yaml,.zip,.tar,.gz,.tgz,.png,.jpg,.jpeg,.gif';
+
+const getFileExtension = (fileName: string): string | null => {
+  const lastDotIndex = fileName.lastIndexOf('.');
+  if (lastDotIndex !== -1 && lastDotIndex < fileName.length - 1) {
+    return fileName.substring(lastDotIndex + 1).toLowerCase();
+  }
+  return null;
+};
+
 const QuestionStep: React.FC<QuestionStepProps> = ({
   question,
   questionNumber,
@@ -44,6 +80,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
     existingAnswer?.additionalInformation || ''
   );
   const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [hasExistingEvidence, setHasExistingEvidence] = useState(
     !!existingAnswer?.evidence
   );
@@ -58,6 +95,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
       setAnswer(question.answerType === 'boolean' ? null : '');
       setAdditionalInformation('');
       setEvidenceFile(null);
+      setFileError(null);
       setHasExistingEvidence(false);
     }
   }, [existingAnswer, question.questionId, question.answerType]);
@@ -70,6 +108,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
       answer,
       additionalInformation: additionalInformation || undefined,
       evidence: evidenceFile || (hasExistingEvidence ? existingAnswer?.evidence : null),
+      evidenceFileName: evidenceFile?.name || existingAnswer?.evidenceFileName,
     };
 
     onSubmit(complianceAnswer);
@@ -77,15 +116,44 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setEvidenceFile(file);
-      setHasExistingEvidence(false);
+    if (!file) {
+      return;
     }
+
+    const extension = getFileExtension(file.name);
+    if (!extension || BLOCKED_EXTENSIONS.has(extension) || !EVIDENCE_ALLOWED_EXTENSIONS.has(extension)) {
+      setFileError(t('oscrat.ui.file-upload-allowed-types'));
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_EVIDENCE_FILE_SIZE_BYTES) {
+      setFileError(t('oscrat.ui.file-upload-max-size'));
+      e.target.value = '';
+      return;
+    }
+
+    setFileError(null);
+    setEvidenceFile(file);
+    setHasExistingEvidence(false);
   };
 
   const removeFile = () => {
     setEvidenceFile(null);
+    setFileError(null);
     setHasExistingEvidence(false);
+  };
+
+  const isEvidenceRequiredForCurrentAnswer = (): boolean => {
+    if (!question.evidence?.required) {
+      return false;
+    }
+
+    if (question.answerType === 'boolean') {
+      return answer === true;
+    }
+
+    return true;
   };
 
   if (!ready) return null;
@@ -118,13 +186,14 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
     }
 
     if (question.answerType === 'text') {
-      const charCount = (answer as string).length;
+      const textValue = typeof answer === 'string' ? answer : '';
+      const charCount = textValue.length;
       const MAX_CHARS = 1000;
       
       return (
         <div>
           <textarea
-            value={answer as string}
+            value={textValue}
             onChange={(e) => setAnswer(e.target.value)}
             placeholder={t('oscrat.ui.enter-your-answer')}
             className="w-full p-3 border border-gray-300 rounded-lg min-h-[120px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -160,7 +229,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
     }
     
     // Check evidence upload if required
-    if (question.evidence?.required && !evidenceFile && !hasExistingEvidence) {
+    if (isEvidenceRequiredForCurrentAnswer() && !evidenceFile && !hasExistingEvidence) {
       return false;
     }
     
@@ -218,7 +287,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
           <div className="flex items-center gap-2 mb-2">
             <label className="block text-sm font-medium text-gray-700">
               {t('oscrat.ui.evidence-upload')}
-              {question.evidence.required && <span className="text-red-600 ml-1">*</span>}
+              {isEvidenceRequiredForCurrentAnswer() && <span className="text-red-600 ml-1">*</span>}
               {question.evidence.hint && (
                 <span className="ml-2 text-xs text-gray-500 font-normal">
                   ({question.evidence.hint})
@@ -242,16 +311,19 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
                   type="file"
                   onChange={handleFileChange}
                   className="sr-only"
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                  accept={EVIDENCE_FILE_ACCEPT}
                 />
               </label>
+              {fileError && (
+                <p className="mt-2 text-xs text-red-500">{fileError}</p>
+              )}
             </div>
           ) : (
             <div className="mt-2 flex items-center justify-between p-3 bg-white rounded-md border border-gray-200">
               <div className="flex items-center">
                 <FaFile className="text-gray-400 mr-2" />
                 <span className="text-sm text-gray-700">
-                  {evidenceFile?.name || t('oscrat.ui.existing-evidence')}
+                  {evidenceFile?.name || existingAnswer?.evidenceFileName || t('oscrat.ui.existing-evidence')}
                 </span>
               </div>
               <button

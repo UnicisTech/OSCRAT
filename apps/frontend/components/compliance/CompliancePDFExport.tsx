@@ -4,6 +4,7 @@ import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { saveAs } from 'file-saver';
 import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 import type { PDFTranslations } from '@/lib/compliance/pdfTranslations';
+import type { Task } from '@oscrat/model';
 
 const styles = StyleSheet.create({
   page: {
@@ -151,7 +152,84 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1f2937',
   },
+  chartBarRow: {
+    flexDirection: 'row',
+    height: 24,
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  chartLegendRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 4,
+  },
+  chartLegendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
+    marginBottom: 4,
+  },
+  chartLegendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 2,
+    marginRight: 4,
+  },
+  chartLegendText: {
+    fontSize: 8,
+    color: '#374151',
+  },
 });
+
+interface TaskCounts {
+  autoTodo: number;
+  autoInProgress: number;
+  autoDone: number;
+  manualTodo: number;
+  manualInProgress: number;
+  manualDone: number;
+  total: number;
+}
+
+interface ChartBarSegment {
+  label: string;
+  value: number;
+  color: string;
+}
+
+const BarChart = ({ segments, total }: { segments: ChartBarSegment[]; total: number }) => {
+  if (total === 0) return null;
+
+  return (
+    <View>
+      <View style={styles.chartBarRow}>
+        {segments.map((seg, i) =>
+          seg.value > 0 ? (
+            <View
+              key={i}
+              style={{
+                width: `${(seg.value / total) * 100}%`,
+                backgroundColor: seg.color,
+                height: '100%',
+              }}
+            />
+          ) : null
+        )}
+      </View>
+      <View style={styles.chartLegendRow}>
+        {segments.map((seg, i) => (
+          <View key={i} style={styles.chartLegendItem}>
+            <View style={[styles.chartLegendDot, { backgroundColor: seg.color }]} />
+            <Text style={styles.chartLegendText}>
+              {seg.label}: {seg.value}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
 
 interface CompliancePDFDocumentProps {
   complianceData: ComplianceArea[];
@@ -161,6 +239,7 @@ interface CompliancePDFDocumentProps {
   productName?: string;
   translations: PDFTranslations;
   translateComplianceFn: (key: string) => string;
+  taskCounts?: TaskCounts;
 }
 
 const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
@@ -170,6 +249,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
   productName,
   translations: t,
   translateComplianceFn: tc,
+  taskCounts,
 }) => {
   const allRequirements = complianceData.flatMap(area =>
     area.content.map(req => {
@@ -202,15 +282,20 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
   );
 
   const evaluatedCount = allRequirements.filter(r => r.isEvaluated).length;
+  const notEvaluatedCount = allRequirements.length - evaluatedCount;
   const totalProgress = allRequirements.reduce((sum, req) => {
     return sum + (req.isEvaluated ? 100 : req.completionPercentage);
   }, 0);
-  const overallProgress = Math.round(totalProgress / allRequirements.length);
+  const overallProgress = allRequirements.length > 0 ? Math.round(totalProgress / allRequirements.length) : 0;
 
   const compliantCount = allRequirements.filter(r => r.conformityStatus === CONFORMITY_STATUS.FULLY_COMPLIANT).length;
   const partiallyCompliantCount = allRequirements.filter(r => r.conformityStatus === CONFORMITY_STATUS.PARTIALLY_COMPLIANT).length;
   const notCompliantCount = allRequirements.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_COMPLIANT).length;
   const notApplicableCount = allRequirements.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_APPLICABLE).length;
+  const inEvaluationCount = allRequirements.filter(r => r.conformityStatus.startsWith(CONFORMITY_STATUS.IN_EVALUATION)).length;
+  const notEvaluatedConformityCount = allRequirements.filter(r =>
+    !r.isEvaluated && !r.conformityStatus.startsWith(CONFORMITY_STATUS.IN_EVALUATION) && r.completionPercentage === 0
+  ).length;
 
   const exportDate = new Date().toLocaleString('en-GB', {
     dateStyle: 'full',
@@ -225,6 +310,31 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
     if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) return styles.badgeBlue;
     return styles.badgeGray;
   };
+
+  const evaluationSegments: ChartBarSegment[] = [
+    { label: t.evaluated, value: evaluatedCount, color: '#10b981' },
+    { label: t.notEvaluated, value: notEvaluatedCount, color: '#ef4444' },
+  ];
+
+  const conformitySegments: ChartBarSegment[] = [
+    { label: t.compliant, value: compliantCount, color: '#10b981' },
+    { label: t.partiallyCompliant, value: partiallyCompliantCount, color: '#f59e0b' },
+    { label: t.notCompliant, value: notCompliantCount, color: '#ef4444' },
+    { label: t.notApplicable, value: notApplicableCount, color: '#9ca3af' },
+    { label: t.inEvaluation, value: inEvaluationCount, color: '#3b82f6' },
+    { label: t.notEvaluated, value: notEvaluatedConformityCount, color: '#d1d5db' },
+  ];
+
+  const taskSegments: ChartBarSegment[] | null = taskCounts && taskCounts.total > 0
+    ? [
+        { label: `${t.autoGenerated} - ${t.todo}`, value: taskCounts.autoTodo, color: '#93c5fd' },
+        { label: `${t.autoGenerated} - ${t.inProgress}`, value: taskCounts.autoInProgress, color: '#3b82f6' },
+        { label: `${t.autoGenerated} - ${t.done}`, value: taskCounts.autoDone, color: '#1d4ed8' },
+        { label: `${t.manual} - ${t.todo}`, value: taskCounts.manualTodo, color: '#fde68a' },
+        { label: `${t.manual} - ${t.inProgress}`, value: taskCounts.manualInProgress, color: '#f59e0b' },
+        { label: `${t.manual} - ${t.done}`, value: taskCounts.manualDone, color: '#b45309' },
+      ]
+    : null;
 
   return (
     <Document>
@@ -247,6 +357,24 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
             {evaluatedCount} {t.of} {allRequirements.length} {t.requirementsEvaluated}
           </Text>
         </View>
+
+        {/* Visual Charts */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.evaluationStatusChart}</Text>
+          <BarChart segments={evaluationSegments} total={allRequirements.length} />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.conformityBreakdownChart}</Text>
+          <BarChart segments={conformitySegments} total={allRequirements.length} />
+        </View>
+
+        {taskSegments && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t.taskDistribution}</Text>
+            <BarChart segments={taskSegments} total={taskCounts!.total} />
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.summaryStatistics}</Text>
@@ -282,19 +410,26 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
           </View>
         </View>
 
+        <Text style={styles.footer}>{t.page} 1 - {t.reportTitle}</Text>
+      </Page>
+
+      {/* Status Table Page */}
+      <Page size="A4" style={styles.page}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.requirementsStatusSummary}</Text>
           <View style={styles.table}>
             <View style={styles.tableHeader}>
               <Text style={styles.tableColSmall}>{t.id}</Text>
               <Text style={styles.tableCol}>{t.requirement}</Text>
+              <Text style={{ width: '20%', fontSize: 9 }}>{t.area}</Text>
               <Text style={styles.tableColSmall}>{t.status}</Text>
               <Text style={styles.tableColSmall}>{t.conformity}</Text>
             </View>
             {allRequirements.map((req, index) => (
-              <View key={index} style={styles.tableRow}>
+              <View key={index} style={styles.tableRow} wrap={false}>
                 <Text style={styles.tableColSmall}>{req.id}</Text>
                 <Text style={styles.tableCol}>{req.name}</Text>
+                <Text style={{ width: '20%', fontSize: 9 }}>{req.areaName}</Text>
                 <Text style={styles.tableColSmall}>
                   {req.isEvaluated ? t.evaluated : t.notEvaluated}
                 </Text>
@@ -306,7 +441,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
           </View>
         </View>
 
-        <Text style={styles.footer}>{t.page} 1 - {t.reportTitle}</Text>
+        <Text style={styles.footer}>{t.page} 2 - {t.reportTitle}</Text>
       </Page>
 
       {/* Detailed Assessment Pages */}
@@ -346,7 +481,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
                     {answer && (
                       <>
                         <Text style={styles.answer}>
-                          {t.answer}: {typeof answer.answer === 'boolean' 
+                          {t.answer}: {typeof answer.answer === 'boolean'
                             ? (answer.answer ? t.yes : t.no)
                             : answer.answer}
                         </Text>
@@ -371,13 +506,30 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
             </View>
 
             <Text style={styles.footer}>
-              {t.page} {reqIndex + 2} - {req.id} {t.detailedAssessment}
+              {t.page} {reqIndex + 3} - {req.id} {t.detailedAssessment}
             </Text>
           </Page>
         ))}
     </Document>
   );
 };
+
+function computeTaskCounts(tasks?: Task[]): TaskCounts | undefined {
+  if (!tasks || tasks.length === 0) return undefined;
+
+  const autoTasks = tasks.filter(t => t.originType === 'AUTOMATIC');
+  const manualTasks = tasks.filter(t => t.originType !== 'AUTOMATIC');
+
+  return {
+    autoTodo: autoTasks.filter(t => t.status === 'TODO' || t.status === 'PLANNED').length,
+    autoInProgress: autoTasks.filter(t => t.status === 'IN_PROGRESS').length,
+    autoDone: autoTasks.filter(t => t.status === 'DONE').length,
+    manualTodo: manualTasks.filter(t => t.status === 'TODO' || t.status === 'PLANNED').length,
+    manualInProgress: manualTasks.filter(t => t.status === 'IN_PROGRESS').length,
+    manualDone: manualTasks.filter(t => t.status === 'DONE').length,
+    total: tasks.length,
+  };
+}
 
 export const exportComplianceToPDF = async (
   complianceData: ComplianceArea[],
@@ -387,8 +539,11 @@ export const exportComplianceToPDF = async (
   productName: string | undefined,
   translations: PDFTranslations,
   translateComplianceFn: (key: string) => string,
-  returnBlob: boolean = false
+  returnBlob: boolean = false,
+  tasks?: Task[]
 ): Promise<Blob | void> => {
+  const taskCounts = computeTaskCounts(tasks);
+
   const blob = await pdf(
     <CompliancePDFDocument
       complianceData={complianceData}
@@ -398,6 +553,7 @@ export const exportComplianceToPDF = async (
       productName={productName}
       translations={translations}
       translateComplianceFn={translateComplianceFn}
+      taskCounts={taskCounts}
     />
   ).toBlob();
 
@@ -406,12 +562,11 @@ export const exportComplianceToPDF = async (
   }
 
   const timestamp = new Date().toISOString().split('T')[0];
-  const namePart = productName 
+  const namePart = productName
     ? productName.replace(/[^a-z0-9]/gi, '-')
     : organizationName.replace(/[^a-z0-9]/gi, '-');
-  const filename = `compliance-assessment-${namePart}-${timestamp}.pdf`
+  const filename = `compliance-assessment-${namePart}-${timestamp}.pdf`;
   saveAs(blob, filename);
 };
 
 export default CompliancePDFDocument;
-

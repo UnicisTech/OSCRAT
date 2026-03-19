@@ -12,6 +12,8 @@ import { TASK_STATUS_TRANSLATION_MAP } from '@/constants/taskStatuses';
 import { CreateTask } from '@/components/interfaces/Task';
 import TaskStatusDropdown from '@/components/oscrat/tasks/TaskStatusDropdown';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
+import usePagination from '@/hooks/usePagination';
+import PaginationControls from '@/components/shared/PaginationControls';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -156,6 +158,17 @@ export default function Index() {
 
   const allStatusOptions = Object.values(TaskStatus);
 
+  const ITEMS_PER_PAGE = 10;
+  const {
+    currentPage,
+    totalPages,
+    pageData: paginatedTasks,
+    goToPreviousPage,
+    goToNextPage,
+    prevButtonDisabled,
+    nextButtonDisabled,
+  } = usePagination(filteredTasks, ITEMS_PER_PAGE);
+
   // --- HANDLERS ---
   const handleAddTask = () => {
     setCreateTaskVisible(true);
@@ -180,7 +193,7 @@ export default function Index() {
     <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
       <div className="w-full">
         <TaskTable
-          tasks={filteredTasks}
+          tasks={paginatedTasks}
           team={team}
           onAddTask={handleAddTask}
           onViewTask={handleViewTask}
@@ -188,6 +201,19 @@ export default function Index() {
           onStatusFilterChange={setStatusFilter}
           statusOptions={allStatusOptions}
         />
+        {totalPages > 1 && (
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            prevButtonDisabled={prevButtonDisabled}
+            nextButtonDisabled={nextButtonDisabled}
+            goToPreviousPage={goToPreviousPage}
+            goToNextPage={goToNextPage}
+            showItemCount
+            totalItems={filteredTasks.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+          />
+        )}
       </div>
 
       <CreateTask

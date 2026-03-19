@@ -21,6 +21,7 @@ interface Props {
   teamSlug: string;
   teamRole: OscratOrganizationRole;
   complianceType: ComplianceType;
+  isAssessmentStarted?: boolean;
   onLanguageSelect: (languageCode: string, translations: Record<string, string> | null) => void;
 }
 
@@ -69,6 +70,7 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
   teamSlug,
   teamRole,
   complianceType,
+  isAssessmentStarted = false,
   onLanguageSelect,
 }) => {
   const { t } = useTranslation('common');
@@ -152,7 +154,11 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
           disabled={isStarting || isListLoading}
         >
           <FaPlay />
-          {t('oscrat.ui.dashboard.start-assessment')}
+          {t(
+            isAssessmentStarted
+              ? 'oscrat.ui.dashboard.continue-assessment'
+              : 'oscrat.ui.dashboard.start-assessment'
+          )}
         </button>
       </div>
     </div>

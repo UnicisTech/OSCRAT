@@ -15,8 +15,17 @@ interface VersionEditModalProps {
   initialData: {
     version: string;
     status: OscratProductVersionStatus;
+    releaseDate?: string;
+    supportEndDate?: string;
   };
 }
+
+const formatDateForInput = (date?: string | Date | null): string => {
+  if (!date) return '';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+  return d.toISOString().split('T')[0];
+};
 
 const VersionEditModal: React.FC<VersionEditModalProps> = ({
   isOpen,
@@ -30,6 +39,8 @@ const VersionEditModal: React.FC<VersionEditModalProps> = ({
     initialValues: {
       version: initialData.version,
       status: initialData.status,
+      releaseDate: formatDateForInput(initialData.releaseDate),
+      supportEndDate: formatDateForInput(initialData.supportEndDate),
     },
     enableReinitialize: true,
     validationSchema: versionUpdateSchema,
@@ -39,6 +50,8 @@ const VersionEditModal: React.FC<VersionEditModalProps> = ({
       onSave({
         version: values.version.trim(),
         status: values.status as OscratProductVersionStatus,
+        releaseDate: values.releaseDate ? new Date(values.releaseDate) : undefined,
+        supportEndDate: values.supportEndDate ? new Date(values.supportEndDate) : undefined,
       });
     },
   });
@@ -100,6 +113,34 @@ const VersionEditModal: React.FC<VersionEditModalProps> = ({
               {t(formik.errors.status)}
             </p>
           )}
+        </div>
+
+        <div>
+          <label className={formStyles.label.default}>
+            {t('oscrat.ui.release-date')}
+          </label>
+          <input
+            type="date"
+            name="releaseDate"
+            value={formik.values.releaseDate}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={getInputClassName(false)}
+          />
+        </div>
+
+        <div>
+          <label className={formStyles.label.default}>
+            {t('oscrat.ui.support-period')}
+          </label>
+          <input
+            type="date"
+            name="supportEndDate"
+            value={formik.values.supportEndDate}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={getInputClassName(false)}
+          />
         </div>
       </div>
     </FullScreenModal>

@@ -1,4 +1,4 @@
-const tokenEncryptionKey = process.env.TOKEN_ENCRYPTION_KEY;
+const tokenEncryptionKey = 'testingonly';
 if (!tokenEncryptionKey) {
   throw new Error('TOKEN_ENCRYPTION_KEY is required');
 }

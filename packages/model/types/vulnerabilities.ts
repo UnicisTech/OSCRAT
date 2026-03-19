@@ -11,6 +11,8 @@ export interface OscratVulnerabilitySummary {
   severity: OscratProductVulnerabilitySeverity;
   status: OscratProductVulnerabilityStatus;
   cve?: string;
+  affectedVendor?: string;
+  references: string[];
   advisoryId?: string;
   dateOfDiscovery: Date;
   affectedMemberStates: string[];
@@ -41,6 +43,8 @@ export interface OscratVulnerabilityCreate {
   severity: OscratProductVulnerabilitySeverity;
   status: OscratProductVulnerabilityStatus;
   cve?: string;
+  affectedVendor?: string;
+  references?: string[];
   advisoryId?: string;
   dateOfDiscovery: Date;
   affectedMemberStates: string[];
@@ -54,6 +58,8 @@ export interface OscratVulnerabilityUpdate {
   severity?: OscratProductVulnerabilitySeverity;
   status?: OscratProductVulnerabilityStatus;
   cve?: string;
+  affectedVendor?: string;
+  references?: string[];
   advisoryId?: string;
   dateOfDiscovery?: Date;
   affectedMemberStates?: string[];

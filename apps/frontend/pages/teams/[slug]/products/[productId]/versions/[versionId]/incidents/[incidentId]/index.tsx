@@ -52,18 +52,18 @@ function IncidentDetailsPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleClose = async () => {
+  const handleComplete = async () => {
     if (!incident) return;
 
     try {
       await updateIncident({
         status: IncidentStatus.COMPLETED,
-        updatedBy: '', // Will be set by API
+        updatedBy: '',
       });
-      toast.success(t('oscrat.ui.versions.incidents.closed-successfully'));
+      toast.success(t('oscrat.ui.versions.incidents.completed-successfully'));
     } catch (error: unknown) {
       toast.error(
-        extractErrorMessage(error, t('oscrat.ui.versions.incidents.failed-to-close'))
+        extractErrorMessage(error, t('oscrat.ui.versions.incidents.failed-to-complete'))
       );
     }
   };
@@ -161,21 +161,22 @@ function IncidentDetailsPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleEdit}
-                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                disabled={incident.status === IncidentStatus.COMPLETED}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
                 {t('oscrat.ui.edit')}
               </button>
               <button
-                onClick={handleClose}
+                onClick={handleComplete}
                 disabled={incident.status === IncidentStatus.COMPLETED}
                 className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
-                {t('oscrat.ui.close')}
+                {t('oscrat.ui.complete-incident')}
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
             <div>
               <label className="block text-sm font-medium text-gray-500">
                 {t('oscrat.ui.versions.incidents.classification')}
@@ -209,7 +210,7 @@ function IncidentDetailsPage() {
             {t('oscrat.ui.versions.incidents.extended-data')}
           </h2>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-500">
                 {t('oscrat.ui.versions.incidents.reporter')}

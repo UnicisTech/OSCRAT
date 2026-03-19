@@ -16,6 +16,7 @@ export const versionUpdateSchema = Yup.object({
   status: Yup.string()
     .oneOf(Object.values(OscratProductVersionStatus), 'oscrat.ui.validation.status-invalid')
     .required('oscrat.ui.validation.status-required'),
+  releaseDate: Yup.date().nullable().optional(),
   supportEndDate: Yup.date().nullable().optional(),
 });
 

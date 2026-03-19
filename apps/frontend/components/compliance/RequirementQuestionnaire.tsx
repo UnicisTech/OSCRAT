@@ -147,7 +147,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
+      {/* Header: area + requirement info */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-xl font-semibold text-gray-800">
@@ -159,14 +159,6 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
               total: totalRequirements 
             })}
           </span>
-        </div>
-        
-        {/* Progress bar for questions */}
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-          <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
         </div>
       </div>
 
@@ -211,6 +203,26 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
             )}
           </div>
         )}
+      </div>
+
+      {/* Question progress bar */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between text-sm mb-1">
+          <span className="text-gray-600">
+            {t('oscrat.ui.questions-progress', {
+              answered: currentQuestionIndex,
+              total: requirement.questions.length,
+              remaining: requirement.questions.length - currentQuestionIndex,
+            })}
+          </span>
+          <span className="font-medium text-gray-700">{Math.round(progress)}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
 
       {/* Current question */}

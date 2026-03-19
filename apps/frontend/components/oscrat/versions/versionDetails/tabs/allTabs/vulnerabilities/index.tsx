@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { useVersionContext } from '@/context/VersionContext';
@@ -10,6 +10,8 @@ import Table from './table';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
 import FullScreenModal from '@/components/shared/FullScreenModal';
+import { OscratProductVulnerabilityStatus } from '@oscrat/model';
+import normalizeText from '@/utils/normalizeText';
 
 export default function Index() {
   const { t, ready } = useTranslation('common');
@@ -20,12 +22,18 @@ export default function Index() {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [vulnerabilityToDelete, setVulnerabilityToDelete] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('All');
 
   const { vulnerabilities, isLoading, isError, error, deleteVulnerability } = useVulnerabilities(
     teamId,
     productId,
     versionId
   );
+
+  const filteredVulnerabilities = useMemo(() => {
+    if (!vulnerabilities || statusFilter === 'All') return vulnerabilities || [];
+    return vulnerabilities.filter((v) => v.status === statusFilter);
+  }, [vulnerabilities, statusFilter]);
 
   const handleDelete = (vulnerabilityId: string) => {
     setVulnerabilityToDelete(vulnerabilityId);
@@ -76,12 +84,30 @@ export default function Index() {
     <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
       <div className="w-full">
         <TabHeader title={t('oscrat.ui.versions.vulnerabilities.title')}>
+          <div className="flex items-center space-x-2">
+            <label htmlFor="vuln-status-filter" className="text-sm font-medium text-gray-900">
+              {t('status')}
+            </label>
+            <select
+              id="vuln-status-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="rounded-md border border-gray-300 px-1 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+              <option value="All">{t('all')}</option>
+              {Object.values(OscratProductVulnerabilityStatus).map((status) => (
+                <option key={status} value={status}>
+                  {normalizeText(status)}
+                </option>
+              ))}
+            </select>
+          </div>
           <TabActionButton onClick={handleAddVulnerability}>
             {t('oscrat.ui.add-vulnerability')}
           </TabActionButton>
         </TabHeader>
 
-        <Table vulnerabilities={vulnerabilities} onDelete={handleDelete} />
+        <Table vulnerabilities={filteredVulnerabilities} onDelete={handleDelete} />
       </div>
 
       <FullScreenModal

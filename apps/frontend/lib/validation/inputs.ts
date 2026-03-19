@@ -71,15 +71,17 @@ export const emailSchema = Yup.string()
 
 export const phoneSchema = Yup.string()
   .test('phone-validation', 'oscrat.ui.validation.phone-invalid', function(value) {
-    if (!value) return true;
+    const normalizedValue = value?.trim();
+    if (!normalizedValue) return true;
     
     const { parent } = this;
     const countryCode = parent.countryCode;
     
-    if (!countryCode) return false;
+    // Prefix requiredness is handled by parent schema (e.g. teamCreationSchema).
+    if (!countryCode) return true;
     
     try {
-      const phoneNumber = parsePhoneNumberFromString(value, countryCode);
+      const phoneNumber = parsePhoneNumberFromString(normalizedValue, countryCode);
       return phoneNumber ? isValidPhoneNumber(phoneNumber.number, countryCode) : false;
     } catch {
       return false;
@@ -90,10 +92,9 @@ export const passwordSchema = Yup.string()
   .required('oscrat.ui.validation.password-required')
   .min(passwordPolicies.minLength, 'oscrat.ui.validation.password-too-short')
   .max(128, 'oscrat.ui.validation.password-too-long')
-  .test('password-policy', 'oscrat.ui.validation.password-too-short', function(value) {
-    if (!value) return false; 
-    return value.length >= passwordPolicies.minLength;
-  });
+  .matches(/[A-Z]/, 'oscrat.ui.validation.password-uppercase-required')
+  .matches(/[0-9]/, 'oscrat.ui.validation.password-number-required')
+  .matches(/[^a-zA-Z0-9]/, 'oscrat.ui.validation.password-symbol-required');
 
 export const postalAddressSchema = Yup.string()
   .trim()

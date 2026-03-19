@@ -2,6 +2,8 @@ import type { NextPageWithLayout } from 'types';
 import type { GetServerSidePropsContext } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { useTranslation } from 'next-i18next';
 
 import { getSession } from '@/lib/session';
 import { inferSSRProps } from '@/lib/inferSSRProps';
@@ -14,6 +16,7 @@ const Account: NextPageWithLayout<AccountProps> = ({
   allowEmailChange,
 }) => {
   const { data: session } = useSession();
+  const { t } = useTranslation('common');
 
   const user = {
     id: session?.user?.id,
@@ -24,7 +27,17 @@ const Account: NextPageWithLayout<AccountProps> = ({
     image: session?.user?.image || null,
   };
 
-  return <UpdateAccount user={user} allowEmailChange={allowEmailChange} />;
+  return (
+    <div className="space-y-4">
+      <Link
+        href="/teams"
+        className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
+      >
+        {t('oscrat.ui.go-home')}
+      </Link>
+      <UpdateAccount user={user} allowEmailChange={allowEmailChange} />
+    </div>
+  );
 };
 
 export const getServerSideProps = async (

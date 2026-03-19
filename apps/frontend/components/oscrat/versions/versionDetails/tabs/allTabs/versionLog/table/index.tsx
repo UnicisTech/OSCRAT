@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { TabHeader, TableWrapper, TableHeader, TableRow } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { tableStyles } from '@/components/oscrat/tableStyles';
-import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { formatTimestamp } from '@/lib/auditUtils';
 import { formatNameWithUuidFallback } from '@/lib/utils';
@@ -11,10 +10,12 @@ import AuditLogsFilters from '@/components/team/AuditLogsFilters';
 import AuditDetailsModal from '@/components/team/AuditDetailsModal';
 import type { OscratAuditLog, OscratAuditLogQueryParams, AuditLogFilterOptions } from '@oscrat/model';
 
-const ITEMS_PER_PAGE = 15;
-
 interface VersionLogTableProps {
   logs: OscratAuditLog[];
+  totalLogs: number;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
   filters: Partial<OscratAuditLogQueryParams>;
   onFilterChange: (filters: Partial<OscratAuditLogQueryParams>) => void;
   filterOptions?: AuditLogFilterOptions;
@@ -23,6 +24,10 @@ interface VersionLogTableProps {
 
 const Table: React.FC<VersionLogTableProps> = ({
   logs,
+  totalLogs,
+  currentPage,
+  totalPages,
+  onPageChange,
   filters,
   onFilterChange,
   filterOptions,
@@ -31,15 +36,6 @@ const Table: React.FC<VersionLogTableProps> = ({
   const { t, ready } = useTranslation('common');
   const [selectedLog, setSelectedLog] = useState<OscratAuditLog | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const {
-    currentPage,
-    totalPages,
-    pageData,
-    goToPreviousPage,
-    goToNextPage,
-    prevButtonDisabled,
-    nextButtonDisabled,
-  } = usePagination<OscratAuditLog>(logs || [], ITEMS_PER_PAGE);
 
   const handleViewDetails = (log: OscratAuditLog) => {
     setSelectedLog(log);
@@ -85,7 +81,7 @@ const Table: React.FC<VersionLogTableProps> = ({
                 </td>
               </tr>
             )}
-            {pageData.map((log) => (
+            {logs.map((log) => (
                 <TableRow key={log.id}>
                   <td className={tableStyles.td}>
                     <span className="text-sm text-gray-600">
@@ -133,17 +129,17 @@ const Table: React.FC<VersionLogTableProps> = ({
         </table>
       </TableWrapper>
 
-      {logs && logs.length > ITEMS_PER_PAGE && (
+      {totalLogs > 0 && totalPages > 1 && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
-          prevButtonDisabled={prevButtonDisabled}
-          nextButtonDisabled={nextButtonDisabled}
-          goToPreviousPage={goToPreviousPage}
-          goToNextPage={goToNextPage}
+          prevButtonDisabled={currentPage <= 1}
+          nextButtonDisabled={currentPage >= totalPages}
+          goToPreviousPage={() => onPageChange(currentPage - 1)}
+          goToNextPage={() => onPageChange(currentPage + 1)}
           showItemCount
-          totalItems={logs.length}
-          itemsPerPage={ITEMS_PER_PAGE}
+          totalItems={totalLogs}
+          itemsPerPage={15}
         />
       )}
 

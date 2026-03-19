@@ -21,6 +21,12 @@ const CreateDocumentationModal: React.FC<Props> = ({
   defaultVersionId,
 }) => {
   const { t } = useTranslation('common');
+  const requiredLabel = (labelText: string) => (
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      {labelText}
+      <span className="ml-1 text-red-600">*</span>
+    </label>
+  );
 
   const wizard = useCreateDocumentationWizard({
     defaultProductId,
@@ -37,7 +43,7 @@ const CreateDocumentationModal: React.FC<Props> = ({
           <div className="space-y-4">
             <SelectWithLabel
               name="level"
-              label={t('oscrat.ui.documentation.level.label')}
+              label={requiredLabel(t('oscrat.ui.documentation.level.label'))}
               value={wizard.isProductLevel ? 'PRODUCT' : 'ORGANIZATION'}
               onChange={wizard.handleLevelChange}
               disabled={!!defaultProductId}
@@ -52,7 +58,7 @@ const CreateDocumentationModal: React.FC<Props> = ({
               <>
                 <SelectWithLabel
                   name="productId"
-                  label={t('product')}
+                  label={requiredLabel(t('product'))}
                   value={wizard.productId}
                   onChange={wizard.handleProductChange}
                   disabled={!!defaultProductId}
@@ -69,7 +75,7 @@ const CreateDocumentationModal: React.FC<Props> = ({
                 {wizard.productId && (
                   <SelectWithLabel
                     name="versionId"
-                    label={t('version')}
+                    label={requiredLabel(t('version'))}
                     value={wizard.versionId}
                     onChange={(e) => wizard.setVersionId(e.target.value)}
                     disabled={!!defaultVersionId}
@@ -102,7 +108,7 @@ const CreateDocumentationModal: React.FC<Props> = ({
           <div className="space-y-4">
             <InputWithLabel
               name="title"
-              label={t('title')}
+              label={requiredLabel(t('title'))}
               value={wizard.title}
               onChange={(e) => wizard.setTitle(e.target.value)}
               placeholder={t('oscrat.ui.documentation.title-placeholder')}

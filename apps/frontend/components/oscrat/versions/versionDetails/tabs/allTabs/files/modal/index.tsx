@@ -74,6 +74,30 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
     }
   };
 
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
   if (!isOpen || !ready) return null;
 
   return (
@@ -107,7 +131,14 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
                 />
                 <label
                   htmlFor="fileUpload"
-                  className="flex w-full cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 px-4 py-6 text-center hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`flex w-full cursor-pointer items-center justify-center rounded-md border-2 border-dashed px-4 py-6 text-center focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isDragOver
+                      ? 'border-blue-400 bg-blue-50'
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
                 >
                   <div className="space-y-2">
                     <IoCloudUpload className="mx-auto h-8 w-8 text-gray-400" />

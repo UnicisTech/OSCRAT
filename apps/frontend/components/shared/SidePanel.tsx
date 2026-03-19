@@ -46,6 +46,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
   const { t } = useTranslation('common');
   const { slug } = router.query as { slug: string };
   const activePathname = router.asPath;
+  const logoHref = slug ? `/teams/${slug}/dashboard` : '/teams';
 
   const navItems = [
     {
@@ -138,7 +139,9 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
     <div className="flex h-full w-64 flex-col bg-white dark:bg-gray-900">
       {/* Logo */}
       <div className="mt-6 flex h-16 shrink-0 items-center justify-center px-6 dark:border-gray-800">
-        <img src={app.logoUrl} alt={app.name} className="w-full" />
+        <Link href={logoHref} className="w-full">
+          <img src={app.logoUrl} alt={app.name} className="w-full" />
+        </Link>
       </div>
 
       {/* Content */}

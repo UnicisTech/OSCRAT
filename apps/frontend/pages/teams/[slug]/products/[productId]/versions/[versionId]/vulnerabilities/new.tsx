@@ -63,6 +63,8 @@ function NewVulnerabilityPage() {
       severity: OscratProductVulnerabilitySeverity.LOW,
       status: OscratProductVulnerabilityStatus.PENDING,
       cve: '',
+      affectedVendor: '',
+      references: '',
       advisoryId: '',
       dateOfDiscovery: new Date().toISOString().split('T')[0],
       assigner: currentUserId,
@@ -81,12 +83,18 @@ function NewVulnerabilityPage() {
               .filter(s => s.length > 0)
           : [];
 
+        const referencesArray = values.references
+          ? values.references.split(',').map(s => s.trim()).filter(s => s.length > 0)
+          : [];
+
         const createData: OscratVulnerabilityCreate = {
           name: values.name,
           description: values.description,
           severity: values.severity,
           status: values.status,
           cve: values.cve || undefined,
+          affectedVendor: values.affectedVendor || undefined,
+          references: referencesArray.length > 0 ? referencesArray : undefined,
           advisoryId: values.advisoryId || undefined,
           dateOfDiscovery: new Date(values.dateOfDiscovery),
           affectedMemberStates: affectedMemberStatesArray,
@@ -124,6 +132,8 @@ function NewVulnerabilityPage() {
         severity: mappedSeverity,
         status: OscratProductVulnerabilityStatus.PENDING,
         cve: cve as string,
+        affectedVendor: '',
+        references: '',
         advisoryId: '',
         dateOfDiscovery: new Date().toISOString().split('T')[0],
         assigner: currentUserId,

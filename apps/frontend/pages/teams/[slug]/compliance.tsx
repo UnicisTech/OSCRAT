@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { GetServerSidePropsContext } from 'next';
 import { withTeamLayout } from '@/lib/layout-helpers';
@@ -8,6 +8,11 @@ import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { COMPLIANCE_TYPES } from '@/lib/compliance/translations';
+import { useAssessments, useOscratAssessment } from '@/hooks/oscrat/useOscratAssessment';
+import { useLatestAssessment } from '@/hooks/oscrat/useLatestAssessment';
+import { transformOrgAssessmentToComplianceState } from '@/utils/compliance';
+import { ComplianceState } from '@/types/compliance';
+import { OscratAssessmentType } from '@oscrat/model';
 
 const TeamCompliancePage = () => {
   const { t, ready } = useTranslation('common');
@@ -22,6 +27,44 @@ const TeamCompliancePage = () => {
     complianceType: COMPLIANCE_TYPES.TEAM,
     enabled: !!team,
   });
+
+  const { assessments } = useAssessments(team.slug);
+  const latestOrgAssessmentId = useLatestAssessment(
+    assessments,
+    OscratAssessmentType.ORG
+  );
+  const { assessment: assessmentDetail } = useOscratAssessment(
+    team.slug,
+    latestOrgAssessmentId || '',
+    { enabled: !!latestOrgAssessmentId }
+  );
+
+  const hasStartedAssessment = useMemo(() => {
+    if (assessmentDetail?.rawData) {
+      const complianceState = transformOrgAssessmentToComplianceState(
+        assessmentDetail.rawData,
+        team.orgRoles[0]
+      );
+      return !!(complianceState?.started && !complianceState.completed);
+    }
+
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    const storageKey = `team_compliance_${team.id}`;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const complianceState = JSON.parse(saved) as ComplianceState;
+        return !!(complianceState.started && !complianceState.completed);
+      } catch {
+        localStorage.removeItem(storageKey);
+      }
+    }
+
+    return false;
+  }, [assessmentDetail, team.id, team.orgRoles]);
 
   if (isLoading || !complianceData || !ready) {
     return <Loading />;
@@ -60,6 +103,7 @@ const TeamCompliancePage = () => {
         teamName={team.name}
         productName={team.name}
         complianceType={COMPLIANCE_TYPES.TEAM}
+        isAssessmentStarted={hasStartedAssessment}
       />
     </div>
   );

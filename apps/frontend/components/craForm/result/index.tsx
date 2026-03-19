@@ -58,15 +58,15 @@ const Result: React.FC<ResultWithFormStateProps> = ({
         <>
           <Button
             onClick={handleAddProduct}
-            className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
+            className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
             text={t('oscrat.ui.add-product')}
-            variant="normal"
+            variant="primary"
           />
           <Button
             onClick={handleTryAgain}
-            className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
+            className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
             text={t('oscrat.ui.try-again')}
-            variant="primary"
+            variant="normal"
           />
         </>
       );

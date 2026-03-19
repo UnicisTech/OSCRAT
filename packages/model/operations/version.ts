@@ -2,6 +2,7 @@ import {
   PrismaClient,
   type Prisma,
   OscratProductVersionStatus,
+  TaskStatus,
 } from '@prisma/client';
 import type {
   OscratProductVersionCreate,
@@ -11,6 +12,8 @@ import type {
 } from '../types/version';
 import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
 import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
+
+const OPEN_TASK_STATUSES: TaskStatus[] = [TaskStatus.TODO, TaskStatus.PLANNED, TaskStatus.IN_PROGRESS];
 import {
   upsertAttachmentFileWithTx,
   deleteAttachmentWithTx,
@@ -31,6 +34,13 @@ const VERSION_SUMMARY_INCLUDE = {
         where: {
           status: {
             in: OPEN_VULNERABILITY_STATUSES,
+          },
+        },
+      },
+      tasks: {
+        where: {
+          status: {
+            in: OPEN_TASK_STATUSES,
           },
         },
       },
@@ -95,10 +105,12 @@ export const transformToVersionSummary = (
   id: version.id,
   version: version.version,
   status: version.status,
+  releaseDate: version.releaseDate || undefined,
   supportEndDate: version.supportEndDate || undefined,
   productId: version.productId,
   openIncidents: version._count?.incidents || 0,
   openVulnerabilities: version._count?.vulnerabilities || 0,
+  openTasks: version._count?.tasks || 0,
   hasRepository: !!version.repository,
   sbomReportsCount: version._count?.sbomReports || 0,
   hasConformityAssessmentReport: !!version.conformityAssessmentReport,
@@ -115,6 +127,7 @@ export const transformToVersionDetail = (
   id: version.id,
   version: version.version,
   status: version.status,
+  releaseDate: version.releaseDate || undefined,
   supportEndDate: version.supportEndDate || undefined,
   productId: version.productId,
   incidents:
@@ -145,6 +158,8 @@ export const transformToVersionDetail = (
       severity: vuln.severity,
       status: vuln.status,
       cve: vuln.cve ?? undefined,
+      affectedVendor: vuln.affectedVendor ?? undefined,
+      references: vuln.references,
       advisoryId: vuln.advisoryId ?? undefined,
       dateOfDiscovery: vuln.dateOfDiscovery,
       affectedMemberStates: vuln.affectedMemberStates,
@@ -231,6 +246,7 @@ export const createVersion = async (
       data: {
         version: data.version,
         status: data.status || OscratProductVersionStatus.DRAFT,
+        releaseDate: data.releaseDate,
         supportEndDate: data.supportEndDate,
         productId: data.productId,
         teamId: teamId,
@@ -272,6 +288,7 @@ export const updateVersion = async (
       data: {
         version: data.version,
         status: data.status,
+        releaseDate: data.releaseDate,
         supportEndDate: data.supportEndDate,
         updatedBy: data.updatedBy,
       },

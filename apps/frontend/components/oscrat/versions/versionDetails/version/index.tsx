@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { BsExclamationCircleFill } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
 import { getBorderClass } from '@/lib/borderUtils';
@@ -13,8 +13,10 @@ import { useTeamContext } from '@/context/TeamContext';
 import VersionEditModal from './VersionEditModal';
 import VersionActionModal from './VersionActionModal';
 import type { OscratProductVersionUpdate } from '@oscrat/model';
+import { OscratProductVersionStatus, TaskStatus } from '@oscrat/model';
 import { extractErrorMessage } from '@/lib/utils';
 import { getProductVersionStatusKey } from '@/utils/translation';
+import useTasks from '@/hooks/useTasks';
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-green-100 dark:bg-green-900',
@@ -38,6 +40,13 @@ const Index = () => {
   );
   const { openCount: openVulnerabilitiesCount } = useVulnerabilities(teamId, productId, versionId);
   const { openCount: openIncidentsCount } = useIncidents(teamId, productId, versionId);
+  const { tasks: allTasks } = useTasks(slug);
+  const openTasksCount = useMemo(() => {
+    if (!allTasks) return 0;
+    return allTasks.filter(
+      (t) => t.versionId === versionId && t.status !== TaskStatus.DONE
+    ).length;
+  }, [allTasks, versionId]);
 
   const router = useRouter();
 
@@ -58,6 +67,11 @@ const Index = () => {
   const displayIncidents =
     openIncidentsCount > 0
       ? `${openIncidentsCount} ${t('oscrat.ui.open')}`
+      : t('oscrat.ui.none');
+
+  const displayTasks =
+    openTasksCount > 0
+      ? `${openTasksCount} ${t('oscrat.ui.open')}`
       : t('oscrat.ui.none');
 
   const handleEdit = async (updatedData: OscratProductVersionUpdate) => {
@@ -85,8 +99,17 @@ const Index = () => {
     }
   };
 
-  const handleWithdraw = () => {
-    // TODO: Implement withdraw functionality
+  const handleWithdraw = async () => {
+    try {
+      await updateVersion({ status: OscratProductVersionStatus.WITHDRAWN });
+      toast.success(t('oscrat.ui.version-withdrawn-successfully'));
+      setShowActionModal(false);
+      setModalAction(null);
+    } catch (error) {
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-withdraw-version'))
+      );
+    }
   };
 
   const handleEditClick = () => setShowEditModal(true);
@@ -113,6 +136,8 @@ const Index = () => {
         initialData={{
           version: version?.version,
           status: version?.status,
+          releaseDate: version?.releaseDate?.toString(),
+          supportEndDate: version?.supportEndDate?.toString(),
         }}
       />
 
@@ -126,12 +151,12 @@ const Index = () => {
       <div
         className={`flex flex-col gap-2 rounded-lg border border-gray-400 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800`}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
             {version?.version}
           </div>
 
-          <div className="flex font-medium text-gray-600">
+          <div className="flex flex-wrap font-medium text-gray-600">
             <div>
               <button
                 onClick={() => handleActionClick('delete')}
@@ -163,7 +188,7 @@ const Index = () => {
 
         <div className="my-2 w-full border-b border-gray-200 dark:border-gray-600" />
 
-        <div className="grid grid-cols-6 items-start gap-4 text-sm text-gray-700 dark:text-gray-300">
+        <div className="grid grid-cols-2 items-start gap-4 text-sm text-gray-700 dark:text-gray-300 md:grid-cols-3 lg:grid-cols-6">
           <div className="flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
               {t('status')}:
@@ -179,8 +204,7 @@ const Index = () => {
               {t('oscrat.ui.release-date')}:
             </span>
             <span className="font-semibold text-black dark:text-gray-100">
-              {version?.createdAt &&
-                new Date(version.createdAt).toLocaleDateString()}
+              {new Date(version?.releaseDate || version?.createdAt).toLocaleDateString()}
             </span>
           </div>
           <div className="flex flex-col">
@@ -238,27 +262,36 @@ const Index = () => {
             </div>
           </div>
 
-          {/*    /!*TODO:align with Radu to implement in DB*!/*/}
-          {/*    <div className="flex flex-col">*/}
-          {/*      <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">*/}
-          {/*        {t('oscrat.ui.tasks')}:*/}
-          {/*      </span>*/}
-          {/*      <div className="inline-flex font-semibold text-black dark:text-gray-100">*/}
-          {/*        <p className="rounded-full border border-gray-400 bg-gray-50 px-2 py-0.5">*/}
-          {/*          {version?.tasks} open*/}
-          {/*        </p>*/}
-          {/*      </div>*/}
-          {/*    </div>*/}
+          <div className="flex flex-col">
+            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
+              {t('oscrat.ui.tasks')}:
+            </span>
+            <div className="inline-flex font-semibold text-black dark:text-gray-100">
+              {openTasksCount > 0 ? (
+                <div
+                  className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(openTasksCount)}`}
+                >
+                  <BsExclamationCircleFill className="text-blue-600" />
+                  <p>{displayTasks}</p>
+                </div>
+              ) : (
+                <p className={`${getBorderClass(0)} rounded-full border border-gray-400 px-2 py-0.5`}>
+                  {displayTasks}
+                </p>
+              )}
+            </div>
+          </div>
 
-          {/*    /!*TODO:align with Radu to implement in DB*!/*/}
-          {/*    <div className="flex flex-col">*/}
-          {/*      <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">*/}
-          {/*        {t('oscrat.ui.support-period')}:*/}
-          {/*      </span>*/}
-          {/*      <span className="font-semibold text-black dark:text-gray-100">*/}
-          {/*        {version?.supportPeriod}*/}
-          {/*      </span>*/}
-          {/*    </div>*/}
+          <div className="flex flex-col">
+            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
+              {t('oscrat.ui.support-period')}:
+            </span>
+            <span className="font-semibold text-black dark:text-gray-100">
+              {version?.supportEndDate
+                ? new Date(version.supportEndDate).toLocaleDateString()
+                : t('oscrat.ui.not-set')}
+            </span>
+          </div>
         </div>
       </div>
     </>

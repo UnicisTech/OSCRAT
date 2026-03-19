@@ -20,6 +20,8 @@ import type { FormState } from '@/types/craForm';
 import { useAssessments, useOscratAssessment } from '@/hooks/oscrat/useOscratAssessment';
 import { useLatestAssessment } from '@/hooks/oscrat/useLatestAssessment';
 import { transformOrgAssessmentToComplianceState } from '@/utils/compliance';
+import { buildPDFTranslations } from '@/lib/compliance/pdfTranslations';
+import useTasks from '@/hooks/useTasks';
 
 const TeamDashboard = () => {
   const { teamContext } = useTeamContext();
@@ -51,6 +53,8 @@ const TeamDashboard = () => {
     teamRole: team.orgRoles[0],
     complianceType: 'team',
   });
+
+  const { tasks: teamTasks } = useTasks(team.slug);
 
   const { assessments, isLoading: isLoadingAssessments } = useAssessments(team.slug);
 
@@ -104,41 +108,7 @@ const TeamDashboard = () => {
   const handleExportPDF = async () => {
     if (!complianceData || !complianceState || !ready) return;
 
-    const pdfTranslations = {
-      reportTitle: t('oscrat.ui.dashboard.pdf.report-title'),
-      product: t('oscrat.ui.dashboard.pdf.product'),
-      organization: t('oscrat.ui.dashboard.pdf.organization'),
-      generated: t('oscrat.ui.dashboard.pdf.generated'),
-      overallProgress: t('oscrat.ui.dashboard.overall-progress'),
-      complete: t('oscrat.ui.dashboard.pdf.complete'),
-      of: t('oscrat.ui.dashboard.pdf.of'),
-      requirementsEvaluated: t('oscrat.ui.dashboard.requirements-evaluated'),
-      summaryStatistics: t('oscrat.ui.dashboard.pdf.summary-statistics'),
-      evaluated: t('oscrat.ui.dashboard.evaluated'),
-      notEvaluated: t('oscrat.ui.dashboard.not-evaluated'),
-      compliant: t('oscrat.ui.dashboard.compliant'),
-      partiallyCompliant: t('oscrat.ui.dashboard.partially-compliant'),
-      notCompliant: t('oscrat.ui.dashboard.not-compliant'),
-      notApplicable: t('oscrat.ui.dashboard.not-applicable'),
-      requirementsStatusSummary: t('oscrat.ui.dashboard.pdf.requirements-status-summary'),
-      id: t('oscrat.ui.dashboard.pdf.id'),
-      requirement: t('oscrat.ui.dashboard.pdf.requirement'),
-      status: t('oscrat.ui.dashboard.pdf.status'),
-      conformity: t('oscrat.ui.dashboard.pdf.conformity'),
-      page: t('oscrat.ui.dashboard.pdf.page'),
-      craReference: t('oscrat.ui.dashboard.pdf.cra-reference'),
-      hint: t('oscrat.ui.dashboard.pdf.hint'),
-      questionsAndAnswers: t('oscrat.ui.dashboard.pdf.questions-and-answers'),
-      answer: t('oscrat.ui.dashboard.pdf.answer'),
-      yes: t('oscrat.ui.dashboard.pdf.yes'),
-      no: t('oscrat.ui.dashboard.pdf.no'),
-      additionalInfo: t('oscrat.ui.dashboard.pdf.additional-info'),
-      evidence: t('oscrat.ui.dashboard.pdf.evidence'),
-      evidenceAttached: t('oscrat.ui.dashboard.pdf.evidence-attached'),
-      noAnswerProvided: t('oscrat.ui.dashboard.pdf.no-answer-provided'),
-      detailedAssessment: t('oscrat.ui.dashboard.pdf.detailed-assessment'),
-      area: t('oscrat.ui.dashboard.area'),
-    };
+    const pdfTranslations = buildPDFTranslations(t);
 
     await exportComplianceToPDF(
       complianceData,
@@ -147,7 +117,9 @@ const TeamDashboard = () => {
       team.name,
       undefined,
       pdfTranslations,
-      (key: string) => t(key, { ns: complianceNamespace })
+      (key: string) => t(key, { ns: complianceNamespace }),
+      false,
+      teamTasks
     );
   };
 
@@ -200,6 +172,7 @@ const TeamDashboard = () => {
               complianceData={complianceData}
               state={complianceState}
               complianceNamespace={complianceNamespace}
+              tasks={teamTasks}
             />
           </div>
         )}

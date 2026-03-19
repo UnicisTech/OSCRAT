@@ -39,14 +39,14 @@ const TABS_CONFIG = [
     component: <Documentation />,
   },
   {
-    id: 'version-log',
-    label: 'oscrat.ui.versions.tabs.version-log',
-    component: <VersionLog />,
-  },
-  {
     id: 'repository',
     label: 'oscrat.ui.versions.tabs.repository',
     component: <Repository />,
+  },
+  {
+    id: 'audit-log',
+    label: 'oscrat.ui.versions.tabs.audit-log',
+    component: <VersionLog />,
   },
 ];
 

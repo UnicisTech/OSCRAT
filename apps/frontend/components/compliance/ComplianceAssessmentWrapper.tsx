@@ -17,6 +17,7 @@ interface Props {
   teamName: string;
   productName: string;
   complianceType: ComplianceType;
+  isAssessmentStarted?: boolean;
 }
 
 const ComplianceAssessmentWrapper: React.FC<Props> = ({
@@ -29,6 +30,7 @@ const ComplianceAssessmentWrapper: React.FC<Props> = ({
   teamName,
   productName,
   complianceType,
+  isAssessmentStarted = false,
 }) => {
   const [translations, setTranslations] = useState<TranslationsState>(undefined);
 
@@ -38,6 +40,7 @@ const ComplianceAssessmentWrapper: React.FC<Props> = ({
         teamSlug={teamSlug}
         teamRole={teamRole}
         complianceType={complianceType}
+        isAssessmentStarted={isAssessmentStarted}
         onLanguageSelect={(_, t) => setTranslations(t)}
       />
     );

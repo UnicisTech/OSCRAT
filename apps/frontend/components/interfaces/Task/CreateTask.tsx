@@ -34,6 +34,7 @@ const CreateTask = ({
   const { t, ready } = useTranslation('common');
   const { createTask, tasks: existingTasks } = useTasks(team.slug);
   const { data: products } = useSearchProducts(team.slug, { includeVersions: true });
+  const requiredAsterisk = <span className="ml-1 text-red-600">*</span>;
 
   const validationSchema = useMemo(
     () => createTaskCreateSchema(existingTasks),
@@ -113,7 +114,12 @@ const CreateTask = ({
           <div className="space-y-4">
             <InputWithLabel
               name="title"
-              label={t('title')}
+              label={
+                <>
+                  {t('title')}
+                  {requiredAsterisk}
+                </>
+              }
               value={formik.values.title}
               onChange={formik.handleChange}
               error={formik.errors.title ? t(formik.errors.title) : undefined}
@@ -123,7 +129,12 @@ const CreateTask = ({
             
             <SelectWithLabel
               name="status"
-              label={t('status')}
+              label={
+                <>
+                  {t('status')}
+                  {requiredAsterisk}
+                </>
+              }
               value={formik.values.status}
               onChange={formik.handleChange}
               options={Object.values(TaskStatus).map(status => ({
@@ -169,7 +180,12 @@ const CreateTask = ({
             <InputWithLabel
               type="date"
               name="duedate"
-              label={t('due-date')}
+              label={
+                <>
+                  {t('due-date')}
+                  {requiredAsterisk}
+                </>
+              }
               value={formik.values.duedate instanceof Date ? formik.values.duedate.toISOString().split('T')[0] : ''}
               onChange={handleDateChange}
               error={formik.errors.duedate ? t(formik.errors.duedate) : undefined}

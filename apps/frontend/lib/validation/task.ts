@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { TaskStatus } from '@oscrat/model';
-import { titleSchema, descriptionSchema } from './inputs';
+import { descriptionSchema } from './inputs';
 
 type TaskTitleCandidate = {
   id: number;
@@ -11,7 +11,12 @@ const createTaskTitleWithUniquenessSchema = (
   existingTasks: TaskTitleCandidate[] | undefined,
   currentTaskId?: number
 ) =>
-  titleSchema
+  Yup.string()
+    .trim()
+    .min(1, 'oscrat.ui.validation.title-required')
+    .max(100, 'oscrat.ui.validation.title-too-long')
+    // Allow brackets specifically for task names in addition to existing title characters.
+    .matches(/^[a-zA-Z0-9\s\-_.,()'\[\]\u00C0-\u017F]*$/, 'oscrat.ui.validation.invalid-characters')
     .required('oscrat.ui.validation.task-title-required')
     .test(
       'unique-title',

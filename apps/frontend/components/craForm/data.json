@@ -282,7 +282,7 @@
             ],
             "answerOptions": [
                 {
-                    "text": "Hardware Devices with Security Boxes?",
+                    "text": "Hardware Devices with Security Boxes",
                     "riskLevel": "CRITICAL",
                     "hint": "This category of products includes: payment terminals, tachograph vehicle units, smart meters, access control terminals and Hardware Security Modules where significant portions of the required security functionality depend upon a hardware physical envelope (referred to as a 'Security Box') that is designed to resist direct attacks. [Ref. extras from COMMISSION IMPLEMENTING REGULATION (EU) 2024/482 of 31 January 2024 laying down rules for the application of Regulation (EU) 2019/881 of the European Parliament and of the Council as regards the adoption of the European Common Criteria-based cybersecurity certification scheme (EUCC)]",
                     "references": [

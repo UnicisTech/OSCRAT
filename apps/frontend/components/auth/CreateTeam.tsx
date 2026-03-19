@@ -18,6 +18,7 @@ interface CreateTeamProps {
 const CreateTeam = ({ onClose }: CreateTeamProps) => {
   const { t, ready } = useTranslation('common');
   const createTeam = useCreateTeam();
+  const requiredAsterisk = <span className="ml-1 text-red-600">*</span>;
 
   const organizationSizeOptions = Object.values(OscratOrganizationSize).map(
     (size) => {
@@ -75,7 +76,6 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
             taxId: values.taxId,
           }),
           postalAddress: values.postalAddress,
-          countryCode: values.countryCode,
           contactEmail: values.contactEmail,
           contactPhone: values.contactPhone,
           additionalInformation: values.additionalInformation,
@@ -91,6 +91,8 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
       }
     },
   });
+
+  const isPhonePrefixRequired = !!formik.values.contactPhone.trim();
 
   const handlePersonTypeChange = (type: OscratOrganizationType) => {
     formik.setFieldValue('type', type);
@@ -117,7 +119,8 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
           {/* Organization Type Radio Buttons */}
           <div className="mb-6">
             <label className="mb-4 block text-sm font-medium text-gray-700">
-              {t('oscrat.ui.organization-type')}:
+              {t('oscrat.ui.organization-type')}
+              {requiredAsterisk}:
             </label>
             <div className="flex items-center space-x-6">
               <label className="flex cursor-pointer items-center">
@@ -166,6 +169,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
           <div className="mb-6">
             <label className="mb-2 block text-sm font-medium text-gray-700">
               {t('oscrat.ui.organization-role')}
+              {requiredAsterisk}
             </label>
             <select
               name="orgRole"
@@ -206,7 +210,12 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 name="name"
                 placeholder={t('oscrat.ui.enter-organization-name')}
                 value={formik.values.name}
-                label={t('oscrat.ui.organization-name')}
+                label={
+                  <>
+                    {t('oscrat.ui.organization-name')}
+                    {requiredAsterisk}
+                  </>
+                }
                 error={
                   formik.touched.name && formik.errors.name 
                     ? t(formik.errors.name) 
@@ -238,6 +247,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   {t('oscrat.ui.organization-size')}
+                  {requiredAsterisk}
                 </label>
                 <select
                   name="size"
@@ -276,7 +286,12 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
                 name="name"
                 placeholder={t('oscrat.ui.enter-team-name')}
                 value={formik.values.name}
-                label={t('oscrat.ui.team-name')}
+                label={
+                  <>
+                    {t('oscrat.ui.team-name')}
+                    {requiredAsterisk}
+                  </>
+                }
                 error={
                   formik.touched.name && formik.errors.name 
                     ? t(formik.errors.name) 
@@ -296,7 +311,12 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               name="postalAddress"
               placeholder={t('address')}
               value={formik.values.postalAddress}
-              label={t('oscrat.ui.postal-address')}
+              label={
+                <>
+                  {t('oscrat.ui.postal-address')}
+                  {requiredAsterisk}
+                </>
+              }
               error={
                 formik.touched.postalAddress && formik.errors.postalAddress
                   ? t(formik.errors.postalAddress)
@@ -313,7 +333,12 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
               name="contactEmail"
               placeholder={t('email-placeholder')}
               value={formik.values.contactEmail}
-              label={t('oscrat.ui.contact-email')}
+              label={
+                <>
+                  {t('oscrat.ui.contact-email')}
+                  {requiredAsterisk}
+                </>
+              }
               error={
                 formik.touched.contactEmail && formik.errors.contactEmail
                   ? t(formik.errors.contactEmail)
@@ -329,6 +354,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
                 {t('oscrat.ui.phone-prefix')}
+                {isPhonePrefixRequired && requiredAsterisk}
               </label>
               <Select
                 inputId="country-select"
