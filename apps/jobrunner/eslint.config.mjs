@@ -5,6 +5,8 @@ import globals from 'globals';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
+  { ignores: ['dist/**'] },
+
   js.configs.recommended,
 
   // TypeScript files
