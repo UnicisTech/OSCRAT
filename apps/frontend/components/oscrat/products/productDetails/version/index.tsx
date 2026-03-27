@@ -154,7 +154,7 @@ const Version: React.FC<VersionProps> = ({
           </div>
           <div className="min-w-0 flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.tasks')}
+              {t('oscrat.ui.tasks.title')}
             </span>
             <div
               className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}

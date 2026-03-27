@@ -18,7 +18,8 @@ export const createAttachment = async (
   attachmentId: string,
   createdBy: string,
   description?: string,
-  auditInfo?: AuditInfo
+  auditInfo?: AuditInfo,
+  versionId?: string
 ) => {
   return await AttachmentOps.createAttachment(
     prisma,
@@ -30,6 +31,7 @@ export const createAttachment = async (
       fileSize: fileData.length,
       taskId,
       createdBy,
+      versionId,
     },
     auditInfo
   );
@@ -52,6 +54,7 @@ export interface UploadAttachmentParams {
   createdBy: string;
   description?: string;
   auditInfo?: AuditInfo;
+  versionId?: string;
 }
 
 export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
@@ -67,7 +70,8 @@ export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
     attachmentId,
     params.createdBy,
     params.description,
-    params.auditInfo
+    params.auditInfo,
+    params.versionId
   );
 
   return url;

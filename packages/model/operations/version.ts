@@ -377,6 +377,7 @@ export const upsertVersionCAR = async (
         fileSize: params.fileSize,
         mimeType: params.mimeType || 'application/octet-stream',
         createdBy: params.createdBy,
+        versionId,
       }
     );
 
@@ -498,6 +499,7 @@ export const upsertVersionDoC = async (
         fileSize: params.fileSize,
         mimeType: params.mimeType || 'application/pdf',
         createdBy: params.createdBy,
+        versionId,
       }
     );
 

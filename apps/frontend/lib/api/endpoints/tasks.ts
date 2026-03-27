@@ -46,6 +46,7 @@ export interface AttachmentUploadParams {
   taskId: number;
   description?: string;
   slug: string;
+  versionId?: string;
 }
 
 export const tasksEndpoints = {
@@ -111,6 +112,9 @@ export const tasksEndpoints = {
     formData.append('taskId', String(params.taskId));
     if (params.description) {
       formData.append('description', params.description);
+    }
+    if (params.versionId) {
+      formData.append('versionId', params.versionId);
     }
 
     return api.post<{ url: string }>(

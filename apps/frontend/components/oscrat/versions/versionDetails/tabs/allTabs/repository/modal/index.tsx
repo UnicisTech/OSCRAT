@@ -21,7 +21,7 @@ import { extractErrorMessage } from '@/lib/utils';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import {
-  createRepositoryCreateSchema,
+  repositoryCreateSchema,
   generateRepositoryUrl,
   parseRepositoryUrl,
   type RepositoryCreateInput,
@@ -227,7 +227,7 @@ const Modal: React.FC<ModalProps> = ({
       targetCommit: repository?.targetCommit || null,
       accessToken: repository?.accessToken || '',
     },
-    validationSchema: createRepositoryCreateSchema(t),
+    validationSchema: repositoryCreateSchema,
     validateOnBlur: true,
     validateOnChange: false,
     onSubmit: async (values) => {

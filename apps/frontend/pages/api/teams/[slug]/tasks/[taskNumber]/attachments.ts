@@ -85,7 +85,7 @@ const handlePOST = async (
 
   try {
     const { fields, files } = await readFile(req);
-    const { taskId, description } = fields;
+    const { taskId, description, versionId } = fields;
 
     const file = Object.values(files)[0] as formidable.File[];
     if (!file?.[0]) {
@@ -96,6 +96,8 @@ const handlePOST = async (
 
     if (isAllowed) {
       try {
+        const resolvedVersionId = Array.isArray(versionId) ? versionId[0] : versionId;
+
         const uploadParams = {
           taskId: Number(taskId),
           file: file[0],
@@ -104,6 +106,7 @@ const handlePOST = async (
             : description,
           createdBy: teamMember.userId,
           auditInfo: req.auditInfo,
+          versionId: resolvedVersionId || undefined,
         };
 
         const url = await saveFileAsAttachment(uploadParams);

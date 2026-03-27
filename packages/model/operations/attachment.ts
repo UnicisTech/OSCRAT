@@ -258,6 +258,7 @@ export interface UpsertAttachmentFileParams {
   fileSize: number;
   mimeType?: string;
   createdBy: string;
+  versionId?: string;
 }
 
 /**
@@ -285,6 +286,7 @@ export const upsertAttachmentFileWithTx = async (
           name: params.name,
           fileSize: params.fileSize,
           mimeType: params.mimeType,
+          ...(params.versionId && { versionId: params.versionId }),
         },
       });
 
@@ -316,6 +318,7 @@ export const upsertAttachmentFileWithTx = async (
       mimeType: params.mimeType || 'application/octet-stream',
       createdBy: params.createdBy,
       fileId: file.id,
+      ...(params.versionId && { versionId: params.versionId }),
     },
   });
 

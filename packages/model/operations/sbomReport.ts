@@ -542,11 +542,12 @@ export const updateSbomReport = async (
   });
 
   await prisma.$transaction(async (tx) => {
-    await tx.sbomReport.update({
+    const report = await tx.sbomReport.update({
       where: { id: params.reportId },
       data: {
         sbomData: params.sbomData ?? null,
       },
+      select: { versionId: true },
     });
 
     if (params.sbomFile) {
@@ -557,6 +558,7 @@ export const updateSbomReport = async (
         fileSize: params.sbomFile.fileData.length,
         mimeType: params.sbomFile.mimeType,
         sbomReportId: params.reportId,
+        versionId: report.versionId,
         createdBy: params.createdBy,
       });
     }

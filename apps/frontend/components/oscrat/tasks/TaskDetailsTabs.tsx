@@ -151,6 +151,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
         file,
         taskId: task.id,
         slug: team.slug,
+        versionId: task.versionId ?? undefined,
       });
       toast.success(t('oscrat.ui.file-uploaded-successfully'));
     } catch (error: unknown) {
