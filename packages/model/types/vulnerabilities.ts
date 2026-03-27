@@ -68,7 +68,8 @@ export interface OscratVulnerabilityUpdate {
 }
 
 export interface ScanVulnerability {
-  cve: string;
+  advisoryId: string;
+  cve?: string;
   severity: string;
   package: string;
   version: string;

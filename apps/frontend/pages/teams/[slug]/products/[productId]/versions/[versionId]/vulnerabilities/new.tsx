@@ -113,9 +113,9 @@ function NewVulnerabilityPage() {
 
   // Handle query params for pre-filling from scan report
   useEffect(() => {
-    const { prefill, cve, severity, description, package: pkg, version: ver } = router.query;
+    const { prefill, advisoryId, cve, severity, description, package: pkg, version: ver } = router.query;
 
-    if (prefill === 'true' && cve && pkg) {
+    if (prefill === 'true' && (advisoryId || cve) && pkg) {
       setIsFromScanReport(true);
 
       const mappedSeverity = severity
@@ -127,14 +127,14 @@ function NewVulnerabilityPage() {
         : `Vulnerability in package ${pkg}${ver ? `@${ver}` : ''}`;
 
       formik.setValues({
-        name: `${pkg} - ${cve}`,
+        name: `${pkg} - ${advisoryId || cve}`,
         description: descriptionText,
         severity: mappedSeverity,
         status: OscratProductVulnerabilityStatus.PENDING,
-        cve: cve as string,
+        cve: (cve as string) || '',
         affectedVendor: '',
         references: '',
-        advisoryId: '',
+        advisoryId: (advisoryId as string) || '',
         dateOfDiscovery: new Date().toISOString().split('T')[0],
         assigner: currentUserId,
         hasOtherMemberStates: false,

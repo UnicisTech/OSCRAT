@@ -1168,6 +1168,7 @@
           "vulnerabilities-section": "Vulnerabilities",
           "vulnerabilities-found": "{{count}} vulnerabilities found",
           "no-vulnerabilities-found": "No vulnerabilities found",
+          "table-advisory-id": "Advisory ID",
           "table-cve": "CVE",
           "table-severity": "Severity",
           "table-package": "Package",

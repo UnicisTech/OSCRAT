@@ -233,6 +233,9 @@ function VulnerabilitiesTable({
           <thead className={tableStyles.thead}>
             <tr>
               <th className={tableStyles.th}>
+                {t('oscrat.ui.versions.vulnerability-scan.table-advisory-id')}
+              </th>
+              <th className={tableStyles.th}>
                 {t('oscrat.ui.versions.vulnerability-scan.table-cve')}
               </th>
               <th className={tableStyles.th}>
@@ -260,7 +263,7 @@ function VulnerabilitiesTable({
               <tr key={index} className={tableStyles.tr}>
                 <td className={`${tableStyles.td} font-medium text-gray-900`}>
                   <div className="flex items-center gap-2">
-                    {vuln.cve}
+                    {vuln.advisoryId}
                     {vuln.existingVulnerability && (
                       <FaCheckCircle
                         className="text-green-600"
@@ -270,6 +273,7 @@ function VulnerabilitiesTable({
                     )}
                   </div>
                 </td>
+                <td className={tableStyles.td}>{vuln.cve || '-'}</td>
                 <td className={tableStyles.td}>{getSeverityBadge(vuln.severity)}</td>
                 <td className={`${tableStyles.td} text-gray-900`}>{vuln.package}</td>
                 <td className={tableStyles.td}>{vuln.version}</td>
@@ -433,7 +437,8 @@ export default function VulnerabilityScanSummary() {
           onCreateVulnerability={(vuln) => {
             const params = new URLSearchParams({
               prefill: 'true',
-              cve: vuln.cve,
+              advisoryId: vuln.advisoryId,
+              ...(vuln.cve && { cve: vuln.cve }),
               severity: vuln.severity,
               description: vuln.description,
               package: vuln.package,
