@@ -1498,6 +1498,10 @@
       "select-compliance-status": "Select Compliance Status",
       "compliance-status-note": "This status will be used to determine the overall compliance of the product. Select based on your assessment of the answers provided.",
       "area-completed": "{{area}} completed!",
+      "checklist-progress": "{{checked}} of {{total}} items checked",
+      "checklist-saved": "Checklist saved successfully",
+      "save-checklist": "Save Checklist",
+      "open-checklist": "Open Checklist",
       "compliance-assessment-complete": "Compliance assessment complete!",
       "compliance-status": {
         "fully-compliant": "Fully Compliant",
@@ -1602,11 +1606,13 @@
         "distributor": "Distributor",
         "importer": "Importer",
         "data-steward": "Data Steward",
+        "authorized-representative": "Authorized Representative",
         "hints": {
           "manufacturer": "Organizations that design, develop, or produce products with digital elements",
           "distributor": "Organizations that make products available on the EU market (excluding importers)",
           "importer": "Organizations that place products from third countries on the EU market",
-          "data-steward": "Organizations responsible for managing and maintaining product security data"
+          "data-steward": "Organizations responsible for managing and maintaining product security data",
+          "authorized-representative": "Organizations authorized to act on behalf of the manufacturer for CRA compliance"
         }
       },
       "types": {

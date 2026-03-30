@@ -29,6 +29,7 @@ export interface ComplianceRequirement {
   reqId: string;
   requirement: string;
   craReference: string;
+  section?: string;
   hint?: string;
   genericTask?: string;
   questions: ComplianceQuestion[];
@@ -37,6 +38,8 @@ export interface ComplianceRequirement {
 export interface ComplianceArea {
   id: number;
   areaOfRequirements: string;
+  areaType?: 'questionnaire' | 'checklist';
+  optional?: boolean;
   content: ComplianceRequirement[];
 }
 

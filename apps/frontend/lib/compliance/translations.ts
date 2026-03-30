@@ -18,7 +18,11 @@ export const COMPLIANCE_NAMESPACES = {
   VERSION_DATA_STEWARD: 'compliance-version-sme-manufacturer-7b',
 } as const;
 
-export type ComplianceNamespace = typeof COMPLIANCE_NAMESPACES[keyof typeof COMPLIANCE_NAMESPACES];
+export const TECH_DOC_CHECKLIST_NAMESPACE = 'compliance-tech-doc-checklist' as const;
+
+export type ComplianceNamespace =
+  | typeof COMPLIANCE_NAMESPACES[keyof typeof COMPLIANCE_NAMESPACES]
+  | typeof TECH_DOC_CHECKLIST_NAMESPACE;
 
 /**
  * Maps organization role to compliance assessment namespace
@@ -37,6 +41,9 @@ export function getComplianceNamespace(role: OscratOrganizationRole, type: Compl
     [OscratOrganizationRole.DATA_STEWARD]: type === 'team' 
       ? COMPLIANCE_NAMESPACES.TEAM_DATA_STEWARD 
       : COMPLIANCE_NAMESPACES.VERSION_DATA_STEWARD,
+    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]: type === 'team'
+      ? COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER
+      : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER,
   };
   
   return roleFileMap[role];
@@ -46,7 +53,7 @@ export function getComplianceNamespace(role: OscratOrganizationRole, type: Compl
  * Get all compliance namespaces for preloading
  */
 export function getAllComplianceNamespaces(): ComplianceNamespace[] {
-  return Object.values(COMPLIANCE_NAMESPACES);
+  return [...Object.values(COMPLIANCE_NAMESPACES), TECH_DOC_CHECKLIST_NAMESPACE];
 }
 
 /**

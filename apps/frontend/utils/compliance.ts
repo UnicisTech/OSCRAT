@@ -4,6 +4,7 @@ import { OscratOrganizationRole } from '@oscrat/model';
 import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 import type { ComplianceNamespace } from '@/lib/compliance/translations';
 import type { TFunction } from 'next-i18next';
+import checklistTranslations from '@/locales/en/compliance-tech-doc-checklist.json';
 
 export interface RequirementStatus {
   id: string;
@@ -44,10 +45,17 @@ export const computeRequirementsStatus = (
         conformityStatus = `${CONFORMITY_STATUS.IN_EVALUATION} [${completionPercentage}%]`;
       }
 
+      const translateKey = (key: string) => {
+        if (area.areaType === 'checklist') {
+          return (checklistTranslations as Record<string, string>)[key] ?? key;
+        }
+        return t(key, { ns: complianceNamespace });
+      };
+
       allRequirements.push({
         id: req.reqId,
-        name: t(req.requirement, { ns: complianceNamespace }),
-        areaName: t(area.areaOfRequirements, { ns: complianceNamespace }),
+        name: translateKey(req.requirement),
+        areaName: translateKey(area.areaOfRequirements),
         isEvaluated,
         conformityStatus,
         completionPercentage,

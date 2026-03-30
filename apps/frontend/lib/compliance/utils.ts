@@ -7,6 +7,7 @@ export function getRoleForTeam(role: OscratOrganizationRole): OscratOrganization
   if (role.includes(OscratOrganizationRole.MANUFACTURER)) return OscratOrganizationRole.MANUFACTURER;
   if (role.includes(OscratOrganizationRole.IMPORTER)) return OscratOrganizationRole.IMPORTER;
   if (role.includes(OscratOrganizationRole.DISTRIBUTOR)) return OscratOrganizationRole.DISTRIBUTOR;
+  if (role.includes(OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE)) return OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE;
   if (role.includes(OscratOrganizationRole.DATA_STEWARD)) return OscratOrganizationRole.DATA_STEWARD;
   return OscratOrganizationRole.MANUFACTURER;
 }

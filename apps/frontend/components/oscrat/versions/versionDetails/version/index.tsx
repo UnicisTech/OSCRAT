@@ -264,7 +264,7 @@ const Index = () => {
 
           <div className="flex flex-col">
             <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.tasks')}:
+              {t('oscrat.ui.tasks.title')}:
             </span>
             <div className="inline-flex font-semibold text-black dark:text-gray-100">
               {openTasksCount > 0 ? (
@@ -289,7 +289,7 @@ const Index = () => {
             <span className="font-semibold text-black dark:text-gray-100">
               {version?.supportEndDate
                 ? new Date(version.supportEndDate).toLocaleDateString()
-                : t('oscrat.ui.not-set')}
+                : t('not-set')}
             </span>
           </div>
         </div>

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "OscratOrganizationRole" ADD VALUE 'AUTHORIZED_REPRESENTATIVE';

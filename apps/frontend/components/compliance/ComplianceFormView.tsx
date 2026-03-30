@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
-import { AreaList, RequirementQuestionnaire } from '@/components/compliance';
+import { AreaList, RequirementQuestionnaire, TechDocChecklist } from '@/components/compliance';
 import type { ComplianceNamespace } from '@/lib/compliance/translations';
 
 interface ComplianceFormViewProps {
@@ -11,6 +11,7 @@ interface ComplianceFormViewProps {
   customTranslations?: Record<string, string> | null;
   onAreaSelect: (areaIndex: number) => void;
   onRequirementComplete: (assessment: RequirementAssessment) => Promise<void>;
+  onChecklistSave: (assessments: RequirementAssessment[]) => Promise<void>;
   onBack: () => void;
   onReset: () => Promise<void>;
   getAreaProgress: (areaId: number) => number;
@@ -25,6 +26,7 @@ const ComplianceFormView: React.FC<ComplianceFormViewProps> = ({
   customTranslations = null,
   onAreaSelect,
   onRequirementComplete,
+  onChecklistSave,
   onBack,
   onReset,
   getAreaProgress,
@@ -32,29 +34,46 @@ const ComplianceFormView: React.FC<ComplianceFormViewProps> = ({
 }) => {
   if (
     showQuestionnaire &&
-    localState.currentAreaIndex !== null &&
-    localState.currentRequirementIndex !== null
+    localState.currentAreaIndex !== null
   ) {
     const currentArea = complianceData[localState.currentAreaIndex];
-    const currentRequirement = currentArea.content[localState.currentRequirementIndex];
 
-    if (!currentRequirement) {
-      return null;
+    if (currentArea.areaType === 'checklist') {
+      const existingAssessments = currentArea.content
+        .map((req) => getRequirementAssessment(req.reqId))
+        .filter((a): a is RequirementAssessment => a !== undefined);
+
+      return (
+        <TechDocChecklist
+          area={currentArea}
+          existingAssessments={existingAssessments}
+          onSave={onChecklistSave}
+          onBack={onBack}
+        />
+      );
     }
 
-    return (
-      <RequirementQuestionnaire
-        area={currentArea}
-        requirement={currentRequirement}
-        requirementIndex={localState.currentRequirementIndex}
-        totalRequirements={currentArea.content.length}
-        existingAssessment={getRequirementAssessment(currentRequirement.reqId)}
-        onComplete={onRequirementComplete}
-        onBack={onBack}
-        complianceNamespace={complianceNamespace}
-        customTranslations={customTranslations}
-      />
-    );
+    if (localState.currentRequirementIndex !== null) {
+      const currentRequirement = currentArea.content[localState.currentRequirementIndex];
+
+      if (!currentRequirement) {
+        return null;
+      }
+
+      return (
+        <RequirementQuestionnaire
+          area={currentArea}
+          requirement={currentRequirement}
+          requirementIndex={localState.currentRequirementIndex}
+          totalRequirements={currentArea.content.length}
+          existingAssessment={getRequirementAssessment(currentRequirement.reqId)}
+          onComplete={onRequirementComplete}
+          onBack={onBack}
+          complianceNamespace={complianceNamespace}
+          customTranslations={customTranslations}
+        />
+      );
+    }
   }
 
   return (

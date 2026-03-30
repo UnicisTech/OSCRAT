@@ -29,9 +29,8 @@ export interface CRAAssessmentRawData {
 }
 
 /**
-<<<<<<< HEAD
- * Validates if rawData has the structure of ComplianceAssessmentRawData
- * 
+ * Validates if rawData has the structure of ComplianceAssessmentRawData.
+ *
  * Needed because rawData is stored as unstructured JSON in the database.
  * This provides runtime safety to ensure the data has the expected structure
  * before accessing its properties.

@@ -69,6 +69,7 @@ const ROLE_SUFFIX_MAP: Record<OscratOrganizationRole, string> = {
   [OscratOrganizationRole.DISTRIBUTOR]: 'distributor',
   [OscratOrganizationRole.IMPORTER]: 'importer',
   [OscratOrganizationRole.DATA_STEWARD]: 'sme-manufacturer',
+  [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]: 'authorized-representative',
 };
 
 export function getTranslationNamespaceKey(

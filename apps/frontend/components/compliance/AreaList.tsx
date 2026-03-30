@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
-import { ComplianceNamespace, createComplianceTranslator } from '@/lib/compliance/translations';
-import { FaPlay, FaCheckCircle, FaRedo } from 'react-icons/fa';
+import { ComplianceNamespace, createComplianceTranslator, TECH_DOC_CHECKLIST_NAMESPACE } from '@/lib/compliance/translations';
+import { FaPlay, FaCheckCircle, FaRedo, FaClipboardList } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import FullScreenModal from '@/components/shared/FullScreenModal';
 
@@ -79,9 +79,18 @@ const AreaList: React.FC<AreaListProps> = ({
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {tr(area.areaOfRequirements)}
-                  </h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {area.areaType === 'checklist'
+                        ? t(area.areaOfRequirements, { ns: TECH_DOC_CHECKLIST_NAMESPACE })
+                        : tr(area.areaOfRequirements)}
+                    </h3>
+                    {area.optional && (
+                      <span className="text-xs font-medium px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
+                        {t('optional')}
+                      </span>
+                    )}
+                  </div>
                   {(() => {
                     const totalCount = area.content.length;
                     const actualCompleted = Math.round((progress / 100) * totalCount);
@@ -140,12 +149,19 @@ const AreaList: React.FC<AreaListProps> = ({
                           {t('edit')}
                         </span>
                       </>
+                    ) : area.areaType === 'checklist' ? (
+                      <>
+                        <FaClipboardList className="text-blue-600 text-2xl mb-1" />
+                        <span className="text-xs text-blue-600 font-medium whitespace-nowrap">
+                          {isInProgress ? t('continue') : t('oscrat.ui.open-checklist')}
+                        </span>
+                      </>
                     ) : (
                       <>
-                      <FaPlay className="text-blue-600 text-2xl mb-1" />
-                      <span className="text-xs text-blue-600 font-medium whitespace-nowrap">
-                        {isInProgress ? t('continue') : t('start')}
-                      </span>
+                        <FaPlay className="text-blue-600 text-2xl mb-1" />
+                        <span className="text-xs text-blue-600 font-medium whitespace-nowrap">
+                          {isInProgress ? t('continue') : t('start')}
+                        </span>
                       </>
                     )}
                     </button>

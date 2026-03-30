@@ -1,0 +1,294 @@
+{
+  "id": 100,
+  "areaOfRequirements": "CRA Technical Documentation Checklist",
+  "areaType": "checklist",
+  "content": [
+    {
+      "reqId": "TD-1",
+      "requirement": "Product's intended purpose is clearly described.",
+      "craReference": "Annex VII point (1) letter (a)",
+      "section": "General Description",
+      "questions": []
+    },
+    {
+      "reqId": "TD-2",
+      "requirement": "Versions of software affecting compliance with cybersecurity requirements are documented.",
+      "craReference": "Annex VII point (1) letter (b)",
+      "section": "General Description",
+      "questions": []
+    },
+    {
+      "reqId": "TD-3",
+      "requirement": "(Hardware only) Photographs or illustrations show external features.",
+      "craReference": "Annex VII point (1) letter (c)",
+      "section": "General Description",
+      "questions": []
+    },
+    {
+      "reqId": "TD-4",
+      "requirement": "(Hardware only) Photographs or illustrations show markings (e.g., CE).",
+      "craReference": "Annex VII point (1) letter (c)",
+      "section": "General Description",
+      "questions": []
+    },
+    {
+      "reqId": "TD-5",
+      "requirement": "(Hardware only) Photographs or illustrations show internal layout.",
+      "craReference": "Annex VII point (1) letter (c)",
+      "section": "General Description",
+      "questions": []
+    },
+    {
+      "reqId": "TD-6",
+      "requirement": "Design and development information provided, including drawings and schemes (where applicable).",
+      "craReference": "Annex VII point (2) letter (a)",
+      "section": "Design, Development, Production, and Vulnerability Handling",
+      "questions": []
+    },
+    {
+      "reqId": "TD-7",
+      "requirement": "Description of system architecture (explaining integration of software components).",
+      "craReference": "Annex VII point (2) letter (a)",
+      "section": "Design, Development, Production, and Vulnerability Handling",
+      "questions": []
+    },
+    {
+      "reqId": "TD-8",
+      "requirement": "Software Bill of Materials (SBOM) included.",
+      "craReference": "Annex VII point (2) letter (b)",
+      "section": "Design, Development, Production, and Vulnerability Handling",
+      "questions": []
+    },
+    {
+      "reqId": "TD-9",
+      "requirement": "Coordinated Vulnerability Disclosure (CVD) policy documented.",
+      "craReference": "Annex VII point (2) letter (b)",
+      "section": "Design, Development, Production, and Vulnerability Handling",
+      "questions": []
+    },
+    {
+      "reqId": "TD-10",
+      "requirement": "Evidence of provision of a contact address for vulnerability reporting.",
+      "craReference": "Annex VII point (2) letter (b)",
+      "section": "Design, Development, Production, and Vulnerability Handling",
+      "questions": []
+    },
+    {
+      "reqId": "TD-11",
+      "requirement": "Description of technical solutions for secure distribution of updates.",
+      "craReference": "Annex VII point (2) letter (b)",
+      "section": "Design, Development, Production, and Vulnerability Handling",
+      "questions": []
+    },
+    {
+      "reqId": "TD-12",
+      "requirement": "Production and monitoring processes described.",
+      "craReference": "Annex VII point (2) letter (c)",
+      "section": "Design, Development, Production, and Vulnerability Handling",
+      "questions": []
+    },
+    {
+      "reqId": "TD-13",
+      "requirement": "Validation of production and monitoring processes included.",
+      "craReference": "Annex VII point (2) letter (c)",
+      "section": "Design, Development, Production, and Vulnerability Handling",
+      "questions": []
+    },
+    {
+      "reqId": "TD-14",
+      "requirement": "Assessment of cybersecurity risks documented.",
+      "craReference": "Annex VII point (3)",
+      "section": "Cybersecurity Risk Assessment",
+      "questions": []
+    },
+    {
+      "reqId": "TD-15",
+      "requirement": "Shows how essential requirements in Annex I (Part I) are applicable.",
+      "craReference": "Annex VII point (3)",
+      "section": "Cybersecurity Risk Assessment",
+      "questions": []
+    },
+    {
+      "reqId": "TD-16",
+      "requirement": "Includes justification for support period determined under Article 13(8).",
+      "craReference": "Annex VII point (4)",
+      "section": "Support Period",
+      "questions": []
+    },
+    {
+      "reqId": "TD-17",
+      "requirement": "Information supporting how the support period was determined is documented.",
+      "craReference": "Article 13 (8)",
+      "section": "Support Period",
+      "questions": []
+    },
+    {
+      "reqId": "TD-18",
+      "requirement": "List of harmonised standards applied (full or partial).",
+      "craReference": "Annex VII point (5)",
+      "section": "Standards, Common Specifications, or Certification Schemes",
+      "questions": []
+    },
+    {
+      "reqId": "TD-19",
+      "requirement": "List of common specifications (Article 27) applied, if any.",
+      "craReference": "Annex VII point (5)",
+      "section": "Standards, Common Specifications, or Certification Schemes",
+      "questions": []
+    },
+    {
+      "reqId": "TD-20",
+      "requirement": "List of European cybersecurity certification schemes applied (EUCC, EUCS, etc.), if relevant.",
+      "craReference": "Annex VII point (5)",
+      "section": "Standards, Common Specifications, or Certification Schemes",
+      "questions": []
+    },
+    {
+      "reqId": "TD-21",
+      "requirement": "Description of alternative solutions used to meet Annex I requirements (if no harmonised standards applied).",
+      "craReference": "Annex VII point (5)",
+      "section": "Standards, Common Specifications, or Certification Schemes",
+      "questions": []
+    },
+    {
+      "reqId": "TD-22",
+      "requirement": "Specification of parts applied when standards/specifications/certifications are partly applied.",
+      "craReference": "Annex VII point (5)",
+      "section": "Standards, Common Specifications, or Certification Schemes",
+      "questions": []
+    },
+    {
+      "reqId": "TD-23",
+      "requirement": "Reports of tests carried out to verify conformity with cybersecurity requirements (Annex I Parts I & II).",
+      "craReference": "Annex VII point (6)",
+      "section": "Test Reports",
+      "questions": []
+    },
+    {
+      "reqId": "TD-24",
+      "requirement": "Reports of tests verifying vulnerability handling processes.",
+      "craReference": "Annex VII point (6)",
+      "section": "Test Reports",
+      "questions": []
+    },
+    {
+      "reqId": "TD-25",
+      "requirement": "Copy of the EU Declaration of Conformity is included and current.",
+      "craReference": "Annex VII point (7)",
+      "section": "EU Declaration of Conformity",
+      "questions": []
+    },
+    {
+      "reqId": "TD-26",
+      "requirement": "SBOM is prepared and available for submission to market surveillance authorities upon reasoned request.",
+      "craReference": "Annex VII point (8)",
+      "section": "Software Bill of Materials (SBOM)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-27",
+      "requirement": "SBOM is sufficient for verifying compliance with Annex I requirements.",
+      "craReference": "Annex VII point (8)",
+      "section": "Software Bill of Materials (SBOM)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-28",
+      "requirement": "Manufacturer's name, registered trade name/trademarks, postal address, email/digital contact, and website (if available).",
+      "craReference": "Annex II point (1)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-29",
+      "requirement": "Single point of contact for reporting vulnerabilities and access to coordinated vulnerability disclosure policy.",
+      "craReference": "Annex II point (2)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-30",
+      "requirement": "Product name, type, and any additional information for unique identification.",
+      "craReference": "Annex II point (3)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-31",
+      "requirement": "Intended purpose of the product, including provided security environment, essential functionalities, and security properties.",
+      "craReference": "Annex II point (4)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-32",
+      "requirement": "Disclosure of known or foreseeable circumstances that may lead to significant cybersecurity risks during use or foreseeable misuse.",
+      "craReference": "Annex II point (5)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-33",
+      "requirement": "Internet address at which the EU Declaration of Conformity can be accessed (if applicable).",
+      "craReference": "Annex II point (6)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-34",
+      "requirement": "Type of technical security support offered and end-date of support period for vulnerability handling and security updates.",
+      "craReference": "Annex II point (7)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-35",
+      "requirement": "Detailed instructions (or internet address) on necessary measures during initial commissioning and throughout lifetime for secure use.",
+      "craReference": "Annex II point (8) letter (a)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-36",
+      "requirement": "Explanation of how changes to the product may affect the security of data.",
+      "craReference": "Annex II point (8) letter (b)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-37",
+      "requirement": "Instructions on how security-relevant updates can be installed.",
+      "craReference": "Annex II point (8) letter (c)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-38",
+      "requirement": "Guidance on secure decommissioning, including how user data can be securely removed.",
+      "craReference": "Annex II point (8) letter (d)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-39",
+      "requirement": "Information on how the default setting for automatic installation of security updates can be turned off.",
+      "craReference": "Annex II point (8) letter (e)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-40",
+      "requirement": "Integration guidance: information necessary for integrators to comply with essential cybersecurity requirements (Annex I).",
+      "craReference": "Annex II point (8) letter (f)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    },
+    {
+      "reqId": "TD-41",
+      "requirement": "Information on where the SBOM file can be accessed (if SBOM has been made available to users).",
+      "craReference": "Annex II point (9)",
+      "section": "User Information (Annex II)",
+      "questions": []
+    }
+  ]
+}

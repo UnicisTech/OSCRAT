@@ -1,0 +1,22 @@
+{
+  "tech-doc.name": "Technical Documentation Checklist",
+  "tech-doc.section-1.name": "General Product Description",
+  "tech-doc.section-2.name": "Design and Development Information",
+  "tech-doc.section-3.name": "Conformity Assessment and Testing",
+  "tech-doc.section-4.name": "Information and Instructions to the User (Annex II)",
+  "tech-doc.TD-1.requirement": "A general description of the product with digital elements, including its intended purpose and versions of software affecting compliance with the CRA",
+  "tech-doc.TD-2.requirement": "Photographs or illustrations of external features, marking and internal layout of the product",
+  "tech-doc.TD-3.requirement": "Information on the design, development and production of the product and vulnerability handling processes",
+  "tech-doc.TD-4.requirement": "The essential cybersecurity requirements set out in Annex I that are applicable to the product, and the explanation of how they are met",
+  "tech-doc.TD-5.requirement": "A description of the assessment of cybersecurity risks against which the product is designed, developed, produced and intended to be used",
+  "tech-doc.TD-6.requirement": "Information on the hardware, software and firmware components of the product and their dependencies, including a software bill of materials (SBOM)",
+  "tech-doc.TD-7.requirement": "A copy of the EU declaration of conformity or a reference to its internet address",
+  "tech-doc.TD-8.requirement": "A description of the conformity assessment procedure applied, and where the procedure under Article 32(3) was applied, a reference to the EU-type examination certificate",
+  "tech-doc.TD-9.requirement": "The results of conformity assessment tests performed by the manufacturer or on behalf of the manufacturer",
+  "tech-doc.TD-10.requirement": "A list of fully or partly applied harmonised standards or common specifications, and where those harmonised standards or common specifications have not been applied, descriptions of the solutions adopted to meet the essential requirements",
+  "tech-doc.TD-11.requirement": "Reports from tests carried out by the manufacturer or on behalf of the manufacturer during the internal production control (Module A)",
+  "tech-doc.TD-12.requirement": "Name, registered trade name or registered trade mark and contact address of the manufacturer",
+  "tech-doc.TD-13.requirement": "Instructions for installation, operation and use of the product with digital elements in an easily understandable way",
+  "tech-doc.TD-14.requirement": "The point of contact where the manufacturer can be reached, including an internet address",
+  "tech-doc.TD-15.requirement": "Information on the support period of the product, including at least the end date"
+}

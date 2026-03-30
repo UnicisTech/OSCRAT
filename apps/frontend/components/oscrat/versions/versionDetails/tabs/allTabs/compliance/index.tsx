@@ -19,19 +19,23 @@ import { OscratOrganizationRole } from '@oscrat/model';
 import useTasks from '@/hooks/useTasks';
 
 export default function Compliance() {
-  const { t, ready } = useTranslation('common');
   const router = useRouter();
   const { data: session } = useSession();
   const { teamId, productId, versionId } = useVersionContext();
   const { teamContext, slug: teamSlug } = useTeamContext();
-  
+
+  const team = teamContext.team;
+  const complianceNamespace = team?.orgRoles[0]
+    ? getComplianceNamespace(getRoleForTeam(team.orgRoles[0]), 'version')
+    : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER;
+
+  const { t, ready } = useTranslation(['common', complianceNamespace]);
+
   const [isResetModalOpen, setResetModalOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
   const { project } = useOscratProject(teamId, productId);
   const { version: versionData } = useOscratVersion(teamId, productId, versionId);
-
-  const team = teamContext.team;
 
   const { complianceData, isLoading: isLoadingData } = useComplianceData({
     teamSlug: team?.slug || '',
@@ -55,11 +59,6 @@ export default function Compliance() {
   );
 
   const isLoading = isLoadingData;
-
-  const complianceNamespace = useMemo(() => {
-    if (!team?.orgRoles[0]) return COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER;
-    return getComplianceNamespace(getRoleForTeam(team.orgRoles[0]), 'version');
-  }, [team]);
 
   // Provide default empty state when no assessment exists in database
   const complianceState = useMemo(() => {

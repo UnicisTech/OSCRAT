@@ -52,4 +52,9 @@ export default function Index() {
 
 Index.getLayout = withProductDetailLayout;
 
-export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';
+export async function getServerSideProps(context: import('next').GetServerSidePropsContext) {
+  const { getCommonServerSideProps } = await import('@/lib/server-helpers');
+  const { getAllComplianceNamespaces } = await import('@/lib/compliance/translations');
+
+  return getCommonServerSideProps(context, getAllComplianceNamespaces());
+}

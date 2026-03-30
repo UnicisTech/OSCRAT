@@ -30,6 +30,40 @@ interface ComplianceFormProps {
   customTranslations?: Record<string, string> | null;
 }
 
+function computeCompletionFlags(
+  complianceData: ComplianceArea[],
+  assessments: RequirementAssessment[],
+  completedAreas: Array<{ id: number; text: string }>
+) {
+  const requiredAreas = complianceData.filter((a) => !a.optional);
+  const completed = requiredAreas.every((a) =>
+    completedAreas.find((ca) => ca.id === a.id)
+  );
+
+  const questionnaireAreas = complianceData.filter((a) => a.areaType !== 'checklist');
+  const questionnaireReqIds = new Set(
+    questionnaireAreas.flatMap((a) => a.content.map((r) => r.reqId))
+  );
+  const questionnaireAssessments = assessments.filter((a) =>
+    questionnaireReqIds.has(a.requirementId)
+  );
+  const totalRequired = questionnaireAreas.reduce(
+    (n, area) => n + area.content.length, 0
+  );
+  const allEvaluated =
+    questionnaireAssessments.length === totalRequired &&
+    questionnaireAssessments.every((a) => a.complianceStatus !== undefined);
+  const finished =
+    allEvaluated &&
+    questionnaireAssessments.every(
+      (a) =>
+        a.complianceStatus === COMPLIANCE_STATUS.FULLY_COMPLIANT ||
+        a.complianceStatus === COMPLIANCE_STATUS.NOT_APPLICABLE
+    );
+
+  return { completed, finished };
+}
+
 const createInitialState = (
   productId: string | undefined,
   teamRole: OscratOrganizationRole
@@ -112,6 +146,42 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     createInitialState(productId, teamRole)
   );
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+
+  const generateAndUploadCAR = useCallback(
+    async (state: ComplianceState) => {
+      if (!state.completed || !state.finished || !isVersionCompliance) return;
+
+      toast.success(t('oscrat.ui.assessment-completed-generating-car'));
+      const pdfTranslations = buildPDFTranslations(t);
+
+      try {
+        const pdfBlob = await exportComplianceToPDF(
+          complianceData,
+          state,
+          versionId!,
+          teamName,
+          productName,
+          pdfTranslations,
+          (key: string) => t(key, { ns: complianceNamespace }),
+          true
+        );
+
+        if (pdfBlob) {
+          const file = new File([pdfBlob], generateCARFilename(productName), {
+            type: 'application/pdf',
+          });
+          await uploadCAR(file);
+          toast.success(t('oscrat.ui.car-generated-and-set'));
+          router.push(
+            `/teams/${teamSlug}/products/${productId}/versions/${versionId}`
+          );
+        }
+      } catch {
+        toast.error(t('oscrat.ui.car-generation-failed'));
+      }
+    },
+    [complianceData, complianceNamespace, isVersionCompliance, productId, productName, router, t, teamName, teamSlug, uploadCAR, versionId]
+  );
 
   useEffect(() => {
     if (hookComplianceState) {
@@ -215,23 +285,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
           });
         }
 
-        allAreasComplete = completedAreas.length === complianceData.length;
-
-        const totalRequirements = complianceData.reduce(
-          (total, area) => total + area.content.length,
-          0
-        );
-        const allRequirementsEvaluated =
-          newAssessments.length === totalRequirements &&
-          newAssessments.every((a) => a.complianceStatus !== undefined);
-
-        const allCompliantOrNotApplicable =
-          allRequirementsEvaluated &&
-          newAssessments.every(
-            (a) =>
-              a.complianceStatus === COMPLIANCE_STATUS.FULLY_COMPLIANT ||
-              a.complianceStatus === COMPLIANCE_STATUS.NOT_APPLICABLE
-          );
+        const flags = computeCompletionFlags(complianceData, newAssessments, completedAreas);
+        allAreasComplete = flags.completed;
 
         const nextRequirementIndex = prev.currentRequirementIndex + 1;
 
@@ -242,9 +297,9 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
           completedAreas,
           currentRequirementIndex: nextRequirementIndex,
           lastUpdatedAt: new Date().toISOString(),
-          completed: allAreasComplete,
+          completed: flags.completed,
           started: true,
-          finished: allCompliantOrNotApplicable,
+          finished: flags.finished,
         };
 
         return updatedState;
@@ -331,36 +386,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
 
         if (allAreasComplete) {
           if (updatedState.finished && isVersionCompliance) {
-            toast.success(t('oscrat.ui.assessment-completed-generating-car'));
-
-            const pdfTranslations = buildPDFTranslations(t);
-
-            try {
-              const pdfBlob = await exportComplianceToPDF(
-                complianceData,
-                updatedState,
-                versionId!,
-                teamName,
-                productName,
-                pdfTranslations,
-                (key: string) => t(key, { ns: complianceNamespace }),
-                true
-              );
-
-              if (pdfBlob) {
-                const filename = generateCARFilename(productName);
-                const file = new File([pdfBlob], filename, {
-                  type: 'application/pdf',
-                });
-                await uploadCAR(file);
-                toast.success(t('oscrat.ui.car-generated-and-set'));
-                router.push(
-                  `/teams/${teamSlug}/products/${productId}/versions/${versionId}`
-                );
-              }
-            } catch {
-              toast.error(t('oscrat.ui.car-generation-failed'));
-            }
+            await generateAndUploadCAR(updatedState);
           } else if (updatedState.finished) {
             toast.success(t('oscrat.ui.assessment-completed-finished'));
           } else {
@@ -380,17 +406,88 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       complianceNamespace,
       isVersionCompliance,
       taskGeneration,
-      uploadCAR,
-      router,
-      teamSlug,
-      productId,
-      versionId,
-      teamName,
-      productName,
+      generateAndUploadCAR,
     ]
   );
 
+  const handleChecklistSave = useCallback(
+    async (checklistAssessments: RequirementAssessment[]) => {
+      if (localState.currentAreaIndex === null) return;
+
+      const currentArea = complianceData[localState.currentAreaIndex];
+      let updatedState: ComplianceState = localState;
+
+      setLocalState((prev) => {
+        const checklistReqIds = new Set(currentArea.content.map((r) => r.reqId));
+        const checkedReqIds = new Set(checklistAssessments.map((a) => a.requirementId));
+
+        const newAssessments = prev.assessments.filter(
+          (a) => !checklistReqIds.has(a.requirementId)
+        );
+        newAssessments.push(...checklistAssessments);
+
+        const completedRequirements = prev.completedRequirements.filter(
+          (r) => !checklistReqIds.has(r.id)
+        );
+        for (const assessment of checklistAssessments) {
+          completedRequirements.push({
+            id: assessment.requirementId,
+            text: assessment.requirementText,
+          });
+        }
+
+        const completedAreas = prev.completedAreas.filter(
+          (a) => a.id !== currentArea.id
+        );
+        const allChecklistReqsDone = currentArea.content.every((r) =>
+          checkedReqIds.has(r.reqId)
+        );
+        if (allChecklistReqsDone) {
+          completedAreas.push({
+            id: currentArea.id,
+            text: currentArea.areaOfRequirements,
+          });
+        }
+
+        const flags = computeCompletionFlags(complianceData, newAssessments, completedAreas);
+
+        updatedState = {
+          ...prev,
+          assessments: newAssessments,
+          completedRequirements,
+          completedAreas,
+          lastUpdatedAt: new Date().toISOString(),
+          started: true,
+          completed: flags.completed,
+          finished: flags.finished,
+        };
+
+        return updatedState;
+      });
+
+      try {
+        await saveToDatabase(updatedState);
+        toast.success(t('oscrat.ui.checklist-saved'));
+      } catch {
+        toast.error(t('oscrat.ui.failed-to-save-assessment'));
+      }
+
+      await generateAndUploadCAR(updatedState);
+
+      setShowQuestionnaire(false);
+    },
+    [complianceData, localState, saveToDatabase, t, generateAndUploadCAR]
+  );
+
   const handleBack = useCallback(() => {
+    if (localState.currentAreaIndex !== null) {
+      const currentArea = complianceData[localState.currentAreaIndex];
+      if (currentArea.areaType === 'checklist') {
+        setShowQuestionnaire(false);
+        return;
+      }
+    }
+
     if (
       localState.currentRequirementIndex !== null &&
       localState.currentRequirementIndex > 0
@@ -403,7 +500,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     } else {
       setShowQuestionnaire(false);
     }
-  }, [localState.currentRequirementIndex]);
+  }, [complianceData, localState.currentAreaIndex, localState.currentRequirementIndex]);
 
   const getAreaProgress = useCallback(
     (areaId: number): number => {
@@ -452,6 +549,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       customTranslations={customTranslations}
       onAreaSelect={handleAreaSelect}
       onRequirementComplete={handleRequirementComplete}
+      onChecklistSave={handleChecklistSave}
       onBack={handleBack}
       onReset={handleReset}
       getAreaProgress={getAreaProgress}

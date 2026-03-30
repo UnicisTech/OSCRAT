@@ -5,6 +5,7 @@ import { saveAs } from 'file-saver';
 import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 import type { PDFTranslations } from '@/lib/compliance/pdfTranslations';
 import type { Task } from '@oscrat/model';
+import checklistTranslations from '@/locales/en/compliance-tech-doc-checklist.json';
 
 const styles = StyleSheet.create({
   page: {
@@ -73,6 +74,7 @@ const styles = StyleSheet.create({
   tableCol: {
     flex: 1,
     fontSize: 9,
+    paddingRight: 8,
   },
   tableColSmall: {
     width: '15%',
@@ -251,8 +253,11 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
   translateComplianceFn: tc,
   taskCounts,
 }) => {
-  const allRequirements = complianceData.flatMap(area =>
-    area.content.map(req => {
+  const allRequirements = complianceData.flatMap(area => {
+    const translate = area.areaType === 'checklist'
+      ? (key: string) => (checklistTranslations as Record<string, string>)[key] ?? key
+      : tc;
+    return area.content.map(req => {
       const assessment = state.assessments.find(a => a.requirementId === req.reqId);
       const totalQuestions = req.questions.length;
       const answeredQuestions = assessment?.answers.length || 0;
@@ -270,16 +275,16 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
 
       return {
         id: req.reqId,
-        name: tc(req.requirement),
-        areaName: tc(area.areaOfRequirements),
+        name: translate(req.requirement),
+        areaName: translate(area.areaOfRequirements),
         isEvaluated,
         conformityStatus,
         completionPercentage,
         assessment,
         requirement: req,
       };
-    })
-  );
+    });
+  });
 
   const evaluatedCount = allRequirements.filter(r => r.isEvaluated).length;
   const notEvaluatedCount = allRequirements.length - evaluatedCount;

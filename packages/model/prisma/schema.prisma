@@ -228,6 +228,7 @@ enum OscratOrganizationRole {
   DISTRIBUTOR
   IMPORTER
   DATA_STEWARD
+  AUTHORIZED_REPRESENTATIVE
 }
 
 enum OscratOrganizationType {
