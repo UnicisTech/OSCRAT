@@ -5,3 +5,4 @@ export { default as TaskListItem } from './TaskListItem';
 export { default as TaskStatusDropdown } from './TaskStatusDropdown';
 export { default as TaskDetailsForm } from './TaskDetailsForm';
 export { default as TaskDetailsTabs } from './TaskDetailsTabs';
+export { default as RiskAssessmentSection } from './RiskAssessmentSection';

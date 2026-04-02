@@ -5,7 +5,7 @@ import { withTeamLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
 import { useTask } from '@/hooks/useTask';
 import { Breadcrumb } from '@/components/shared';
-import { TaskDetailsForm, TaskDetailsTabs } from '@/components/oscrat/tasks';
+import { TaskDetailsForm, TaskDetailsTabs, RiskAssessmentSection } from '@/components/oscrat/tasks';
 
 const TaskDetails = () => {
   const router = useRouter();
@@ -56,6 +56,11 @@ const TaskDetails = () => {
       
       {/* Task Details Form */}
       <TaskDetailsForm task={task} team={team} />
+
+      {/* Risk Assessment (only for Risk tasks) */}
+      {task.taskType === 'RISK' && (
+        <RiskAssessmentSection task={task} team={team} />
+      )}
       
       {/* Tab Manager */}
       <TaskDetailsTabs task={task} team={team} />
