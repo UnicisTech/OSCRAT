@@ -91,14 +91,14 @@ const Tasks = ({ team }: { team: Team }) => {
                 return (
                   <tr key={task.id}>
                     <td className="px-6 py-3">
-                      <Link href={`/teams/${slug}/tasks/${task.taskNumber}`}>
+                      <Link href={`/organization/${slug}/tasks/${task.taskNumber}`}>
                         <div className="flex items-center justify-start space-x-2">
                           <span className="underline">{task.taskNumber}</span>
                         </div>
                       </Link>
                     </td>
                     <td className="px-6 py-3">
-                      <Link href={`/teams/${slug}/tasks/${task.taskNumber}`}>
+                      <Link href={`/organization/${slug}/tasks/${task.taskNumber}`}>
                         <div className="flex items-center justify-start space-x-2">
                           <span className="underline">{task.title}</span>
                         </div>

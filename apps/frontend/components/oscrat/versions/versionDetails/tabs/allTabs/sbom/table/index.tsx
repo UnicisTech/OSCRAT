@@ -184,7 +184,7 @@ const Table: React.FC<SsmTableProps> = ({
                 className="cursor-pointer"
                 onClick={() =>
                   router.push(
-                    `/teams/${slug}/products/${productId}/versions/${versionId}/sbom/${report.id}`
+                    `/organization/${slug}/products/${productId}/versions/${versionId}/sbom/${report.id}`
                   )
                 }
               >
@@ -241,7 +241,7 @@ const Table: React.FC<SsmTableProps> = ({
                     WorkerJobStatus.COMPLETED ? (
                       <ShortUuidButton
                         uuid={report.latestVulnerabilityScan.id}
-                        href={`/teams/${slug}/products/${productId}/versions/${versionId}/scan/${report.latestVulnerabilityScan.id}`}
+                        href={`/organization/${slug}/products/${productId}/versions/${versionId}/scan/${report.latestVulnerabilityScan.id}`}
                       />
                     ) : (
                       getVulnStatusBadge(report.latestVulnerabilityScan.status)

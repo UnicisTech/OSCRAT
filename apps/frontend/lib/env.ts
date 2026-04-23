@@ -3,8 +3,8 @@ const env = {
   appUrl: `${process.env.APP_URL}`,
   publicAppUrl: `${process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || ''}`,
   product: 'unicis-platform',
-  // redirectAfterSignIn: '/teams',
-  redirectIfAuthenticated: '/teams',
+  // redirectAfterSignIn: '/organization',
+  redirectIfAuthenticated: '/organization',
 
   // SAML Jackson configuration
   saml: {

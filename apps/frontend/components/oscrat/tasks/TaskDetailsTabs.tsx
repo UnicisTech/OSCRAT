@@ -80,7 +80,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
   ];
 
   const handleDocClick = (docId: string) => {
-    router.push(`/teams/${team.slug}/documentation/${docId}`);
+    router.push(`/organization/${team.slug}/documentation/${docId}`);
   };
 
   // --- Documentation linking (direct endpoint call, no hook-level docId needed) ---

@@ -30,7 +30,7 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
     try {
       await acceptInvitationMutation({ token: invitation.token });
       toast.success(t('oscrat.ui.invitation-accepted'));
-      router.push(`/teams`);
+      router.push(`/organization`);
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-accept-invitation')));
     }

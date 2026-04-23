@@ -81,7 +81,7 @@ export function useForm({ teamSlug, productId }: UseFormOptions) {
     
     setIsProcessing(true);
     toast.error(t('oscrat.ui.product-not-applicable-cannot-update'));
-    await router.replace(`/teams/${teamSlug}/products/${productId}`);
+    await router.replace(`/organization/${teamSlug}/products/${productId}`);
   }, [isEditMode, productId, router, teamSlug, t]);
 
   // Handle assessment update
@@ -127,7 +127,7 @@ export function useForm({ teamSlug, productId }: UseFormOptions) {
 
       clearFormState();
 
-      await router.replace(`/teams/${teamSlug}/products/${productId}`);
+      await router.replace(`/organization/${teamSlug}/products/${productId}`);
     } catch (error) {
       toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-update-assessment')));
       setIsProcessing(false);

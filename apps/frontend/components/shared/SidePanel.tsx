@@ -46,46 +46,46 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
   const { t } = useTranslation('common');
   const { slug } = router.query as { slug: string };
   const activePathname = router.asPath;
-  const logoHref = slug ? `/teams/${slug}/dashboard` : '/teams';
+  const logoHref = slug ? `/organization/${slug}/dashboard` : '/organization';
 
   const navItems = [
     {
       name: t('dashboard'),
-      href: `/teams/${slug}/dashboard`,
+      href: `/organization/${slug}/dashboard`,
       icon: ChartBarIcon,
-      active: activePathname?.includes(`/teams/${slug}/dashboard`),
+      active: activePathname?.includes(`/organization/${slug}/dashboard`),
     },
     {
       name: t('products'),
-      href: `/teams/${slug}/products`,
+      href: `/organization/${slug}/products`,
       icon: RectangleStackIcon,
-      active: activePathname?.includes(`/teams/${slug}/products`),
+      active: activePathname?.includes(`/organization/${slug}/products`),
     },
     {
       name: t('oscrat.ui.tasks.title'),
-      href: `/teams/${slug}/tasks`,
+      href: `/organization/${slug}/tasks`,
       icon: DocumentCheckIcon,
-      active: activePathname?.includes(`/teams/${slug}/tasks`),
+      active: activePathname?.includes(`/organization/${slug}/tasks`),
     },
     {
       name: t('documentation'),
-      href: `/teams/${slug}/documentation`,
+      href: `/organization/${slug}/documentation`,
       icon: DocumentTextIcon,
-      active: activePathname?.includes(`/teams/${slug}/documentation`),
+      active: activePathname?.includes(`/organization/${slug}/documentation`),
     },
     {
       name: t('settings'),
-      href: `/teams/${slug}/settings`,
+      href: `/organization/${slug}/settings`,
       icon: Cog6ToothIcon,
-      active: activePathname?.includes(`/teams/${slug}/settings`),
+      active: activePathname?.includes(`/organization/${slug}/settings`),
     },
     {
       name: t('compliance'),
-      href: `/teams/${slug}/compliance`,
+      href: `/organization/${slug}/compliance`,
       icon: ClipboardDocumentCheckIcon,
       className: 'stroke-blue-600',
       active:
-        activePathname?.startsWith(`/teams/${slug}/compliance`)
+        activePathname?.startsWith(`/organization/${slug}/compliance`)
     },
   ];
 

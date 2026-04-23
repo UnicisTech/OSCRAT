@@ -71,7 +71,7 @@ export const oscratProductVersionStatusTranslationMap = {
   DEPRECATED: 'oscrat.ui.not-supported',
   ARCHIVED: 'oscrat.ui.archived',
   WITHDRAWN: 'oscrat.ui.withdrawn',
-  SUPPORTED: 'oscrat.ui.doc.ready-for-market',
+  SUPPORTED: 'oscrat.ui.supported',
 } as const;
 
 // Risk Level mappings

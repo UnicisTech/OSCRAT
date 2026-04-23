@@ -378,6 +378,7 @@
   "incident": "Incident",
   "corrective-action": "Corrective Action",
   "recent-activities": "Recent Activities",
+  "date": "Date",
   "root-cause": "Root Cause",
   "classification": "Classification",
   "attack-type": "Attack Type",
@@ -1089,6 +1090,10 @@
       "failed-to-delete-version": "Failed to delete version",
       "failed-to-update-version": "Failed to update version",
       "versions": {
+        "lists": {
+          "active-supported": "Active / Supported",
+          "not-supported": "Not Supported"
+        },
         "tabs": {
           "compliance": "Compliance",
           "files": "Files",
@@ -1671,7 +1676,7 @@
     },
     "compliance": {
       "status": {
-        "not-assessed": "Not Assessed",
+        "not-assessed": "Not evaluated",
         "in-progress": "In Progress",
         "compliant": "Compliant",
         "non-compliant": "Non-Compliant",

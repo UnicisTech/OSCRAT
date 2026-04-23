@@ -22,7 +22,7 @@ const TasksList = ({
   return (
     <div className="flex flex-col">
       {selectedTasks.map((task, index) => (
-        <Link key={index} href={`/teams/${slug}/tasks/${task.taskNumber}`}>
+        <Link key={index} href={`/organization/${slug}/tasks/${task.taskNumber}`}>
           <div className="flex items-center justify-start space-x-2">
             <span className="underline">{task.title}</span>
           </div>

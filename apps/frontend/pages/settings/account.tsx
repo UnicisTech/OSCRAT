@@ -30,7 +30,7 @@ const Account: NextPageWithLayout<AccountProps> = ({
   return (
     <div className="space-y-4">
       <Link
-        href="/teams"
+        href="/organization"
         className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
       >
         {t('oscrat.ui.go-home')}

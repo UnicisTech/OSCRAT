@@ -173,7 +173,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
           await uploadCAR(file);
           toast.success(t('oscrat.ui.car-generated-and-set'));
           router.push(
-            `/teams/${teamSlug}/products/${productId}/versions/${versionId}`
+            `/organization/${teamSlug}/products/${productId}/versions/${versionId}`
           );
         }
       } catch {

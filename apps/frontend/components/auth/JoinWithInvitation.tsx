@@ -73,7 +73,7 @@ const JoinWithInvitation = ({
           email: invitation.email,
           password: values.password,
           redirect: true,
-          callbackUrl: `/teams?token=${inviteToken}`,
+          callbackUrl: `/organization?token=${inviteToken}`,
         });
         
       } catch (error: unknown) {

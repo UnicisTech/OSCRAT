@@ -82,7 +82,7 @@ export default function Compliance() {
   }, [dbComplianceState, versionId, team?.orgRoles]);
 
   const handleNavigateToCompliance = () => {
-    router.push(`/teams/${team?.slug}/products/${productId}/versions/${versionId}/compliance`);
+    router.push(`/organization/${team?.slug}/products/${productId}/versions/${versionId}/compliance`);
   };
 
   const handleExportPDF = async () => {
@@ -98,8 +98,7 @@ export default function Compliance() {
       `${project.name} (${versionData.version})`,
       pdfTranslations,
       (key: string) => t(key, { ns: complianceNamespace }),
-      false,
-      versionTasks
+      false
     );
   };
 

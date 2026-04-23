@@ -98,7 +98,7 @@ export function useCreateDocumentationWizard({
 
       toast.success(t('oscrat.ui.documentation.created'));
       handleClose();
-      router.push(`/teams/${slug}/documentation/${doc.id}`);
+      router.push(`/organization/${slug}/documentation/${doc.id}`);
     } catch (error: unknown) {
       const errorMessage = extractErrorMessage(error, t('error'));
       toast.error(t(errorMessage, { defaultValue: errorMessage }));

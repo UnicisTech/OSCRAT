@@ -15,7 +15,7 @@ const unAuthenticatedRoutes = [
   '/invitations/*',
   '/api/invitations/*',
   '/terms-condition',
-  '/teams/*/public/**',
+  '/organization/*/public/**',
   '/api/teams/*/public/**',
 ];
 
@@ -45,5 +45,5 @@ export default async function middleware(req: NextRequest) {
 
 export const config = {
   //matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
-  matcher: ['/account/:path*', '/teams/:path*', '/tasks'],
+  matcher: ['/account/:path*', '/organization/:path*', '/tasks'],
 };

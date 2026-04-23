@@ -18,6 +18,11 @@ export const auditLogQuerySchema = Yup.object().shape({
   endDate: Yup.string()
     .matches(DATE_REGEX, 'Invalid date format. Use YYYY-MM-DD')
     .optional(),
+  productId: Yup.string().uuid().optional(),
+  versionId: Yup.string().uuid().optional(),
+  action: Yup.string().optional(),
+  targetId: Yup.string().optional(),
+  hasProductOrVersion: Yup.boolean().optional(),
 });
 
 export type AuditLogQueryInput = Yup.InferType<typeof auditLogQuerySchema>;

@@ -10,6 +10,10 @@ import {
   LoadingState,
   ErrorState,
 } from '@/components/shared/StateComponents';
+import usePagination from '@/hooks/usePagination';
+import PaginationControls from '@/components/shared/PaginationControls';
+
+const PRODUCTS_PER_PAGE = 12;
 
 export function ProductListContent() {
   const { slug: teamId } = useTeamContext();
@@ -36,6 +40,16 @@ export function ProductListContent() {
     router.push(`${pathname}/${productId}`);
   };
 
+  const {
+    currentPage,
+    totalPages,
+    pageData: paginatedProducts,
+    goToPreviousPage,
+    goToNextPage,
+    prevButtonDisabled,
+    nextButtonDisabled,
+  } = usePagination(filteredProducts, PRODUCTS_PER_PAGE);
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -61,13 +75,28 @@ export function ProductListContent() {
         {filteredProducts.length === 0 ? (
           <EmptyState />
         ) : (
-          filteredProducts.map((product) => (
-            <ProductComponent
-              key={product.id}
-              project={product}
-              onShowMore={() => handleShowMore(product.id)}
-            />
-          ))
+          <>
+            {paginatedProducts.map((product) => (
+              <ProductComponent
+                key={product.id}
+                project={product}
+                onShowMore={() => handleShowMore(product.id)}
+              />
+            ))}
+            {totalPages > 1 && (
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                prevButtonDisabled={prevButtonDisabled}
+                nextButtonDisabled={nextButtonDisabled}
+                goToPreviousPage={goToPreviousPage}
+                goToNextPage={goToNextPage}
+                showItemCount
+                totalItems={filteredProducts.length}
+                itemsPerPage={PRODUCTS_PER_PAGE}
+              />
+            )}
+          </>
         )}
       </div>
     </div>

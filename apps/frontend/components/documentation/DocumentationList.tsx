@@ -56,7 +56,7 @@ const DocumentationList = () => {
   }, [filteredDocs, currentPage]);
 
   const handleRowClick = (docId: string) => {
-    router.push(`/teams/${slug}/documentation/${docId}`);
+    router.push(`/organization/${slug}/documentation/${docId}`);
   };
 
   return (

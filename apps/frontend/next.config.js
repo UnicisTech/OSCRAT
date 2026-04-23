@@ -5,8 +5,18 @@ const { withGlobalCss } = require('next-global-css');
 
 const withConfig = withGlobalCss();
 
-// Redirect root url to login page
+// Redirect root url to login page; legacy /teams/* → /organization/*
 const redirects = [
+  {
+    source: '/teams/:path*',
+    destination: '/organization/:path*',
+    permanent: true,
+  },
+  {
+    source: '/teams',
+    destination: '/organization',
+    permanent: true,
+  },
   {
     source: '/',
     destination: '/auth/login',

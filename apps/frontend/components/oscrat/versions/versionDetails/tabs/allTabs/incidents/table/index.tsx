@@ -123,7 +123,7 @@ const Table: React.FC<IncidentsTableProps> = ({
 
   const handleViewDetails = (incidentId: string) => {
     router.push(
-      `/teams/${slug}/products/${productId}/versions/${versionId}/incidents/${incidentId}`
+      `/organization/${slug}/products/${productId}/versions/${versionId}/incidents/${incidentId}`
     );
   };
 

@@ -47,7 +47,7 @@ const TaskListItem: React.FC<TaskListItemProps> = ({
     if (target.closest('select') || target.closest('button')) {
       return;
     }
-    router.push(`/teams/${team.slug}/tasks/${task.taskNumber}`);
+    router.push(`/organization/${team.slug}/tasks/${task.taskNumber}`);
   };
 
   return (

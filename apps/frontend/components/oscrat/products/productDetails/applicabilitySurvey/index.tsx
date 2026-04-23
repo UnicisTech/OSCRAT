@@ -85,7 +85,7 @@ export default function ApplicabilitySurveySection({
   };
 
   const handleRetake = () => {
-    router.push(`/teams/${slug}/form?productId=${product.id}`);
+    router.push(`/organization/${slug}/form?productId=${product.id}`);
   };
 
   return (

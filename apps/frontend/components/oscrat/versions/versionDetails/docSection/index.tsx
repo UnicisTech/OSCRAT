@@ -107,7 +107,7 @@ export default function DocSection() {
   };
 
   const handleNavigateToCompliance = () => {
-    router.push(`/teams/${team?.slug}/products/${productId}/versions/${versionId}/compliance`);
+    router.push(`/organization/${team?.slug}/products/${productId}/versions/${versionId}/compliance`);
   };
 
   if (isLoading || !team || !project || !version) {

@@ -8,6 +8,8 @@ import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 import { computeRequirementsStatus, getStatusBadgeColor } from '@/utils/compliance';
 import { FaCheckCircle, FaExclamationCircle, FaClock } from 'react-icons/fa';
 import type { Task } from '@oscrat/model';
+import { TaskOriginType, TaskStatus } from '@oscrat/model';
+import { TASK_STATUS_TRANSLATION_MAP } from '@/constants/taskStatuses';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -22,6 +24,31 @@ const PIE_OPTIONS = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: { legend: { position: 'bottom' as const } },
+};
+
+const TASK_PIE_COLORS = [
+  '#93c5fd',
+  '#60a5fa',
+  '#3b82f6',
+  '#1d4ed8',
+  '#fde68a',
+  '#fcd34d',
+  '#f59e0b',
+  '#b45309',
+];
+
+const TASK_PIE_OPTIONS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        label: (ctx: { label?: string; parsed: number }) =>
+          `${ctx.label ?? ''}: ${ctx.parsed}`,
+      },
+    },
+  },
 };
 
 const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
@@ -46,8 +73,8 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
     const notCompliant = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_COMPLIANT).length;
     const notApplicable = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_APPLICABLE).length;
     const inEvaluation = requirementsStatus.filter(r => r.conformityStatus.startsWith(CONFORMITY_STATUS.IN_EVALUATION)).length;
-    const notEvaluatedConformity = requirementsStatus.filter(r =>
-      !r.isEvaluated && !r.conformityStatus.startsWith(CONFORMITY_STATUS.IN_EVALUATION) && r.completionPercentage === 0
+    const notEvaluatedConformity = requirementsStatus.filter(
+      (r) => r.conformityStatus === CONFORMITY_STATUS.NOT_EVALUATED
     ).length;
 
     return {
@@ -74,27 +101,42 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
   const taskChartData = useMemo(() => {
     if (!tasks || tasks.length === 0) return null;
 
-    const autoTasks = tasks.filter(t => t.originType === 'AUTOMATIC');
-    const manualTasks = tasks.filter(t => t.originType !== 'AUTOMATIC');
+    const statusOrder = [
+      TaskStatus.TODO,
+      TaskStatus.PLANNED,
+      TaskStatus.IN_PROGRESS,
+      TaskStatus.DONE,
+    ] as const;
 
-    const autoTodo = autoTasks.filter(t => t.status === 'TODO' || t.status === 'PLANNED').length;
-    const autoInProgress = autoTasks.filter(t => t.status === 'IN_PROGRESS').length;
-    const autoDone = autoTasks.filter(t => t.status === 'DONE').length;
-    const manualTodo = manualTasks.filter(t => t.status === 'TODO' || t.status === 'PLANNED').length;
-    const manualInProgress = manualTasks.filter(t => t.status === 'IN_PROGRESS').length;
-    const manualDone = manualTasks.filter(t => t.status === 'DONE').length;
+    const segments = statusOrder.flatMap((status, statusIdx) => {
+      const autoCount = tasks.filter(
+        (task) => task.originType === TaskOriginType.AUTOMATIC && task.status === status
+      ).length;
+      const manualCount = tasks.filter(
+        (task) => task.originType !== TaskOriginType.AUTOMATIC && task.status === status
+      ).length;
+
+      const statusLabel = t(TASK_STATUS_TRANSLATION_MAP[status]);
+      const autoLabel = `${t('oscrat.ui.dashboard.auto-generated')} — ${statusLabel}`;
+      const manualLabel = `${t('oscrat.ui.dashboard.manual')} — ${statusLabel}`;
+      const base = statusIdx * 2;
+
+      return [
+        { key: `auto-${status}`, label: autoLabel, count: autoCount, color: TASK_PIE_COLORS[base] },
+        { key: `manual-${status}`, label: manualLabel, count: manualCount, color: TASK_PIE_COLORS[base + 1] },
+      ];
+    });
+
+    const nonZero = segments.filter((s) => s.count > 0);
+    if (nonZero.length === 0) return null;
 
     return {
-      labels: [
-        `${t('oscrat.ui.dashboard.auto-generated')} - ${t('oscrat.ui.dashboard.todo')}`,
-        `${t('oscrat.ui.dashboard.auto-generated')} - ${t('oscrat.ui.dashboard.in-progress')}`,
-        `${t('oscrat.ui.dashboard.auto-generated')} - ${t('oscrat.ui.dashboard.done')}`,
-        `${t('oscrat.ui.dashboard.manual')} - ${t('oscrat.ui.dashboard.todo')}`,
-        `${t('oscrat.ui.dashboard.manual')} - ${t('oscrat.ui.dashboard.in-progress')}`,
-        `${t('oscrat.ui.dashboard.manual')} - ${t('oscrat.ui.dashboard.done')}`,
-      ],
-      data: [autoTodo, autoInProgress, autoDone, manualTodo, manualInProgress, manualDone],
-      colors: ['#93c5fd', '#3b82f6', '#1d4ed8', '#fde68a', '#f59e0b', '#b45309'],
+      legendRows: segments,
+      pie: {
+        labels: nonZero.map((s) => s.label),
+        data: nonZero.map((s) => s.count),
+        colors: nonZero.map((s) => s.color),
+      },
     };
   }, [tasks, t]);
 
@@ -182,19 +224,38 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             {t('oscrat.ui.dashboard.task-distribution')}
           </h3>
-          <div className="h-72 flex items-center justify-center max-w-md mx-auto">
-            <Pie
-              data={{
-                labels: taskChartData.labels,
-                datasets: [{
-                  data: taskChartData.data,
-                  backgroundColor: taskChartData.colors,
-                  borderWidth: 2,
-                  borderColor: '#ffffff',
-                }],
-              }}
-              options={PIE_OPTIONS}
-            />
+          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-center">
+            <div className="mx-auto h-72 w-full max-w-xs shrink-0">
+              <Pie
+                data={{
+                  labels: taskChartData.pie.labels,
+                  datasets: [
+                    {
+                      data: taskChartData.pie.data,
+                      backgroundColor: taskChartData.pie.colors,
+                      borderWidth: 2,
+                      borderColor: '#ffffff',
+                    },
+                  ],
+                }}
+                options={TASK_PIE_OPTIONS}
+              />
+            </div>
+            <ul className="flex min-w-0 flex-1 flex-col gap-2 text-sm text-gray-800 dark:text-gray-200">
+              {taskChartData.legendRows.map((row) => (
+                <li key={row.key} className="flex items-center gap-3">
+                  <span
+                    className="h-3 w-3 shrink-0 rounded-sm"
+                    style={{ backgroundColor: row.color }}
+                    aria-hidden
+                  />
+                  <span className="min-w-0 flex-1 leading-snug">{row.label}</span>
+                  <span className="shrink-0 tabular-nums font-medium text-gray-900 dark:text-gray-100">
+                    {row.count}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
@@ -235,6 +296,8 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
                   ? <FaClock className="text-blue-500" />
                   : req.conformityStatus === CONFORMITY_STATUS.NOT_COMPLIANT
                   ? <FaExclamationCircle className="text-red-500" />
+                  : req.conformityStatus === CONFORMITY_STATUS.NOT_EVALUATED
+                  ? <FaExclamationCircle className="text-gray-400" />
                   : null;
 
                 return (

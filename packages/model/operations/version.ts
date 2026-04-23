@@ -87,6 +87,13 @@ const VERSION_DETAIL_INCLUDE = {
   _count: {
     select: {
       sbomReports: true,
+      tasks: {
+        where: {
+          status: {
+            in: OPEN_TASK_STATUSES,
+          },
+        },
+      },
     },
   },
 };
@@ -130,6 +137,7 @@ export const transformToVersionDetail = (
   releaseDate: version.releaseDate || undefined,
   supportEndDate: version.supportEndDate || undefined,
   productId: version.productId,
+  openTasks: version._count?.tasks || 0,
   incidents:
     version.incidents?.map((incident) => ({
       id: incident.id,

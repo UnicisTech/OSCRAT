@@ -29,7 +29,7 @@ const TeamSettings = ({ team }: { team: Team }) => {
         const response = await updateTeam(values);
 
         toast.success(t('successfully-updated'));
-        router.push(`/teams/${response.slug}/settings`);
+        router.push(`/organization/${response.slug}/settings`);
       } catch (error: unknown) {
         toast.error(extractErrorMessage(error, t('an-error-occurred')));
       }

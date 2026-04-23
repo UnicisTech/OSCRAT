@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useRouter } from 'next/router';
 import { OscratOrganizationSize, OscratOrganizationType, OscratOrganizationRole } from '@oscrat/model';
 import { useFormik } from 'formik';
 import { InputWithLabel } from '@/components/shared';
@@ -17,6 +18,7 @@ interface CreateTeamProps {
 
 const CreateTeam = ({ onClose }: CreateTeamProps) => {
   const { t, ready } = useTranslation('common');
+  const router = useRouter();
   const createTeam = useCreateTeam();
   const requiredAsterisk = <span className="ml-1 text-red-600">*</span>;
 
@@ -81,10 +83,11 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
           additionalInformation: values.additionalInformation,
         };
 
-        await createTeam.mutateAsync(teamData);
+        const created = await createTeam.mutateAsync(teamData);
 
         toast.success(t('team-created'));
         onClose();
+        await router.push(`/organization/${created.slug}/compliance`);
       } catch (error: unknown) {
         const apiError = error as ApiError;
         toast.error(apiError.message);

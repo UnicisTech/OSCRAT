@@ -32,7 +32,7 @@ const TeamDropdown = () => {
       items: (Array.isArray(teams) ? teams : []).map((team) => ({
         id: team.id,
         name: team.name,
-        href: `/teams/${team.slug}/dashboard`,
+        href: `/organization/${team.slug}/dashboard`,
         icon: FolderIcon,
       })),
     },
@@ -55,7 +55,7 @@ const TeamDropdown = () => {
         {
           id: 'all-teams',
           name: t('all-teams'),
-          href: '/teams',
+          href: '/organization',
           icon: RectangleStackIcon,
         },
         ...(canAccess('team', ['create'])
@@ -63,7 +63,7 @@ const TeamDropdown = () => {
               {
                 id: 'new-team',
                 name: t('new-team'),
-                href: '/teams',
+                href: '/organization',
                 icon: FolderPlusIcon,
               },
             ]

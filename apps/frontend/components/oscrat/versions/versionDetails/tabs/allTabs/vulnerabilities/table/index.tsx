@@ -93,7 +93,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
 
   const handleViewDetails = (vulnerabilityId: string) => {
     router.push(
-      `/teams/${slug}/products/${productId}/versions/${versionId}/vulnerabilities/${vulnerabilityId}`
+      `/organization/${slug}/products/${productId}/versions/${versionId}/vulnerabilities/${vulnerabilityId}`
     );
   };
 

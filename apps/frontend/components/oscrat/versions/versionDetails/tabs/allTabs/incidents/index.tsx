@@ -62,7 +62,7 @@ export default function Index() {
 
   const handleAddIncident = () => {
     router.push(
-      `/teams/${slug}/products/${productId}/versions/${versionId}/incidents/new`
+      `/organization/${slug}/products/${productId}/versions/${versionId}/incidents/new`
     );
   };
 

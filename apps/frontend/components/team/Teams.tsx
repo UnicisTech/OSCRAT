@@ -4,7 +4,7 @@ import { useTeams } from 'hooks/useTeams';
 import { useTeam } from 'hooks/useTeam';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
@@ -13,6 +13,10 @@ import CreateTeam from '@/components/oscrat/organization/addNewOrganization';
 import { extractErrorMessage } from '@/lib/utils';
 import { useRouter } from 'next/router';
 import { useAcceptInvitation } from '@/lib/api/hooks/invitations';
+import usePagination from '@/hooks/usePagination';
+import PaginationControls from '@/components/shared/PaginationControls';
+
+const TEAMS_PER_PAGE = 10;
 
 const Teams = () => {
   const { t } = useTranslation('common');
@@ -43,12 +47,12 @@ const Teams = () => {
         try {
           await acceptInvitationMutation({ token: inviteToken });
           toast.success(t('oscrat.ui.invitation-accepted'));
-          router.replace('/teams', undefined, { shallow: true });
+          router.replace('/organization', undefined, { shallow: true });
         } catch (error: unknown) {
           console.error('Failed to accept invitation:', error);
           toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-accept-invitation')));
           
-          router.replace('/teams', undefined, { shallow: true });
+          router.replace('/organization', undefined, { shallow: true });
         }
       }
     };
@@ -70,6 +74,18 @@ const Teams = () => {
   const isLoading = isLoadingTeams || isLeavingTeam;
 
   const hasTeams = teamsResponse && teamsResponse.length > 0;
+
+  const teamsList = useMemo(() => teamsResponse ?? [], [teamsResponse]);
+
+  const {
+    currentPage,
+    totalPages,
+    pageData: paginatedTeams,
+    goToPreviousPage,
+    goToNextPage,
+    prevButtonDisabled,
+    nextButtonDisabled,
+  } = usePagination(teamsList, TEAMS_PER_PAGE);
 
   return (
     <>
@@ -104,10 +120,10 @@ const Teams = () => {
                 </tr>
               </thead>
               <tbody>
-                {teamsResponse?.map((team) => (
+                {paginatedTeams.map((team) => (
                   <tr key={team.id}>
                     <td>
-                      <Link href={`/teams/${team.slug}/dashboard`}>
+                      <Link href={`/organization/${team.slug}/dashboard`}>
                         <div className="flex items-center justify-start space-x-2">
                           <LetterAvatar name={team.name} />
                           <span className="underline">{team.name}</span>
@@ -133,6 +149,20 @@ const Teams = () => {
                 ))}
               </tbody>
             </table>
+
+            {totalPages > 1 && (
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                prevButtonDisabled={prevButtonDisabled}
+                nextButtonDisabled={nextButtonDisabled}
+                goToPreviousPage={goToPreviousPage}
+                goToNextPage={goToNextPage}
+                showItemCount
+                totalItems={teamsList.length}
+                itemsPerPage={TEAMS_PER_PAGE}
+              />
+            )}
 
           <ConfirmationDialog
             visible={askConfirmation}

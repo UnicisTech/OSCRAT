@@ -154,7 +154,7 @@ export default function Documentation() {
                 filteredDocumentation.map((doc) => (
                   <TableRow
                     key={doc.id}
-                    onClick={() => router.push(`/teams/${slug}/documentation/${doc.id}`)}
+                    onClick={() => router.push(`/organization/${slug}/documentation/${doc.id}`)}
                     className="cursor-pointer transition-colors hover:bg-gray-50"
                   >
                     <td className={tableStyles.td}>

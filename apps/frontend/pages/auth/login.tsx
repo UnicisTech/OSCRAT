@@ -70,7 +70,7 @@ const Login: NextPageWithLayout<
   }, [error, success]);
 
   const redirectUrl = token
-    ? `/teams?token=${token}`
+    ? `/organization?token=${token}`
     : env.redirectIfAuthenticated;
 
   //TODO: should delete this
@@ -79,7 +79,7 @@ const Login: NextPageWithLayout<
   // }
 
   // if (status === "authenticated") {
-  //   router.push(redirectAfterSignIn || '/teams');
+  //   router.push(redirectAfterSignIn || '/organization');
   // }
 
   const handleStartForm = () => {

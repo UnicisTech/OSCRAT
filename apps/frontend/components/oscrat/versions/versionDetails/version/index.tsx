@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { BsExclamationCircleFill } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
 import { getBorderClass } from '@/lib/borderUtils';
@@ -13,10 +13,9 @@ import { useTeamContext } from '@/context/TeamContext';
 import VersionEditModal from './VersionEditModal';
 import VersionActionModal from './VersionActionModal';
 import type { OscratProductVersionUpdate } from '@oscrat/model';
-import { OscratProductVersionStatus, TaskStatus } from '@oscrat/model';
+import { OscratProductVersionStatus } from '@oscrat/model';
 import { extractErrorMessage } from '@/lib/utils';
 import { getProductVersionStatusKey } from '@/utils/translation';
-import useTasks from '@/hooks/useTasks';
 
 const STATUS_COLORS: Record<string, string> = {
   ACTIVE: 'bg-green-100 dark:bg-green-900',
@@ -40,13 +39,6 @@ const Index = () => {
   );
   const { openCount: openVulnerabilitiesCount } = useVulnerabilities(teamId, productId, versionId);
   const { openCount: openIncidentsCount } = useIncidents(teamId, productId, versionId);
-  const { tasks: allTasks } = useTasks(slug);
-  const openTasksCount = useMemo(() => {
-    if (!allTasks) return 0;
-    return allTasks.filter(
-      (t) => t.versionId === versionId && t.status !== TaskStatus.DONE
-    ).length;
-  }, [allTasks, versionId]);
 
   const router = useRouter();
 
@@ -69,6 +61,8 @@ const Index = () => {
       ? `${openIncidentsCount} ${t('oscrat.ui.open')}`
       : t('oscrat.ui.none');
 
+  const openTasksCount = version?.openTasks ?? 0;
+
   const displayTasks =
     openTasksCount > 0
       ? `${openTasksCount} ${t('oscrat.ui.open')}`
@@ -90,7 +84,7 @@ const Index = () => {
     try {
       await deleteVersion();
       toast.success(t('oscrat.ui.version-deleted-successfully'));
-      const redirectPath = `/teams/${slug}/products/${productId}`;
+      const redirectPath = `/organization/${slug}/products/${productId}`;
       router.replace(redirectPath);
     } catch (error) {
       toast.error(

@@ -131,7 +131,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
               className="flex items-center justify-between rounded-md border border-gray-100 bg-gray-50 px-3 py-2"
             >
               <a
-                href={`/teams/${slug}/tasks/${task.taskNumber}`}
+                href={`/organization/${slug}/tasks/${task.taskNumber}`}
                 className="text-blue-600 hover:underline"
               >
                 #{task.taskNumber}: {task.title}

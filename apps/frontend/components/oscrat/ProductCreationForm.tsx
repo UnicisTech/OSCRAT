@@ -34,7 +34,7 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
   const { slug: teamId } = useTeamContext();
 
   const handleBack = () => {
-    router.push(`/teams/${teamId}/products/add-product`);
+    router.push(`/organization/${teamId}/products/add-product`);
   };
 
   if (!ready) return null;

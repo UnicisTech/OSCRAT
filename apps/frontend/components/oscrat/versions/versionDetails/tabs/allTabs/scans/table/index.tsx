@@ -159,7 +159,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                 className="cursor-pointer"
                 onClick={() =>
                   router.push(
-                    `/teams/${slug}/products/${productId}/versions/${versionId}/scan/${report.id}`
+                    `/organization/${slug}/products/${productId}/versions/${versionId}/scan/${report.id}`
                   )
                 }
               >
@@ -168,7 +168,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                   {report.sourceSbomReport ? (
                     <ShortUuidButton
                       uuid={report.sourceSbomReport.id}
-                      href={`/teams/${slug}/products/${productId}/versions/${versionId}/sbom/${report.sourceSbomReport.id}`}
+                      href={`/organization/${slug}/products/${productId}/versions/${versionId}/sbom/${report.sourceSbomReport.id}`}
                     />
                   ) : (
                     <span className="text-gray-400">-</span>

@@ -142,10 +142,12 @@ export default function Index() {
 
   const { tasks: allTasks, isLoading } = useTasks(team?.slug || '');
 
-  // Filter tasks by versionId
+  // Filter tasks by versionId; newest first (higher taskNumber = more recent)
   const versionTasks = useMemo(() => {
     if (!allTasks) return [];
-    return allTasks.filter(task => task.versionId === versionId);
+    return allTasks
+      .filter((task) => task.versionId === versionId)
+      .sort((a, b) => b.taskNumber - a.taskNumber);
   }, [allTasks, versionId]);
 
   // Apply status filter
@@ -177,7 +179,7 @@ export default function Index() {
   const handleViewTask = (taskNumber: number) => {
     if (!team) return;
     router.push(
-      `/teams/${team.slug}/products/${productId}/versions/${versionId}/task/${taskNumber}`
+      `/organization/${team.slug}/products/${productId}/versions/${versionId}/task/${taskNumber}`
     );
   };
 

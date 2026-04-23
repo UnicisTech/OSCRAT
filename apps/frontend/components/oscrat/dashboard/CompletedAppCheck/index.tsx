@@ -14,7 +14,7 @@ export default function CompletedAppCheck({ riskLevel }: CompletedAppCheckProps)
   const router = useRouter();
 
   const handleAddProduct = () => {
-    router.push(`/teams/${teamId}/products/add-product/cache`);
+    router.push(`/organization/${teamId}/products/add-product/cache`);
   };
 
   if (!ready) return null;

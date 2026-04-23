@@ -125,7 +125,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
       t('oscrat.ui.documentation.deleted'),
       t('error')
     );
-    if (result !== null) router.push(`/teams/${slug}/documentation`);
+    if (result !== null) router.push(`/organization/${slug}/documentation`);
   };
 
   const handleArchive = async () => {

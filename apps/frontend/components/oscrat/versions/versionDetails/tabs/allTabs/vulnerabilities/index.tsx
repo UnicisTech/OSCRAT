@@ -62,7 +62,7 @@ export default function Index() {
 
   const handleAddVulnerability = () => {
     router.push(
-      `/teams/${slug}/products/${productId}/versions/${versionId}/vulnerabilities/new`
+      `/organization/${slug}/products/${productId}/versions/${versionId}/vulnerabilities/new`
     );
   };
 

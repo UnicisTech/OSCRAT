@@ -19,7 +19,7 @@ const RemoveTeam = ({ team }: { team: Team }) => {
   const removeTeam = async () => {
     try {
       await deleteTeam();
-      router.replace('/teams');
+      router.replace('/organization');
       toast.success(t('team-removed-successfully'));
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, t('an-error-occurred')));

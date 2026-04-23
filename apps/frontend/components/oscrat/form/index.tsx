@@ -37,7 +37,7 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
       highestRisk: null,
     });
     setCompletedFormState(null);
-    const formPath = teamSlug ? `/teams/${teamSlug}/form${productId ? `?productId=${productId}` : ''}` : '/form';
+    const formPath = teamSlug ? `/organization/${teamSlug}/form${productId ? `?productId=${productId}` : ''}` : '/form';
     router.push(formPath);
   };
 

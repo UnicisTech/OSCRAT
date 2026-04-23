@@ -20,28 +20,28 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
   const menus: MenuItem[] = [
     {
       name: t('dashboard'),
-      href: `/teams/${slug}/dashboard`,
+      href: `/organization/${slug}/dashboard`,
       icon: ChartBarIcon,
       className: 'fill-blue-600 stroke-blue-600',
       active:
-        activePathname?.startsWith(`/teams/${slug}`) &&
+        activePathname?.startsWith(`/organization/${slug}`) &&
         activePathname.includes('dashboard'),
     },
     {
       name: t('all-tasks'),
-      href: `/teams/${slug}/tasks`,
+      href: `/organization/${slug}/tasks`,
       icon: QueueListIcon,
       className: 'fill-blue-600 stroke-blue-600',
       active:
-        activePathname?.startsWith(`/teams/${slug}`) &&
+        activePathname?.startsWith(`/organization/${slug}`) &&
         activePathname.includes('tasks'),
     },
     {
       name: t('cybersecurity-management-system'),
-      href: `/teams/${slug}/csc`,
+      href: `/organization/${slug}/csc`,
       icon: () => <Icon src="/unicis-csc-logo.png" />,
       active:
-        activePathname?.startsWith(`/teams/${slug}`) &&
+        activePathname?.startsWith(`/organization/${slug}`) &&
         activePathname.includes('csc'),
     },
     {
@@ -50,9 +50,9 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
       children: [
         {
           name: t('projects'),
-          href: `/teams/${slug}/products`,
+          href: `/organization/${slug}/products`,
           active:
-            activePathname?.startsWith(`/teams/${slug}`) &&
+            activePathname?.startsWith(`/organization/${slug}`) &&
             activePathname.includes('products'),
         },
       ],
@@ -67,7 +67,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
       icon: CodeBracketIcon,
       className: 'stroke-blue-600',
       active:
-        activePathname?.startsWith(`/teams/${slug}`) &&
+        activePathname?.startsWith(`/organization/${slug}`) &&
         activePathname.includes('documentation'),
     },
     {
@@ -76,7 +76,7 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
       icon: ChatBubbleBottomCenterTextIcon,
       className: 'stroke-blue-600',
       active:
-        activePathname?.startsWith(`/teams/${slug}`) &&
+        activePathname?.startsWith(`/organization/${slug}`) &&
         activePathname.includes('feedback'),
     },
     {
@@ -86,11 +86,11 @@ const TeamNavigation = ({ slug, activePathname }: NavigationItemsProps) => {
     },
     {
       name: t('settings'),
-      href: `/teams/${slug}/settings`,
+      href: `/organization/${slug}/settings`,
       icon: Cog6ToothIcon,
       className: 'stroke-blue-600',
       active:
-        activePathname?.startsWith(`/teams/${slug}`) &&
+        activePathname?.startsWith(`/organization/${slug}`) &&
         /(settings|members|audit-logs)/.test(activePathname),
     },
   ];

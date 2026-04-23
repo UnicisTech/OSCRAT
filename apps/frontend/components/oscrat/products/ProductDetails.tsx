@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useTeamContext } from '@/context/TeamContext';
@@ -7,7 +7,7 @@ import { extractErrorMessage } from '@/lib/utils';
 import ProductComponent from '@/components/oscrat/products/productDetails/product';
 import TabsManager from '@/components/shared/TabsManager';
 import { useTranslation } from 'next-i18next';
-import createTabsConfig from '@/components/oscrat/products/productDetails/tabs/tabs';
+import { createTabsConfig } from '@/components/oscrat/products/productDetails/tabs/tabs';
 import ApplicabilitySurveySection from '@/components/oscrat/products/productDetails/applicabilitySurvey';
 import type { OscratProductDetail, OscratProductUpdate } from '@oscrat/model';
 
@@ -19,7 +19,6 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
   const router = useRouter();
   const { slug } = useTeamContext();
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const [tabs, setTabs] = useState<any>(null);
   const { t } = useTranslation('common');
 
   const { project, deleteProject, updateProject } = useOscratProject(
@@ -28,12 +27,10 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
     { enabled: !isRedirecting }
   );
 
-  useEffect(() => {
-    if (project?.versions) {
-      const tabsConfig = createTabsConfig(project?.versions as any);
-      setTabs(tabsConfig);
-    }
-  }, [project?.versions]);
+  const tabs = useMemo(() => {
+    if (!project?.versions?.length) return null;
+    return createTabsConfig(project.versions as OscratProductDetail['versions'], t);
+  }, [project?.versions, t]);
 
   const handleDelete = async () => {
     if (!project) {
@@ -45,7 +42,7 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
     try {
       await deleteProject.mutateAsync(undefined);
       toast.success(t('oscrat.ui.product-deleted-successfully'));
-      const redirectPath = `/teams/${slug}/products`;
+      const redirectPath = `/organization/${slug}/products`;
       router.replace(redirectPath);
     } catch (error) {
       setIsRedirecting(false);
@@ -63,7 +60,7 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
   };
 
   const handleAddVersion = () => {
-    router.push(`/teams/${slug}/products/${productId}/versions/new`);
+    router.push(`/organization/${slug}/products/${productId}/versions/new`);
   };
 
   return (
@@ -77,13 +74,13 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
       {project && (
         <ApplicabilitySurveySection product={project as OscratProductDetail} />
       )}
-      {tabs && tabs.length > 0 && (
-        <TabsManager 
-          buttonText={t('oscrat.ui.add-version')} 
+      {tabs && tabs.length > 0 ? (
+        <TabsManager
+          buttonText={t('oscrat.ui.add-version')}
           tabs={tabs}
           onButtonClick={handleAddVersion}
         />
-      )}
+      ) : null}
     </>
   );
 }

@@ -42,15 +42,15 @@ function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: strin
   const breadcrumbItems = [
     {
       label: t('oscrat.ui.products'),
-      href: `/teams/${team.slug}/products`,
+      href: `/organization/${team.slug}/products`,
     },
     {
       label: productContext.project?.name || '...',
-      href: `/teams/${team.slug}/products/${routeProductId}`,
+      href: `/organization/${team.slug}/products/${routeProductId}`,
     },
     {
       label: versionContext.version?.version || '...',
-      href: `/teams/${team.slug}/products/${routeProductId}/versions/${routeVersionId}`,
+      href: `/organization/${team.slug}/products/${routeProductId}/versions/${routeVersionId}`,
     },
     {
       label: task.title || t('task-details'),
@@ -90,7 +90,7 @@ function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team:
   const breadcrumbItems = [
     {
       label: t('oscrat.ui.tasks.title'),
-      href: `/teams/${team.slug}/tasks`,
+      href: `/organization/${team.slug}/tasks`,
     },
     {
       label: task.title || t('task-details'),

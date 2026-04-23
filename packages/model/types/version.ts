@@ -30,6 +30,7 @@ export interface OscratProductVersionDetail {
   releaseDate?: Date;
   supportEndDate?: Date;
   productId: string;
+  openTasks: number;
   incidents: OscratIncidentSummary[];
   vulnerabilities: OscratVulnerabilitySummary[];
   assessments: OscratAssessmentSummary[];

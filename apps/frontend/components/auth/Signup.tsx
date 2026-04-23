@@ -65,7 +65,7 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
           router.push('/auth/login');
         } else {
           toast.success(t('successfully-joined'));
-          router.push('/teams');
+          router.push('/organization');
         }
       } catch (error: unknown) {
         const apiError = error as ApiError;

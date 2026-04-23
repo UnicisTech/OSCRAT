@@ -38,7 +38,7 @@ export const computeRequirementsStatus = (
 
       const isEvaluated = assessment?.complianceStatus !== undefined;
 
-      let conformityStatus: string = CONFORMITY_STATUS.NOT_COMPLIANT;
+      let conformityStatus: string = CONFORMITY_STATUS.NOT_EVALUATED;
       if (isEvaluated && assessment?.complianceStatus) {
         conformityStatus = assessment.complianceStatus;
       } else if (completionPercentage > 0 && completionPercentage < 100) {
@@ -72,6 +72,7 @@ export const getStatusBadgeColor = (status: string): string => {
   if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT) return 'bg-yellow-100 text-yellow-800';
   if (status === CONFORMITY_STATUS.NOT_COMPLIANT) return 'bg-red-100 text-red-800';
   if (status === CONFORMITY_STATUS.NOT_APPLICABLE) return 'bg-gray-100 text-gray-800';
+  if (status === CONFORMITY_STATUS.NOT_EVALUATED) return 'bg-gray-100 text-gray-600';
   if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) return 'bg-blue-100 text-blue-800';
   return 'bg-gray-100 text-gray-600';
 };

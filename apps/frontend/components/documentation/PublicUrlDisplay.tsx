@@ -22,8 +22,8 @@ const PublicUrlDisplay: React.FC<PublicUrlDisplayProps> = ({
   const baseUrl = env.publicAppUrl;
   const publicUrl =
     productId && versionId
-      ? `${baseUrl}/teams/${slug}/public/products/${productId}/versions/${versionId}/documentation/${docSlug}`
-      : `${baseUrl}/teams/${slug}/public/documentation/${docSlug}`;
+      ? `${baseUrl}/organization/${slug}/public/products/${productId}/versions/${versionId}/documentation/${docSlug}`
+      : `${baseUrl}/organization/${slug}/public/documentation/${docSlug}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(publicUrl);

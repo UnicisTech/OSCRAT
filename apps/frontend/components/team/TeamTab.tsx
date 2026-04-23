@@ -23,7 +23,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   const navigations = [
     {
       name: 'Settings',
-      href: `/teams/${teamSlug}/settings`,
+      href: `/organization/${teamSlug}/settings`,
       active: activeTab === 'settings',
       icon: Cog6ToothIcon,
     },
@@ -32,7 +32,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   if (canAccess('team_member', ['create', 'update', 'read', 'delete'])) {
     navigations.push({
       name: 'Members',
-      href: `/teams/${teamSlug}/members`,
+      href: `/organization/${teamSlug}/members`,
       active: activeTab === 'members',
       icon: UserPlusIcon,
     });
@@ -44,7 +44,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
   ) {
     navigations.push({
       name: 'Audit Logs',
-      href: `/teams/${teamSlug}/audit-logs`,
+      href: `/organization/${teamSlug}/audit-logs`,
       active: activeTab === 'audit-logs',
       icon: ClipboardDocumentListIcon,
     });

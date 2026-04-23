@@ -19,14 +19,23 @@ export function useGetTeamTasks(slug: string) {
   });
 }
 
+function invalidateVersionOpenTasksCache(task: { teamId: string; versionId?: string | null }) {
+  if (task.versionId) {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.oscrat.projects.versions.detail(task.teamId, task.versionId),
+    });
+  }
+}
+
 export function useCreateTeamTask(slug: string) {
   return useMutation({
     mutationFn: (data: CreateTaskData) =>
       tasksEndpoints.createTeamTask(slug, data),
-    onSuccess: () => {
+    onSuccess: (task) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.all(slug),
       });
+      invalidateVersionOpenTasksCache(task);
     },
   });
 }
@@ -44,13 +53,14 @@ export function useUpdateTask(slug: string, taskNumber: string) {
     mutationFn: (data: UpdateTaskData) => {
       return tasksEndpoints.updateTask(slug, taskNumber, data);
     },
-    onSuccess: () => {
+    onSuccess: (task) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.detail(slug, taskNumber),
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.all(slug),
       });
+      invalidateVersionOpenTasksCache(task);
     },
   });
 }
@@ -64,6 +74,12 @@ export function useDeleteTask(slug: string, taskNumber: string) {
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.all(slug),
+      });
+      queryClient.invalidateQueries({
+        predicate: (q) =>
+          Array.isArray(q.queryKey) &&
+          q.queryKey[2] === 'oscrat' &&
+          q.queryKey[3] === 'versions',
       });
     },
   });

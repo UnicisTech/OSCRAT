@@ -41,11 +41,11 @@ const Result: React.FC<ResultWithFormStateProps> = ({
     onTryAgain?.();
   };
   const handleAddProduct = () => {
-    router.push(`/teams/${teamSlug}/products/add-product/cache`);
+    router.push(`/organization/${teamSlug}/products/add-product/cache`);
   };
   const handleGoHome = () => {
     if (isAuthenticated && teamSlug) {
-      router.push(`/teams/${teamSlug}/dashboard`);
+      router.push(`/organization/${teamSlug}/dashboard`);
     } else {
       router.push('/auth/login');
     }
