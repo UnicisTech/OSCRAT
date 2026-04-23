@@ -1,33 +1,23 @@
-# OSCRAT Platform Community (free and open source)
+# OSCRAT Platform (free and open source)
 
-![Static Badge](https://img.shields.io/badge/Github%20stargazers%2C%20https%3A%2F%2Fgithub.com%2FUnicisTech%2Funicis-platform-ce%2Fstargazers?logo=github&label=GitHub%20Star&link=https%3A%2F%2Fgithub.com%2FUnicisTech%2Funicis-platform-ce%2Fstargazer)
-![Static Badge](https://img.shields.io/badge/Github%20fork%2C%20https%3A%2F%2Fgithub.com%2FUnicisTech%2Funicis-platform-ce%2Ffork?logo=github&label=GitHub%20Fork&link=https%3A%2F%2Fgithub.com%2FUnicisTech%2Funicis-platform-ce%2Ffork)
-[Mastodon](https://mastodon.xyz/@unicis_tech) |
-![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/UnicisTech)
-![Static Badge](https://img.shields.io/badge/LinkedIn%2C%20https%3A%2F%2Fwww.linkedin.com%2Fcompany%2Funicis-tech-o%C3%BC%2F?logo=LinkedIn&label=LinkedIn&link=https%3A%2F%2Fwww.linkedin.com%2Fcompany%2Funicis-tech-o%C3%BC%2F) |
-<a href="https://discord.com/invite/8TwyeD97HD">Discord</a>
+OSCRAT Platform - an open core, enterprise-ready trust management platform for startups and SMEs.
 
-OSCRAT Platform Community Edition - an open core, enterprise-ready trust management platform for startups and SMEs.
-
-Please star ⭐ the repo if you want us to continue developing and improving the OSCRAT Platform! 😀
+Please star the repo if you want us to continue developing and improving the OSCRAT Platform.
 
 ## Structure
 
 ```
-oscrat-platform/
+oscrat-oves/
 ├── apps/
-│   └── frontend/          # @oscrat/frontend (Next.js app)
+│   ├── frontend/       # @oscrat/frontend (Next.js app)
+│   └── jobrunner/      # @oscrat/jobrunner (background jobs)
 ├── packages/
-│   └── model/             # @oscrat/model (Database & types)
-├── docker-compose.yml     # Local development services
-└── package.json           # Workspace orchestrator
+│   └── model/          # @oscrat/model (Prisma schema, DB operations, types)
+├── docker-compose.yml  # Local development services
+└── package.json        # Workspace orchestrator
 ```
 
-## 📖 Additional Resources
-
-- [Unicis Platform getting started documentation](https://www.unicis.tech/docs/unicis_platform)
-
-## 🛠️ Built With
+## Built With
 
 - [SaaS-Starter-Kit](https://github.com/boxyhq/saas-starter-kit/)
 - [Next.js](https://nextjs.org)
@@ -40,32 +30,32 @@ oscrat-platform/
 - [Svix](https://www.svix.com/) (Provides Webhook Orchestration)
 - Endpoints collection (Provided by [Osquery](https://osquery.io/))
 
-## 🚀 Deployment
+## Deployment
 
 To Be Done
 
-## ✨ Getting Started
+## Getting Started
 
 Please follow these simple steps to get a local copy up and running.
 
 ### Prerequisites
 
-- Node.js (Version: >=18.x)
+- Node.js (Version: >=22.x, see `.nvmrc`)
 - PostgreSQL
 - PNPM
 - Docker compose
-- Syft
-- Grype
+- [Syft](https://github.com/anchore/syft) (required by the jobrunner for SBOM generation)
+- [Grype](https://github.com/anchore/grype) (required by the jobrunner for vulnerability scanning)
 
 ### Development
 
 #### 1. Setup
 
-- [Fork](https://github.com/UnicisTech/unicis-platform-ce/fork) the repository
+- [Fork](https://github.com/oscrat/OSCRAT/fork) the repository
 - Clone the repository by using this command:
 
 ```bash
-git clone https://github.com/RaduCatalinAndrei/OSCRAT.git
+git clone https://github.com/oscrat/OSCRAT.git
 ```
 
 #### 2. Go to the project folder
@@ -80,43 +70,46 @@ cd oscrat-oves
 pnpm install
 ```
 
-#### 4. Set up your .env files
+#### 4. Install Syft & Grype
 
-Duplicate `.env.example` to `.env` in both the frontend and model packages.
+The jobrunner shells out to these binaries — install them and make sure they're on your `PATH`. See [syft](https://github.com/anchore/syft#installation) and [grype](https://github.com/anchore/grype#installation).
 
-```bash
-cp apps/frontend/.env.example apps/frontend/.env
-cp packages/model/.env.example packages/model/.env
-```
+#### 5. Set up your .env file
 
-#### 5. Start local services (Database)
+Duplicate the root `.env.example` to `.env`:
 
 ```bash
-pnpm services:up
+cp .env.example .env
 ```
 
-This starts PostgreSQL and Redis containers for local development.
+Keep `CONFIRM_EMAIL=false` in your local `.env`. No SMTP is wired up by default, so if email confirmation is on, new accounts will be stuck waiting for a confirmation email that never arrives.
 
-#### 6. Set up database schema
+#### 6. Start local services (Database)
+
+```bash
+pnpm services:db:up
+```
+
+This starts a PostgreSQL container for local development.
+
+#### 7. Set up database schema
 
 ```bash
 pnpm db:generate
-pnpm db:push
+pnpm db:migrate:dev
 ```
 
-#### 7. Start the development server
+On a fresh database this applies every migration in `packages/model/prisma/migrations/` in order and generates the Prisma client.
+
+#### 8. Start the development server
 
 ```bash
 pnpm dev
 ```
 
-Or to start only the frontend:
+This starts both the frontend and the jobrunner.
 
-```bash
-pnpm frontend:dev
-```
-
-#### 8. Start the Prisma Studio
+#### 9. Start the Prisma Studio
 
 Prisma Studio is a visual editor for the data in your database.
 
@@ -130,31 +123,15 @@ pnpm db:studio
 
 - `pnpm dev` - Start all apps in development
 - `pnpm build` - Build all apps
-- `pnpm check-types` - Type check all packages
-- `pnpm services:up` - Start local services (PostgreSQL, Redis)
-- `pnpm services:down` - Stop local services
+- `pnpm typecheck` - Type check all packages
+- `pnpm services:db:up` - Start local PostgreSQL
+- `pnpm services:db:down` - Stop local PostgreSQL
 - `pnpm db:generate` - Generate Prisma client
-- `pnpm db:push` - Push database schema
+- `pnpm db:migrate:dev` - Apply migrations locally
 - `pnpm db:studio` - Open Prisma Studio
-- `pnpm db:seed` - Seed database with test data
+- `pnpm db:reset` - Reset the local database
 
-#### Frontend Only
-
-- `pnpm frontend:dev` - Start frontend only
-- `pnpm frontend:build` - Build frontend only
-- `pnpm frontend:start` - Start frontend in production mode
-
-#### Free and open source community edition - all-in-one tools for security, privacy and compliance team
-
-![unicis-platform-beta-poster](https://www.unicis.tech/img/unicis-platform-beta-001.png)
-
-## Applications
-
-- [Record of Processing Activities](https://www.unicis.tech/docs/rpa)
-- [Transfer Impact Assessment](https://www.unicis.tech/docs/tia)
-- [Cybersecurity Controls: MVSP](https://www.unicis.tech/docs/csc)
-
-## 🥇 Features
+## Features
 
 - Create account
 - Sign in with Email and Password
@@ -174,34 +151,6 @@ pnpm db:studio
 - Roles and Permissions
 - Dark mode
 
-## ✨ Contributing
+## License
 
-Thanks for taking the time to contribute! Contributions make the open-source community a fantastic place to learn, inspire, and create. Any contributions you make are greatly appreciated.
-
-Please try to create bug reports that are:
-
-- _Reproducible._ Include steps to reproduce the problem.
-- _Specific._ Include as much detail as possible: which version, what environment, etc.
-- _Unique._ Do not duplicate existing opened issues.
-- _Scoped to a Single Bug._ One bug per report.
-
-[Contributing Guide](https://github.com/UnicisTech/unicis-platform-ce/blob/main/CONTRIBUTING.md)
-
-## 🤩 Community
-
-- [Discord](https://discord.com/invite/8TwyeD97HD) (For live discussion with the Open-Source Community and Unicis team)
-- [X](https://twitter.com/UnicisTech) / [LinkedIn](https://www.linkedin.com/company/unicis-tech-oü/) / [Mastodon](https://mastodon.xyz/@unicis_tech) (Follow us)
-- [Vimeo](https://vimeo.com/user183384852) (Watch community events and tutorials)
-- [GitHub Issues](https://github.com/UnicisTech/unicis-platform-ce/issues) (Contributions, report issues, and product ideas)
-
-## 🌍 Contributors
-
-<a href="https://github.com/UnicisTech/unicis-platform-ce/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=UnicisTech/unicis-platform-ce" />
-</a>
-
-Made with [contrib.rocks](https://contrib.rocks).
-
-## 🛡️ License
-
-[Apache 2.0 License](https://github.com/UnicisTech/unicis-platform-ce/blob/community-edition/LICENSE)
+Apache 2.0 — see [LICENSE](./LICENSE).
