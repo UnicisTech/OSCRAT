@@ -1,7 +1,10 @@
 const env = {
   databaseUrl: `${process.env.DATABASE_URL}`,
-  appUrl: `${process.env.APP_URL}`,
-  publicAppUrl: `${process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || ''}`,
+  appUrl: process.env.APP_URL
+    || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : ''),
+  publicAppUrl: process.env.NEXT_PUBLIC_APP_URL
+    || process.env.APP_URL
+    || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : ''),
   product: 'unicis-platform',
   // redirectAfterSignIn: '/organization',
   redirectIfAuthenticated: '/organization',
