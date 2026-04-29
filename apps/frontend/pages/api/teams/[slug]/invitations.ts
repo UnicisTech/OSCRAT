@@ -11,15 +11,16 @@ import {
   isInvitationExpired,
 } from 'models/invitation';
 import { addTeamMember } from 'models/team';
-import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
-import type { NextApiResponse } from 'next';
+import {
+  withTeamAuth,
+  type AuthenticatedTeamRequest,
+} from '@/lib/middleware';
+import { withApiHandler } from '@/lib/middleware';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { toPlainObject } from '@/lib/utils';
 
-export default function handler(
-  req: AuthenticatedTeamRequest,
-  res: NextApiResponse
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   switch (method) {
@@ -40,7 +41,8 @@ export default function handler(
   }
 }
 
-// Invite a user to a team
+export default withApiHandler(handler);
+
 const handlePOST = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
@@ -87,9 +89,17 @@ const handlePOST = async (
     req.auditInfo
   );
 
-  await sendEvent(teamMember.teamId, 'invitation.created', invitation);
+  try {
+    await sendEvent(teamMember.teamId, 'invitation.created', invitation);
+  } catch (error) {
+    console.error('[Invitation] Failed to send webhook event:', error);
+  }
 
-  await sendTeamInviteEmail(teamMember.teamName, invitation);
+  try {
+    await sendTeamInviteEmail(teamMember.teamName, invitation);
+  } catch (error) {
+    console.error('[Invitation] Failed to send invite email:', error);
+  }
 
   recordMetric('invitation.created');
 
@@ -115,7 +125,7 @@ const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
-  const { teamMember, user } = req.teamContext;
+  const { teamMember } = req.teamContext;
 
   const { id } = req.query as { id: string };
 
@@ -125,10 +135,7 @@ const handleDELETE = async (
 
   const invitation = await getInvitation({ id });
 
-  if (
-    invitation.invitedBy != user.id ||
-    invitation.teamId != teamMember.teamId
-  ) {
+  if (invitation.teamId != teamMember.teamId) {
     throw new ApiError(
       400,
       `You don't have permission to delete this invitation.`

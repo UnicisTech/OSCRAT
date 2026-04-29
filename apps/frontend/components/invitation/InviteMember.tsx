@@ -1,4 +1,5 @@
 import { availableRoles } from '@/lib/permissions';
+import { extractErrorMessage } from '@/lib/utils';
 import { Role, type Team } from '@oscrat/model';
 import { useFormik } from 'formik';
 import { useInvitations } from 'hooks/useInvitations';
@@ -33,12 +34,8 @@ const InviteMember = ({
         toast.success(t('invitation-sent'));
         setVisible(false);
         formik.resetForm();
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error(t('error-sending-invitation'));
-        }
+      } catch (error: unknown) {
+        toast.error(extractErrorMessage(error, t('error-sending-invitation')));
       }
     },
   });

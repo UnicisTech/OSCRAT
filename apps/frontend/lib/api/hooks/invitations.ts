@@ -38,6 +38,7 @@ export function useGetInvitation(token: string) {
   return useQuery({
     queryKey: queryKeys.invitations.detail(token),
     queryFn: () => teamInvitationsEndpoints.getInvitation(token),
+    enabled: !!token,
   });
 }
 

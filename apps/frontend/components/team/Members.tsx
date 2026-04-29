@@ -74,14 +74,16 @@ const Members = ({ team }: { team: Team }) => {
             Team members and their roles.
           </p>
         </div>
-        <Button
-          color="primary"
-          variant="outline"
-          size="md"
-          onClick={() => setVisible(!visible)}
-        >
-          {t('add-member')}
-        </Button>
+        {canAccess('team_invitation', ['create']) && (
+          <Button
+            color="primary"
+            variant="outline"
+            size="md"
+            onClick={() => setVisible(!visible)}
+          >
+            {t('add-member')}
+          </Button>
+        )}
       </div>
       <table className="dark:border-base-200 table w-full border-b text-sm">
         <thead className="dark:bg-base-200 bg-gray-200 text-gray-600 dark:text-gray-400">

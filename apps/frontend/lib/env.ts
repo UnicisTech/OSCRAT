@@ -42,11 +42,9 @@ const env = {
     from: process.env.SMTP_FROM,
   },
 
-  // SendGrid configuration
-  sendgrid: {
-    apiKey: process.env.SENDGRID_API_KEY,
-    fromEmail: process.env.SENDGRID_FROM_EMAIL,
-  },
+  // Email provider (Brevo SMTP, Mailpit, or any SMTP relay)
+  // SendGrid env vars kept for backward compatibility but no longer used
+
 
   // Matomo configuration
   matomo: {
