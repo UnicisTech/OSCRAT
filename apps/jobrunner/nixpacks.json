@@ -1,10 +1,11 @@
 {
   "phases": {
     "setup": {
-      "nixPkgs": ["...", "nodejs", "syft", "grype", "python3", "python3Packages.pip"]
+      "nixPkgs": ["...", "nodejs", "syft", "grype", "python3", "python3Packages.pipx"]
     },
-    "install": {
-      "cmds": ["pip install openscap-report --break-system-packages"]
+    "openscap": {
+      "dependsOn": ["install"],
+      "cmds": ["PIPX_BIN_DIR=/usr/local/bin pipx install openscap-report==1.0.0"]
     }
   }
 }
