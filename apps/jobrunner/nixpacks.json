@@ -1,11 +1,15 @@
 {
   "phases": {
     "setup": {
-      "nixPkgs": ["...", "nodejs", "syft", "grype", "python3", "python3Packages.pipx"]
+      "nixPkgs": ["...", "nodejs", "syft", "grype", "python3", "python3Packages.pip"]
     },
     "openscap": {
       "dependsOn": ["install"],
-      "cmds": ["PIPX_BIN_DIR=/usr/local/bin pipx install openscap-report==1.0.0"]
+      "cmds": [
+        "python3 -m venv /opt/openscap-venv",
+        "/opt/openscap-venv/bin/pip install openscap-report==1.0.0",
+        "ln -sf /opt/openscap-venv/bin/oscap-report /usr/bin/oscap-report"
+      ]
     }
   }
 }
