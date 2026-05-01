@@ -3,6 +3,7 @@ import { getCscStatusesProp, getCscControlsProp } from '@/lib/csc';
 import { findOrCreateApp } from '@/lib/svix';
 import { Role, TeamCreateData, type AuditInfo } from '@oscrat/model';
 import * as TeamOps from '@oscrat/model/operations';
+import { fromJsonObject } from '@oscrat/model/utils/json';
 import { controls } from '@/components/defaultLanding/data/configs/csc';
 import type { TeamProperties, TaskProperties, ISO } from 'types';
 import type { Session } from 'next-auth';
@@ -301,7 +302,7 @@ export const addControlsToIssue = async (params: {
 
   const cscStatusesProp = getCscControlsProp(ISO);
   const taskId = task.id;
-  const taskProperties = task?.properties as TaskProperties;
+  const taskProperties = fromJsonObject<TaskProperties>(task?.properties);
   let csc_controls = taskProperties?.[cscStatusesProp];
 
   if (typeof csc_controls === 'undefined') {
@@ -357,7 +358,7 @@ export const removeControlsFromIssue = async (params: {
 
   const cscStatusesProp = getCscControlsProp(ISO);
   const taskId = task.id;
-  const taskProperties = task?.properties as TaskProperties;
+  const taskProperties = fromJsonObject<TaskProperties>(task?.properties);
   const csc_controls = taskProperties?.[cscStatusesProp] as Array<string>;
   const new_csc_controls = csc_controls.filter(
     (item) => !controls.includes(item)
@@ -411,7 +412,7 @@ export const changeControlInIssue = async (params: {
 
   const cscStatusesProp = getCscControlsProp(ISO);
   const taskId = task.id;
-  const taskProperties = task?.properties as TaskProperties;
+  const taskProperties = fromJsonObject<TaskProperties>(task?.properties);
   const csc_controls = taskProperties?.[cscStatusesProp] as Array<string>;
 
   const new_csc_controls = csc_controls.map((control) => {

@@ -46,6 +46,7 @@ Please follow these simple steps to get a local copy up and running.
 - Docker compose
 - [Syft](https://github.com/anchore/syft) (required by the jobrunner for SBOM generation)
 - [Grype](https://github.com/anchore/grype) (required by the jobrunner for vulnerability scanning)
+- [openscap-report](https://github.com/OpenSCAP/openscap-report) (required by the jobrunner for configuration scan reports)
 
 ### Development
 
@@ -70,9 +71,9 @@ cd oscrat-oves
 pnpm install
 ```
 
-#### 4. Install Syft & Grype
+#### 4. Install Syft, Grype & openscap-report
 
-The jobrunner shells out to these binaries — install them and make sure they're on your `PATH`. See [syft](https://github.com/anchore/syft#installation) and [grype](https://github.com/anchore/grype#installation).
+The jobrunner shells out to these binaries — install them and make sure they're on your `PATH`. See [syft](https://github.com/anchore/syft#installation), [grype](https://github.com/anchore/grype#installation), and [openscap-report](https://github.com/OpenSCAP/openscap-report#installation).
 
 #### 5. Set up your .env file
 

@@ -8,6 +8,7 @@ import type {
   OscratAssessmentSummary,
   OscratAssessmentDetail,
 } from '../types/assessment';
+import { fromJsonObject, toJsonInput } from '../utils/json';
 import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
 
 /** Select for assessment summary queries */
@@ -66,7 +67,7 @@ export const transformToAssessmentDetail = (
   id: assessment.id,
   type: assessment.type,
   schemaVersion: assessment.schemaVersion,
-  rawData: assessment.rawData as Record<string, any>,
+  rawData: fromJsonObject<Record<string, any>>(assessment.rawData),
   teamId: assessment.teamId,
   versionId: assessment.versionId ?? undefined,
   productId: assessment.productId ?? undefined,
@@ -158,7 +159,7 @@ export const createAssessment = async (
       data: {
         type: data.type,
         schemaVersion: data.schemaVersion,
-        rawData: data.rawData as Prisma.InputJsonValue,
+        rawData: toJsonInput(data.rawData),
         teamId,
         productId: data.productId ?? null,
         versionId: data.versionId ?? null,
@@ -200,7 +201,7 @@ export const updateAssessment = async (
       where: { id: assessmentId },
       data: {
         ...(data.schemaVersion && { schemaVersion: data.schemaVersion }),
-        ...(data.rawData && { rawData: data.rawData as Prisma.InputJsonValue }),
+        ...(data.rawData && { rawData: toJsonInput(data.rawData) }),
       },
       select: ASSESSMENT_DETAIL_SELECT,
     });

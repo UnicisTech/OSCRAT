@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import * as TaskOps from '@oscrat/model/operations';
 import * as TeamOps from '@oscrat/model/operations';
-import { TaskStatus, TaskOriginType, type AuditInfo } from '@oscrat/model';
+import { TaskStatus, TaskOriginType, type AuditInfo, type TaskProperties } from '@oscrat/model';
 
 const normalizeTaskTitle = (title: string) => title.trim();
 type TaskUpdateInput = Record<string, unknown>;
@@ -48,6 +48,7 @@ export const createTask = async (param: {
   productId?: string;
   versionId?: string;
   originType?: TaskOriginType;
+  properties?: TaskProperties;
 }, audit: AuditInfo) => {
   const { teamId } = param;
   const normalizedTitle = normalizeTaskTitle(param.title);

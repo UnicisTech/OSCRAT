@@ -5,6 +5,7 @@ import Repository from './allTabs/repository';
 import Incidents from './allTabs/incidents';
 import Vulnerabilities from './allTabs/vulnerabilities';
 import Scans from './allTabs/scans';
+import Configuration from './allTabs/configuration';
 import Task from './allTabs/task';
 import Documentation from './allTabs/documentation';
 import Compliance from './allTabs/compliance';
@@ -21,6 +22,11 @@ const TABS_CONFIG = [
     id: 'scans',
     label: 'oscrat.ui.versions.tabs.scans',
     component: <Scans />,
+  },
+  {
+    id: 'configuration',
+    label: 'oscrat.ui.versions.tabs.configuration',
+    component: <Configuration />,
   },
   {
     id: 'vulnerabilities',

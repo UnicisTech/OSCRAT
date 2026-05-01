@@ -1,7 +1,10 @@
 {
   "phases": {
     "setup": {
-      "nixPkgs": ["...", "nodejs", "syft", "grype"]
+      "nixPkgs": ["...", "nodejs", "syft", "grype", "python3", "python3Packages.pip"]
+    },
+    "install": {
+      "cmds": ["pip install openscap-report --break-system-packages"]
     }
   }
 }

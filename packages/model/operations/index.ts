@@ -2,6 +2,7 @@ export * from './repository';
 export * from './workerJob';
 export * from './sbomReport';
 export * from './vulnerabilityScanReport';
+export * from './configurationScanReport';
 export * from './file';
 export * from './team';
 export * from './product';

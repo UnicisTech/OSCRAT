@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Team, TaskStatus } from '@oscrat/model';
+import { Team, TaskStatus, TaskOriginType, type TaskProperties } from '@oscrat/model';
 import toast from 'react-hot-toast';
 import Modal from '@/components/shared/Modal';
 import { Button } from 'react-daisyui';
@@ -20,6 +20,10 @@ interface CreateTaskProps {
   team: Team;
   defaultProductId?: string;
   defaultVersionId?: string;
+  defaultTitle?: string;
+  defaultDescription?: string;
+  defaultOriginType?: TaskOriginType;
+  linkedProperties?: TaskProperties;
   onSuccess?: (taskId: number) => void;
 }
 
@@ -29,6 +33,10 @@ const CreateTask = ({
   team,
   defaultProductId,
   defaultVersionId,
+  defaultTitle,
+  defaultDescription,
+  defaultOriginType,
+  linkedProperties,
   onSuccess,
 }: CreateTaskProps) => {
   const { t, ready } = useTranslation('common');
@@ -42,14 +50,14 @@ const CreateTask = ({
   );
   
   const initialValues: TaskCreateData = {
-    title: '',
+    title: defaultTitle || '',
     status: DEFAULT_TASK_STATUS,
     duedate: new Date(getCurrentStringDate()),
-    description: '',
+    description: defaultDescription || '',
     productId: defaultProductId || '',
     versionId: defaultVersionId || '',
   };
-  
+
   const formik = useFormik<TaskCreateData>({
     initialValues,
     validationSchema,
@@ -65,12 +73,14 @@ const CreateTask = ({
           description: values.description?.trim() || '',
           productId: values.productId || undefined,
           versionId: values.versionId || undefined,
+          originType: defaultOriginType,
+          properties: linkedProperties,
         });
-        
+
         toast.success(t('task-created'));
         formik.resetForm();
         setVisible(false);
-        
+
         // Call onSuccess callback if provided (e.g., to link task to documentation)
         if (onSuccess && result?.id) {
           onSuccess(result.id);

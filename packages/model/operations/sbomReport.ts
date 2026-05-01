@@ -1,17 +1,21 @@
 import { PrismaClient, Prisma, WorkerJobStatus, WorkerJobType } from '@prisma/client';
 import { format } from 'date-fns';
 import { randomUUID } from 'crypto';
+import { gzipSync } from 'zlib';
 import { createAttachmentWithTx } from './attachment';
+import { createFileInTransaction } from './file';
 import { slugify } from '../utils/slugify';
+import { fromJson, toJsonInput } from '../utils/json';
 import { SbomSource, createWorkerJobWithTx } from './workerJob';
 import { createAuditContextWithTx, logCreate, logDelete, EntityType, CrudType, type AuditInfo } from '../audit';
+import type { SBOMSummary } from '../types/sbom';
 
 export interface SbomReportSummary {
   id: string;
   jobId: string;
   versionId: string;
   productId: string;
-  sbomData: any;
+  sbomData: SBOMSummary | null;
   attachment?: {
     id: string;
     name: string;
@@ -36,7 +40,7 @@ export interface SbomReportDetails {
   versionId: string;
   productId: string;
   status: WorkerJobStatus;
-  sbomData: any | null;
+  sbomData: SBOMSummary | null;
   createdAt: Date;
   updatedAt: Date;
 
@@ -150,7 +154,7 @@ const transformToSbomReportSummary = (
   jobId: report.jobId,
   versionId: report.versionId,
   productId: report.productId,
-  sbomData: report.sbomData,
+  sbomData: fromJson<SBOMSummary>(report.sbomData),
   attachment: report.attachment
     ? {
         id: report.attachment.id,
@@ -185,7 +189,7 @@ const transformToSbomReportDetails = (
     versionId: report.versionId,
     productId: report.productId,
     status: report.job.status,
-    sbomData: report.sbomData,
+    sbomData: fromJson<SBOMSummary>(report.sbomData),
     createdAt: report.createdAt,
     updatedAt: report.updatedAt,
     job: {
@@ -368,11 +372,18 @@ export const generateSbomFilename = (
 };
 
 /** Create SBOM report with job (report-first approach) */
+export interface SbomFileImport {
+  fileData: Buffer;
+  filename: string;
+  mimeType: string;
+}
+
 export interface CreateSbomReportWithJobParams {
   versionId: string;
   productId: string;
   jobType: 'REPO_GENERATE_SBOM' | 'FILE_IMPORT_SBOM';
   jobPayload: any;
+  fileImport?: SbomFileImport;
   triggeredByUserId: string;
   teamId: string;
 }
@@ -387,7 +398,23 @@ export const createSbomReportWithJob = async (
     productId: params.productId,
     jobType: params.jobType,
     triggeredByUserId: params.triggeredByUserId,
+    fileSize: params.fileImport?.fileData.length,
   });
+
+  // For file-import flow, gzip outside the transaction to keep CPU work off
+  // the DB session. Worker gunzips on read.
+  let compressedFileImport: { data: Buffer; filename: string; mimeType: string } | undefined;
+  if (params.fileImport) {
+    const data = gzipSync(params.fileImport.fileData);
+    console.log(
+      `[SBOM Report Operations] gzip: ${params.fileImport.fileData.length} -> ${data.length} bytes`
+    );
+    compressedFileImport = {
+      data,
+      filename: params.fileImport.filename,
+      mimeType: params.fileImport.mimeType,
+    };
+  }
 
   const result = await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
@@ -395,7 +422,23 @@ export const createSbomReportWithJob = async (
     // 1. Pre-generate the report ID
     const reportId = randomUUID();
 
-    // 2. Create job using helper with reportId in payload
+    // 2. Persist the gzipped bytes in the File table; only the small fileId
+    //    travels through the WorkerJob payload.
+    let fileImportPayload: { fileId: string; filename: string; mimeType: string } | undefined;
+    if (compressedFileImport) {
+      const inputFile = await createFileInTransaction(tx, {
+        fileData: compressedFileImport.data,
+        fileSize: compressedFileImport.data.length,
+        mimeType: 'application/gzip',
+      });
+      fileImportPayload = {
+        fileId: inputFile.id,
+        filename: compressedFileImport.filename,
+        mimeType: compressedFileImport.mimeType,
+      };
+    }
+
+    // 3. Create job using helper with reportId in payload
     const job = await createWorkerJobWithTx(tx, {
       type: params.jobType,
       triggeredByUserId: params.triggeredByUserId,
@@ -404,11 +447,12 @@ export const createSbomReportWithJob = async (
       contextVersionId: params.versionId,
       payload: {
         ...params.jobPayload,
+        ...fileImportPayload,
         reportId, // Inject reportId into payload
       },
     });
 
-    // 3. Create report with pre-generated ID
+    // 4. Create report with pre-generated ID
     const sbomReport = await tx.sbomReport.create({
       data: {
         id: reportId, // Use pre-generated ID
@@ -522,7 +566,7 @@ export const getSbomReportDetailsById = async (
 /** Update SBOM report (used by job runner when job completes) */
 export interface UpdateSbomReportParams {
   reportId: string;
-  sbomData?: any;
+  sbomData?: SBOMSummary;
   sbomFile?: {
     filename: string;
     fileData: Buffer;
@@ -545,7 +589,7 @@ export const updateSbomReport = async (
     const report = await tx.sbomReport.update({
       where: { id: params.reportId },
       data: {
-        sbomData: params.sbomData ?? null,
+        sbomData: toJsonInput(params.sbomData),
       },
       select: { versionId: true },
     });

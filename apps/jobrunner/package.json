@@ -18,8 +18,10 @@
     "@oscrat/model": "workspace:*",
     "dotenv": "^16.4.5",
     "dotenv-cli": "^7.4.2",
+    "fast-xml-parser": "^5.7.2",
     "p-queue": "^8.1.0",
     "tempy": "^3.1.0",
+    "yup": "^1.6.1",
     "zx": "^8.5.5"
   },
   "devDependencies": {

@@ -6,6 +6,7 @@ import type { Session } from 'next-auth';
 import type { Role, TeamMemberDetail, AuditInfo } from '@oscrat/model';
 import * as TeamOps from '@oscrat/model/operations';
 import { randomUUID } from 'crypto';
+import { ApiError } from '@/lib/errors';
 
 export interface AuthenticatedTeamContext {
   user: Session['user'];
@@ -97,11 +98,14 @@ export function createMiddleware<T = any>(
         const message = error.message || 'Something went wrong';
         const status =
           error.status || (error.message === 'Unauthorized' ? 401 : 500);
+        const code = error instanceof ApiError ? error.code : undefined;
+        const values = error instanceof ApiError ? error.values : undefined;
 
+        const codeLog = code ? `, code: ${code}` : '';
         console.log(
-          `[API Error] ${method} ${url} failed, error: ${message}, id: ${requestId}`
+          `[API Error] ${method} ${url} failed, error: ${message}${codeLog}, id: ${requestId}`
         );
-        res.status(status).json({ error: { message } } as T);
+        res.status(status).json({ error: { message, code, values } } as T);
       }
     };
   };

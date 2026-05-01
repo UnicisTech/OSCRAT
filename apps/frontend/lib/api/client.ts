@@ -116,17 +116,17 @@ class ApiClient {
 
   private transformError(error: unknown): ApiError {
     if (axios.isAxiosError(error)) {
-      // Handle nested error objects
-      const errorMessage = 
-        error.response?.data?.error?.message ||
-        error.response?.data?.message || 
-        error.message || 
+      const body = error.response?.data?.error;
+      const errorMessage =
+        body?.message ||
+        error.response?.data?.message ||
+        error.message ||
         'An error occurred';
-        
+
       return {
         message: errorMessage,
-        code: error.response?.status?.toString(),
-        values: {},
+        code: body?.code,
+        values: body?.values || {},
       };
     }
     return {

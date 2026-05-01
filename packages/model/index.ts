@@ -44,6 +44,7 @@ export {
   AuditUserType,
   DocumentationVisibility,
   DocumentationStatus,
+  ConfigurationScanFormat,
 } from '@prisma/client';
 
 // Export shared application types (these are safe for client)
@@ -52,6 +53,7 @@ export * from './types/product';
 export * from './types/version';
 export * from './types/vulnerabilities';
 export * from './types/vulnerabilityScan';
+export * from './types/configurationScan';
 export * from './types/incidents';
 export * from './types/repository';
 export * from './types/team';
@@ -60,6 +62,7 @@ export * from './types/jobPayloads';
 export * from './types/dashboard';
 export * from './types/auditLog';
 export * from './types/documentation';
+export * from './types/task';
 
 // Export error utilities
 export { ERROR_CODES, type ErrorCode } from './constants/errorCodes';
@@ -78,13 +81,20 @@ export type {
   VulnerabilityScanReportDetails,
   VulnerabilityScanReportSummary,
 } from './operations/vulnerabilityScanReport';
+export type {
+  ConfigurationScanReportDetails,
+  ConfigurationScanReportSummary,
+} from './operations/configurationScanReport';
 export { VulnerabilityScanSource, SbomSource } from './operations/workerJob';
 export type { CreateFileParams, FileData } from './operations/file';
 export type {
   AttachmentWithFile,
   CreateAttachmentParams,
 } from './operations/attachment';
-export type {
-  SbomReportScanVulnerabilitiesPayload,
-  SbomReportScanVulnerabilitiesResult,
-} from './types/jobPayloads';
+export {
+  repoGenerateSbomPayloadSchema,
+  fileImportSbomPayloadSchema,
+  repoScanVulnerabilitiesPayloadSchema,
+  sbomReportScanVulnerabilitiesPayloadSchema,
+  processConfigurationScanPayloadSchema,
+} from './schemas/jobPayloads';

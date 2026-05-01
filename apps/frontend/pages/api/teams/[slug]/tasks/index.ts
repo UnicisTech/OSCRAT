@@ -3,6 +3,7 @@ import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 import { DEFAULT_TASK_STATUS, DEFAULT_TASK_ORIGIN_TYPE } from '@/constants/taskStatuses';
+import { taskPropertiesSchema } from '@/lib/validation/task';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -40,8 +41,20 @@ const handlePOST = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  const { title, status, duedate, description, productId, versionId, originType } = req.body;
+  const { title, status, duedate, description, productId, versionId, originType, properties } = req.body;
   const { teamId } = teamMember;
+
+  let validatedProperties;
+  if (properties !== undefined) {
+    try {
+      validatedProperties = await taskPropertiesSchema.validate(properties, {
+        abortEarly: false,
+        stripUnknown: false,
+      });
+    } catch (err) {
+      throw new ApiError(400, (err as Error).message);
+    }
+  }
 
   const task = await createTask({
     authorId: user.id,
@@ -53,6 +66,7 @@ const handlePOST = async (
     productId,
     versionId,
     originType: originType || DEFAULT_TASK_ORIGIN_TYPE,
+    properties: validatedProperties,
   }, req.auditInfo);
 
   return res.status(200).json({ data: task, error: null });

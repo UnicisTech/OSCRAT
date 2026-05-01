@@ -73,16 +73,17 @@ const handlePOST = async (
 
     // Extract file data
     const fileUpload = await extractFileData(uploadedFile);
-    const fileDataBase64 = fileUpload.fileData.toString('base64');
 
-    // Create the file import report and job with file data in payload
+    // Create the file import report and job; bytes go to the File table
+    // (gzipped) inside createSbomReportWithJob, not into the WorkerJob payload.
     const report = await createSbomReportWithJob(prisma, {
       versionId: versionId as string,
       productId: productId as string,
       jobType: 'FILE_IMPORT_SBOM',
-      jobPayload: {
+      jobPayload: {},
+      fileImport: {
+        fileData: fileUpload.fileData,
         filename: fileUpload.filename,
-        fileData: fileDataBase64,
         mimeType: fileUpload.mimeType,
       },
       triggeredByUserId: teamMember.userId,
@@ -101,6 +102,6 @@ const handlePOST = async (
       throw error;
     }
 
-    handleFormidableError(error, 100);
+    await handleFormidableError(error, 100);
   }
 };

@@ -23,6 +23,7 @@ export interface CreateAttachmentParams {
   versionId?: string;
   sbomReportId?: string;
   vulnerabilityScanReportId?: string;
+  configurationScanReportId?: string;
   vulnerabilityId?: string;
   incidentId?: string;
 }
@@ -39,6 +40,7 @@ export const createAttachmentWithTx = async (
     versionId: params.versionId,
     sbomReportId: params.sbomReportId,
     vulnerabilityScanReportId: params.vulnerabilityScanReportId,
+    configurationScanReportId: params.configurationScanReportId,
     vulnerabilityId: params.vulnerabilityId,
     incidentId: params.incidentId,
   });
@@ -61,6 +63,7 @@ export const createAttachmentWithTx = async (
       versionId: params.versionId,
       sbomReportId: params.sbomReportId,
       vulnerabilityScanReportId: params.vulnerabilityScanReportId,
+      configurationScanReportId: params.configurationScanReportId,
       vulnerabilityId: params.vulnerabilityId,
       incidentId: params.incidentId,
       createdBy: params.createdBy,
@@ -92,6 +95,7 @@ export const createAttachment = async (
     versionId: params.versionId,
     sbomReportId: params.sbomReportId,
     vulnerabilityScanReportId: params.vulnerabilityScanReportId,
+    configurationScanReportId: params.configurationScanReportId,
     vulnerabilityId: params.vulnerabilityId,
     incidentId: params.incidentId,
   });

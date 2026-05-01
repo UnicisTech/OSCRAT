@@ -1,5 +1,13 @@
-import { PrismaClient, TaskStatus, TaskOriginType } from '@prisma/client';
+import { PrismaClient, TaskStatus, TaskOriginType, Prisma } from '@prisma/client';
 import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
+import { toJsonInput } from '../utils/json';
+import {
+  TASK_CONFIGURATION_PROPERTY_KEYS,
+  type TaskByRuleSummary,
+  type TaskProperties,
+} from '../types/task';
+
+const { RULE_ID: CONFIGURATION_RULE_ID } = TASK_CONFIGURATION_PROPERTY_KEYS;
 
 /** Create a new task */
 export const createTask = async (
@@ -15,12 +23,13 @@ export const createTask = async (
     productId?: string;
     versionId?: string;
     originType?: TaskOriginType;
+    properties?: TaskProperties;
   },
   auditInfo: AuditInfo
 ) => {
   return await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
-    const { authorId, teamId, title, status, duedate, description, taskNumber, productId, versionId, originType } =
+    const { authorId, teamId, title, status, duedate, description, taskNumber, productId, versionId, originType, properties } =
       param;
 
     const task = await tx.task.create({
@@ -32,7 +41,7 @@ export const createTask = async (
         status: status,
         duedate,
         description,
-        properties: {},
+        properties: toJsonInput(properties ?? {}),
         productId,
         versionId,
         originType: originType,
@@ -206,4 +215,48 @@ export const getTeamTasks = async (prisma: PrismaClient, slug: string) => {
       },
     },
   });
+};
+
+/** Unresolved configuration-rule tasks for a product version, keyed by rule_id.
+ *  Scoped to versionId (not reportId) so the same task is surfaced across every
+ *  configuration scan report under the version. */
+export const getConfigurationTasksByVersion = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string
+): Promise<Map<string, TaskByRuleSummary>> => {
+  const tasks = await prisma.task.findMany({
+    where: {
+      teamId,
+      versionId,
+      status: { not: TaskStatus.DONE },
+      properties: {
+        path: [CONFIGURATION_RULE_ID],
+        not: Prisma.AnyNull,
+      },
+    },
+    select: {
+      id: true,
+      taskNumber: true,
+      title: true,
+      status: true,
+      properties: true,
+    },
+  });
+
+  const byRule = new Map<string, TaskByRuleSummary>();
+  for (const t of tasks) {
+    const ruleId = (t.properties as Record<string, unknown>)?.[CONFIGURATION_RULE_ID] as
+      | string
+      | undefined;
+    if (ruleId && !byRule.has(ruleId)) {
+      byRule.set(ruleId, {
+        id: t.id,
+        taskNumber: t.taskNumber,
+        title: t.title,
+        status: t.status,
+      });
+    }
+  }
+  return byRule;
 };

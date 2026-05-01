@@ -3,6 +3,7 @@ import { parsePhoneNumberFromString, isValidPhoneNumber } from 'libphonenumber-j
 import DOMPurify from 'isomorphic-dompurify';
 import { stdnum } from 'stdnum';
 import { passwordPolicies } from '@/lib/common';
+import { DESCRIPTION_CHAR_REGEX } from '@/lib/text-sanitize';
 
 function validateTaxIDAgainstAllCountries(taxID: string): boolean {
   for (const countryCode of Object.keys(stdnum)) {
@@ -32,7 +33,7 @@ function validateTaxIDAgainstAllCountries(taxID: string): boolean {
 
 // Safe patterns - alphanumeric with basic punctuation
 const SAFE_TEXT_REGEX = /^[a-zA-Z0-9\s\-_.,()'\u00C0-\u017F]*$/;
-const SAFE_FREETEXT_REGEX = /^[a-zA-Z0-9\s\-_.,()':;@#&+/\\!?\n\r\u00C0-\u017F]*$/;
+const SAFE_FREETEXT_REGEX = DESCRIPTION_CHAR_REGEX;
 const SAFE_ACRONYM_REGEX = /^[a-zA-Z0-9\-_]+$/;
 const SAFE_IDENTIFIER_REGEX = /^[a-zA-Z0-9\-_]*$/;
 

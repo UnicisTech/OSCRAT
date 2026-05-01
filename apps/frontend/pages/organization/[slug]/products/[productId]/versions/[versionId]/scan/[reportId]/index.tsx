@@ -342,8 +342,8 @@ export default function VulnerabilityScanSummary() {
 
   const { downloadAttachment } = useAttachments();
 
-  const scanData = report?.scanData as any;
-  const vulnerabilities = (scanData?.vulnerabilities || []) as ScanVulnerability[];
+  const scanData = report?.scanData ?? null;
+  const vulnerabilities = scanData?.vulnerabilities ?? [];
 
   const {
     currentPage,

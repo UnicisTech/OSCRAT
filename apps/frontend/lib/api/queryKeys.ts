@@ -245,6 +245,21 @@ export const queryKeys = {
                 reportId,
               ] as const,
           },
+          configurationScan: {
+            all: (teamId: string, versionId: string) =>
+              [
+                ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+                'jobs',
+                'configuration-scan',
+              ] as const,
+            detail: (teamId: string, versionId: string, reportId: string) =>
+              [
+                ...queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+                'jobs',
+                'configuration-scan',
+                reportId,
+              ] as const,
+          },
         },
         attachments: {
           all: (teamId: string, versionId: string, filters?: any) =>

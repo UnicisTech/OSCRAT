@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import type { Task } from '@oscrat/model';
+import { TASK_CSC_PROPERTY_KEYS, type Task } from '@oscrat/model';
 
 const TasksList = ({
   tasks,
@@ -12,7 +12,9 @@ const TasksList = ({
 }) => {
   const [selectedTasks] = useState<Array<Task>>(
     tasks.filter((task: any) =>
-      task.properties?.csc_controls?.find((item: string) => item === control)
+      task.properties?.[TASK_CSC_PROPERTY_KEYS.CONTROLS]?.find(
+        (item: string) => item === control
+      )
     )
   );
 

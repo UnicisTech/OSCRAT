@@ -5,6 +5,10 @@ import {
   WorkerJob,
   Prisma,
 } from '@prisma/client';
+import type { ConfigurationScanSummary } from '../types/configurationScan';
+import type { VulnerabilityScanSummary } from '../types/vulnerabilityScan';
+import type { SBOMSummary } from '../types/sbom';
+import { fromJson } from '../utils/json';
 
 // Reusable select patterns
 const USER_SELECT = {
@@ -62,7 +66,7 @@ export interface SbomWorkerJob {
     name: string | null;
     email: string;
   };
-  sbomData?: any;
+  sbomData: SBOMSummary | null;
   attachment?: {
     id: string;
     name: string;
@@ -85,7 +89,7 @@ export interface VulnerabilityScanWorkerJob {
     name: string | null;
     email: string;
   };
-  scanData?: any;
+  scanData: VulnerabilityScanSummary | null;
   attachment?: {
     id: string;
     name: string;
@@ -394,7 +398,7 @@ const transformToSbomWorkerJob = (job: any): SbomWorkerJob => {
     errCode: job.errCode || undefined,
     errMessage: job.errMessage || undefined,
     triggeredByUser: job.triggeredByUser,
-    sbomData: job.sbomReport?.sbomData,
+    sbomData: fromJson<SBOMSummary>(job.sbomReport?.sbomData),
     attachment: job.sbomReport?.attachment
       ? {
           id: job.sbomReport.attachment.id,
@@ -523,7 +527,9 @@ const transformToVulnerabilityScanWorkerJob = (
     errCode: job.errCode || undefined,
     errMessage: job.errMessage || undefined,
     triggeredByUser: job.triggeredByUser,
-    scanData: job.vulnerabilityScanReport?.scanData,
+    scanData: fromJson<VulnerabilityScanSummary>(
+      job.vulnerabilityScanReport?.scanData
+    ),
     attachment: job.vulnerabilityScanReport?.attachment
       ? {
           id: job.vulnerabilityScanReport.attachment.id,
@@ -641,5 +647,158 @@ export const deleteVulnerabilityScanWorkerJob = async (
 
   console.log(
     `[Worker Job Operations] Successfully deleted vulnerability scan job ${jobId} and all associated data`
+  );
+};
+
+// Configuration Scan Operations
+
+export interface ConfigurationScanWorkerJob {
+  id: string;
+  status: WorkerJobStatus;
+  createdAt: Date;
+  processStartTime: Date | null;
+  processEndTime: Date | null;
+  errCode?: string;
+  errMessage?: string;
+  triggeredByUser: {
+    id: string;
+    name: string | null;
+    email: string;
+  };
+  scanData: ConfigurationScanSummary | null;
+  attachment?: {
+    id: string;
+    name: string;
+    fileSize: number;
+    mimeType?: string;
+  };
+}
+
+const CONFIGURATION_SCAN_JOB_INCLUDE = {
+  triggeredByUser: USER_SELECT,
+  configurationScanReport: {
+    include: {
+      attachment: {
+        select: {
+          id: true,
+          name: true,
+          fileSize: true,
+          mimeType: true,
+        },
+      },
+    },
+  },
+} as const;
+
+type ConfigurationScanJobPayload = Prisma.WorkerJobGetPayload<{
+  include: typeof CONFIGURATION_SCAN_JOB_INCLUDE;
+}>;
+
+const transformToConfigurationScanWorkerJob = (
+  job: ConfigurationScanJobPayload
+): ConfigurationScanWorkerJob => {
+  return {
+    id: job.id,
+    status: job.status,
+    createdAt: job.createdAt,
+    processStartTime: job.processStartTime,
+    processEndTime: job.processEndTime,
+    errCode: job.errCode || undefined,
+    errMessage: job.errMessage || undefined,
+    triggeredByUser: job.triggeredByUser,
+    scanData: fromJson<ConfigurationScanSummary>(
+      job.configurationScanReport?.scanData
+    ),
+    attachment: job.configurationScanReport?.attachment
+      ? {
+          id: job.configurationScanReport.attachment.id,
+          name: job.configurationScanReport.attachment.name,
+          fileSize: job.configurationScanReport.attachment.fileSize,
+          mimeType: job.configurationScanReport.attachment.mimeType ?? undefined,
+        }
+      : undefined,
+  };
+};
+
+export const getConfigurationScanWorkerJobs = async (
+  prisma: PrismaClient,
+  teamId: string,
+  versionId: string,
+  limit: number = 50
+): Promise<ConfigurationScanWorkerJob[]> => {
+  console.log(
+    `[Worker Job Operations] Getting configuration scan jobs for version:`,
+    {
+      teamId,
+      versionId,
+      limit,
+    }
+  );
+
+  const jobs = await prisma.workerJob.findMany({
+    where: {
+      contextVersionId: versionId,
+      contextTeamId: teamId,
+      type: WorkerJobType.PROCESS_CONFIGURATION_SCAN,
+    },
+    include: CONFIGURATION_SCAN_JOB_INCLUDE,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: limit,
+  });
+
+  const configurationScanWorkerJobs: ConfigurationScanWorkerJob[] = jobs.map(
+    (job) => {
+      return transformToConfigurationScanWorkerJob(job);
+    }
+  );
+
+  console.log(
+    `[Worker Job Operations] Found ${configurationScanWorkerJobs.length} configuration scan jobs with enhanced data`
+  );
+  return configurationScanWorkerJobs;
+};
+
+export const deleteConfigurationScanWorkerJob = async (
+  prisma: PrismaClient,
+  teamId: string,
+  jobId: string
+): Promise<void> => {
+  console.log(`[Worker Job Operations] Deleting configuration scan job:`, {
+    teamId,
+    jobId,
+  });
+
+  const job = await prisma.workerJob.findFirst({
+    where: {
+      id: jobId,
+      contextTeamId: teamId,
+      type: WorkerJobType.PROCESS_CONFIGURATION_SCAN,
+    },
+    select: { id: true, status: true },
+  });
+
+  if (!job) {
+    throw new Error(
+      `Configuration scan job ${jobId} not found or not accessible for team ${teamId}`
+    );
+  }
+
+  if (
+    job.status !== WorkerJobStatus.COMPLETED &&
+    job.status !== WorkerJobStatus.FAILED
+  ) {
+    throw new Error(
+      `Cannot delete configuration scan job ${jobId}: only completed or failed jobs can be deleted (current status: ${job.status})`
+    );
+  }
+
+  await prisma.workerJob.delete({
+    where: { id: jobId },
+  });
+
+  console.log(
+    `[Worker Job Operations] Successfully deleted configuration scan job ${jobId} and all associated data`
   );
 };

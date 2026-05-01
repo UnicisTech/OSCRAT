@@ -1,10 +1,15 @@
 import {
-  TaskProperties,
   ExtendedComment,
   Attachment,
 } from '@/types';
 import { api } from '@/lib/api/client';
-import { Task, TaskStatus, TaskOriginType, DocumentationStatus } from '@oscrat/model';
+import {
+  Task,
+  TaskStatus,
+  TaskOriginType,
+  DocumentationStatus,
+  type TaskProperties,
+} from '@oscrat/model';
 
 export interface TaskLinkedDocumentation {
   id: string;
@@ -27,6 +32,7 @@ export type CreateTaskData = {
   productId?: string;
   versionId?: string;
   originType?: TaskOriginType;
+  properties?: TaskProperties;
 };
 
 export type UpdateTaskData = Partial<CreateTaskData>;
@@ -65,16 +71,6 @@ export const tasksEndpoints = {
 
   deleteTask: (slug: string, taskNumber: string) =>
     api.delete<void>(`/teams/${slug}/tasks/${taskNumber}`),
-
-  updateTaskProperties: (
-    slug: string,
-    taskNumber: number,
-    properties: Partial<TaskProperties>
-  ) =>
-    api.put<TaskProperties>(
-      `/teams/${slug}/tasks/${taskNumber}/properties`,
-      properties
-    ),
 
   // Comments
   getComments: (slug: string, taskNumber: number) =>

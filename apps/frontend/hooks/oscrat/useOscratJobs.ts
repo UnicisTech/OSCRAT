@@ -9,6 +9,10 @@ import {
   useCreateSbomReportVulnerabilityScan,
   useDeleteVulnerabilityScanReport,
   useInvalidateVulnerabilityScanReports,
+  useGetConfigurationScanReports,
+  useCreateFileConfigurationScanReport,
+  useDeleteConfigurationScanReport,
+  useInvalidateConfigurationScanReports,
 } from '@/lib/api/hooks/oscrat/jobs';
 import type {
   CreateSbomJobRequest,
@@ -18,6 +22,7 @@ import type {
 import type {
   SbomReportDetails,
   VulnerabilityScanReportDetails,
+  ConfigurationScanReportDetails,
 } from '@oscrat/model/operations';
 
 /**
@@ -160,6 +165,67 @@ export function useOscratVersionVulnerabilityScanReports(
     createRepoVulnerabilityScanReport,
     createSbomReportVulnerabilityScan,
     deleteVulnerabilityScanReport,
+    refreshReports,
+  };
+}
+
+/**
+ * Hook for configuration scan reports for a version (file-import only)
+ * @param teamId Team ID
+ * @param productId Product ID that owns the version
+ * @param versionId Version ID
+ * @param options Optional configuration to control queries
+ */
+export function useOscratVersionConfigurationScanReports(
+  teamId: string,
+  productId: string,
+  versionId: string,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled !== false;
+
+  const {
+    data: reports,
+    isLoading: isFetchingReports,
+    isError,
+    error,
+  } = useGetConfigurationScanReports(teamId, productId, versionId, { enabled });
+
+  const createFileConfigurationScanReportMutation =
+    useCreateFileConfigurationScanReport(teamId, productId, versionId);
+  const deleteConfigurationScanReportMutation = useDeleteConfigurationScanReport(
+    teamId,
+    productId,
+    versionId
+  );
+  const invalidateConfigurationScanReports = useInvalidateConfigurationScanReports();
+
+  const createFileConfigurationScanReport = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return createFileConfigurationScanReportMutation.mutateAsync(formData);
+  };
+
+  const deleteConfigurationScanReport = async (reportId: string) => {
+    return deleteConfigurationScanReportMutation.mutateAsync(reportId);
+  };
+
+  const refreshReports = () => {
+    return invalidateConfigurationScanReports(teamId, versionId);
+  };
+
+  const isLoading =
+    isFetchingReports ||
+    createFileConfigurationScanReportMutation.isPending ||
+    deleteConfigurationScanReportMutation.isPending;
+
+  return {
+    reports,
+    isLoading,
+    isError,
+    error,
+    createFileConfigurationScanReport,
+    deleteConfigurationScanReport,
     refreshReports,
   };
 }

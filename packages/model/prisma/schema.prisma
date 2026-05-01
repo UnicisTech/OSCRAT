@@ -377,6 +377,7 @@ enum WorkerJobType {
   FILE_IMPORT_SBOM
   REPO_SCAN_VULNERABILITIES
   SBOM_REPORT_SCAN_VULNERABILITIES
+  PROCESS_CONFIGURATION_SCAN
 }
 
 enum WorkerJobStatus {
@@ -479,6 +480,7 @@ model OscratProductVersion {
   repository               OscratRepository?
   sbomReports              SbomReport[]
   vulnerabilityScanReports VulnerabilityScanReport[]
+  configurationScanReports ConfigurationScanReport[]
   attachments              Attachment[]
   workerJobs               WorkerJob[]
   tasks                    Task[]
@@ -706,6 +708,7 @@ model WorkerJob {
 
   sbomReport              SbomReport? @relation("SbomReportJob")
   vulnerabilityScanReport VulnerabilityScanReport? @relation("VulnerabilityScanReportJob")
+  configurationScanReport ConfigurationScanReport? @relation("ConfigurationScanReportJob")
 
   @@index([status, type])
   @@index([contextVersionId, type])
@@ -765,6 +768,39 @@ model VulnerabilityScanReport {
   @@index([versionId, createdAt])
   @@index([productId, createdAt])
   @@index([sourceSbomReportId])
+}
+
+enum ConfigurationScanFormat {
+  ARF
+  XCCDF
+  OVAL
+}
+
+model ConfigurationScanReport {
+  id String @id @default(uuid())
+
+  jobId String    @unique
+  job   WorkerJob @relation("ConfigurationScanReportJob", fields: [jobId], references: [id], onDelete: Cascade)
+
+  versionId String
+  version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  productId String
+
+  format        ConfigurationScanFormat
+  formatVersion String
+
+  scanData Json?
+
+  attachment Attachment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([versionId])
+  @@index([productId])
+  @@index([versionId, createdAt])
+  @@index([productId, createdAt])
 }
 
 // TeamData Model - Generic JSON storage per team
@@ -831,6 +867,9 @@ model Attachment {
   vulnerabilityScanReportId String? @unique
   vulnerabilityScanReport   VulnerabilityScanReport? @relation(fields: [vulnerabilityScanReportId], references: [id], onDelete: Cascade)
 
+  configurationScanReportId String? @unique
+  configurationScanReport   ConfigurationScanReport? @relation(fields: [configurationScanReportId], references: [id], onDelete: Cascade)
+
   incidentId String?
   incident   OscratProductIncident? @relation(fields: [incidentId], references: [id], onDelete: Cascade)
 
@@ -854,6 +893,7 @@ model Attachment {
   @@index([versionId])
   @@index([sbomReportId])
   @@index([vulnerabilityScanReportId])
+  @@index([configurationScanReportId])
   @@index([incidentId])
   @@index([vulnerabilityId])
   @@index([documentationId])

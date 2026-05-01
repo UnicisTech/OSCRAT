@@ -1,7 +1,18 @@
-export interface RepoGenerateSbomPayload {
-  repositoryId: string;
-  reportId: string; 
-}
+import type {
+  RepoGenerateSbomPayload,
+  FileImportSbomPayload,
+  RepoScanVulnerabilitiesPayload,
+  SbomReportScanVulnerabilitiesPayload,
+  ProcessConfigurationScanPayload,
+} from '../../schemas/jobPayloads';
+
+export type {
+  RepoGenerateSbomPayload,
+  FileImportSbomPayload,
+  RepoScanVulnerabilitiesPayload,
+  SbomReportScanVulnerabilitiesPayload,
+  ProcessConfigurationScanPayload,
+};
 
 export interface RepoGenerateSbomResult {
   repositoryId: string;
@@ -12,23 +23,11 @@ export interface RepoGenerateSbomResult {
   vulnerabilityCount?: number;
 }
 
-export interface FileImportSbomPayload {
-  filename: string;
-  fileData: string; 
-  mimeType: string;
-  reportId: string;
-}
-
 export interface FileImportSbomResult {
   sbomData: any;
   generatedAt: string;
   packageCount?: number;
   vulnerabilityCount?: number;
-}
-
-export interface RepoScanVulnerabilitiesPayload {
-  repositoryId: string;
-  reportId: string; 
 }
 
 export interface RepoScanVulnerabilitiesResult {
@@ -42,11 +41,6 @@ export interface RepoScanVulnerabilitiesResult {
   lowCount?: number;
 }
 
-export interface SbomReportScanVulnerabilitiesPayload {
-  sbomReportId: string;
-  reportId: string; 
-}
-
 export interface SbomReportScanVulnerabilitiesResult {
   sbomReportId: string;
   scanData: any;
@@ -58,14 +52,24 @@ export interface SbomReportScanVulnerabilitiesResult {
   lowCount?: number;
 }
 
+export interface ProcessConfigurationScanResult {
+  generatedAt: string;
+  totalRules?: number;
+  passCount?: number;
+  failCount?: number;
+  otherCount?: number;
+}
+
 export type WorkerJobPayload =
   | RepoGenerateSbomPayload
   | FileImportSbomPayload
   | RepoScanVulnerabilitiesPayload
-  | SbomReportScanVulnerabilitiesPayload;
+  | SbomReportScanVulnerabilitiesPayload
+  | ProcessConfigurationScanPayload;
 
 export type WorkerJobResult =
   | RepoGenerateSbomResult
   | FileImportSbomResult
   | RepoScanVulnerabilitiesResult
-  | SbomReportScanVulnerabilitiesResult;
+  | SbomReportScanVulnerabilitiesResult
+  | ProcessConfigurationScanResult;

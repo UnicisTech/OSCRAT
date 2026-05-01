@@ -1,15 +1,13 @@
 import { WorkerJob } from '@oscrat/model';
 import { PrismaClient } from '@oscrat/model/server';
-import type {
-  SbomReportScanVulnerabilitiesPayload,
-  SbomReportScanVulnerabilitiesResult,
-} from '@oscrat/model/types/jobPayloads';
+import type { SbomReportScanVulnerabilitiesResult } from '@oscrat/model/types/jobPayloads';
 import {
   getSbomReportFile,
   updateVulnerabilityScanReport,
   getProductVersionNames,
   generateVulnerabilityScanFilename,
 } from '@oscrat/model/operations';
+import { sbomReportScanVulnerabilitiesPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
 import { withTempDirectory } from '../utils/filesystem';
 import {
   scanSbomFileWithGrype,
@@ -18,6 +16,7 @@ import {
 } from '../utils/vulnerabilityScanner';
 import { JobError, saveJobError } from '../utils/JobError';
 import { ERROR_CODES } from '@oscrat/model/constants/errorCodes';
+import { validatePayload } from '../utils/validatePayload';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -28,14 +27,7 @@ export async function executeSbomReportScan(
 ): Promise<SbomReportScanVulnerabilitiesResult> {
   console.log(`[SBOM Report Scan] Starting job ${job.id}`);
 
-  const payload = job.payload as unknown as SbomReportScanVulnerabilitiesPayload;
-
-  if (!payload.sbomReportId) {
-    throw new JobError(
-      ERROR_CODES.INVALID_JOB_PAYLOAD,
-      'SBOM report ID is required in job payload'
-    );
-  }
+  const payload = await validatePayload(sbomReportScanVulnerabilitiesPayloadSchema, job.payload);
 
   console.log(
     `[SBOM Report Scan] Scanning SBOM report: ${payload.sbomReportId}`

@@ -19,7 +19,8 @@
     "cryptr": "^6.4.0",
     "date-fns": "^3.6.0",
     "nanoid": "^5.1.6",
-    "rfc6902": "^5.1.2"
+    "rfc6902": "^5.1.2",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@types/cryptr": "^4.0.3",

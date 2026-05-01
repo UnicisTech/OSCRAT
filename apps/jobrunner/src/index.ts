@@ -5,6 +5,7 @@ import { executeSbomGeneration } from './jobs/sbom';
 import { executeSbomImport } from './jobs/sbomImport';
 import { executeVulnerabilityScan } from './jobs/vulnerabilityScan';
 import { executeSbomReportScan } from './jobs/sbomReportScan';
+import { executeConfigurationScan } from './jobs/configurationScan';
 import * as fs from 'fs';
 import * as path from 'path';
 import { $ } from 'zx';
@@ -87,6 +88,18 @@ class JobRunner {
     }
   }
 
+  private async checkOscapReportAvailability(): Promise<void> {
+    try {
+      console.log('[Job Runner] Checking oscap-report availability...');
+      await $`which oscap-report`;
+      console.log('[Job Runner] oscap-report is available');
+    } catch (error) {
+      throw new Error(
+        'oscap-report is not installed or not available in PATH. Configuration scanning requires oscap-report to be installed. Install with: pip install openscap-report'
+      );
+    }
+  }
+
   public getWorkspaceRoot(): string {
     return this.workspaceRoot;
   }
@@ -97,6 +110,7 @@ class JobRunner {
     try {
       await this.checkSyftAvailability();
       await this.checkGrypeAvailability();
+      await this.checkOscapReportAvailability();
       await this.ensureWorkspaceRoot();
       await this.prisma.$connect();
       console.log('[Job Runner] Database connected');
@@ -259,6 +273,12 @@ class JobRunner {
           );
         case WorkerJobType.SBOM_REPORT_SCAN_VULNERABILITIES:
           return await executeSbomReportScan(
+            job,
+            this.prisma,
+            this.workspaceRoot
+          );
+        case WorkerJobType.PROCESS_CONFIGURATION_SCAN:
+          return await executeConfigurationScan(
             job,
             this.prisma,
             this.workspaceRoot

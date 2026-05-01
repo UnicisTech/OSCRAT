@@ -1,6 +1,7 @@
 import type { NextApiRequest } from 'next';
 import toast from 'react-hot-toast';
 import { ApiError } from '@/types';
+import { getErrorCodeTranslationKey } from '@/utils/errorCodeTranslation';
 
 export const getIpAddress = (req: NextApiRequest): string => {
   return (req.headers['x-forwarded-for'] ||
@@ -34,6 +35,25 @@ export function extractErrorMessage(
   }
 
   return fallbackMessage;
+}
+
+/**
+ * Translate an API error via its error code, falling back to the message.
+ * Use for user-facing failures that carry a typed code from `ERROR_CODES`.
+ */
+export function extractTranslatedErrorMessage(
+  error: unknown,
+  t: (key: string, values?: Record<string, string>) => string,
+  fallback: string
+): string {
+  const err = error as
+    | { code?: string; values?: Record<string, string>; message?: string }
+    | undefined;
+
+  if (err?.code) {
+    return t(getErrorCodeTranslationKey(err.code), err.values);
+  }
+  return err?.message || fallback;
 }
 
 /** Convert any object to a plain Record<string, unknown> for APIs that require it */

@@ -1,5 +1,6 @@
 import type { Prisma, TeamMember, User, Comment, Task } from '@oscrat/model';
 import type { TaskCscProperties, TeamCscProperties } from './csc';
+import type { TaskConfigurationProperties } from './configuration';
 
 export type ApiError = {
   code?: string;
@@ -125,7 +126,7 @@ export type TeamMemberWithUser = TeamMember & { user: User };
 
 export type TeamProperties = TeamCscProperties;
 
-export type TaskProperties = TaskCscProperties;
+export type TaskProperties = TaskCscProperties & TaskConfigurationProperties;
 
 export type ExtendedComment = Comment & {
   createdBy: User;

@@ -307,3 +307,127 @@ export function useInvalidateVulnerabilityScanReports() {
     });
   };
 }
+
+// ============================================
+// Configuration Scan Reports
+// ============================================
+
+// List configuration scan reports
+export function useGetConfigurationScanReports(
+  teamId: string,
+  productId: string,
+  versionId: string,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled !== false;
+
+  return useQuery({
+    queryKey: queryKeys.oscrat.projects.versions.jobs.configurationScan.all(
+      teamId,
+      versionId
+    ),
+    queryFn: () =>
+      oscratJobEndpoints.listConfigurationScanReports(
+        teamId,
+        productId,
+        versionId
+      ),
+    enabled,
+  });
+}
+
+export function useGetConfigurationScanReportDetail(
+  teamId: string,
+  productId: string,
+  versionId: string,
+  reportId: string,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled !== false;
+
+  return useQuery({
+    queryKey: queryKeys.oscrat.projects.versions.jobs.configurationScan.detail(
+      teamId,
+      versionId,
+      reportId
+    ),
+    queryFn: () =>
+      oscratJobEndpoints.getConfigurationScanReportDetail(
+        teamId,
+        productId,
+        versionId,
+        reportId
+      ),
+    enabled,
+  });
+}
+
+// Create file-based configuration scan report
+export function useCreateFileConfigurationScanReport(
+  teamId: string,
+  productId: string,
+  versionId: string
+) {
+  return useMutation({
+    mutationFn: (formData: FormData) =>
+      oscratJobEndpoints.createFileConfigurationScanReport(
+        teamId,
+        productId,
+        versionId,
+        formData
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.jobs.configurationScan.all(
+          teamId,
+          versionId
+        ),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+      });
+    },
+  });
+}
+
+// Delete configuration scan report
+export function useDeleteConfigurationScanReport(
+  teamId: string,
+  productId: string,
+  versionId: string
+) {
+  return useMutation({
+    mutationFn: (reportId: string) =>
+      oscratJobEndpoints.deleteConfigurationScanReport(
+        teamId,
+        productId,
+        versionId,
+        reportId
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.jobs.configurationScan.all(
+          teamId,
+          versionId
+        ),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+      });
+    },
+  });
+}
+
+// Invalidate configuration scan reports query
+export function useInvalidateConfigurationScanReports() {
+  const queryClient = useQueryClient();
+
+  return (teamId: string, versionId: string) => {
+    return queryClient.invalidateQueries({
+      queryKey: queryKeys.oscrat.projects.versions.jobs.configurationScan.all(
+        teamId,
+        versionId
+      ),
+    });
+  };
+}

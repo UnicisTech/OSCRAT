@@ -7,9 +7,9 @@ import {
   UpdateCommentData,
   AttachmentUploadParams,
 } from '@/lib/api/endpoints/tasks';
-import { TaskProperties } from '@/types';
 import { queryKeys } from '../queryKeys';
 import { queryClient } from '.';
+import { TASK_CONFIGURATION_PROPERTY_KEYS, type TaskProperties } from '@oscrat/model';
 
 // Team tasks
 export function useGetTeamTasks(slug: string) {
@@ -27,6 +27,22 @@ function invalidateVersionOpenTasksCache(task: { teamId: string; versionId?: str
   }
 }
 
+function invalidateConfigurationReportCache(
+  slug: string,
+  task: { versionId?: string | null; properties: unknown }
+) {
+  const properties = task.properties as TaskProperties | null;
+  const ruleId = properties?.[TASK_CONFIGURATION_PROPERTY_KEYS.RULE_ID];
+  if (ruleId && task.versionId) {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.oscrat.projects.versions.jobs.configurationScan.all(
+        slug,
+        task.versionId
+      ),
+    });
+  }
+}
+
 export function useCreateTeamTask(slug: string) {
   return useMutation({
     mutationFn: (data: CreateTaskData) =>
@@ -36,6 +52,7 @@ export function useCreateTeamTask(slug: string) {
         queryKey: queryKeys.teams.tasks.all(slug),
       });
       invalidateVersionOpenTasksCache(task);
+      invalidateConfigurationReportCache(slug, task);
     },
   });
 }
@@ -61,6 +78,7 @@ export function useUpdateTask(slug: string, taskNumber: string) {
         queryKey: queryKeys.teams.tasks.all(slug),
       });
       invalidateVersionOpenTasksCache(task);
+      invalidateConfigurationReportCache(slug, task);
     },
   });
 }
@@ -80,19 +98,6 @@ export function useDeleteTask(slug: string, taskNumber: string) {
           Array.isArray(q.queryKey) &&
           q.queryKey[2] === 'oscrat' &&
           q.queryKey[3] === 'versions',
-      });
-    },
-  });
-}
-
-// Task properties
-export function useUpdateTaskProperties(slug: string, taskNumber: number) {
-  return useMutation({
-    mutationFn: (properties: Partial<TaskProperties>) =>
-      tasksEndpoints.updateTaskProperties(slug, taskNumber, properties),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.teams.tasks.detail(slug, taskNumber.toString()),
       });
     },
   });

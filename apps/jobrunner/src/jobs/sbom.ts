@@ -1,9 +1,6 @@
 import { WorkerJob } from '@oscrat/model';
 import { PrismaClient } from '@oscrat/model/server';
-import type {
-  RepoGenerateSbomPayload,
-  RepoGenerateSbomResult,
-} from '@oscrat/model/types/jobPayloads';
+import type { RepoGenerateSbomResult } from '@oscrat/model/types/jobPayloads';
 import type { OscratRepositoryWithRelations } from '@oscrat/model/types/repository';
 import { getRepositoryById } from '@oscrat/model/operations/repository';
 import {
@@ -11,12 +8,14 @@ import {
   getProductVersionNames,
   generateSbomFilename,
 } from '@oscrat/model/operations/sbomReport';
+import { repoGenerateSbomPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
 import { withTempDirectory } from '../utils/filesystem';
 import { cloneRepository } from '../utils/git';
 import { generateSbom, analyzeSBOM, SyftSBOM } from '../utils/sbom';
 import { JobError, saveJobError } from '../utils/JobError';
 import { ERROR_CODES } from '@oscrat/model/constants/errorCodes';
 import { translateError } from '../utils/errorTranslator';
+import { validatePayload } from '../utils/validatePayload';
 import { $ } from 'zx';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -94,7 +93,8 @@ async function generateSbomForRepository(
   repository: OscratRepositoryWithRelations,
   job: WorkerJob,
   tempDir: string,
-  prisma: PrismaClient
+  prisma: PrismaClient,
+  reportId: string
 ): Promise<RepoGenerateSbomResult> {
   try {
     // Clone repository
@@ -138,10 +138,6 @@ async function generateSbomForRepository(
     const filename = names
       ? generateSbomFilename(names.productName, names.versionName)
       : path.basename(cycloneDxXmlPath);
-
-    // Get report ID from payload (injected during job creation)
-    const payload = job.payload as unknown as RepoGenerateSbomPayload;
-    const reportId = payload.reportId;
 
     // Update the existing report with data (status comes from job)
     await updateSbomReport(prisma, {
@@ -189,14 +185,7 @@ export async function executeSbomGeneration(
 ): Promise<RepoGenerateSbomResult | string> {
   console.log(`[SBOM Job] Starting job ${job.id}`);
 
-  const payload = job.payload as unknown as RepoGenerateSbomPayload;
-
-  if (!payload.repositoryId) {
-    throw new JobError(
-      ERROR_CODES.INVALID_JOB_PAYLOAD,
-      'Repository ID is required in job payload'
-    );
-  }
+  const payload = await validatePayload(repoGenerateSbomPayloadSchema, job.payload);
 
   const repository = await getRepositoryById(prisma, payload.repositoryId);
   if (!repository) {
@@ -210,6 +199,6 @@ export async function executeSbomGeneration(
 
   return await withTempDirectory(
     `sbom-${job.id}`,
-    (tempDir) => generateSbomForRepository(repository, job, tempDir, prisma)
+    (tempDir) => generateSbomForRepository(repository, job, tempDir, prisma, payload.reportId)
   );
 }
