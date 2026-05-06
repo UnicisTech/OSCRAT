@@ -7,7 +7,7 @@ import { createFileInTransaction } from './file';
 import { slugify } from '../utils/slugify';
 import { fromJson, toJsonInput } from '../utils/json';
 import { createWorkerJobWithTx } from './workerJob';
-import { createAuditContextWithTx, logCreate, logDelete, EntityType, type AuditInfo } from '../audit';
+import { createAuditContextWithTx, logCreate, logDelete, CrudType, EntityType, type AuditInfo } from '../audit';
 import { getConfigurationTasksByVersion } from './task';
 import type {
   ConfigurationScanRuleResult,
@@ -533,7 +533,8 @@ export interface UpdateConfigurationScanReportParams {
 
 export const updateConfigurationScanReport = async (
   prisma: PrismaClient,
-  params: UpdateConfigurationScanReportParams
+  params: UpdateConfigurationScanReportParams,
+  auditInfo?: AuditInfo
 ): Promise<void> => {
   console.log(
     `[Configuration Scan Report Operations] Updating configuration scan report:`,
@@ -563,6 +564,24 @@ export const updateConfigurationScanReport = async (
         configurationScanReportId: params.reportId,
         versionId: report.versionId,
         createdBy: params.createdBy,
+      });
+    }
+
+    if (auditInfo) {
+      const audit = createAuditContextWithTx(tx, auditInfo);
+      await audit.log({
+        action: 'configurationscanreport.process',
+        crud: CrudType.Update,
+        user: audit.user,
+        team: audit.team,
+        target: {
+          id: params.reportId,
+          name: params.htmlReportFile?.filename ?? params.reportId,
+          type: EntityType.ConfigurationScanReport,
+        },
+        productId: audit.productId,
+        versionId: audit.versionId,
+        metadata: {},
       });
     }
   });

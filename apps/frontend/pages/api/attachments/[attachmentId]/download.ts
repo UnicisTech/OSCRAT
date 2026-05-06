@@ -1,6 +1,7 @@
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import { getAttachmentWithFileById } from '@oscrat/model/operations';
+import { getAttachmentWithFileById, getAttachmentLinkedEntity } from '@oscrat/model/operations';
+import { createAuditContext, CrudType, EntityType } from '@oscrat/model/audit';
 import { prisma } from '@/lib/prisma';
 import { ApiError } from '@/lib/errors';
 
@@ -36,6 +37,28 @@ const handleGET = async (
 
   // TODO: Implement proper access control based on attachment's linked entity
   // For now, rely on team auth middleware for basic access control
+
+  const audit = createAuditContext(prisma, {
+    ...req.auditInfo,
+    versionId: attachment.versionId ?? req.auditInfo.versionId,
+  });
+  const linkedEntity = getAttachmentLinkedEntity(attachment);
+  const metadata: Record<string, string> = {};
+  if (attachment.mimeType) metadata.mimeType = attachment.mimeType;
+  if (linkedEntity) {
+    metadata.linkedEntityType = linkedEntity.type;
+    metadata.linkedEntityId = linkedEntity.id;
+  }
+  await audit.log({
+    action: 'attachment.download',
+    crud: CrudType.Read,
+    user: audit.user,
+    team: audit.team,
+    target: { id: attachment.id, name: attachment.name, type: EntityType.Attachment },
+    productId: audit.productId,
+    versionId: audit.versionId,
+    metadata,
+  });
 
   const mimeType = attachment.mimeType || 'application/octet-stream';
   res.setHeader('Content-Type', mimeType);

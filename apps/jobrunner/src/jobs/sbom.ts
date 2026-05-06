@@ -8,6 +8,7 @@ import {
   getProductVersionNames,
   generateSbomFilename,
 } from '@oscrat/model/operations/sbomReport';
+import type { AuditInfo } from '@oscrat/model/audit';
 import { repoGenerateSbomPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
 import { withTempDirectory } from '../utils/filesystem';
 import { cloneRepository } from '../utils/git';
@@ -140,16 +141,28 @@ async function generateSbomForRepository(
       : path.basename(cycloneDxXmlPath);
 
     // Update the existing report with data (status comes from job)
-    await updateSbomReport(prisma, {
-      reportId,
-      sbomData: sbomSummary,
-      createdBy: job.triggeredByUserId,
-      sbomFile: {
-        filename,
-        fileData: cycloneDxXmlData,
-        mimeType: 'application/xml',
+    const auditInfo: AuditInfo | undefined = job.contextTeamId
+      ? {
+          user: { id: job.triggeredByUserId },
+          team: { id: job.contextTeamId },
+          productId: job.contextProductId ?? undefined,
+          versionId: job.contextVersionId ?? undefined,
+        }
+      : undefined;
+    await updateSbomReport(
+      prisma,
+      {
+        reportId,
+        sbomData: sbomSummary,
+        createdBy: job.triggeredByUserId,
+        sbomFile: {
+          filename,
+          fileData: cycloneDxXmlData,
+          mimeType: 'application/xml',
+        },
       },
-    });
+      auditInfo
+    );
 
     console.log(`[SBOM Job] Completed successfully. Report ID: ${reportId}`);
 

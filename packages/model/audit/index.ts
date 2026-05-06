@@ -131,6 +131,7 @@ export const createAuditContextWithTx = (
 
 export const CrudType = {
   Create: 'c',
+  Read: 'r',
   Update: 'u',
   Delete: 'd',
 } as const;

@@ -7,7 +7,7 @@ export interface AuditUser {
 
 export interface AuditTeam {
   id: string;
-  name: string;
+  name?: string;
 }
 
 export interface AuditTarget {

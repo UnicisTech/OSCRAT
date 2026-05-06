@@ -8,6 +8,7 @@ import {
   getFileById,
   deleteFile,
 } from '@oscrat/model/operations';
+import type { AuditInfo } from '@oscrat/model/audit';
 import { processConfigurationScanPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
 import { withTempDirectory } from '../utils/filesystem';
 import {
@@ -86,12 +87,24 @@ export async function executeConfigurationScan(
         };
 
         const reportId = payload.reportId;
-        await updateConfigurationScanReport(prisma, {
-          reportId,
-          scanData: scanSummary,
-          createdBy: job.triggeredByUserId,
-          htmlReportFile,
-        });
+        const auditInfo: AuditInfo | undefined = job.contextTeamId
+          ? {
+              user: { id: job.triggeredByUserId },
+              team: { id: job.contextTeamId },
+              productId: job.contextProductId ?? undefined,
+              versionId: job.contextVersionId ?? undefined,
+            }
+          : undefined;
+        await updateConfigurationScanReport(
+          prisma,
+          {
+            reportId,
+            scanData: scanSummary,
+            createdBy: job.triggeredByUserId,
+            htmlReportFile,
+          },
+          auditInfo
+        );
 
         console.log(`[Configuration Scan] Completed successfully. Report ID: ${reportId}`);
 

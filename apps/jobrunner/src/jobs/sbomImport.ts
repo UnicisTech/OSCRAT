@@ -7,6 +7,7 @@ import {
   generateSbomFilename,
 } from '@oscrat/model/operations/sbomReport';
 import { getFileById, deleteFile } from '@oscrat/model/operations';
+import type { AuditInfo } from '@oscrat/model/audit';
 import { fileImportSbomPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
 import { withTempDirectory } from '../utils/filesystem';
 import { convertSbomToSyftJson, analyzeSBOM, SyftSBOM } from '../utils/sbom';
@@ -71,16 +72,28 @@ export async function executeSbomImport(
         const reportId = payload.reportId;
 
         // Update the existing report with data (status comes from job)
-        await updateSbomReport(prisma, {
-          reportId,
-          sbomData: sbomSummary,
-          createdBy: job.triggeredByUserId,
-          sbomFile: {
-            filename,
-            fileData: fileBuffer,
-            mimeType: payload.mimeType || 'application/xml',
+        const auditInfo: AuditInfo | undefined = job.contextTeamId
+          ? {
+              user: { id: job.triggeredByUserId },
+              team: { id: job.contextTeamId },
+              productId: job.contextProductId ?? undefined,
+              versionId: job.contextVersionId ?? undefined,
+            }
+          : undefined;
+        await updateSbomReport(
+          prisma,
+          {
+            reportId,
+            sbomData: sbomSummary,
+            createdBy: job.triggeredByUserId,
+            sbomFile: {
+              filename,
+              fileData: fileBuffer,
+              mimeType: payload.mimeType || 'application/xml',
+            },
           },
-        });
+          auditInfo
+        );
 
         console.log(`[SBOM Import] Completed successfully. Report ID: ${reportId}`);
 

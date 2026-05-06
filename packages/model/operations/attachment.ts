@@ -156,6 +156,38 @@ export const getAttachmentWithFileById = async (
   });
 };
 
+export interface AttachmentLinkedEntity {
+  type: EntityType;
+  id: string;
+}
+
+export const getAttachmentLinkedEntity = (
+  attachment: Attachment
+): AttachmentLinkedEntity | null => {
+  if (attachment.configurationScanReportId) {
+    return { type: EntityType.ConfigurationScanReport, id: attachment.configurationScanReportId };
+  }
+  if (attachment.sbomReportId) {
+    return { type: EntityType.SbomReport, id: attachment.sbomReportId };
+  }
+  if (attachment.vulnerabilityScanReportId) {
+    return { type: EntityType.VulnerabilityScanReport, id: attachment.vulnerabilityScanReportId };
+  }
+  if (attachment.taskId) {
+    return { type: EntityType.Task, id: String(attachment.taskId) };
+  }
+  if (attachment.vulnerabilityId) {
+    return { type: EntityType.Vulnerability, id: attachment.vulnerabilityId };
+  }
+  if (attachment.incidentId) {
+    return { type: EntityType.Incident, id: attachment.incidentId };
+  }
+  if (attachment.documentationId) {
+    return { type: EntityType.Documentation, id: attachment.documentationId };
+  }
+  return null;
+};
+
 export const getTaskAttachments = async (
   prisma: PrismaClient,
   taskId: number

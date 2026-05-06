@@ -1103,7 +1103,7 @@
           "files": "Files",
           "sbom": "SBOM",
           "scans": "Scans",
-          "configuration": "Configuration",
+          "configuration": "Config Management",
           "vulnerabilities": "Vulnerabilities",
           "incidents": "Incidents",
           "task": "Tasks",

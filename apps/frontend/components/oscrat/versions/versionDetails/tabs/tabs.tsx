@@ -24,14 +24,14 @@ const TABS_CONFIG = [
     component: <Scans />,
   },
   {
-    id: 'configuration',
-    label: 'oscrat.ui.versions.tabs.configuration',
-    component: <Configuration />,
-  },
-  {
     id: 'vulnerabilities',
     label: 'oscrat.ui.versions.tabs.vulnerabilities',
     component: <Vulnerabilities />,
+  },
+  {
+    id: 'configuration',
+    label: 'oscrat.ui.versions.tabs.configuration',
+    component: <Configuration />,
   },
   {
     id: 'incidents',

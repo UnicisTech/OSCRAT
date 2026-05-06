@@ -577,7 +577,8 @@ export interface UpdateSbomReportParams {
 
 export const updateSbomReport = async (
   prisma: PrismaClient,
-  params: UpdateSbomReportParams
+  params: UpdateSbomReportParams,
+  auditInfo?: AuditInfo
 ): Promise<void> => {
   console.log(`[SBOM Report Operations] Updating SBOM report:`, {
     reportId: params.reportId,
@@ -604,6 +605,24 @@ export const updateSbomReport = async (
         sbomReportId: params.reportId,
         versionId: report.versionId,
         createdBy: params.createdBy,
+      });
+    }
+
+    if (auditInfo) {
+      const audit = createAuditContextWithTx(tx, auditInfo);
+      await audit.log({
+        action: 'sbomreport.process',
+        crud: CrudType.Update,
+        user: audit.user,
+        team: audit.team,
+        target: {
+          id: params.reportId,
+          name: params.sbomFile?.filename ?? params.reportId,
+          type: EntityType.SbomReport,
+        },
+        productId: audit.productId,
+        versionId: audit.versionId,
+        metadata: {},
       });
     }
   });
