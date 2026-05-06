@@ -169,10 +169,10 @@ const TechDocChecklist: React.FC<TechDocChecklistProps> = ({
                   key={req.reqId}
                   className="flex items-start gap-4 px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
                 >
-                  <div className="pt-0.5 flex-shrink-0">
+                  <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
                     {isChecked ? (
                       <FaCheckCircle
-                        className="text-green-500 text-xl cursor-pointer"
+                        className="text-green-500 w-5 h-5 cursor-pointer"
                         onClick={(e) => {
                           e.preventDefault();
                           handleToggle(req.reqId);

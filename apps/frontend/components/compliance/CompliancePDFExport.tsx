@@ -264,6 +264,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
         id: req.reqId,
         name: translate(req.requirement),
         areaName: translate(area.areaOfRequirements),
+        areaType: area.areaType,
         isEvaluated,
         conformityStatus,
         completionPercentage,
@@ -421,7 +422,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
 
       {/* Detailed Assessment Pages */}
       {allRequirements
-        .filter(req => req.assessment)
+        .filter(req => req.assessment && req.areaType !== 'checklist')
         .map((req, reqIndex) => (
           <Page key={reqIndex} size="A4" style={styles.page}>
             <View style={styles.header}>

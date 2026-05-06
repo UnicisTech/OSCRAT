@@ -46,14 +46,10 @@ export function useComplianceData({
 
   const activeQuery = isTeamCompliance ? teamComplianceQuery : versionComplianceQuery;
 
-  if (activeQuery.error) {
-    throw activeQuery.error;
-  }
-
   return {
     complianceData: activeQuery.data || null,
     isLoading: activeQuery.isLoading,
-    error: activeQuery.error as Error | null,
+    error: (activeQuery.error as Error) || null,
     refetch: activeQuery.refetch,
   };
 }
