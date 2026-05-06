@@ -9,6 +9,7 @@ import {
 } from '@oscrat/model/operations';
 import { sbomReportScanVulnerabilitiesPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
 import { withTempDirectory } from '../utils/filesystem';
+import { createSingleFileZip } from '../utils/archive';
 import {
   scanSbomFileWithGrype,
   analyzeGrypeResults,
@@ -94,15 +95,20 @@ export async function executeSbomReportScan(
         // Get report ID from payload (injected during job creation)
         const reportId = payload.reportId;
 
+        const zipped = createSingleFileZip(filename, grypeJsonData);
+        console.log(
+          `[SBOM Report Scan] zip grype: ${grypeJsonData.length} -> ${zipped.data.length} bytes`
+        );
+
         // Update the existing report with data (status comes from job)
         await updateVulnerabilityScanReport(prisma, {
           reportId,
           scanData: scanSummary,
           createdBy: job.triggeredByUserId,
           scanFile: {
-            filename,
-            fileData: grypeJsonData,
-            mimeType: 'application/json',
+            filename: zipped.filename,
+            fileData: zipped.data,
+            mimeType: 'application/zip',
           },
         });
 

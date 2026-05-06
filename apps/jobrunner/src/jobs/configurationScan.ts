@@ -22,6 +22,7 @@ import { saveJobError } from '../utils/JobError';
 import * as fs from 'fs';
 import * as path from 'path';
 import { gunzipSync } from 'zlib';
+import { createSingleFileZip } from '../utils/archive';
 
 export async function executeConfigurationScan(
   job: WorkerJob,
@@ -73,10 +74,15 @@ export async function executeConfigurationScan(
           ? generateConfigurationScanFilename(names.productName, names.versionName)
           : `config-scan-${job.id}.html`;
 
+        const zipped = createSingleFileZip(filename, htmlReportData);
+        console.log(
+          `[Configuration Scan] zip html: ${htmlReportData.length} -> ${zipped.data.length} bytes`
+        );
+
         const htmlReportFile = {
-          filename,
-          fileData: htmlReportData,
-          mimeType: 'text/html',
+          filename: zipped.filename,
+          fileData: zipped.data,
+          mimeType: 'application/zip',
         };
 
         const reportId = payload.reportId;

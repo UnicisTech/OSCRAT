@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@oscrat/model": "workspace:*",
+    "adm-zip": "^0.5.17",
     "dotenv": "^16.4.5",
     "dotenv-cli": "^7.4.2",
     "fast-xml-parser": "^5.7.2",
@@ -25,6 +26,7 @@
     "zx": "^8.5.5"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "20.14.0"
   }
 }
