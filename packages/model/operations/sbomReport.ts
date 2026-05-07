@@ -478,10 +478,14 @@ export const createSbomReportWithJob = async (
       crud: CrudType.Create,
       user: audit.user,
       team: audit.team,
-      target: { id: completeReport.id, name: completeReport.attachment?.name || completeReport.id, type: EntityType.SbomReport },
+      target: {
+        id: completeReport.id,
+        name: completeReport.id,
+        type: EntityType.SbomReport,
+      },
       productId: audit.productId,
       versionId: audit.versionId,
-      metadata: { snapshot: JSON.stringify({ id: completeReport.id }) },
+      metadata: params.fileImport ? { inputFilename: params.fileImport.filename } : {},
     });
 
     console.log(`[SBOM Report Operations] Created SBOM report and job:`, {
@@ -617,12 +621,12 @@ export const updateSbomReport = async (
         team: audit.team,
         target: {
           id: params.reportId,
-          name: params.sbomFile?.filename ?? params.reportId,
+          name: params.reportId,
           type: EntityType.SbomReport,
         },
         productId: audit.productId,
         versionId: audit.versionId,
-        metadata: {},
+        metadata: params.sbomFile ? { outputFilename: params.sbomFile.filename } : {},
       });
     }
   });
@@ -656,11 +660,7 @@ export const deleteSbomReport = async (
           },
         },
       },
-      include: {
-        attachment: {
-          select: { name: true },
-        },
-      },
+      select: { id: true },
     });
 
     if (!report) {
@@ -669,7 +669,7 @@ export const deleteSbomReport = async (
       );
     }
 
-    await logDelete(EntityType.SbomReport, audit, { id: report.id, name: report.attachment?.name || report.id });
+    await logDelete(EntityType.SbomReport, audit, { id: report.id });
 
     await tx.sbomReport.delete({
       where: { id: reportId },

@@ -41,10 +41,13 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
   }));
 
   // Build crud options using CrudType from model and labels from crudConfig
-  const crudOptions: Option[] = Object.entries(CrudType).map(([key, value]) => ({
-    value,
-    label: crudConfig[value as keyof typeof crudConfig]?.label || key,
-  }));
+  const crudOptions: Option[] = Object.entries(CrudType).map(([key, value]) => {
+    const cfg = crudConfig[value as keyof typeof crudConfig];
+    return {
+      value,
+      label: cfg ? t(cfg.labelKey, { defaultValue: key }) : key,
+    };
+  });
 
   // Get current values for selects
   const currentUserOption = userOptions.find((o) => o.value === filters.userId) || null;

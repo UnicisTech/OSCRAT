@@ -1,15 +1,17 @@
+const badge = { bg: 'bg-gray-100', text: 'text-gray-700' } as const;
+
 export const crudConfig = {
-  c: { label: 'Create', bg: 'bg-emerald-100', text: 'text-emerald-700' },
-  r: { label: 'Read', bg: 'bg-sky-100', text: 'text-sky-700' },
-  u: { label: 'Update', bg: 'bg-amber-100', text: 'text-amber-700' },
-  d: { label: 'Delete', bg: 'bg-rose-100', text: 'text-rose-700' },
+  c: { labelKey: 'oscrat.audit.crud.create', ...badge },
+  r: { labelKey: 'oscrat.audit.crud.read', ...badge },
+  u: { labelKey: 'oscrat.audit.crud.update', ...badge },
+  d: { labelKey: 'oscrat.audit.crud.delete', ...badge },
 } as const;
 
 export type CrudType = keyof typeof crudConfig;
 
 export const getCrudConfig = (crud: string) =>
   crudConfig[crud as CrudType] ?? {
-    label: crud.toUpperCase(),
+    labelKey: '',
     bg: 'bg-gray-100',
     text: 'text-gray-700',
   };

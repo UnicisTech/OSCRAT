@@ -214,6 +214,7 @@ export const oscratEntityTypeTranslationMap: Record<string, string> = {
   ProductVersion: 'oscrat.entity-types.product-version',
   SbomReport: 'oscrat.entity-types.sbom-report',
   VulnerabilityScanReport: 'oscrat.entity-types.vulnerability-scan-report',
+  ConfigurationScanReport: 'oscrat.entity-types.configuration-scan-report',
   File: 'oscrat.entity-types.file',
   Team: 'oscrat.entity-types.team',
   TeamMember: 'oscrat.entity-types.team-member',

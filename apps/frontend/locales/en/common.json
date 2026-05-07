@@ -441,6 +441,12 @@
   },
   "oscrat": {
     "audit": {
+      "crud": {
+        "create": "Create",
+        "read": "Read",
+        "update": "Update",
+        "delete": "Delete"
+      },
       "actions": {
         "vulnerability.create": "Created vulnerability",
         "vulnerability.update": "Updated vulnerability",
@@ -1777,6 +1783,7 @@
       "product-version": "Product Version",
       "sbom-report": "SBOM Report",
       "vulnerability-scan-report": "Vulnerability Scan Report",
+      "configuration-scan-report": "Configuration Scan",
       "file": "File",
       "team": "Team",
       "team-member": "Team Member",

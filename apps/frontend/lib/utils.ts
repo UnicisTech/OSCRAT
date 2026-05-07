@@ -112,9 +112,11 @@ export async function asyncWithErrorToast<T>(
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+export const isUuid = (value: string): boolean => UUID_REGEX.test(value);
+
 /** Returns shortened UUID (first 5 chars) if value is a UUID, otherwise the original value */
 export function shortenUuid(value: string): string {
-  return UUID_REGEX.test(value) ? value.slice(0, 5) : value;
+  return isUuid(value) ? value.slice(0, 5) : value;
 }
 
 /** Formats a name, shortening UUIDs to "id: xxxxx" via translation */
@@ -122,7 +124,7 @@ export function formatNameWithUuidFallback(
   value: string,
   t: (key: string, options?: Record<string, unknown>) => string
 ): string {
-  if (UUID_REGEX.test(value)) {
+  if (isUuid(value)) {
     return t('id-short', { id: shortenUuid(value) });
   }
   return value;

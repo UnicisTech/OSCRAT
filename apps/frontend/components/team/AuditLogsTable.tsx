@@ -80,7 +80,7 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${crud.bg} ${crud.text}`}
                     >
-                      {crud.label}
+                      {t(crud.labelKey, { defaultValue: log.crud.toUpperCase() })}
                     </span>
                   );
                 })()}

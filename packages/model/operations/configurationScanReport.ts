@@ -502,7 +502,7 @@ export const createConfigurationScanReportWithJob = async (
       );
     }
 
-    await logCreate(EntityType.ConfigurationScanReport, audit, { id: completeReport.id, name: completeReport.attachment?.name || completeReport.id });
+    await logCreate(EntityType.ConfigurationScanReport, audit, { id: completeReport.id });
 
     console.log(
       `[Configuration Scan Report Operations] Created configuration scan report and job:`,
@@ -576,12 +576,14 @@ export const updateConfigurationScanReport = async (
         team: audit.team,
         target: {
           id: params.reportId,
-          name: params.htmlReportFile?.filename ?? params.reportId,
+          name: params.reportId,
           type: EntityType.ConfigurationScanReport,
         },
         productId: audit.productId,
         versionId: audit.versionId,
-        metadata: {},
+        metadata: params.htmlReportFile
+          ? { outputFilename: params.htmlReportFile.filename }
+          : {},
       });
     }
   });
@@ -621,11 +623,7 @@ export const deleteConfigurationScanReport = async (
           },
         },
       },
-      include: {
-        attachment: {
-          select: { name: true },
-        },
-      },
+      select: { id: true },
     });
 
     if (!report) {
@@ -634,7 +632,7 @@ export const deleteConfigurationScanReport = async (
       );
     }
 
-    await logDelete(EntityType.ConfigurationScanReport, audit, { id: report.id, name: report.attachment?.name || report.id });
+    await logDelete(EntityType.ConfigurationScanReport, audit, { id: report.id });
 
     await tx.configurationScanReport.delete({
       where: { id: reportId },

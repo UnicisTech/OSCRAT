@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import Button from '@atlaskit/button';
+import {
+  ClipboardIcon,
+  CheckIcon,
+  ArrowUpTrayIcon,
+  ArrowDownTrayIcon,
+} from '@heroicons/react/24/outline';
 import type { OscratAuditLog } from '@oscrat/model';
-import { getAuditActionTranslationKey, oscratEntityTypeTranslationMap } from '@/utils/translation';
+import {
+  getAuditActionTranslationKey,
+  oscratEntityTypeTranslationMap,
+} from '@/utils/translation';
 import { getCrudConfig, formatTimestamp } from '@/lib/auditUtils';
-import { formatNameWithUuidFallback } from '@/lib/utils';
+import { isUuid } from '@/lib/utils';
 
 interface AuditDetailsModalProps {
   log: OscratAuditLog | null;
@@ -32,11 +41,17 @@ const formatValue = (value: unknown): string => {
   return String(value);
 };
 
+const PatchOp = {
+  Add: 'add',
+  Remove: 'remove',
+  Replace: 'replace',
+} as const;
+type PatchOpValue = (typeof PatchOp)[keyof typeof PatchOp];
+
 interface PatchOperation {
-  op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test';
+  op: PatchOpValue;
   path: string;
   value?: unknown;
-  from?: string;
 }
 
 const parseMetadata = (
@@ -66,68 +81,110 @@ const parseMetadata = (
   return { type: 'raw', data: parsed };
 };
 
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
 const pathToFieldName = (path: string): string => {
   const parts = path.split('/').filter(Boolean);
   return parts.length > 0 ? formatKey(parts[parts.length - 1]) : path;
 };
 
-const PatchDisplay: React.FC<{ patch: PatchOperation[] }> = ({ patch }) => {
-  return (
-    <dl className="space-y-1">
-      {patch.map((op, index) => (
-        <div key={index} className="flex py-1">
-          <dt className="text-gray-500 min-w-[140px] flex-shrink-0">
-            {pathToFieldName(op.path)}
-          </dt>
-          <dd className="text-gray-900">
-            {op.op === 'replace' && (
-              <span>→ {formatValue(op.value)}</span>
-            )}
-            {op.op === 'add' && (
-              <span className="text-emerald-600">+ {formatValue(op.value)}</span>
-            )}
-            {op.op === 'remove' && (
-              <span className="text-rose-600">removed</span>
-            )}
-          </dd>
-        </div>
-      ))}
-    </dl>
-  );
+const opIndicator: Record<PatchOpValue, { symbol: string; className: string }> = {
+  [PatchOp.Replace]: { symbol: '→', className: 'text-amber-600' },
+  [PatchOp.Add]:     { symbol: '+', className: 'text-emerald-600' },
+  [PatchOp.Remove]:  { symbol: '−', className: 'text-rose-600' },
 };
 
-const isObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+const PatchDisplay: React.FC<{ patch: PatchOperation[] }> = ({ patch }) => (
+  <dl className="grid grid-cols-[max-content_max-content_1fr] gap-x-3 gap-y-1.5 items-baseline">
+    {patch.map((op, index) => {
+      const ind = opIndicator[op.op];
+      return (
+        <React.Fragment key={index}>
+          <dt className="text-xs text-gray-500">{pathToFieldName(op.path)}</dt>
+          <span className={`font-mono text-sm ${ind.className}`}>{ind.symbol}</span>
+          <dd className="text-sm text-gray-900 break-words">
+            {op.op === PatchOp.Remove ? (
+              <span className="text-rose-600 italic">removed</span>
+            ) : (
+              formatValue(op.value)
+            )}
+          </dd>
+        </React.Fragment>
+      );
+    })}
+  </dl>
+);
 
 const SimplePropertyList: React.FC<{
   data: Record<string, unknown>;
   depth?: number;
-}> = ({ data, depth = 0 }) => {
+}> = ({ data, depth = 0 }) => (
+  <dl
+    className={`grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 items-baseline ${depth > 0 ? 'ml-4 mt-1 col-span-2' : ''}`}
+  >
+    {Object.entries(data).map(([key, value]) => (
+      <React.Fragment key={key}>
+        <dt className="text-xs text-gray-500">{formatKey(key)}</dt>
+        <dd className="text-sm text-gray-900 break-words min-w-0">
+          {isObject(value) ? (
+            <SimplePropertyList data={value} depth={depth + 1} />
+          ) : Array.isArray(value) ? (
+            value.length === 0 ? '—' : value.map(formatValue).join(', ')
+          ) : (
+            formatValue(value)
+          )}
+        </dd>
+      </React.Fragment>
+    ))}
+  </dl>
+);
+
+const CopyableValue: React.FC<{ value: string }> = ({ value }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // ignore
+    }
+  };
+  const display = isUuid(value) ? `${value.slice(0, 8)}…${value.slice(-4)}` : value;
   return (
-    <dl className={depth > 0 ? 'ml-4' : ''}>
-      {Object.entries(data).map(([key, value]) => (
-        <div key={key} className="flex py-1">
-          <dt className="text-gray-500 min-w-[140px] flex-shrink-0">
-            {formatKey(key)}
-          </dt>
-          <dd className="text-gray-900">
-            {isObject(value) ? (
-              <SimplePropertyList data={value} depth={depth + 1} />
-            ) : Array.isArray(value) ? (
-              value.length === 0 ? (
-                '—'
-              ) : (
-                <span>{value.map(formatValue).join(', ')}</span>
-              )
-            ) : (
-              formatValue(value)
-            )}
-          </dd>
-        </div>
-      ))}
-    </dl>
+    <button
+      type="button"
+      onClick={handleCopy}
+      title={value}
+      className="group inline-flex items-center gap-1.5 font-mono text-xs text-gray-700 hover:text-gray-900"
+    >
+      <span>{display}</span>
+      {copied ? (
+        <CheckIcon className="h-3.5 w-3.5 text-emerald-500" />
+      ) : (
+        <ClipboardIcon className="h-3.5 w-3.5 text-gray-300 group-hover:text-gray-500 transition-colors" />
+      )}
+    </button>
   );
 };
+
+const FileRow: React.FC<{ icon: React.ReactNode; label: string; filename: string }> = ({ icon, label, filename }) => (
+  <div className="flex items-center gap-3 text-sm min-w-0">
+    <div className="text-gray-400 flex-shrink-0">{icon}</div>
+    <span className="text-xs text-gray-500 w-[50px] flex-shrink-0">{label}</span>
+    <span className="font-mono text-xs text-gray-700 truncate min-w-0" title={filename}>
+      {filename}
+    </span>
+  </div>
+);
+
+const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+  <>
+    <dt className="text-xs text-gray-500 pt-0.5">{label}</dt>
+    <dd className="text-sm text-gray-900 min-w-0">{children}</dd>
+  </>
+);
 
 const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
   log,
@@ -136,134 +193,146 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
 }) => {
   const { t } = useTranslation('common');
 
-  if (!log) {
-    return null;
-  }
+  if (!log) return null;
 
-  const crudStyle = getCrudConfig(log.crud);
+  const crud = getCrudConfig(log.crud);
   const metadata = log.metadata
     ? parseMetadata(log.metadata as Record<string, unknown>)
     : null;
   const metadataData = metadata?.data;
   const metadataType = metadata?.type;
-  const hasMetadataData = metadataData !== null && metadataData !== undefined;
+
+  // Pull file context out of raw metadata so we can show it in a dedicated block.
+  let inputFilename: string | undefined;
+  let outputFilename: string | undefined;
+  let extraMetadata: Record<string, unknown> | undefined;
+  if (metadataType === 'raw' && isObject(metadataData)) {
+    const { inputFilename: i, outputFilename: o, ...rest } = metadataData;
+    inputFilename = typeof i === 'string' ? i : undefined;
+    outputFilename = typeof o === 'string' ? o : undefined;
+    if (Object.keys(rest).length > 0) extraMetadata = rest;
+  }
+
+  const hasFiles = !!(inputFilename || outputFilename);
+  const hasChanges =
+    metadataType === 'patch' ||
+    (metadataType === 'snapshot' && isObject(metadataData) && Object.keys(metadataData).length > 0) ||
+    (metadataType === 'raw' && !!extraMetadata);
+
+  const targetTypeLabel = t(
+    oscratEntityTypeTranslationMap[log.targetType] ?? '',
+    { defaultValue: log.targetType }
+  );
+  const actionLabel = t(getAuditActionTranslationKey(log.action), {
+    defaultValue: log.action,
+  });
+
+  const showSeparateTargetId = log.targetId && log.targetName !== log.targetId;
 
   return (
-    <Modal open={isOpen} className="bg-white text-gray-900">
-      <Modal.Header className="font-bold text-gray-900">{t('audit-log-details')}</Modal.Header>
+    <Modal open={isOpen} className="bg-white text-gray-900 max-w-2xl">
+      <Modal.Header className="border-b border-gray-100 pb-3 mb-0">
+        <div
+          className="font-semibold text-base text-gray-900 leading-tight"
+          title={log.action}
+        >
+          {actionLabel}
+        </div>
+        <div className="mt-1 text-xs">
+          <span className={`px-1.5 py-0.5 rounded ${crud.bg} ${crud.text}`}>
+            {t(crud.labelKey, { defaultValue: log.crud.toUpperCase() })}
+          </span>
+        </div>
+      </Modal.Header>
 
       <Modal.Body>
-        <div className="max-h-[60vh] overflow-y-auto space-y-6">
-          {/* Context section */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-900 border-b border-gray-200 pb-2">
-              {t('context')}
-            </h3>
-
-            {/* Action - CRUD badge only */}
-            <div>
-              <div className="text-sm font-medium text-gray-500">
-                {t('action')}
-              </div>
-              <div className="mt-1">
-                <span
-                  className={`text-xs px-2 py-0.5 rounded ${crudStyle.bg} ${crudStyle.text}`}
-                >
-                  {crudStyle.label}
-                </span>
-              </div>
-            </div>
-
-            {/* Scope - full action string */}
-            <div>
-              <div className="text-sm font-medium text-gray-500">
-                {t('scope')}
-              </div>
-              <div className="mt-1 text-sm text-gray-900">
-                {t(getAuditActionTranslationKey(log.action), { defaultValue: log.action })}
-              </div>
-            </div>
-
-            {/* User info */}
-            <div>
-              <div className="text-sm font-medium text-gray-500">
-                {t('user')}
-              </div>
-              <div className="mt-1 text-sm text-gray-900">
-                {log.userName || log.userId || '—'}
-              </div>
+        <div className="max-h-[60vh] overflow-y-auto py-2 space-y-5">
+          <dl className="grid grid-cols-[max-content_1fr] gap-x-5 gap-y-3">
+            <Field label={t('user')}>
+              <div className="font-medium">{log.userName || log.userId || '—'}</div>
               {log.userEmail && (
-                <div className="text-xs text-gray-500 mt-0.5">
-                  {log.userEmail}
-                </div>
+                <div className="text-xs text-gray-500">{log.userEmail}</div>
               )}
-            </div>
+            </Field>
 
-            {/* Target info */}
-            <div>
-              <div className="text-sm font-medium text-gray-500">
-                {t('target')}
-              </div>
-              <div className="mt-1 text-sm text-gray-900">{t(oscratEntityTypeTranslationMap[log.targetType], { defaultValue: log.targetType })}</div>
+            <Field label={t('timestamp')}>
+              {formatTimestamp(log.createdAt, true)}
+            </Field>
+
+            {(log.productName || log.versionName) && (
+              <Field label={log.versionName ? `${t('product')} · ${t('version')}` : t('product')}>
+                {log.productName ?? '—'}
+                {log.versionName && (
+                  <span className="text-gray-500"> · {log.versionName}</span>
+                )}
+              </Field>
+            )}
+
+            <Field label={t('target')}>
+              <div>{targetTypeLabel}</div>
               {log.targetName && (
-                <div className="text-xs text-gray-500 mt-0.5">
-                  {formatNameWithUuidFallback(log.targetName, t)}
+                <div>
+                  {isUuid(log.targetName) ? (
+                    <CopyableValue value={log.targetName} />
+                  ) : (
+                    <span className="text-xs text-gray-500 break-all" title={log.targetName}>
+                      {log.targetName}
+                    </span>
+                  )}
                 </div>
               )}
-            </div>
-
-            {/* Product context */}
-            {log.productName && (
-              <div>
-                <div className="text-sm font-medium text-gray-500">
-                  {t('product')}
+              {showSeparateTargetId && (
+                <div>
+                  <CopyableValue value={log.targetId!} />
                 </div>
-                <div className="mt-1 text-sm text-gray-900">{log.productName}</div>
-              </div>
-            )}
+              )}
+            </Field>
+          </dl>
 
-            {/* Version context */}
-            {log.versionName && (
-              <div>
-                <div className="text-sm font-medium text-gray-500">
-                  {t('version')}
-                </div>
-                <div className="mt-1 text-sm text-gray-900">{log.versionName}</div>
-              </div>
-            )}
-
-            {/* Timestamp */}
+          {hasFiles && (
             <div>
-              <div className="text-sm font-medium text-gray-500">
-                {t('timestamp')}
-              </div>
-              <div className="mt-1 text-sm text-gray-900">
-                {formatTimestamp(log.createdAt, true)}
+              <h3 className="text-sm font-medium text-gray-700 mb-2">
+                {t('files')}
+              </h3>
+              <div className="space-y-1 pl-1">
+                {inputFilename && (
+                  <FileRow
+                    icon={<ArrowUpTrayIcon className="h-4 w-4" />}
+                    label="Input"
+                    filename={inputFilename}
+                  />
+                )}
+                {outputFilename && (
+                  <FileRow
+                    icon={<ArrowDownTrayIcon className="h-4 w-4" />}
+                    label="Output"
+                    filename={outputFilename}
+                  />
+                )}
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Changes section (if metadata exists) */}
-          {hasMetadataData && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-gray-900 border-b border-gray-200 pb-2">
+          {hasChanges && (
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">
                 {t('changes')}
               </h3>
-              <div className="text-sm">
+              <div className="pl-1">
                 {metadataType === 'patch' ? (
                   <PatchDisplay patch={metadataData as PatchOperation[]} />
-                ) : isObject(metadataData) ? (
+                ) : metadataType === 'snapshot' && isObject(metadataData) ? (
                   <SimplePropertyList data={metadataData} />
-                ) : (
-                  <span className="text-gray-900">{formatValue(metadataData)}</span>
-                )}
+                ) : extraMetadata ? (
+                  <SimplePropertyList data={extraMetadata} />
+                ) : null}
               </div>
             </div>
           )}
         </div>
       </Modal.Body>
 
-      <Modal.Actions>
+      <Modal.Actions className="border-t border-gray-100 pt-3">
         <Button appearance="default" onClick={onClose}>
           {t('close')}
         </Button>
