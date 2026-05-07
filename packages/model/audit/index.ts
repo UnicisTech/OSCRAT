@@ -8,37 +8,60 @@ type RequestInfo = {
   userAgent?: string;
 };
 
+const resolveAuditDenormalizedFields = async (
+  tx: PrismaClient | Prisma.TransactionClient,
+  event: AuditEvent
+): Promise<{
+  userName: string | null;
+  productName: string | null;
+  versionName: string | null;
+}> => {
+  let productName: string | null = null;
+  let versionName: string | null = null;
+
+  if (event.versionId) {
+    const version = await tx.oscratProductVersion.findUnique({
+      where: { id: event.versionId },
+      select: { version: true, product: { select: { name: true } } },
+    });
+    if (version) {
+      versionName = version.version;
+      productName = version.product.name;
+    }
+  } else if (event.productId) {
+    const product = await tx.oscratProduct.findUnique({
+      where: { id: event.productId },
+      select: { name: true },
+    });
+    productName = product?.name ?? null;
+  }
+
+  let userName: string | null = event.user.name ?? null;
+  if (!userName) {
+    const user = await tx.user.findUnique({
+      where: { id: event.user.id },
+      select: { name: true, email: true },
+    });
+    userName = user?.name || user?.email || null;
+  }
+
+  return { userName, productName, versionName };
+};
+
 export const createAuditLogger = (
   prismaClient: PrismaClient,
   request?: RequestInfo
 ): AuditLogger => {
   return async (event: AuditEvent) => {
     await prismaClient.$transaction(async (tx) => {
-      let productName: string | null = null;
-      let versionName: string | null = null;
-
-      if (event.versionId) {
-        const version = await tx.oscratProductVersion.findUnique({
-          where: { id: event.versionId },
-          select: { version: true, product: { select: { name: true } } },
-        });
-        if (version) {
-          versionName = version.version;
-          productName = version.product.name;
-        }
-      } else if (event.productId) {
-        const product = await tx.oscratProduct.findUnique({
-          where: { id: event.productId },
-          select: { name: true },
-        });
-        productName = product?.name ?? null;
-      }
+      const { userName, productName, versionName } =
+        await resolveAuditDenormalizedFields(tx, event);
 
       await tx.auditLog.create({
         data: {
           userId: event.user.id,
           userType: AuditUserType.USER,
-          userName: event.user.name,
+          userName,
           action: event.action,
           crud: event.crud,
           targetType: event.target.type,
@@ -74,31 +97,14 @@ export const createAuditLoggerWithTx = (
   request?: RequestInfo
 ): AuditLogger => {
   return async (event: AuditEvent) => {
-    let productName: string | null = null;
-    let versionName: string | null = null;
-
-    if (event.versionId) {
-      const version = await tx.oscratProductVersion.findUnique({
-        where: { id: event.versionId },
-        select: { version: true, product: { select: { name: true } } },
-      });
-      if (version) {
-        versionName = version.version;
-        productName = version.product.name;
-      }
-    } else if (event.productId) {
-      const product = await tx.oscratProduct.findUnique({
-        where: { id: event.productId },
-        select: { name: true },
-      });
-      productName = product?.name ?? null;
-    }
+    const { userName, productName, versionName } =
+      await resolveAuditDenormalizedFields(tx, event);
 
     await tx.auditLog.create({
       data: {
         userId: event.user.id,
         userType: AuditUserType.USER,
-        userName: event.user.name,
+        userName,
         action: event.action,
         crud: event.crud,
         targetType: event.target.type,
