@@ -12,7 +12,6 @@ import { useTask } from 'hooks/useTask';
 import { useFormik } from 'formik';
 import { createTaskUpdateSchema, type TaskUpdateData } from '@/lib/validation/task';
 import type { ApiError } from '@/types';
-import { useGetTeamTasks } from '@/lib/api/hooks';
 
 const EditTask = ({
   visible,
@@ -27,12 +26,7 @@ const EditTask = ({
 }) => {
   const { t, ready } = useTranslation('common');
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
-  const { data: existingTasks } = useGetTeamTasks(team.slug);
-
-  const validationSchema = useMemo(
-    () => createTaskUpdateSchema(existingTasks, task.id),
-    [existingTasks, task.id]
-  );
+  const validationSchema = useMemo(() => createTaskUpdateSchema(), []);
   
   const initialValues: TaskUpdateData = useMemo(() => ({
     title: task?.title || '',

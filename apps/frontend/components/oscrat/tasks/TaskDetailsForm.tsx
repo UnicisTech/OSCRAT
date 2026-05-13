@@ -13,7 +13,6 @@ import { useFormik } from 'formik';
 import { createTaskUpdateSchema } from '@/lib/validation/task';
 import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 import type { ApiError } from '@/types';
-import { useGetTeamTasks } from '@/lib/api/hooks';
 
 interface TaskDetailsFormProps {
   task: Task;
@@ -25,8 +24,6 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
   
   const { members } = useTeamMembers(team.slug);
-  const { data: existingTasks } = useGetTeamTasks(team.slug);
-  
   const { project: product } = useOscratProject(
     team.slug,
     task.productId || '',
@@ -40,11 +37,8 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
     { enabled: !!task.productId && !!task.versionId }
   );
 
-  const validationSchema = useMemo(
-    () => createTaskUpdateSchema(existingTasks, task.id),
-    [existingTasks, task.id]
-  );
-  
+  const validationSchema = useMemo(() => createTaskUpdateSchema(), []);
+
   const initialValues: UpdateTaskData = useMemo(() => ({
     title: task?.title || '',
     status: task?.status,
@@ -247,7 +241,7 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
           {renderField('status', t('status'), 'select', Object.values(TaskStatus).map(s => ({ 
             value: s, 
             label: t(getTaskStatusTranslationKey(s))
-          })))}
+           })))}
           
           {renderField('assigneeId', t('assignee'), 'select', [
             { value: '', label: t('unassigned') },

@@ -6,6 +6,7 @@ import { executeSbomImport } from './jobs/sbomImport';
 import { executeVulnerabilityScan } from './jobs/vulnerabilityScan';
 import { executeSbomReportScan } from './jobs/sbomReportScan';
 import { executeConfigurationScan } from './jobs/configurationScan';
+import { checkAwarenessTrainingRegeneration } from './jobs/awarenessTraining';
 import * as fs from 'fs';
 import * as path from 'path';
 import { $ } from 'zx';
@@ -19,7 +20,8 @@ class JobRunner {
   private runningJobs = new Set<Promise<void>>();
   private maxConcurrentJobs: number;
   private pollTimeout: NodeJS.Timeout | null = null;
-  private isProcessingJobs = false; // Lock for processJobs method
+  private isProcessingJobs = false;
+  private trainingCheckTimeout: NodeJS.Timeout | null = null;
   private workspaceRoot: string;
 
   constructor() {
@@ -116,6 +118,7 @@ class JobRunner {
       console.log('[Job Runner] Database connected');
       this.isRunning = true;
       this.processJobs();
+      this.startTrainingRegeneration();
       console.log(
         `[Job Runner] Started successfully (max ${this.maxConcurrentJobs} concurrent jobs)`
       );
@@ -125,9 +128,35 @@ class JobRunner {
     }
   }
 
+  private startTrainingRegeneration() {
+    this.runTrainingCheck();
+    console.log('[Job Runner] Awareness training regeneration scheduled (every 24h)');
+  }
+
+  private async runTrainingCheck() {
+    try {
+      await checkAwarenessTrainingRegeneration(this.prisma);
+    } catch (err) {
+      console.error('[Job Runner] Awareness training check failed:', err);
+    } finally {
+      this.scheduleTrainingCheck();
+    }
+  }
+
+  private scheduleTrainingCheck() {
+    if (!this.isRunning) return;
+    const intervalMs = 24 * 60 * 60 * 1000;
+    this.trainingCheckTimeout = setTimeout(() => this.runTrainingCheck(), intervalMs);
+  }
+
   async stop() {
     console.log('[Job Runner] Stopping...');
     this.isRunning = false;
+
+    if (this.trainingCheckTimeout) {
+      clearTimeout(this.trainingCheckTimeout);
+      this.trainingCheckTimeout = null;
+    }
 
     if (this.pollTimeout) {
       clearTimeout(this.pollTimeout);

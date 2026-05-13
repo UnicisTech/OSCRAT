@@ -8,6 +8,7 @@ import { Role } from '@oscrat/model';
 import { getAccount } from 'models/account';
 import { addTeamMember, getTeam, getTeamDetail } from 'models/team';
 import { createUser, getUser } from 'models/user';
+import { ensureAwarenessTrainingTask } from 'models/task';
 import NextAuth, { Account, NextAuthOptions, Profile, User } from 'next-auth';
 import BoxyHQSAMLProvider from 'next-auth/providers/boxyhq-saml';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -299,10 +300,16 @@ const linkToTeam = async (profile: Profile, userId: string, userName?: string | 
     }
   }
 
-  await addTeamMember(team.id, userId, userRole, {
+  const auditInfo = {
     user: { id: userId, name: userName },
     team: { id: team.id, name: team.name },
-  });
+  };
+
+  await addTeamMember(team.id, userId, userRole, auditInfo);
+
+  ensureAwarenessTrainingTask(team.id, userId, userName!, auditInfo).catch(
+    (err) => console.error('[Awareness] Failed to create training task on SAML link:', err)
+  );
 };
 
 const linkAccount = async (user: User, account: Account) => {

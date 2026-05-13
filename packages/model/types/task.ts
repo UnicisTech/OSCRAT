@@ -13,6 +13,10 @@ export const TASK_CSC_PROPERTY_KEYS = {
   AUDIT_LOGS: 'csc_audit_logs',
 } as const;
 
+export const TASK_TRAINING_PROPERTY_KEYS = {
+  TASK_TYPE: 'task_type',
+} as const;
+
 interface TaskByRuleSummary {
   id: number;
   taskNumber: number;
@@ -45,7 +49,11 @@ interface TaskCscProperties {
   [TASK_CSC_PROPERTY_KEYS.AUDIT_LOGS]?: TaskCscAuditLogEntry[];
 }
 
-type TaskProperties = TaskConfigurationProperties & TaskCscProperties;
+interface TaskTrainingProperties {
+  [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]?: string;
+}
+
+type TaskProperties = TaskConfigurationProperties & TaskCscProperties & TaskTrainingProperties;
 
 export type {
   TaskByRuleSummary,
@@ -53,5 +61,6 @@ export type {
   TaskCscAuditLogActor,
   TaskCscAuditLogEntry,
   TaskCscProperties,
+  TaskTrainingProperties,
   TaskProperties,
 };

@@ -40,14 +40,11 @@ const CreateTask = ({
   onSuccess,
 }: CreateTaskProps) => {
   const { t, ready } = useTranslation('common');
-  const { createTask, tasks: existingTasks } = useTasks(team.slug);
+  const { createTask } = useTasks(team.slug);
   const { data: products } = useSearchProducts(team.slug, { includeVersions: true });
   const requiredAsterisk = <span className="ml-1 text-red-600">*</span>;
 
-  const validationSchema = useMemo(
-    () => createTaskCreateSchema(existingTasks),
-    [existingTasks]
-  );
+  const validationSchema = useMemo(() => createTaskCreateSchema(), []);
   
   const initialValues: TaskCreateData = {
     title: defaultTitle || '',

@@ -1,5 +1,6 @@
 import { getInvitation, isInvitationExpired, deleteInvitation } from 'models/invitation';
 import { addTeamMember } from 'models/team';
+import { ensureAwarenessTrainingTask } from 'models/task';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { ApiError } from '@/lib/errors';
@@ -47,15 +48,21 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     );
   }
 
+  const auditInfo = {
+    user: { id: session.user.id, name: session.user.name },
+    team: { id: invitation.team.id, name: invitation.team.name },
+  };
+
   const teamMember = await addTeamMember(
     invitation.team.id,
     userId,
     invitation.role,
-    {
-      user: { id: session.user.id, name: session.user.name },
-      team: { id: invitation.team.id, name: invitation.team.name },
-    }
+    auditInfo
   );
+
+  ensureAwarenessTrainingTask(
+    invitation.team.id, userId, session.user.name!, auditInfo
+  ).catch((err) => console.error('[Awareness] Failed to create training task on invite accept:', err));
 
   await sendEvent(
     invitation.team.id,

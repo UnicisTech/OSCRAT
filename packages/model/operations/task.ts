@@ -3,9 +3,17 @@ import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, 
 import { toJsonInput } from '../utils/json';
 import {
   TASK_CONFIGURATION_PROPERTY_KEYS,
+  TASK_TRAINING_PROPERTY_KEYS,
   type TaskByRuleSummary,
   type TaskProperties,
 } from '../types/task';
+import {
+  TRAINING_TASK_TYPE_VALUE,
+  AWARENESS_TRAINING_DUE_DAYS,
+  AWARENESS_TRAINING_TITLE_LOC_ID,
+  AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
+} from '../constants/awarenessTraining';
+import { getTeamDetail, incrementTaskIndex } from './team';
 
 const { RULE_ID: CONFIGURATION_RULE_ID } = TASK_CONFIGURATION_PROPERTY_KEYS;
 
@@ -16,10 +24,13 @@ export const createTask = async (
     authorId: string;
     teamId: string;
     title: string;
+    titleLocId?: string;
     status: TaskStatus;
     duedate: string;
     description: string;
+    descriptionLocId?: string;
     taskNumber: number;
+    assigneeId?: string;
     productId?: string;
     versionId?: string;
     originType?: TaskOriginType;
@@ -29,8 +40,10 @@ export const createTask = async (
 ) => {
   return await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
-    const { authorId, teamId, title, status, duedate, description, taskNumber, productId, versionId, originType, properties } =
-      param;
+    const {
+      authorId, teamId, title, titleLocId, status, duedate, description,
+      descriptionLocId, taskNumber, assigneeId, productId, versionId, originType, properties,
+    } = param;
 
     const task = await tx.task.create({
       data: {
@@ -38,13 +51,16 @@ export const createTask = async (
         taskNumber,
         teamId,
         title,
-        status: status,
+        titleLocId,
+        status,
         duedate,
         description,
+        descriptionLocId,
         properties: toJsonInput(properties ?? {}),
+        assigneeId,
         productId,
         versionId,
-        originType: originType,
+        originType,
       },
     });
 
@@ -260,3 +276,69 @@ export const getConfigurationTasksByVersion = async (
   }
   return byRule;
 };
+
+const TRAINING_TYPE_FILTER = {
+  path: [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE],
+  equals: TRAINING_TASK_TYPE_VALUE,
+};
+
+/** Find an active (non-DONE) training task assigned to a user in a team */
+export const findActiveTrainingTaskForUser = async (
+  prisma: PrismaClient,
+  teamId: string,
+  userId: string
+) => {
+  return await prisma.task.findFirst({
+    where: {
+      teamId,
+      assigneeId: userId,
+      properties: TRAINING_TYPE_FILTER,
+      status: { not: TaskStatus.DONE },
+    },
+  });
+};
+
+/**
+ * Creates an awareness training task for a user in a team if one doesn't
+ * already exist (idempotent). Used by both the frontend (on team member
+ * creation) and the jobrunner (daily regeneration).
+ */
+export const ensureAwarenessTrainingTask = async (
+  prisma: PrismaClient,
+  teamId: string,
+  userId: string,
+  userName: string,
+  auditInfo: AuditInfo
+) => {
+  const existing = await findActiveTrainingTaskForUser(prisma, teamId, userId);
+  if (existing) return existing;
+
+  const team = await getTeamDetail(prisma, { id: teamId });
+  if (!team) throw new Error(`Team ${teamId} not found`);
+
+  const duedate = new Date();
+  duedate.setDate(duedate.getDate() + AWARENESS_TRAINING_DUE_DAYS);
+
+  const task = await createTask(
+    prisma,
+    {
+      authorId: userId,
+      teamId,
+      title: '',
+      titleLocId: AWARENESS_TRAINING_TITLE_LOC_ID,
+      status: TaskStatus.TODO,
+      duedate: duedate.toISOString(),
+      description: '',
+      descriptionLocId: AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
+      assigneeId: userId,
+      originType: TaskOriginType.AUTOMATIC,
+      taskNumber: team.taskIndex,
+      properties: { [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]: TRAINING_TASK_TYPE_VALUE },
+    },
+    auditInfo
+  );
+
+  await incrementTaskIndex(prisma, teamId);
+  return task;
+};
+

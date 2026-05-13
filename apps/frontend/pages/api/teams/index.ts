@@ -1,6 +1,7 @@
 import { slugify } from '@oscrat/model/utils/slugify';
 import { ApiError } from '@/lib/errors';
 import { createTeam, getTeams } from 'models/team';
+import { ensureAwarenessTrainingTask } from 'models/task';
 import {
   withUserAuth,
   type AuthenticatedUserRequest,
@@ -81,6 +82,13 @@ const handlePOST = async (
 
   console.log(
     `[Team] created, teamId: ${team.id}, name: ${requestData.name}, slug: ${slug}, ownerId: ${user.id}`
+  );
+
+  ensureAwarenessTrainingTask(team.id, user.id, user.name!, {
+    user: { id: user.id, name: user.name },
+    team: { id: team.id, name: team.name },
+  }).catch((err) =>
+    console.error('[Awareness] Failed to create training task on team create:', err)
   );
 
   recordMetric('team.created');

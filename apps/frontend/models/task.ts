@@ -1,42 +1,16 @@
 import { prisma } from '@/lib/prisma';
 import * as TaskOps from '@oscrat/model/operations';
 import * as TeamOps from '@oscrat/model/operations';
-import { TaskStatus, TaskOriginType, type AuditInfo, type TaskProperties } from '@oscrat/model';
+import {
+  TaskStatus,
+  TaskOriginType,
+  TRAINING_TASK_TYPE_VALUE,
+  type AuditInfo,
+  type TaskProperties,
+} from '@oscrat/model';
 
 const normalizeTaskTitle = (title: string) => title.trim();
 type TaskUpdateInput = Record<string, unknown>;
-
-const createConflictError = (message: string) => {
-  const error = new Error(message) as Error & { status: number };
-  error.status = 409;
-  return error;
-};
-
-const throwIfTaskTitleExists = async ({
-  teamId,
-  title,
-  excludeTaskId,
-}: {
-  teamId: string;
-  title: string;
-  excludeTaskId?: number;
-}) => {
-  const existingTask = await prisma.task.findFirst({
-    where: {
-      teamId,
-      ...(excludeTaskId ? { id: { not: excludeTaskId } } : {}),
-      title: {
-        equals: title,
-        mode: 'insensitive',
-      },
-    },
-    select: { id: true },
-  });
-
-  if (existingTask) {
-    throw createConflictError('A task with this title already exists');
-  }
-};
 
 export const createTask = async (param: {
   authorId: string;
@@ -45,6 +19,7 @@ export const createTask = async (param: {
   status: TaskStatus;
   duedate?: string;
   description: string;
+  assigneeId?: string;
   productId?: string;
   versionId?: string;
   originType?: TaskOriginType;
@@ -56,7 +31,6 @@ export const createTask = async (param: {
   if (!team) {
     throw new Error('Team not found');
   }
-  await throwIfTaskTitleExists({ teamId, title: normalizedTitle });
   const taskNumber = team.taskIndex;
 
   const task = await TaskOps.createTask(prisma, {
@@ -79,34 +53,25 @@ export const updateTask = async (
 ) => {
   let updateData: TaskUpdateInput = data;
 
-  if (typeof data?.title === 'string') {
-    const taskToUpdate = await prisma.task.findFirst({
-      where: {
-        taskNumber,
-        team: {
-          slug,
-        },
-      },
-      select: {
-        id: true,
-        teamId: true,
-      },
+  if (data?.status === TaskStatus.DONE) {
+    const task = await prisma.task.findFirst({
+      where: { taskNumber, team: { slug } },
+      select: { assigneeId: true, teamId: true, properties: true },
     });
-
-    if (!taskToUpdate) {
-      return null;
+    if (task?.assigneeId) {
+      const props = task.properties as Record<string, unknown>;
+      if (props?.task_type === TRAINING_TASK_TYPE_VALUE) {
+        await TeamOps.updateLastAwarenessTrainingCompletion(
+          prisma, task.teamId, task.assigneeId, new Date()
+        );
+      }
     }
+  }
 
-    const normalizedTitle = normalizeTaskTitle(data.title);
-    await throwIfTaskTitleExists({
-      teamId: taskToUpdate.teamId,
-      title: normalizedTitle,
-      excludeTaskId: taskToUpdate.id,
-    });
-
+  if (typeof data?.title === 'string') {
     updateData = {
-      ...data,
-      title: normalizedTitle,
+      ...updateData,
+      title: normalizeTaskTitle(data.title),
     };
   }
 
@@ -130,4 +95,13 @@ export const getTaskBySlugAndNumber = async (
 
 export const getTeamTasks = async (slug: string) => {
   return await TaskOps.getTeamTasks(prisma, slug);
+};
+
+export const ensureAwarenessTrainingTask = async (
+  teamId: string,
+  userId: string,
+  userName: string,
+  auditInfo: AuditInfo
+) => {
+  return TaskOps.ensureAwarenessTrainingTask(prisma, teamId, userId, userName, auditInfo);
 };

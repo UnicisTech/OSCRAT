@@ -676,6 +676,8 @@
       "task-status-planned": "Planned",
       "task-status-in-progress": "In Progress",
       "task-status-done": "Done",
+      "awareness-training-title": "Awareness Training",
+      "awareness-training-description": "Please complete the following security awareness training materials:\n\n1. OWASP Security Awareness: https://owasp.org/www-project-security-awareness/\n2. ENISA Cybersecurity Training: https://www.enisa.europa.eu/topics/training-and-exercises\n3. NIST Cybersecurity Awareness: https://www.nist.gov/cybersecurity\n\nAfter completing all materials, update the task status to Done.",
       "remediate-compliance-requirement": "Remediate compliance requirement",
       "external-reporting": "External Reporting",
       "team-compliance-assessment": "Organization Compliance Assessment",

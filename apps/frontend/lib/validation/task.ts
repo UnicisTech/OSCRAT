@@ -4,6 +4,7 @@ import {
   CONFIGURATION_SEVERITY,
   TASK_CONFIGURATION_PROPERTY_KEYS,
   TASK_CSC_PROPERTY_KEYS,
+  TASK_TRAINING_PROPERTY_KEYS,
   type ConfigurationSeverity,
   type TaskCscAuditLogEntry,
   type TaskProperties,
@@ -25,81 +26,46 @@ const taskCscPropertiesSchema = {
   [TASK_CSC_PROPERTY_KEYS.AUDIT_LOGS]: Yup.array().of(Yup.mixed<TaskCscAuditLogEntry>().required()).optional(),
 };
 
+const taskTrainingPropertiesSchema = {
+  [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]: Yup.string().trim().optional(),
+};
+
 export const taskPropertiesSchema: Yup.ObjectSchema<TaskProperties> = Yup.object({
   ...taskConfigurationPropertiesSchema,
   ...taskCscPropertiesSchema,
+  ...taskTrainingPropertiesSchema,
 })
   .noUnknown()
   .strict();
 
-type TaskTitleCandidate = {
-  id: number;
-  title: string;
-};
+const taskTitleSchema = Yup.string()
+  .trim()
+  .min(1, 'oscrat.ui.validation.title-required')
+  .max(100, 'oscrat.ui.validation.title-too-long')
+  .matches(TITLE_CHAR_REGEX, 'oscrat.ui.validation.invalid-characters')
+  .required('oscrat.ui.validation.task-title-required');
 
-const createTaskTitleWithUniquenessSchema = (
-  existingTasks: TaskTitleCandidate[] | undefined,
-  currentTaskId?: number
-) =>
-  Yup.string()
-    .trim()
-    .min(1, 'oscrat.ui.validation.title-required')
-    .max(100, 'oscrat.ui.validation.title-too-long')
-    // Allow brackets specifically for task names in addition to existing title characters.
-    .matches(TITLE_CHAR_REGEX, 'oscrat.ui.validation.invalid-characters')
-    .required('oscrat.ui.validation.task-title-required')
-    .test(
-      'unique-title',
-      'oscrat.ui.validation.task-title-already-exists',
-      (value) => {
-        if (!value || !existingTasks) return true;
-        const normalizedValue = value.trim().toLowerCase();
-        return !existingTasks.some(
-          (task) => {
-            if (currentTaskId && task.id === currentTaskId) {
-              return false;
-            }
-            const normalizedTaskTitle = task.title.trim().toLowerCase();
-            return normalizedTaskTitle === normalizedValue;
-          }
-        );
-      }
-    );
-
-export const createTaskCreateSchema = (
-  existingTasks: TaskTitleCandidate[] | undefined
-) =>
+export const createTaskCreateSchema = () =>
   Yup.object({
-    title: createTaskTitleWithUniquenessSchema(existingTasks),
-    
+    title: taskTitleSchema,
     description: descriptionSchema.optional(),
-      
     status: Yup.mixed<TaskStatus>()
       .oneOf(Object.values(TaskStatus), 'oscrat.ui.validation.task-status-invalid')
       .required('oscrat.ui.validation.task-status-required'),
-      
     duedate: Yup.date()
       .required('oscrat.ui.validation.task-due-date-required'),
-    
     productId: Yup.string().optional(),
     versionId: Yup.string().optional(),
   });
 
-export const createTaskUpdateSchema = (
-  existingTasks: TaskTitleCandidate[] | undefined,
-  currentTaskId?: number
-) =>
+export const createTaskUpdateSchema = () =>
   Yup.object({
-    title: createTaskTitleWithUniquenessSchema(existingTasks, currentTaskId),
-    
+    title: taskTitleSchema,
     description: descriptionSchema.optional(),
-      
     status: Yup.mixed<TaskStatus>()
       .oneOf(Object.values(TaskStatus), 'oscrat.ui.validation.task-status-invalid')
       .optional(),
-      
     duedate: Yup.date().optional(),
-      
     assigneeId: Yup.string().nullable().optional(),
   });
 

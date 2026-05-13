@@ -657,3 +657,35 @@ export const getTeamWithProductsSummary = async (
     products: team.products.map(transformToProductSummary),
   };
 };
+
+/** Update the awareness training completion timestamp for a team member */
+export const updateLastAwarenessTrainingCompletion = async (
+  prisma: PrismaClient,
+  teamId: string,
+  userId: string,
+  date: Date
+) => {
+  return prisma.teamMember.update({
+    where: { teamId_userId: { teamId, userId } },
+    data: { lastAwarenessTrainingCompletion: date },
+  });
+};
+
+/** Find team members who have never completed training or whose last completion is overdue */
+export const getAwarenessTrainingOverdueMembers = async (
+  prisma: PrismaClient,
+  thresholdDate: Date
+) => {
+  return prisma.teamMember.findMany({
+    where: {
+      OR: [
+        { lastAwarenessTrainingCompletion: null },
+        { lastAwarenessTrainingCompletion: { lt: thresholdDate } },
+      ],
+    },
+    include: {
+      user: { select: { id: true, name: true } },
+      team: { select: { id: true, name: true, slug: true } },
+    },
+  });
+};

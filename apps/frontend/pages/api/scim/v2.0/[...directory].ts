@@ -9,6 +9,7 @@ import type {
 } from '@boxyhq/saml-jackson';
 import { Role } from '@oscrat/model';
 import { addTeamMember, getTeam } from 'models/team';
+import { ensureAwarenessTrainingTask } from 'models/task';
 import { deleteUser, getUser } from 'models/user';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -80,10 +81,14 @@ const handleEvents = async (event: DirectorySyncEvent) => {
       },
     });
 
-    await addTeamMember(teamId, user.id, Role.MEMBER, {
+    const auditInfo = {
       user: { id: user.id, name: userName },
       team: { id: teamId, name: team.name },
-    });
+    };
+    await addTeamMember(teamId, user.id, Role.MEMBER, auditInfo);
+    ensureAwarenessTrainingTask(teamId, user.id, userName, auditInfo).catch(
+      (err) => console.error('[Awareness] Failed to create training task on SCIM create:', err)
+    );
   }
 
   // User has been updated
@@ -111,10 +116,14 @@ const handleEvents = async (event: DirectorySyncEvent) => {
         },
       });
 
-      await addTeamMember(teamId, user.id, Role.MEMBER, {
+      const auditInfo = {
         user: { id: user.id, name: userName },
         team: { id: teamId, name: team.name },
-      });
+      };
+      await addTeamMember(teamId, user.id, Role.MEMBER, auditInfo);
+      ensureAwarenessTrainingTask(teamId, user.id, userName, auditInfo).catch(
+        (err) => console.error('[Awareness] Failed to create training task on SCIM update:', err)
+      );
 
       return;
     }

@@ -138,9 +138,11 @@ model Task {
   authorId    String
   assigneeId  String?
   title       String
+  titleLocId  String?
   status      TaskStatus   @default(TODO)
   duedate     String
-  description String
+  description    String
+  descriptionLocId String?
   properties  Json
   
   productId   String?
@@ -179,6 +181,7 @@ model TeamMember {
   role      Role     @default(MEMBER)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  lastAwarenessTrainingCompletion DateTime?
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
