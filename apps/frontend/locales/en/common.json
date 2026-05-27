@@ -687,6 +687,7 @@
       "task-type-configuration-management": "Configuration Management",
       "task-type-requirements": "Requirements",
       "no-type": "No type",
+      "enable-risk-assessment": "Enable Risk Assessment",
       "risk": {
         "section-details": "Section 1: Risk Details",
         "section-treatment": "Section 2: Risk Treatment",

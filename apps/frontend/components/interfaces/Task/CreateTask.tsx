@@ -46,6 +46,8 @@ const CreateTask = ({
 
   const validationSchema = useMemo(() => createTaskCreateSchema(), []);
   
+  const [enableRiskAssessment, setEnableRiskAssessment] = React.useState(false);
+
   const initialValues: TaskCreateData = {
     title: defaultTitle || '',
     status: DEFAULT_TASK_STATUS,
@@ -71,7 +73,10 @@ const CreateTask = ({
           productId: values.productId || undefined,
           versionId: values.versionId || undefined,
           originType: defaultOriginType,
-          properties: linkedProperties,
+          properties: {
+            ...linkedProperties,
+            ...(enableRiskAssessment ? { enableRiskAssessment: true } : {}),
+          },
         });
 
         toast.success(t('task-created'));
@@ -107,6 +112,7 @@ const CreateTask = ({
 
   const handleClose = () => {
     formik.resetForm();
+    setEnableRiskAssessment(false);
     setVisible(false);
   };
 
@@ -199,6 +205,22 @@ const CreateTask = ({
               required
             />
             
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="enableRiskAssessment"
+                checked={enableRiskAssessment}
+                onChange={(e) => setEnableRiskAssessment(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="enableRiskAssessment"
+                className="text-sm font-medium text-gray-700"
+              >
+                {t('oscrat.ui.enable-risk-assessment')}
+              </label>
+            </div>
+
             <div className="w-full">
               <label
                 htmlFor="description"

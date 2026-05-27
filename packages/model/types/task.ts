@@ -17,6 +17,10 @@ export const TASK_TRAINING_PROPERTY_KEYS = {
   TASK_TYPE: 'task_type',
 } as const;
 
+export const TASK_RISK_PROPERTY_KEYS = {
+  ENABLE_RISK_ASSESSMENT: 'enableRiskAssessment',
+} as const;
+
 interface TaskByRuleSummary {
   id: number;
   taskNumber: number;
@@ -53,7 +57,11 @@ interface TaskTrainingProperties {
   [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]?: string;
 }
 
-type TaskProperties = TaskConfigurationProperties & TaskCscProperties & TaskTrainingProperties;
+interface TaskRiskFlagProperties {
+  [TASK_RISK_PROPERTY_KEYS.ENABLE_RISK_ASSESSMENT]?: boolean;
+}
+
+type TaskProperties = TaskConfigurationProperties & TaskCscProperties & TaskTrainingProperties & TaskRiskFlagProperties;
 
 export type {
   TaskByRuleSummary,
@@ -62,5 +70,6 @@ export type {
   TaskCscAuditLogEntry,
   TaskCscProperties,
   TaskTrainingProperties,
+  TaskRiskFlagProperties,
   TaskProperties,
 };

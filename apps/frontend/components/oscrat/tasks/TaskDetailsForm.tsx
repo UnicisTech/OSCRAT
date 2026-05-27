@@ -70,6 +70,25 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
     },
   });
 
+  const existingProps = (task.properties || {}) as Record<string, unknown>;
+  const [enableRiskAssessment, setEnableRiskAssessment] = React.useState(
+    !!existingProps?.enableRiskAssessment
+  );
+
+  const handleRiskAssessmentToggle = async (checked: boolean) => {
+    setEnableRiskAssessment(checked);
+    try {
+      await updateTask({
+        properties: { ...existingProps, enableRiskAssessment: checked },
+      } as any);
+      toast.success(t('task-updated-successfully'));
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      toast.error(apiError.message);
+      setEnableRiskAssessment(!checked);
+    }
+  };
+
   const handleInputChange = (field: keyof UpdateTaskData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
@@ -253,6 +272,23 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
           
           <div className="lg:col-span-3">
             {renderField('description', t('description'), 'textarea')}
+          </div>
+
+          <div className="flex items-center gap-2 mt-4">
+            <input
+              type="checkbox"
+              id="enableRiskAssessment"
+              checked={enableRiskAssessment}
+              onChange={(e) => handleRiskAssessmentToggle(e.target.checked)}
+              disabled={formik.isSubmitting}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed"
+            />
+            <label
+              htmlFor="enableRiskAssessment"
+              className="text-sm font-medium text-gray-700"
+            >
+              {t('oscrat.ui.enable-risk-assessment')}
+            </label>
           </div>
         </div>
 

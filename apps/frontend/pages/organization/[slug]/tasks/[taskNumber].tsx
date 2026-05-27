@@ -57,8 +57,8 @@ const TaskDetails = () => {
       {/* Task Details Form */}
       <TaskDetailsForm task={task} team={team} />
 
-      {/* Risk Assessment (only for Risk tasks) */}
-      {(task.properties as Record<string, unknown>)?.task_type === 'RISK' && (
+      {/* Risk Assessment (enabled via checkbox) */}
+      {(task.properties as Record<string, unknown>)?.enableRiskAssessment === true && (
         <RiskAssessmentSection task={task} team={team} />
       )}
       

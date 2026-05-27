@@ -5,6 +5,7 @@ import {
   TASK_CONFIGURATION_PROPERTY_KEYS,
   TASK_CSC_PROPERTY_KEYS,
   TASK_TRAINING_PROPERTY_KEYS,
+  TASK_RISK_PROPERTY_KEYS,
   type ConfigurationSeverity,
   type TaskCscAuditLogEntry,
   type TaskProperties,
@@ -30,10 +31,15 @@ const taskTrainingPropertiesSchema = {
   [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]: Yup.string().trim().optional(),
 };
 
+const taskRiskFlagPropertiesSchema = {
+  [TASK_RISK_PROPERTY_KEYS.ENABLE_RISK_ASSESSMENT]: Yup.boolean().optional(),
+};
+
 export const taskPropertiesSchema: Yup.ObjectSchema<TaskProperties> = Yup.object({
   ...taskConfigurationPropertiesSchema,
   ...taskCscPropertiesSchema,
   ...taskTrainingPropertiesSchema,
+  ...taskRiskFlagPropertiesSchema,
 })
   .noUnknown()
   .strict();
