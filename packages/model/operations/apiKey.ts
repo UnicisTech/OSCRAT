@@ -43,11 +43,16 @@ export const fetchApiKeys = async (prisma: PrismaClient, teamId: string) => {
   });
 };
 
-/** Delete an API key */
-export const deleteApiKey = async (prisma: PrismaClient, id: string) => {
-  return prisma.apiKey.delete({
+/** Delete an API key scoped to a team */
+export const deleteApiKey = async (
+  prisma: PrismaClient,
+  id: string,
+  teamId: string
+) => {
+  return prisma.apiKey.deleteMany({
     where: {
       id,
+      teamId,
     },
   });
 };

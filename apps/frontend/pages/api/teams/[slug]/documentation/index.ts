@@ -4,7 +4,7 @@ import { ApiError } from '@/lib/errors';
 import { createDocumentation, listDocumentation } from 'models/documentation';
 import { DocumentationStatus, DocumentationVisibility } from '@oscrat/model';
 import { documentationCreateSchema, documentationFilterSchema } from '@/lib/validation/documentation';
-import * as Yup from 'yup';
+import { validateRequest } from '@/lib/validation/validateRequest';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -29,16 +29,9 @@ const handleGET = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  try {
-    const filter = await documentationFilterSchema.validate(req.query);
-    const docs = await listDocumentation(teamMember.teamId, filter);
-    return res.status(200).json({ data: docs, error: null });
-  } catch (error) {
-    if (error instanceof Yup.ValidationError) {
-      throw new ApiError(400, error.message);
-    }
-    throw error;
-  }
+  const filter = await validateRequest(documentationFilterSchema, req.query);
+  const docs = await listDocumentation(teamMember.teamId, filter);
+  return res.status(200).json({ data: docs, error: null });
 };
 
 const handlePOST = async (
@@ -47,28 +40,24 @@ const handlePOST = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  try {
-    const validatedData = await documentationCreateSchema.validate(req.body);
+  const validatedData = await validateRequest(
+    documentationCreateSchema,
+    req.body
+  );
 
-    const doc = await createDocumentation(
-      teamMember.teamId,
-      user.id,
-      {
-        title: validatedData.title,
-        content: validatedData.content || '',
-        visibility: validatedData.visibility || DocumentationVisibility.PRIVATE,
-        status: validatedData.status || DocumentationStatus.DRAFT,
-        productId: validatedData.productId,
-        versionId: validatedData.versionId,
-      },
-      req.auditInfo
-    );
+  const doc = await createDocumentation(
+    teamMember.teamId,
+    user.id,
+    {
+      title: validatedData.title,
+      content: validatedData.content || '',
+      visibility: validatedData.visibility || DocumentationVisibility.PRIVATE,
+      status: validatedData.status || DocumentationStatus.DRAFT,
+      productId: validatedData.productId,
+      versionId: validatedData.versionId,
+    },
+    req.auditInfo
+  );
 
-    return res.status(201).json({ data: doc, error: null });
-  } catch (error) {
-    if (error instanceof Yup.ValidationError) {
-      throw new ApiError(400, error.message);
-    }
-    throw error;
-  }
+  return res.status(201).json({ data: doc, error: null });
 };

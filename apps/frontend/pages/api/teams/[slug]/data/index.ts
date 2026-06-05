@@ -4,7 +4,7 @@ import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 import type { TeamDataCreate } from '@oscrat/model/types/teamData';
 import { teamDataCreateSchema } from '@/lib/validation/teamData';
-import * as Yup from 'yup';
+import { validateRequest } from '@/lib/validation/validateRequest';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -40,22 +40,15 @@ const handlePOST = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  try {
-    const validatedData = await teamDataCreateSchema.validate(req.body);
+  const validatedData = await validateRequest(teamDataCreateSchema, req.body);
 
-    const createData: TeamDataCreate = {
-      dataKey: validatedData.dataKey,
-      payload: validatedData.payload,
-      updatedBy: user.id,
-    };
+  const createData: TeamDataCreate = {
+    dataKey: validatedData.dataKey,
+    payload: validatedData.payload,
+    updatedBy: user.id,
+  };
 
-    const result = await upsertTeamData(teamMember.teamId, createData);
+  const result = await upsertTeamData(teamMember.teamId, createData);
 
-    res.status(201).json({ data: result });
-  } catch (error) {
-    if (error instanceof Yup.ValidationError) {
-      throw new ApiError(400, error.message);
-    }
-    throw error;
-  }
+  res.status(201).json({ data: result });
 };

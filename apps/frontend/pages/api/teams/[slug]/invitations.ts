@@ -1,25 +1,22 @@
 import { sendTeamInviteEmail } from '@/lib/email/sendTeamInviteEmail';
 import { ApiError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/session';
 import { sendEvent } from '@/lib/svix';
 import {
   createInvitation,
   deleteInvitation,
   getInvitation,
   getInvitations,
-  isInvitationExpired,
 } from 'models/invitation';
-import { addTeamMember } from 'models/team';
-import { ensureAwarenessTrainingTask } from 'models/task';
 import {
   withTeamAuth,
   type AuthenticatedTeamRequest,
 } from '@/lib/middleware';
 import { withApiHandler } from '@/lib/middleware';
+import { inviteMemberSchema } from '@/lib/validation/team';
+import { validateRequest } from '@/lib/validation/validateRequest';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
-import { toPlainObject } from '@/lib/utils';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
@@ -29,15 +26,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return withTeamAuth(['team_invitation', 'read'])(handleGET)(req, res);
     case 'POST':
       return withTeamAuth(['team_invitation', 'create'])(handlePOST)(req, res);
-    case 'PUT':
-      return withTeamAuth()(handlePUT)(req, res);
     case 'DELETE':
       return withTeamAuth(['team_invitation', 'delete'])(handleDELETE)(
         req,
         res
       );
     default:
-      res.setHeader('Allow', 'GET, POST, PUT, DELETE');
+      res.setHeader('Allow', 'GET, POST, DELETE');
       throw new ApiError(405, `Method ${method} Not Allowed`);
   }
 }
@@ -50,7 +45,7 @@ const handlePOST = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  const { email, role } = req.body;
+  const { email, role } = await validateRequest(inviteMemberSchema, req.body);
 
   const invitationExists = await prisma.invitation.findFirst({
     where: {
@@ -153,57 +148,6 @@ const handleDELETE = async (
   await sendEvent(teamMember.teamId, 'invitation.removed', invitation);
 
   recordMetric('invitation.removed');
-
-  res.status(200).json({ data: {} });
-};
-
-// Accept an invitation to an organization
-const handlePUT = async (
-  req: AuthenticatedTeamRequest,
-  res: NextApiResponse
-) => {
-  const { inviteToken } = req.body as { inviteToken: string };
-
-  const invitation = await getInvitation({ token: inviteToken });
-
-  if (await isInvitationExpired(invitation)) {
-    throw new ApiError(400, 'Invitation expired. Please request a new one.');
-  }
-
-  const session = await getSession(req, res);
-  const userId = session?.user?.id as string;
-
-  if (session?.user.email != invitation.email) {
-    throw new ApiError(
-      400,
-      'You must be logged in with the email address you were invited with.'
-    );
-  }
-
-  const auditInfo = {
-    user: { id: session.user.id, name: session.user.name },
-    team: { id: invitation.team.id, name: invitation.team.name },
-  };
-
-  const teamMember = await addTeamMember(
-    invitation.team.id,
-    userId,
-    invitation.role,
-    auditInfo
-  );
-
-  ensureAwarenessTrainingTask(
-    invitation.team.id, userId, session.user.name!, auditInfo
-  ).catch((err) => console.error('[Awareness] Failed to create training task on invite accept:', err));
-
-  await sendEvent(
-    invitation.team.id,
-    'member.created',
-    toPlainObject(teamMember)
-  );
-  await deleteInvitation({ token: inviteToken });
-
-  recordMetric('member.created');
 
   res.status(200).json({ data: {} });
 };

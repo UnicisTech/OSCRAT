@@ -35,7 +35,11 @@ const handleDELETE = async (
 
   const { apiKeyId } = req.query as { apiKeyId: string };
 
-  await deleteApiKey(apiKeyId);
+  const result = await deleteApiKey(apiKeyId, teamMember.teamId);
+
+  if (result.count === 0) {
+    throw new ApiError(404, 'API key not found.');
+  }
 
   recordMetric('apikey.removed');
 

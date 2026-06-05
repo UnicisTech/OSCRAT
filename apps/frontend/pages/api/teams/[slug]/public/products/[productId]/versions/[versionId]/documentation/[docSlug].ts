@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import * as Yup from 'yup';
 import { getPublicDocumentation } from 'models/documentation';
 import { ApiError } from '@/lib/errors';
+import { validateRequest } from '@/lib/validation/validateRequest';
 import type { DocumentationDetails } from '@oscrat/model';
 
 const querySchema = Yup.object({
@@ -24,37 +25,33 @@ export default async function handler(
     throw new ApiError(405, `Method ${req.method} Not Allowed`);
   }
 
-  try {
-    const { slug, productId, versionId, docSlug } = await querySchema.validate(req.query);
-    const doc = await getPublicDocumentation(slug, docSlug, {
-      productId,
-      versionId,
-      includeContent: true,
-    }) as DocumentationDetails | null;
+  const { slug, productId, versionId, docSlug } = await validateRequest(
+    querySchema,
+    req.query
+  );
+  const doc = await getPublicDocumentation(slug, docSlug, {
+    productId,
+    versionId,
+    includeContent: true,
+  }) as DocumentationDetails | null;
 
-    if (!doc) {
-      throw new ApiError(404, 'Documentation not found');
-    }
-
-    return res.status(200).json({
-      data: {
-        id: doc.id,
-        slug: doc.slug,
-        title: doc.title,
-        content: doc.content,
-        version: doc.version,
-        productId: doc.productId,
-        productName: doc.productName,
-        versionId: doc.versionId,
-        versionName: doc.versionName,
-        updatedAt: doc.updatedAt,
-      },
-      error: null,
-    });
-  } catch (error) {
-    if (error instanceof Yup.ValidationError) {
-      throw new ApiError(400, error.message);
-    }
-    throw error;
+  if (!doc) {
+    throw new ApiError(404, 'Documentation not found');
   }
+
+  return res.status(200).json({
+    data: {
+      id: doc.id,
+      slug: doc.slug,
+      title: doc.title,
+      content: doc.content,
+      version: doc.version,
+      productId: doc.productId,
+      productName: doc.productName,
+      versionId: doc.versionId,
+      versionName: doc.versionName,
+      updatedAt: doc.updatedAt,
+    },
+    error: null,
+  });
 }

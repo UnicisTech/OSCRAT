@@ -4,8 +4,19 @@ import { sendEvent } from '@/lib/svix';
 import { Role } from '@oscrat/model';
 import { getTeamMembers, removeTeamMember, updateTeamMemberRole } from 'models/team';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
+import { updateMemberRoleSchema } from '@/lib/validation/team';
+import { validateRequest } from '@/lib/validation/validateRequest';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
+
+async function assertTeamHasOtherOwners(teamId: string) {
+  const owners = await prisma.teamMember.count({
+    where: { teamId, role: Role.OWNER },
+  });
+  if (owners <= 1) {
+    throw new ApiError(400, 'A team should have at least one owner.');
+  }
+}
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -47,7 +58,7 @@ const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
-  const { teamMember, user } = req.teamContext;
+  const { teamMember } = req.teamContext;
 
   const { userId } = req.query as { userId: string };
 
@@ -66,6 +77,10 @@ const handleDELETE = async (
 
   if (!existingMember) {
     throw new ApiError(404, 'Team member not found.');
+  }
+
+  if (existingMember.role === Role.OWNER) {
+    await assertTeamHasOtherOwners(teamMember.teamId);
   }
 
   try {
@@ -89,16 +104,7 @@ const handlePUT = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  const totalTeamOwners = await prisma.teamMember.count({
-    where: {
-      role: Role.OWNER,
-      team: { id: teamMember.teamId, name: teamMember.teamName },
-    },
-  });
-
-  if (totalTeamOwners <= 1) {
-    throw new ApiError(400, 'A team should have at least one owner.');
-  }
+  await assertTeamHasOtherOwners(teamMember.teamId);
 
   await removeTeamMember(teamMember.teamId, user.id, req.auditInfo);
 
@@ -112,9 +118,24 @@ const handlePATCH = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
-  const { teamMember, user } = req.teamContext;
+  const { teamMember } = req.teamContext;
 
-  const { memberId, role } = req.body as { memberId: string; role: Role };
+  const { memberId, role } = await validateRequest(
+    updateMemberRoleSchema,
+    req.body
+  );
+
+  if (role !== Role.OWNER) {
+    const existingMember = await prisma.teamMember.findUnique({
+      where: {
+        teamId_userId: { teamId: teamMember.teamId, userId: memberId },
+      },
+    });
+
+    if (existingMember?.role === Role.OWNER) {
+      await assertTeamHasOtherOwners(teamMember.teamId);
+    }
+  }
 
   const memberUpdated = await updateTeamMemberRole(
     teamMember.teamId,

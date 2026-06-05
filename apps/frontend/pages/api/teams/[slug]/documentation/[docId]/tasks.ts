@@ -2,6 +2,7 @@ import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import * as Yup from 'yup';
 import { ApiError } from '@/lib/errors';
+import { validateRequest } from '@/lib/validation/validateRequest';
 import { linkDocumentationToTask, unlinkDocumentationFromTask } from 'models/documentation';
 
 const taskLinkSchema = Yup.object({
@@ -32,23 +33,16 @@ const handlePOST = async (
   const { teamMember } = req.teamContext;
   const { docId } = req.query;
 
-  try {
-    const { taskId } = await taskLinkSchema.validate(req.body);
+  const { taskId } = await validateRequest(taskLinkSchema, req.body);
 
-    await linkDocumentationToTask(
-      teamMember.teamId,
-      docId as string,
-      taskId,
-      req.auditInfo
-    );
+  await linkDocumentationToTask(
+    teamMember.teamId,
+    docId as string,
+    taskId,
+    req.auditInfo
+  );
 
-    return res.status(200).json({ data: { success: true }, error: null });
-  } catch (error) {
-    if (error instanceof Yup.ValidationError) {
-      throw new ApiError(400, error.message);
-    }
-    throw error;
-  }
+  return res.status(200).json({ data: { success: true }, error: null });
 };
 
 const handleDELETE = async (
@@ -58,21 +52,14 @@ const handleDELETE = async (
   const { teamMember } = req.teamContext;
   const { docId } = req.query;
 
-  try {
-    const { taskId } = await taskLinkSchema.validate(req.body);
+  const { taskId } = await validateRequest(taskLinkSchema, req.body);
 
-    await unlinkDocumentationFromTask(
-      teamMember.teamId,
-      docId as string,
-      taskId,
-      req.auditInfo
-    );
+  await unlinkDocumentationFromTask(
+    teamMember.teamId,
+    docId as string,
+    taskId,
+    req.auditInfo
+  );
 
-    return res.status(200).json({ data: { success: true }, error: null });
-  } catch (error) {
-    if (error instanceof Yup.ValidationError) {
-      throw new ApiError(400, error.message);
-    }
-    throw error;
-  }
+  return res.status(200).json({ data: { success: true }, error: null });
 };

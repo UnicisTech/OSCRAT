@@ -3,7 +3,7 @@ import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 import { getDocumentation, updateDocumentation, deleteDocumentation } from 'models/documentation';
 import { documentationUpdateSchema } from '@/lib/validation/documentation';
-import * as Yup from 'yup';
+import { validateRequest } from '@/lib/validation/validateRequest';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -47,33 +47,29 @@ const handlePUT = async (
   const { teamMember, user } = req.teamContext;
   const { docId } = req.query;
 
-  try {
-    const validatedData = await documentationUpdateSchema.validate(req.body);
+  const validatedData = await validateRequest(
+    documentationUpdateSchema,
+    req.body
+  );
 
-    const doc = await updateDocumentation(
-      teamMember.teamId,
-      docId as string,
-      user.id,
-      {
-        title: validatedData.title,
-        content: validatedData.content,
-        visibility: validatedData.visibility,
-        status: validatedData.status,
-      },
-      req.auditInfo
-    );
+  const doc = await updateDocumentation(
+    teamMember.teamId,
+    docId as string,
+    user.id,
+    {
+      title: validatedData.title,
+      content: validatedData.content,
+      visibility: validatedData.visibility,
+      status: validatedData.status,
+    },
+    req.auditInfo
+  );
 
-    if (!doc) {
-      throw new ApiError(404, 'Documentation not found');
-    }
-
-    return res.status(200).json({ data: doc, error: null });
-  } catch (error) {
-    if (error instanceof Yup.ValidationError) {
-      throw new ApiError(400, error.message);
-    }
-    throw error;
+  if (!doc) {
+    throw new ApiError(404, 'Documentation not found');
   }
+
+  return res.status(200).json({ data: doc, error: null });
 };
 
 const handleDELETE = async (

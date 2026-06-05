@@ -22,6 +22,6 @@ export const fetchApiKeys = async (teamId: string) => {
   return await ApiKeyOps.fetchApiKeys(prisma, teamId);
 };
 
-export const deleteApiKey = async (id: string) => {
-  return await ApiKeyOps.deleteApiKey(prisma, id);
+export const deleteApiKey = async (id: string, teamId: string) => {
+  return await ApiKeyOps.deleteApiKey(prisma, id, teamId);
 };

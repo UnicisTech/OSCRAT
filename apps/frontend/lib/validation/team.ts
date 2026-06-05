@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { OscratOrganizationType, OscratOrganizationRole } from '@oscrat/model';
+import { OscratOrganizationType, OscratOrganizationRole, Role } from '@oscrat/model';
 import {
   emailSchema,
   phoneSchema,
@@ -57,14 +57,26 @@ export const teamSettingsSchema = Yup.object({
   }),
 });
 
+const roleSchema = Yup.mixed<Role>()
+  .oneOf(availableRoles.map((r) => r.id), 'oscrat.ui.validation.role-invalid')
+  .required('oscrat.ui.validation.role-required');
+
 /**
  * Team member invitation schema
  */
 export const inviteMemberSchema = Yup.object({
   email: emailSchema.required('oscrat.ui.validation.email-required'),
-  role: Yup.string()
-    .required('oscrat.ui.validation.role-required')
-    .oneOf(availableRoles.map((r) => r.id), 'oscrat.ui.validation.role-invalid'),
+  role: roleSchema,
+});
+
+/**
+ * Team member role update schema
+ */
+export const updateMemberRoleSchema = Yup.object({
+  memberId: Yup.string()
+    .required('oscrat.ui.validation.member-id-required')
+    .uuid('oscrat.ui.validation.member-id-invalid'),
+  role: roleSchema,
 });
 
 /**
@@ -80,4 +92,5 @@ export const inviteTokenSchema = Yup.object({
 export type TeamCreationData = Yup.InferType<typeof teamCreationSchema>;
 export type TeamSettingsData = Yup.InferType<typeof teamSettingsSchema>;
 export type InviteMemberData = Yup.InferType<typeof inviteMemberSchema>;
+export type UpdateMemberRoleData = Yup.InferType<typeof updateMemberRoleSchema>;
 export type InviteTokenData = Yup.InferType<typeof inviteTokenSchema>;
