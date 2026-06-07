@@ -623,7 +623,7 @@ export const deleteConfigurationScanReport = async (
           },
         },
       },
-      select: { id: true },
+      select: { id: true, versionId: true, productId: true },
     });
 
     if (!report) {
@@ -632,7 +632,7 @@ export const deleteConfigurationScanReport = async (
       );
     }
 
-    await logDelete(EntityType.ConfigurationScanReport, audit, { id: report.id });
+    await logDelete(EntityType.ConfigurationScanReport, audit, report);
 
     await tx.configurationScanReport.delete({
       where: { id: reportId },

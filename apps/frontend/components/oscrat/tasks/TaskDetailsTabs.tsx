@@ -93,7 +93,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     if (!selectedDocId) return;
     setIsLinkingDoc(true);
     try {
-      await documentationEndpoints.linkTask(team.slug, selectedDocId, task.taskNumber);
+      await documentationEndpoints.linkTask(team.slug, selectedDocId, task.id);
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.documentation(team.slug, taskNumberStr),
       });
@@ -108,11 +108,11 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     } finally {
       setIsLinkingDoc(false);
     }
-  }, [selectedDocId, team.slug, task.taskNumber, taskNumberStr, t]);
+  }, [selectedDocId, team.slug, task.id, taskNumberStr, t]);
 
   const handleUnlinkDoc = useCallback(async (docId: string) => {
     try {
-      await documentationEndpoints.unlinkTask(team.slug, docId, task.taskNumber);
+      await documentationEndpoints.unlinkTask(team.slug, docId, task.id);
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.documentation(team.slug, taskNumberStr),
       });
@@ -123,7 +123,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     } catch (error: unknown) {
       toast.error(extractErrorMessage(error, 'Failed to unlink documentation'));
     }
-  }, [team.slug, task.taskNumber, taskNumberStr, t]);
+  }, [team.slug, task.id, taskNumberStr, t]);
 
   // --- Comments ---
   const handleAddComment = async (event: React.FormEvent<HTMLFormElement>) => {

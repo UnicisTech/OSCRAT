@@ -10,6 +10,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { userSignupSchema } from '@/lib/validation/signup';
 import { useJoin } from '@/hooks/useJoin';
 import { handleAuthError } from '@/lib/errorHandler';
+import AgreeMessage from '@/components/auth/AgreeMessage';
 import type { ApiError } from '@/types';
 
 interface SignupProps {
@@ -60,8 +61,15 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
         formik.resetForm();
 
         if (result?.error) {
-          const errorMessage = handleAuthError(result.error);
-          toast.error(errorMessage);
+          const message = handleAuthError(result.error);
+          // `confirm-your-email` is a successful account creation that simply
+          // requires email verification before logging in, so show it as a
+          // success confirmation rather than an error.
+          if (result.error === 'confirm-your-email') {
+            toast.success(message);
+          } else {
+            toast.error(message);
+          }
           router.push('/auth/login');
         } else {
           toast.success(t('successfully-joined'));
@@ -214,17 +222,8 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
         </div>
 
         {/* Terms and Conditions */}
-        <div className="mt-4 text-center">
-          <p className="text-xs text-gray-500">
-            {t('agree-message-part', { button: t('create-account') })}{' '}
-            <a href="#" className="text-blue-600 hover:underline">
-              {t('terms')}
-            </a>
-            , {t('privacy')} {t('and')}{' '}
-            <a href="#" className="text-blue-600 hover:underline">
-              {t('security')}
-            </a>
-          </p>
+        <div className="mt-4">
+          <AgreeMessage text="create-account" />
         </div>
       </form>
     </div>

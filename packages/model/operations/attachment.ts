@@ -26,6 +26,7 @@ export interface CreateAttachmentParams {
   configurationScanReportId?: string;
   vulnerabilityId?: string;
   incidentId?: string;
+  assessmentId?: string;
 }
 
 /** Create a new attachment within an existing tx */
@@ -66,6 +67,7 @@ export const createAttachmentWithTx = async (
       configurationScanReportId: params.configurationScanReportId,
       vulnerabilityId: params.vulnerabilityId,
       incidentId: params.incidentId,
+      assessmentId: params.assessmentId,
       createdBy: params.createdBy,
     },
     include: {
@@ -114,6 +116,7 @@ export const createAttachment = async (
         versionId: attachment.versionId,
         vulnerabilityId: attachment.vulnerabilityId,
         incidentId: attachment.incidentId,
+        assessmentId: attachment.assessmentId,
       });
     }
 
@@ -185,6 +188,9 @@ export const getAttachmentLinkedEntity = (
   if (attachment.documentationId) {
     return { type: EntityType.Documentation, id: attachment.documentationId };
   }
+  if (attachment.assessmentId) {
+    return { type: EntityType.Assessment, id: attachment.assessmentId };
+  }
   return null;
 };
 
@@ -238,6 +244,30 @@ export const getVersionAttachments = async (
 
   console.log(
     `[Attachment Operations] Found ${attachments.length} attachments for version ${versionId}`
+  );
+  return attachments;
+};
+
+export const getAssessmentAttachments = async (
+  prisma: PrismaClient,
+  assessmentId: string
+) => {
+  console.log(
+    `[Attachment Operations] Getting attachments for assessment: ${assessmentId}`
+  );
+
+  const attachments = await prisma.attachment.findMany({
+    where: { assessmentId },
+    include: {
+      createdByUser: {
+        select: { id: true, name: true, firstName: true, lastName: true },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  console.log(
+    `[Attachment Operations] Found ${attachments.length} attachments for assessment ${assessmentId}`
   );
   return attachments;
 };

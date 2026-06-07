@@ -8,6 +8,7 @@ import { useTranslation } from 'next-i18next';
 import { getSession } from '@/lib/session';
 import { inferSSRProps } from '@/lib/inferSSRProps';
 import { UpdateAccount } from '@/components/account';
+import { useTeams } from 'hooks/useTeams';
 import env from '@/lib/env';
 
 type AccountProps = inferSSRProps<typeof getServerSideProps>;
@@ -17,6 +18,7 @@ const Account: NextPageWithLayout<AccountProps> = ({
 }) => {
   const { data: session } = useSession();
   const { t } = useTranslation('common');
+  const { teams } = useTeams();
 
   const user = {
     id: session?.user?.id,
@@ -27,10 +29,16 @@ const Account: NextPageWithLayout<AccountProps> = ({
     image: session?.user?.image || null,
   };
 
+  // Settings is a global page with no team in scope, so resolve the dashboard
+  // via the user's first team. Fall back to the org landing while teams load.
+  const dashboardHref = teams[0]
+    ? `/organization/${teams[0].slug}/dashboard`
+    : '/organization';
+
   return (
     <div className="space-y-4">
       <Link
-        href="/organization"
+        href={dashboardHref}
         className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
       >
         {t('oscrat.ui.go-home')}

@@ -20,17 +20,23 @@ const TabActionButton: React.FC<TabActionButtonProps> = ({
   const baseClasses = 'inline-flex items-center rounded-md border bg-white text-sm font-medium leading-5 hover:bg-gray-50';
   const justifyClass = variant === 'icon-only' ? 'justify-center' : '';
 
-  const variantClasses = {
-    primary: 'border-gray-300 px-4 py-2 text-gray-900',
-    secondary: 'border-gray-300 px-4 py-2 text-gray-600',
-    'icon-only': 'border-gray-300 px-2.5 py-2 text-gray-700',
+  const sizeClasses = {
+    primary: 'px-4 py-2',
+    secondary: 'px-4 py-2',
+    'icon-only': 'px-2.5 py-2',
   };
 
-  const disabledClasses = disabled
-    ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
-    : variantClasses[variant];
+  const colorClasses = {
+    primary: 'border-gray-300 text-gray-900',
+    secondary: 'border-gray-300 text-gray-600',
+    'icon-only': 'border-gray-300 text-gray-700',
+  };
 
-  const className = `${baseClasses} ${justifyClass} ${disabledClasses}`;
+  const stateClasses = disabled
+    ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
+    : colorClasses[variant];
+
+  const className = `${baseClasses} ${justifyClass} ${sizeClasses[variant]} ${stateClasses}`;
 
   return (
     <button

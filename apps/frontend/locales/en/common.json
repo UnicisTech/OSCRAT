@@ -592,7 +592,7 @@
         "level": {
           "label": "Level",
           "organization": "Organization",
-          "product": "Version"
+          "product": "Product Version"
         },
         "visibility": {
           "label": "Visibility",
@@ -689,8 +689,8 @@
       "no-type": "No type",
       "enable-risk-assessment": "Enable Risk Assessment",
       "risk": {
-        "section-details": "Section 1: Risk Details",
-        "section-treatment": "Section 2: Risk Treatment",
+"section-details": "Risk Details",
+    "section-treatment": "Risk Treatment",
         "section-treatment-locked": "Complete all Risk Details fields to unlock Risk Treatment",
         "asset": "Asset",
         "threat": "Threat",
@@ -738,6 +738,7 @@
         }
       },
       "remediate-compliance-requirement": "Remediate compliance requirement",
+      "compliance-task-title": "[{{reqId}}] {{requirement}} — {{product}}",
       "external-reporting": "External Reporting",
       "team-compliance-assessment": "Organization Compliance Assessment",
       "team-compliance-assessment-description": "Assess the compliance status of {{teamName}} according to the Cyber Resilience Act requirements.",
@@ -746,7 +747,7 @@
       "enter-team-name": "Enter organization name",
       "country-code": "Country Code",
       "add-file": "Add File",
-      "go-home": "Go Home",
+      "go-home": "Go to Dashboard",
       "assessment-type": "Assessment Type",
       "products-list": "Products List",
       "products": "Products",
@@ -1367,6 +1368,9 @@
           "failed-to-close": "Failed to close incident",
           "completed-successfully": "Incident completed successfully",
           "failed-to-complete": "Failed to complete incident",
+          "complete-confirm-title": "Complete Incident",
+          "complete-confirm-warning": "Are you sure you want to complete this incident? This action is final. Once completed, the incident is locked and no further changes can be made.",
+          "complete-confirm-button": "Complete Incident",
           "edit-mode-enabled": "Edit mode enabled",
           "failed-to-load": "Failed to load incident details",
           "no-incidents-added": "No incidents have been added yet",
@@ -1457,6 +1461,9 @@
           "failed-to-update": "Failed to update vulnerability",
           "closed-successfully": "Vulnerability closed successfully",
           "failed-to-close": "Failed to close vulnerability",
+          "close-confirm-title": "Close Vulnerability",
+          "close-confirm-warning": "Are you sure you want to close this vulnerability? This action is final. Once closed, the vulnerability is locked and no further changes can be made.",
+          "close-confirm-button": "Close Vulnerability",
           "no-vulnerabilities-added": "No vulnerabilities have been added yet",
           "failed-to-load-vulnerabilities": "Failed to load vulnerabilities",
           "failed-to-load": "Failed to load vulnerability details",
@@ -1470,7 +1477,17 @@
         }
       },
       "compliance-assessment": "Compliance Assessment",
+      "product-compliance-assessment": "Product Compliance Assessment",
       "compliance-assessment-description": "Assess the compliance status of {{productName}} according to the Cyber Resilience Act requirements.",
+      "assessment-files": "Assessment Files",
+      "assessment-files-description": "Supporting evidence and documents uploaded for this assessment.",
+      "assessment-files-not-started": "Start the assessment to attach supporting files.",
+      "assessment-file-uploaded": "File uploaded successfully",
+      "assessment-file-upload-failed": "Failed to upload file",
+      "assessment-file-deleted": "File deleted successfully",
+      "assessment-file-delete-failed": "Failed to delete file",
+      "assessment-file-download-failed": "Failed to download file",
+      "evidence-partial-failure": "Assessment saved, but {{count}} evidence file(s) failed to upload. Please try re-uploading them.",
       "error-loading-compliance-data": "Error loading compliance data. Please try again.",
       "no-compliance-data": "No compliance data available.",
       "compliance-import-title": "Import Compliance Assessment",
@@ -1716,7 +1733,11 @@
         "download-template": "Download English Template",
         "download-existing": "Download Existing Translation",
         "upload-translation": "Upload Translation",
-        "workflow-hint": "Workflow: 1) Select assessment type and target language, 2) Download the English template, 3) Translate the values (keep the keys unchanged), 4) Upload the translated JSON file.",
+        "workflow-title": "Workflow",
+        "workflow-step-1": "Select assessment type and target language",
+        "workflow-step-2": "Download the English template",
+        "workflow-step-3": "Translate the values (keep the keys unchanged)",
+        "workflow-step-4": "Upload the translated JSON file",
         "existing-translations": "Existing Translations",
         "no-translations": "No custom translations have been uploaded yet.",
         "download": "Download",
@@ -1731,7 +1752,8 @@
         "delete-error": "Failed to delete translation",
         "assessment-language": "Assessment Language",
         "select-language": "Select Language",
-        "default-english": "Default (English)"
+        "default-english": "Default (English)",
+        "language-locked": "The language is locked because the assessment has already been started."
       }
     },
     "organization": {

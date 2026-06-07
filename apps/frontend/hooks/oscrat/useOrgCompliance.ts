@@ -41,8 +41,8 @@ export function useOrgCompliance({
   }, [assessmentDetail, teamRole]);
 
   const saveToDatabase = useCallback(
-    async (state: ComplianceState) => {
-      if (!userId) return;
+    async (state: ComplianceState): Promise<string | undefined> => {
+      if (!userId) return undefined;
 
       const rawData = transformComplianceStateToAssessmentData(state);
 
@@ -51,15 +51,17 @@ export function useOrgCompliance({
           schemaVersion: ASSESSMENT_SCHEMA_VERSION,
           rawData,
         });
-      } else {
-        const assessmentData: OscratAssessmentCreateRequest = {
-          type: OscratAssessmentType.ORG,
-          schemaVersion: ASSESSMENT_SCHEMA_VERSION,
-          rawData,
-          createdBy: userId,
-        };
-        await createAssessment(assessmentData);
+        return latestAssessmentId;
       }
+
+      const assessmentData: OscratAssessmentCreateRequest = {
+        type: OscratAssessmentType.ORG,
+        schemaVersion: ASSESSMENT_SCHEMA_VERSION,
+        rawData,
+        createdBy: userId,
+      };
+      const created = await createAssessment(assessmentData);
+      return created?.id;
     },
     [userId, latestAssessmentId, updateAssessment, createAssessment]
   );

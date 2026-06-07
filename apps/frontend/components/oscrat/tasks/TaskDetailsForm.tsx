@@ -9,6 +9,7 @@ import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
+import { resolveTaskTitle, resolveTaskDescription } from '@/lib/tasks';
 import { useFormik } from 'formik';
 import { createTaskUpdateSchema } from '@/lib/validation/task';
 import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
@@ -38,6 +39,12 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
   );
 
   const validationSchema = useMemo(() => createTaskUpdateSchema(), []);
+
+  const hasLocalizedTitle = !!task.titleLocId;
+  const hasLocalizedDescription = !!task.descriptionLocId;
+
+  const resolvedTitle = resolveTaskTitle(task, t);
+  const resolvedDescription = resolveTaskDescription(task, t);
 
   const initialValues: UpdateTaskData = useMemo(() => ({
     title: task?.title || '',
@@ -208,7 +215,21 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
         <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('task-details')}</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {renderField('title', t('task-name'))}
+          {hasLocalizedTitle && !task.title ? (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                {t('task-name')}
+              </label>
+              <input
+                value={resolvedTitle}
+                readOnly
+                disabled
+                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+              />
+            </div>
+          ) : (
+            renderField('title', t('task-name'))
+          )}
           
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">{t('origin')}</label>
@@ -271,7 +292,32 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
           ])}
           
           <div className="lg:col-span-3">
-            {renderField('description', t('description'), 'textarea')}
+            {hasLocalizedDescription && !task.description ? (
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('description')}
+                </label>
+                <div className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-gray-700 text-sm whitespace-pre-line">
+                  {resolvedDescription.split(/(https?:\/\/[^\s]+)/g).map((segment, i) =>
+                    /^https?:\/\//.test(segment) ? (
+                      <a
+                        key={i}
+                        href={segment}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline hover:text-blue-800 break-all"
+                      >
+                        {segment}
+                      </a>
+                    ) : (
+                      <React.Fragment key={i}>{segment}</React.Fragment>
+                    )
+                  )}
+                </div>
+              </div>
+            ) : (
+              renderField('description', t('description'), 'textarea')
+            )}
           </div>
 
           <div className="flex items-center gap-2 mt-4">

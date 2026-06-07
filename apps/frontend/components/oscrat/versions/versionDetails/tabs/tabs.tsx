@@ -16,7 +16,13 @@ const TABS_CONFIG = [
     label: 'oscrat.ui.versions.tabs.compliance',
     component: <Compliance />,
   },
+  { id: 'task', label: 'oscrat.ui.versions.tabs.task', component: <Task /> },
   { id: 'files', label: 'oscrat.ui.versions.tabs.files', component: <Files /> },
+  {
+    id: 'documentation',
+    label: 'oscrat.ui.versions.tabs.documentation',
+    component: <Documentation />,
+  },
   { id: 'sbom', label: 'oscrat.ui.versions.tabs.sbom', component: <Sbom /> },
   {
     id: 'scans',
@@ -37,12 +43,6 @@ const TABS_CONFIG = [
     id: 'incidents',
     label: 'oscrat.ui.versions.tabs.incidents',
     component: <Incidents />,
-  },
-  { id: 'task', label: 'oscrat.ui.versions.tabs.task', component: <Task /> },
-  {
-    id: 'documentation',
-    label: 'oscrat.ui.versions.tabs.documentation',
-    component: <Documentation />,
   },
   {
     id: 'repository',

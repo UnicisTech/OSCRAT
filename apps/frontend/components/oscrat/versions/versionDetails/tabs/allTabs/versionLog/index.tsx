@@ -20,7 +20,7 @@ export default function Index() {
     page,
     pageSize: PAGE_SIZE,
     ...filters,
-  });
+  }, { enabled: !!versionId });
 
   const handleFilterChange = useCallback((newFilters: Partial<OscratAuditLogQueryParams>) => {
     setFilters(newFilters);

@@ -5,9 +5,10 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useProductContext } from '@/context/ProductContext';
 import { useVersionContext } from '@/context/VersionContext';
 import { useTask } from '@/hooks/useTask';
-import { TaskDetailsForm, TaskDetailsTabs } from '@/components/oscrat/tasks';
+import { TaskDetailsForm, TaskDetailsTabs, RiskAssessmentSection } from '@/components/oscrat/tasks';
 import { Breadcrumb } from '@/components/shared';
 import { Team } from '@oscrat/model';
+import { resolveTaskTitle } from '@/lib/tasks';
 // import TabsManager from '@/components/shared/TabsManager';
 // import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/allTabs/task/taskDetails/tabs';
 
@@ -53,7 +54,7 @@ function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: strin
       href: `/organization/${team.slug}/products/${routeProductId}/versions/${routeVersionId}`,
     },
     {
-      label: task.title || t('task-details'),
+      label: resolveTaskTitle(task, t) || t('task-details'),
       current: true,
     },
   ];
@@ -62,6 +63,9 @@ function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: strin
     <div className="flex flex-col space-y-6">
       <Breadcrumb items={breadcrumbItems} />
       <TaskDetailsForm task={task} team={team} />
+      {(task.properties as Record<string, unknown>)?.enableRiskAssessment === true && (
+        <RiskAssessmentSection task={task} team={team} />
+      )}
       <TaskDetailsTabs task={task} team={team} />
     </div>
   );
@@ -93,7 +97,7 @@ function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team:
       href: `/organization/${team.slug}/tasks`,
     },
     {
-      label: task.title || t('task-details'),
+      label: resolveTaskTitle(task, t) || t('task-details'),
       current: true,
     },
   ];
@@ -102,6 +106,9 @@ function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team:
     <div className="flex flex-col space-y-6">
       <Breadcrumb items={breadcrumbItems} />
       <TaskDetailsForm task={task} team={team} />
+      {(task.properties as Record<string, unknown>)?.enableRiskAssessment === true && (
+        <RiskAssessmentSection task={task} team={team} />
+      )}
       <TaskDetailsTabs task={task} team={team} />
     </div>
   );

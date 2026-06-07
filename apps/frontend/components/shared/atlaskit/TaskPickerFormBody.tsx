@@ -1,8 +1,10 @@
 import React, { Fragment } from 'react';
 import Select, { ValueType } from '@atlaskit/select';
 import { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
+import { useTranslation } from 'next-i18next';
 import type { Task } from '@oscrat/model';
 import { WithoutRing } from 'sharedStyles';
+import { resolveTaskTitle } from '@/lib/tasks';
 
 interface FormBodyProps {
   tasks: Task[];
@@ -14,6 +16,7 @@ interface TaskOption {
 }
 
 const TaskPickerFormBody = ({ tasks }: FormBodyProps) => {
+  const { t } = useTranslation('common');
   return (
     <>
       <div
@@ -49,7 +52,7 @@ const TaskPickerFormBody = ({ tasks }: FormBodyProps) => {
                   styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                   options={tasks?.map((task) => ({
                     value: task,
-                    label: task.title,
+                    label: resolveTaskTitle(task, t),
                   }))}
                   validationState={error ? 'error' : 'default'}
                 />

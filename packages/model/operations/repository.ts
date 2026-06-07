@@ -351,7 +351,7 @@ export const deleteRepository = async (
         id: repositoryId,
         teamId,
       },
-      select: { id: true, name: true },
+      select: { id: true, name: true, versionId: true, productId: true },
     });
 
     if (!repository) {
@@ -398,5 +398,9 @@ export const createProductRepository = async (
     throw new Error(`No active version found for product ${productId}`);
   }
 
-  return createRepository(prisma, teamId, activeVersion.id, data, auditInfo);
+  return createRepository(prisma, teamId, activeVersion.id, data, {
+    ...auditInfo,
+    versionId: activeVersion.id,
+    productId: productId,
+  });
 };

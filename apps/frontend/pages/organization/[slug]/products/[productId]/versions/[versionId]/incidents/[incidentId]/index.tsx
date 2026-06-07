@@ -47,12 +47,17 @@ function IncidentDetailsPage() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [showDeleteAttachmentModal, setShowDeleteAttachmentModal] = useState(false);
   const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
 
   const handleEdit = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleComplete = async () => {
+  const handleComplete = () => {
+    setShowCompleteModal(true);
+  };
+
+  const confirmComplete = async () => {
     if (!incident) return;
 
     try {
@@ -61,6 +66,7 @@ function IncidentDetailsPage() {
         updatedBy: '',
       });
       toast.success(t('oscrat.ui.versions.incidents.completed-successfully'));
+      setShowCompleteModal(false);
     } catch (error: unknown) {
       toast.error(
         extractErrorMessage(error, t('oscrat.ui.versions.incidents.failed-to-complete'))
@@ -466,6 +472,18 @@ function IncidentDetailsPage() {
         continueButtonText={t('delete')}
         onCancel={handleCancelDeleteAttachment}
         onContinue={confirmDeleteAttachment}
+      />
+
+      {/* Complete Incident Confirmation Modal */}
+      <FullScreenModal
+        isOpen={showCompleteModal}
+        onClose={() => setShowCompleteModal(false)}
+        title={t('oscrat.ui.versions.incidents.complete-confirm-title')}
+        text={t('oscrat.ui.versions.incidents.complete-confirm-warning')}
+        cancelButtonText={t('cancel')}
+        continueButtonText={t('oscrat.ui.versions.incidents.complete-confirm-button')}
+        onCancel={() => setShowCompleteModal(false)}
+        onContinue={confirmComplete}
       />
     </>
   );

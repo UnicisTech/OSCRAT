@@ -1,3 +1,20 @@
+import type { TFunction } from 'next-i18next';
+
+type TaskTitleFields = { title?: string | null; titleLocId?: string | null };
+type TaskDescriptionFields = {
+  description?: string | null;
+  descriptionLocId?: string | null;
+};
+
+export const resolveTaskTitle = (task: TaskTitleFields, t: TFunction): string =>
+  task.title || (task.titleLocId ? t(task.titleLocId) : '');
+
+export const resolveTaskDescription = (
+  task: TaskDescriptionFields,
+  t: TFunction
+): string =>
+  task.description || (task.descriptionLocId ? t(task.descriptionLocId) : '');
+
 const dateOptions: Intl.DateTimeFormatOptions = {
   year: 'numeric',
   month: 'long',

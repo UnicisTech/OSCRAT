@@ -17,3 +17,12 @@ export {
   deleteVersionDoC,
   getVersionDoC,
 } from './versionDoc';
+
+export {
+  createAssessmentAttachment,
+  getAssessmentAttachments,
+  deleteAssessmentAttachment,
+  readFile as readAssessmentAttachmentFile,
+  saveFileAsAssessmentAttachment,
+  checkExtensionAndMIMEType as checkAssessmentAttachmentFile,
+} from './assessmentAttachment';

@@ -8,8 +8,9 @@ import type {
   OscratAssessmentSummary,
   OscratAssessmentDetail,
 } from '../types/assessment';
+import { createPatch } from 'rfc6902';
 import { fromJsonObject, toJsonInput } from '../utils/json';
-import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
+import { createAuditContextWithTx, logCreate, logDelete, CrudType, EntityType, type AuditInfo } from '../audit';
 
 /** Select for assessment summary queries */
 const ASSESSMENT_SUMMARY_SELECT = {
@@ -206,12 +207,39 @@ export const updateAssessment = async (
       select: ASSESSMENT_DETAIL_SELECT,
     });
 
-    await logUpdate(
-      EntityType.Assessment,
-      audit,
-      { ...existing, name: `${existing.type}-${existing.id.slice(0, 8)}` },
-      { ...assessment, name: `${assessment.type}-${assessment.id.slice(0, 8)}` }
-    );
+    // The meaningful change on an assessment update is its `rawData` (the
+    // submitted answers), which is intentionally not a TRACKED_FIELD diff, so
+    // the generic logUpdate would silently no-op. Detect a real change by
+    // diffing the previous/next rawData (order-independent) plus schemaVersion,
+    // and only emit an audit event when something actually changed. This keeps
+    // idempotent re-submits from writing noisy false "edited" rows.
+    const rawDataChanged =
+      createPatch(
+        fromJsonObject<Record<string, unknown>>(existing.rawData),
+        fromJsonObject<Record<string, unknown>>(assessment.rawData)
+      ).length > 0;
+    const schemaVersionChanged = existing.schemaVersion !== assessment.schemaVersion;
+
+    if (rawDataChanged || schemaVersionChanged) {
+      await audit.log({
+        action: 'assessment.update',
+        crud: CrudType.Update,
+        user: audit.user,
+        team: audit.team,
+        target: {
+          id: assessment.id,
+          name: `${assessment.type}-${assessment.id.slice(0, 8)}`,
+          type: EntityType.Assessment,
+        },
+        productId: assessment.productId ?? audit.productId,
+        versionId: assessment.versionId ?? audit.versionId,
+        metadata: {
+          rawDataChanged: String(rawDataChanged),
+          schemaVersionChanged: String(schemaVersionChanged),
+          schemaVersion: assessment.schemaVersion,
+        },
+      });
+    }
 
     return transformToAssessmentDetail(assessment);
   });
@@ -230,7 +258,7 @@ export const deleteAssessment = async (
 
     const assessment = await tx.oscratAssessment.findFirst({
       where: { id: assessmentId, teamId },
-      select: { id: true, type: true },
+      select: { id: true, type: true, productId: true, versionId: true },
     });
 
     if (!assessment) {
@@ -238,7 +266,7 @@ export const deleteAssessment = async (
     }
 
     await logDelete(EntityType.Assessment, audit, {
-      id: assessment.id,
+      ...assessment,
       name: `${assessment.type}-${assessment.id.slice(0, 8)}`,
     });
 

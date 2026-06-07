@@ -330,6 +330,7 @@ export const getTeams = async (
       },
     },
     include: TEAM_SUMMARY_INCLUDE,
+    orderBy: { createdAt: 'desc' },
   });
 
   return teams.map(transformToTeamSummary);
@@ -350,6 +351,7 @@ export const getOwnedTeams = async (
       },
     },
     include: TEAM_SUMMARY_INCLUDE,
+    orderBy: { createdAt: 'desc' },
   });
 
   return teams.map(transformToTeamSummary);

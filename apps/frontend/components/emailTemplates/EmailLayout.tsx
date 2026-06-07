@@ -9,18 +9,23 @@ import {
   Text,
 } from '@react-email/components';
 import app from '@/lib/app';
+import env from '@/lib/env';
 
 interface EmailLayoutProps {
   children: ReactNode;
 }
 
 const EmailLayout = ({ children }: EmailLayoutProps) => {
-  console.log('EmailLayout', app.logoUrl);
+  // Emails are rendered outside the app, so relative asset paths do not
+  // resolve. Build an absolute URL so the brand logo loads in mail clients
+  // (otherwise the <Img> falls back to its alt text).
+  const logoSrc = `${env.appUrl}${app.logoUrl}`;
+
   return (
     <Tailwind>
       <Body className="mx-auto my-auto bg-white font-sans">
         <Container className="mx-auto my-[40px] w-[465px] rounded border border-solid border-[#f0f0f0] bg-white p-[20px]">
-          <Img src={app.logoUrl} alt={app.name} className="mx-auto my-8" />
+          <Img src={logoSrc} alt={app.name} className="mx-auto my-8" />
 
           <Section>
             {children}

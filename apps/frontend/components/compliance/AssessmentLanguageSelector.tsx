@@ -131,7 +131,7 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
             className="select select-bordered w-full bg-white dark:bg-base-100"
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
-            disabled={isListLoading || isStarting}
+            disabled={isListLoading || isStarting || isAssessmentStarted}
           >
             {availableLanguages.map((lang) => (
               <option key={lang.code} value={lang.code}>
@@ -140,9 +140,14 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
               </option>
             ))}
           </select>
-          {selectedLang && !selectedLang.available && (
+          {selectedLang && !selectedLang.available && !isAssessmentStarted && (
             <p className="text-xs text-amber-600 mt-1">
               {t('oscrat.ui.compliance-translation.default-english')}
+            </p>
+          )}
+          {isAssessmentStarted && (
+            <p className="text-xs text-gray-500 mt-1">
+              {t('oscrat.ui.compliance-translation.language-locked')}
             </p>
           )}
         </div>

@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { assessmentAttachmentsEndpoints } from '@/lib/api/endpoints/oscrat/assessmentAttachments';
+import { queryClient } from '@/lib/api/hooks';
+import { queryKeys } from '@/lib/api/queryKeys';
 import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
 import { OscratOrganizationRole } from '@oscrat/model';
 import { exportComplianceToPDF } from '@/components/compliance';
@@ -128,6 +131,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     versionId: isVersionCompliance ? versionId : undefined,
     userId: session?.user?.id as string,
     complianceNamespace,
+    productName,
   });
 
   const { uploadCAR } = useDeclarationOfConformity(
@@ -140,12 +144,67 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     complianceState: hookComplianceState,
     saveToDatabase,
     resetAssessment,
+    latestAssessmentId,
   } = isVersionCompliance ? versionComplianceHook : orgComplianceHook;
+
+  const uploadedEvidenceKeys = useRef<Set<string>>(new Set());
+
+  const persistEvidenceFiles = useCallback(
+    async (
+      assessmentId: string | undefined,
+      assessment: RequirementAssessment
+    ): Promise<number> => {
+      if (!assessmentId) return 0;
+
+      let failedCount = 0;
+
+      for (const answer of assessment.answers) {
+        if (!(answer.evidence instanceof File)) continue;
+
+        const key = `${assessment.requirementId}:${answer.questionId}:${answer.evidence.name}:${answer.evidence.size}`;
+        if (uploadedEvidenceKeys.current.has(key)) continue;
+        uploadedEvidenceKeys.current.add(key);
+
+        try {
+          const formData = new FormData();
+          formData.append('file', answer.evidence);
+          formData.append(
+            'description',
+            t('oscrat.ui.evidence-upload')
+          );
+          await assessmentAttachmentsEndpoints.uploadAssessmentAttachment(
+            teamSlug,
+            assessmentId,
+            formData
+          );
+        } catch {
+          uploadedEvidenceKeys.current.delete(key);
+          failedCount += 1;
+        }
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.oscrat.assessments.attachments(teamSlug, assessmentId),
+        exact: false,
+      });
+
+      return failedCount;
+    },
+    [teamSlug, t]
+  );
 
   const [localState, setLocalState] = useState<ComplianceState>(() =>
     createInitialState(productId, teamRole)
   );
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  // Tracks the id returned by the most recent save so the files panel can show
+  // evidence for a freshly-created assessment before the assessments list refetch
+  // updates `latestAssessmentId`.
+  const [savedAssessmentId, setSavedAssessmentId] = useState<string | undefined>(
+    undefined
+  );
+
+  const activeAssessmentId = savedAssessmentId ?? latestAssessmentId;
 
   const generateAndUploadCAR = useCallback(
     async (state: ComplianceState) => {
@@ -312,10 +371,19 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         currentArea.content[currentRequirementIndexJustCompleted];
       const nextRequirementIndex = updatedState.currentRequirementIndex!;
 
+      let evidenceFailures = 0;
       try {
-        await saveToDatabase(updatedState);
+        const newAssessmentId = await saveToDatabase(updatedState);
+        if (newAssessmentId) setSavedAssessmentId(newAssessmentId);
+        evidenceFailures = await persistEvidenceFiles(newAssessmentId, assessment);
       } catch {
         toast.error(t('oscrat.ui.failed-to-save-assessment'));
+      }
+
+      if (evidenceFailures > 0) {
+        toast.error(
+          t('oscrat.ui.evidence-partial-failure', { count: evidenceFailures })
+        );
       }
 
       if (taskGeneration.shouldGenerateTask(assessment.complianceStatus!)) {
@@ -407,6 +475,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       isVersionCompliance,
       taskGeneration,
       generateAndUploadCAR,
+      persistEvidenceFiles,
     ]
   );
 
@@ -466,8 +535,24 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       });
 
       try {
-        await saveToDatabase(updatedState);
-        toast.success(t('oscrat.ui.checklist-saved'));
+        const newAssessmentId = await saveToDatabase(updatedState);
+        if (newAssessmentId) setSavedAssessmentId(newAssessmentId);
+
+        let evidenceFailures = 0;
+        for (const checklistAssessment of checklistAssessments) {
+          evidenceFailures += await persistEvidenceFiles(
+            newAssessmentId,
+            checklistAssessment
+          );
+        }
+
+        if (evidenceFailures > 0) {
+          toast.error(
+            t('oscrat.ui.evidence-partial-failure', { count: evidenceFailures })
+          );
+        } else {
+          toast.success(t('oscrat.ui.checklist-saved'));
+        }
       } catch {
         toast.error(t('oscrat.ui.failed-to-save-assessment'));
       }
@@ -476,7 +561,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
 
       setShowQuestionnaire(false);
     },
-    [complianceData, localState, saveToDatabase, t, generateAndUploadCAR]
+    [complianceData, localState, saveToDatabase, t, generateAndUploadCAR, persistEvidenceFiles]
   );
 
   const handleBack = useCallback(() => {
@@ -532,6 +617,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     try {
       await resetAssessment();
       setLocalState(createInitialState(productId, teamRole));
+      setSavedAssessmentId(undefined);
       toast.success(t('oscrat.ui.assessment-deleted-successfully'));
     } catch {
       toast.error(t('oscrat.ui.failed-to-delete-assessment'));
@@ -547,6 +633,8 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       showQuestionnaire={showQuestionnaire}
       complianceNamespace={complianceNamespace}
       customTranslations={customTranslations}
+      teamSlug={teamSlug}
+      assessmentId={activeAssessmentId}
       onAreaSelect={handleAreaSelect}
       onRequirementComplete={handleRequirementComplete}
       onChecklistSave={handleChecklistSave}

@@ -5,12 +5,14 @@ import { XMarkIcon, LinkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { CreateTask } from '@/components/interfaces/Task';
 import { TaskStatus, type TeamDetail } from '@oscrat/model';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
+import { resolveTaskTitle } from '@/lib/tasks';
 import { useLinkedTasks } from './hooks/useLinkedTasks';
 
 interface LinkedTask {
   taskId: number;
   taskNumber: number;
   title: string;
+  titleLocId?: string | null;
   status: string;
 }
 
@@ -18,6 +20,7 @@ interface AvailableTask {
   id: number;
   taskNumber: number;
   title: string;
+  titleLocId?: string | null;
 }
 
 interface LinkedTasksSectionProps {
@@ -95,7 +98,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
               </option>
               {filteredAvailableTasks?.map((task) => (
                 <option key={task.id} value={task.id}>
-                  #{task.taskNumber}: {task.title}
+                  #{task.taskNumber}: {resolveTaskTitle(task, t)}
                 </option>
               ))}
             </select>
@@ -134,7 +137,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
                 href={`/organization/${slug}/tasks/${task.taskNumber}`}
                 className="text-blue-600 hover:underline"
               >
-                #{task.taskNumber}: {task.title}
+                #{task.taskNumber}: {resolveTaskTitle(task, t)}
                 <span className="ml-2 text-sm text-gray-500">
                   ({t(getTaskStatusTranslationKey(task.status as TaskStatus))})
                 </span>

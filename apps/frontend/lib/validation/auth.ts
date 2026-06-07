@@ -40,6 +40,9 @@ export const joinWithInvitationSchema = Yup.object().shape({
   firstName: nameSchema.required('oscrat.ui.validation.first-name-required'),
   lastName: nameSchema.required('oscrat.ui.validation.last-name-required'), 
   password: passwordSchema.required('oscrat.ui.validation.password-required'),
+  retypePassword: Yup.string()
+    .required('oscrat.ui.validation.password-confirm-required')
+    .oneOf([Yup.ref('password')], 'oscrat.ui.validation.password-confirm-match'),
 });
 
 /**

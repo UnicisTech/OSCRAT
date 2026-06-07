@@ -10,6 +10,7 @@ import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { WithLoadingAndError } from '@/components/shared';
 import type { Task, Team } from '@oscrat/model';
 import { CreateTask, DeleteTask, EditTask } from '@/components/interfaces/Task';
+import { resolveTaskTitle } from '@/lib/tasks';
 
 const Tasks = ({ team }: { team: Team }) => {
   const router = useRouter();
@@ -100,7 +101,7 @@ const Tasks = ({ team }: { team: Team }) => {
                     <td className="px-6 py-3">
                       <Link href={`/organization/${slug}/tasks/${task.taskNumber}`}>
                         <div className="flex items-center justify-start space-x-2">
-                          <span className="underline">{task.title}</span>
+                          <span className="underline">{resolveTaskTitle(task, t)}</span>
                         </div>
                       </Link>
                     </td>

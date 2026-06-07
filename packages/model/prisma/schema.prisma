@@ -531,6 +531,8 @@ model OscratAssessment {
 
   createdByUser User @relation("OscratAssessmentCreatedBy", fields: [createdBy], references: [id])
 
+  attachments Attachment[]
+
   @@index([teamId])
   @@index([productId])
   @@index([versionId])
@@ -882,6 +884,9 @@ model Attachment {
   documentationId String?
   documentation   Documentation? @relation(fields: [documentationId], references: [id], onDelete: Cascade)
 
+  assessmentId String?
+  assessment   OscratAssessment? @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
   // Reverse relations for CAR and DoC
   versionAsCAR OscratProductVersion? @relation("VersionCAR")
   versionAsDoC OscratProductVersion? @relation("VersionDoC")
@@ -900,6 +905,7 @@ model Attachment {
   @@index([incidentId])
   @@index([vulnerabilityId])
   @@index([documentationId])
+  @@index([assessmentId])
   @@index([name])
 }
 

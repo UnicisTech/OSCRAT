@@ -22,6 +22,7 @@ const AreaList: React.FC<AreaListProps> = ({
   completedAreas,
   onAreaSelect,
   getAreaProgress,
+  complianceState,
   onReset,
   complianceNamespace,
   customTranslations = null,
@@ -29,6 +30,11 @@ const AreaList: React.FC<AreaListProps> = ({
   const { t, ready } = useTranslation(['common', complianceNamespace]);
   const tr = createComplianceTranslator(t, complianceNamespace, customTranslations);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const hasStarted =
+    !!complianceState?.started ||
+    (complianceState?.assessments?.length ?? 0) > 0 ||
+    completedAreas.length > 0;
 
   const handleResetConfirm = () => {
     onReset();
@@ -50,7 +56,12 @@ const AreaList: React.FC<AreaListProps> = ({
         </h2>
         <button
           onClick={() => setShowResetConfirm(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          disabled={!hasStarted}
+          className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors ${
+            hasStarted
+              ? 'bg-red-600 hover:bg-red-700'
+              : 'bg-red-300 cursor-not-allowed'
+          }`}
         >
           <FaRedo />
           {t('oscrat.ui.reset-assessment')}

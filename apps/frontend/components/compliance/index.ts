@@ -9,3 +9,4 @@ export { exportComplianceToPDF } from './CompliancePDFExport';
 export { default as AssessmentLanguageSelector } from './AssessmentLanguageSelector';
 export { default as ComplianceAssessmentWrapper } from './ComplianceAssessmentWrapper';
 export { default as TechDocChecklist } from './TechDocChecklist';
+export { default as AssessmentFilesPanel } from './AssessmentFilesPanel';

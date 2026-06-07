@@ -9,6 +9,7 @@ import {
   logCreate,
   logUpdate,
   logDelete,
+  CrudType,
   EntityType,
   type AuditInfo,
 } from '../audit';
@@ -256,10 +257,10 @@ export const deleteDocumentation = async (
     // Will throw if not found - let Prisma handle it
     const deleted = await tx.documentation.delete({
       where: { id: documentationId, teamId },
-      select: { id: true, title: true },
+      select: { id: true, title: true, productId: true, versionId: true },
     });
 
-    await logDelete(EntityType.Documentation, audit, { id: deleted.id, name: deleted.title });
+    await logDelete(EntityType.Documentation, audit, { ...deleted, name: deleted.title });
   });
 };
 
@@ -323,18 +324,44 @@ export const linkDocumentationToTask = async (
   teamId: string,
   documentationId: string,
   taskId: number,
-  _auditInfo: AuditInfo
+  auditInfo: AuditInfo
 ): Promise<void> => {
-  // FK constraints will fail if doc/task don't exist or don't belong to team
-  // Using raw SQL to verify teamId ownership in a single query
-  await prisma.$executeRaw`
-    INSERT INTO "DocumentationTask" ("id", "documentationId", "taskId", "createdAt")
-    SELECT gen_random_uuid(), d.id, t.id, NOW()
-    FROM "Documentation" d, "Task" t
-    WHERE d.id = ${documentationId} AND d."teamId" = ${teamId}
-      AND t.id = ${taskId} AND t."teamId" = ${teamId}
-    ON CONFLICT ("documentationId", "taskId") DO NOTHING
-  `;
+  // Wrap the raw mutation and its audit log in a single transaction so the
+  // link and audit row commit (or roll back) together, preventing data/audit
+  // divergence if the audit write fails.
+  await prisma.$transaction(async (tx) => {
+    // FK constraints will fail if doc/task don't exist or don't belong to team
+    // Using raw SQL to verify teamId ownership in a single query
+    const affected = await tx.$executeRaw`
+      INSERT INTO "DocumentationTask" ("id", "documentationId", "taskId", "createdAt")
+      SELECT gen_random_uuid(), d.id, t.id, NOW()
+      FROM "Documentation" d, "Task" t
+      WHERE d.id = ${documentationId} AND d."teamId" = ${teamId}
+        AND t.id = ${taskId} AND t."teamId" = ${teamId}
+      ON CONFLICT ("documentationId", "taskId") DO NOTHING
+    `;
+
+    // Only audit when a new link was actually created (idempotent no-op otherwise)
+    if (affected > 0) {
+      const doc = await tx.documentation.findFirst({
+        where: { id: documentationId, teamId },
+        select: { id: true, title: true, productId: true, versionId: true },
+      });
+      if (doc) {
+        const audit = createAuditContextWithTx(tx, auditInfo);
+        await audit.log({
+          action: 'documentation.link',
+          crud: CrudType.Update,
+          user: audit.user,
+          team: audit.team,
+          target: { id: doc.id, name: doc.title, type: EntityType.Documentation },
+          productId: doc.productId ?? audit.productId,
+          versionId: doc.versionId ?? audit.versionId,
+          metadata: { taskId: String(taskId) },
+        });
+      }
+    }
+  });
 };
 
 export const unlinkDocumentationFromTask = async (
@@ -342,16 +369,41 @@ export const unlinkDocumentationFromTask = async (
   teamId: string,
   documentationId: string,
   taskId: number,
-  _auditInfo: AuditInfo
+  auditInfo: AuditInfo
 ): Promise<void> => {
-  // Delete only if both doc and task belong to team
-  await prisma.$executeRaw`
-    DELETE FROM "DocumentationTask" dt
-    USING "Documentation" d, "Task" t
-    WHERE dt."documentationId" = d.id AND dt."taskId" = t.id
-      AND d.id = ${documentationId} AND d."teamId" = ${teamId}
-      AND t.id = ${taskId} AND t."teamId" = ${teamId}
-  `;
+  // Wrap the raw mutation and its audit log in a single transaction so the
+  // unlink and audit row commit (or roll back) together, preventing data/audit
+  // divergence if the audit write fails.
+  await prisma.$transaction(async (tx) => {
+    // Capture name before unlink for a readable audit entry
+    const doc = await tx.documentation.findFirst({
+      where: { id: documentationId, teamId },
+      select: { id: true, title: true, productId: true, versionId: true },
+    });
+
+    // Delete only if both doc and task belong to team
+    const affected = await tx.$executeRaw`
+      DELETE FROM "DocumentationTask" dt
+      USING "Documentation" d, "Task" t
+      WHERE dt."documentationId" = d.id AND dt."taskId" = t.id
+        AND d.id = ${documentationId} AND d."teamId" = ${teamId}
+        AND t.id = ${taskId} AND t."teamId" = ${teamId}
+    `;
+
+    if (affected > 0 && doc) {
+      const audit = createAuditContextWithTx(tx, auditInfo);
+      await audit.log({
+        action: 'documentation.unlink',
+        crud: CrudType.Update,
+        user: audit.user,
+        team: audit.team,
+        target: { id: doc.id, name: doc.title, type: EntityType.Documentation },
+        productId: doc.productId ?? audit.productId,
+        versionId: doc.versionId ?? audit.versionId,
+        metadata: { taskId: String(taskId) },
+      });
+    }
+  });
 };
 
 export interface PublicDocumentationOptions {

@@ -106,7 +106,7 @@
             "evidence": {
               "type": "fileUpload",
               "required": false,
-              "hint": "Please upoload la latest assessment"
+              "hint": "Please upload the latest assessment"
             }
           },
           {
@@ -143,7 +143,7 @@
             "evidence": {
               "type": "fileUpload",
               "required": false,
-              "hint": "Please upoload la latest assessment"
+              "hint": "Please upload the latest assessment"
             }
           }
         ],

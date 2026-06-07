@@ -660,7 +660,7 @@ export const deleteSbomReport = async (
           },
         },
       },
-      select: { id: true },
+      select: { id: true, versionId: true, productId: true },
     });
 
     if (!report) {
@@ -669,7 +669,7 @@ export const deleteSbomReport = async (
       );
     }
 
-    await logDelete(EntityType.SbomReport, audit, { id: report.id });
+    await logDelete(EntityType.SbomReport, audit, report);
 
     await tx.sbomReport.delete({
       where: { id: reportId },

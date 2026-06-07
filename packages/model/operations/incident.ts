@@ -375,14 +375,14 @@ export const deleteIncident = async (
         id: incidentId,
         teamId: teamId,
       },
-      select: { id: true, description: true },
+      select: { id: true, description: true, versionId: true, productId: true },
     });
 
     if (!incident) {
       throw new Error('Incident not found or does not belong to team');
     }
 
-    await logDelete(EntityType.Incident, audit, { id: incident.id });
+    await logDelete(EntityType.Incident, audit, incident);
 
     await tx.oscratProductIncident.delete({
       where: {

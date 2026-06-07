@@ -158,7 +158,15 @@ const UploadTranslationForm: React.FC<UploadTranslationFormProps> = ({
           </button>
         </div>
 
-        <p className="text-xs text-gray-500">{t('oscrat.ui.compliance-translation.workflow-hint')}</p>
+        <div className="text-xs text-gray-500">
+          <p className="font-medium mb-1">{t('oscrat.ui.compliance-translation.workflow-title')}</p>
+          <ol className="list-decimal list-inside flex flex-col gap-1">
+            <li>{t('oscrat.ui.compliance-translation.workflow-step-1')}</li>
+            <li>{t('oscrat.ui.compliance-translation.workflow-step-2')}</li>
+            <li>{t('oscrat.ui.compliance-translation.workflow-step-3')}</li>
+            <li>{t('oscrat.ui.compliance-translation.workflow-step-4')}</li>
+          </ol>
+        </div>
       </div>
     </AccessControl>
   );

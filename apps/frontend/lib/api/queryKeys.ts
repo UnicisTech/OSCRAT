@@ -99,6 +99,11 @@ export const queryKeys = {
         ] as const,
       detail: (teamSlug: string, assessmentId: string) =>
         [...queryKeys.oscrat.assessments.all(teamSlug), assessmentId] as const,
+      attachments: (teamSlug: string, assessmentId: string) =>
+        [
+          ...queryKeys.oscrat.assessments.detail(teamSlug, assessmentId),
+          'attachments',
+        ] as const,
     },
     projects: {
       all: (teamId: string) => ['teams', teamId, 'oscrat', 'projects'] as const,

@@ -8,6 +8,7 @@ import { Button } from 'react-daisyui';
 import type { Task, Team } from '@oscrat/model';
 import { TaskStatus } from '@oscrat/model';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
+import { resolveTaskTitle } from '@/lib/tasks';
 import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
 import { WithoutRing, IssuePanelContainer } from 'sharedStyles';
 import { useTask } from 'hooks/useTask';
@@ -86,7 +87,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                 name="title"
                 label="Title"
                 isRequired
-                defaultValue={task?.title}
+                defaultValue={resolveTaskTitle(task, t)}
               >
                 {({ fieldProps }) => (
                   <Fragment>

@@ -11,6 +11,7 @@ interface UseComplianceTaskGenerationOptions {
   versionId?: string;
   userId: string;
   complianceNamespace: string;
+  productName: string;
 }
 
 interface PendingTask {
@@ -24,6 +25,7 @@ export function useComplianceTaskGeneration({
   productId,
   versionId,
   complianceNamespace,
+  productName,
 }: UseComplianceTaskGenerationOptions) {
   const { createTask } = useTasks(teamSlug);
   const { t } = useTranslation(['common', complianceNamespace]);
@@ -40,7 +42,14 @@ export function useComplianceTaskGeneration({
   const generateTaskData = useCallback(
     (requirement: ComplianceRequirement): CreateTaskData => {
       const translatedRequirement = t(requirement.requirement, { ns: complianceNamespace });
-      const title = `[${requirement.reqId}] ${translatedRequirement}`;
+      // Include the product/version context (productName already encodes
+      // "Project (version)" for version assessments) so auto-generated
+      // remediation tasks stay distinguishable across products and versions.
+      const title = t('oscrat.ui.compliance-task-title', {
+        reqId: requirement.reqId,
+        requirement: translatedRequirement,
+        product: productName,
+      });
       const description = requirement.genericTask || t('oscrat.ui.remediate-compliance-requirement');
 
       const taskData: CreateTaskData = {
@@ -54,7 +63,7 @@ export function useComplianceTaskGeneration({
 
       return taskData;
     },
-    [productId, versionId, t, complianceNamespace]
+    [productId, versionId, t, complianceNamespace, productName]
   );
 
   const proposeTask = useCallback(

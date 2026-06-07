@@ -188,7 +188,7 @@ const TRACKED_FIELDS: Record<EntityType, string[]> = {
   Webhook: ['name', 'url', 'events', 'isActive'],
   ApiKey: ['name', 'expiresAt'],
   Assessment: ['type', 'schemaVersion'],
-  Attachment: ['name', 'mimeType', 'description', 'taskId', 'versionId', 'vulnerabilityId', 'incidentId'],
+  Attachment: ['name', 'mimeType', 'description', 'taskId', 'versionId', 'vulnerabilityId', 'incidentId', 'assessmentId'],
   Documentation: ['title', 'level', 'visibility', 'status', 'version', 'productId', 'versionId'],
 };
 
@@ -198,20 +198,34 @@ function pick<T extends Record<string, unknown>>(obj: T, fields: string[]): Part
   return result;
 }
 
+function resolveEntityScope(
+  ctx: AuditContext,
+  entity: Record<string, unknown>
+): { productId?: string; versionId?: string } {
+  const versionId = 'versionId' in entity
+    ? (entity.versionId as string) || undefined
+    : ctx.versionId;
+  const productId = 'productId' in entity
+    ? (entity.productId as string) || undefined
+    : ctx.productId;
+  return { productId, versionId };
+}
+
 export async function logCreate(
   type: EntityType,
   ctx: AuditContext,
   entity: { id: string; name?: string } & Record<string, unknown>
 ): Promise<void> {
   const tracked = pick(entity, TRACKED_FIELDS[type]);
+  const scope = resolveEntityScope(ctx, entity);
   await ctx.log({
     action: `${type.toLowerCase()}.create`,
     crud: CrudType.Create,
     user: ctx.user,
     team: ctx.team,
     target: { id: entity.id, name: entity.name || entity.id, type },
-    productId: ctx.productId,
-    versionId: ctx.versionId,
+    productId: scope.productId,
+    versionId: scope.versionId,
     metadata: { snapshot: JSON.stringify(tracked) },
   });
 }
@@ -226,14 +240,15 @@ export async function logUpdate(
   const patch = createPatch(pick(previous, fields), pick(current, fields));
   if (patch.length === 0) return;
 
+  const scope = resolveEntityScope(ctx, current);
   await ctx.log({
     action: `${type.toLowerCase()}.update`,
     crud: CrudType.Update,
     user: ctx.user,
     team: ctx.team,
     target: { id: current.id, name: current.name || current.id, type },
-    productId: ctx.productId,
-    versionId: ctx.versionId,
+    productId: scope.productId,
+    versionId: scope.versionId,
     metadata: { patch: JSON.stringify(patch) },
   });
 }
@@ -241,16 +256,17 @@ export async function logUpdate(
 export async function logDelete(
   type: EntityType,
   ctx: AuditContext,
-  entity: { id: string; name?: string }
+  entity: { id: string; name?: string } & Record<string, unknown>
 ): Promise<void> {
+  const scope = resolveEntityScope(ctx, entity);
   await ctx.log({
     action: `${type.toLowerCase()}.delete`,
     crud: CrudType.Delete,
     user: ctx.user,
     team: ctx.team,
     target: { id: entity.id, name: entity.name || entity.id, type },
-    productId: ctx.productId,
-    versionId: ctx.versionId,
+    productId: scope.productId,
+    versionId: scope.versionId,
     metadata: {},
   });
 }

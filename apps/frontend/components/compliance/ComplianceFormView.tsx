@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
-import { AreaList, RequirementQuestionnaire, TechDocChecklist } from '@/components/compliance';
+import { AreaList, RequirementQuestionnaire, TechDocChecklist, AssessmentFilesPanel } from '@/components/compliance';
 import type { ComplianceNamespace } from '@/lib/compliance/translations';
 
 interface ComplianceFormViewProps {
@@ -9,6 +9,8 @@ interface ComplianceFormViewProps {
   showQuestionnaire: boolean;
   complianceNamespace: ComplianceNamespace;
   customTranslations?: Record<string, string> | null;
+  teamSlug: string;
+  assessmentId: string | null | undefined;
   onAreaSelect: (areaIndex: number) => void;
   onRequirementComplete: (assessment: RequirementAssessment) => Promise<void>;
   onChecklistSave: (assessments: RequirementAssessment[]) => Promise<void>;
@@ -24,6 +26,8 @@ const ComplianceFormView: React.FC<ComplianceFormViewProps> = ({
   showQuestionnaire,
   complianceNamespace,
   customTranslations = null,
+  teamSlug,
+  assessmentId,
   onAreaSelect,
   onRequirementComplete,
   onChecklistSave,
@@ -77,16 +81,19 @@ const ComplianceFormView: React.FC<ComplianceFormViewProps> = ({
   }
 
   return (
-    <AreaList
-      areas={complianceData}
-      completedAreas={localState.completedAreas}
-      onAreaSelect={onAreaSelect}
-      getAreaProgress={getAreaProgress}
-      complianceState={localState}
-      onReset={onReset}
-      complianceNamespace={complianceNamespace}
-      customTranslations={customTranslations}
-    />
+    <>
+      <AreaList
+        areas={complianceData}
+        completedAreas={localState.completedAreas}
+        onAreaSelect={onAreaSelect}
+        getAreaProgress={getAreaProgress}
+        complianceState={localState}
+        onReset={onReset}
+        complianceNamespace={complianceNamespace}
+        customTranslations={customTranslations}
+      />
+      <AssessmentFilesPanel teamSlug={teamSlug} assessmentId={assessmentId} />
+    </>
   );
 };
 

@@ -14,6 +14,7 @@ import TaskStatusDropdown from '@/components/oscrat/tasks/TaskStatusDropdown';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
+import { resolveTaskTitle } from '@/lib/tasks';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -104,7 +105,7 @@ const TaskTable: React.FC<TaskTableProps> = ({
                 >
                   <td className={tableStyles.td}>
                     <div className="font-medium">
-                      {task.title}
+                      {resolveTaskTitle(task, t)}
                     </div>
                   </td>
                   <td className={tableStyles.td}>

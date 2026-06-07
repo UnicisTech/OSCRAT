@@ -11,6 +11,7 @@ import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { useTask } from 'hooks/useTask';
 import { useFormik } from 'formik';
 import { createTaskUpdateSchema, type TaskUpdateData } from '@/lib/validation/task';
+import { resolveTaskTitle } from '@/lib/tasks';
 import type { ApiError } from '@/types';
 
 const EditTask = ({
@@ -29,11 +30,11 @@ const EditTask = ({
   const validationSchema = useMemo(() => createTaskUpdateSchema(), []);
   
   const initialValues: TaskUpdateData = useMemo(() => ({
-    title: task?.title || '',
+    title: resolveTaskTitle(task, t),
     status: task?.status || '',
     duedate: task?.duedate ? new Date(task.duedate) : undefined,
     description: task?.description || '',
-  }), [task]);
+  }), [task, t]);
   
   const formik = useFormik<TaskUpdateData>({
     initialValues,
