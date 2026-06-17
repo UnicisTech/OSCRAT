@@ -305,6 +305,21 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
     return styles.badgeGray;
   };
 
+  // Mirrors the dashboard labels so the PDF reads "Compliant" (not the raw
+  // "Fully compliant" enum) and stays consistent with the breakdown legend.
+  const getConformityLabel = (status: string): string => {
+    if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) return t.compliant;
+    if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT) return t.partiallyCompliant;
+    if (status === CONFORMITY_STATUS.NOT_COMPLIANT) return t.notCompliant;
+    if (status === CONFORMITY_STATUS.NOT_APPLICABLE) return t.notApplicable;
+    if (status === CONFORMITY_STATUS.NOT_EVALUATED) return t.notEvaluated;
+    if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) {
+      const suffix = status.slice(CONFORMITY_STATUS.IN_EVALUATION.length).trim();
+      return suffix ? `${t.inEvaluation} ${suffix}` : t.inEvaluation;
+    }
+    return status;
+  };
+
   const evaluationSegments: ChartBarSegment[] = [
     { label: t.evaluated, value: evaluatedCount, color: '#10b981' },
     { label: t.notEvaluated, value: notEvaluatedCount, color: '#ef4444' },
@@ -410,7 +425,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
                   {req.isEvaluated ? t.evaluated : t.notEvaluated}
                 </Text>
                 <Text style={[styles.tableColSmall, getStatusStyle(req.conformityStatus)]}>
-                  {req.conformityStatus}
+                  {getConformityLabel(req.conformityStatus)}
                 </Text>
               </View>
             ))}
@@ -429,7 +444,7 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
               <Text style={styles.title}>{req.id}: {req.name}</Text>
               <Text style={styles.subtitle}>{t.area}: {req.areaName}</Text>
               <Text style={[styles.badge, getStatusStyle(req.conformityStatus)]}>
-                {req.conformityStatus}
+                {getConformityLabel(req.conformityStatus)}
               </Text>
             </View>
 

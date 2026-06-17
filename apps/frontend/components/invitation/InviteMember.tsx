@@ -50,14 +50,24 @@ const InviteMember = ({
         <Modal.Description>{t('invite-member-message')}</Modal.Description>
         <Modal.Body>
           <div className="flex flex-col gap-4">
-            <Input
-              name="email"
-              onChange={formik.handleChange}
-              value={formik.values.email}
-              placeholder="email@unicis.tech"
-              required
-              className="input input-bordered bg-white text-black border-gray-300 placeholder-gray-500"
-            />
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                {t('email')}
+                <span className="ml-1 text-red-600">*</span>
+              </label>
+              <Input
+                id="email"
+                name="email"
+                onChange={formik.handleChange}
+                value={formik.values.email}
+                placeholder="email@unicis.tech"
+                required
+                className="input input-bordered w-full bg-white text-black border-gray-300 placeholder-gray-500"
+              />
+            </div>
             <select
               className="select select-bordered rounded bg-white text-black border-gray-300"
               name="role"

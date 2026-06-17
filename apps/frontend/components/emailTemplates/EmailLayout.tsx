@@ -17,9 +17,11 @@ interface EmailLayoutProps {
 
 const EmailLayout = ({ children }: EmailLayoutProps) => {
   // Emails are rendered outside the app, so relative asset paths do not
-  // resolve. Build an absolute URL so the brand logo loads in mail clients
-  // (otherwise the <Img> falls back to its alt text).
-  const logoSrc = `${env.appUrl}${app.logoUrl}`;
+  // resolve. Build an absolute URL to a raster (PNG) logo so it loads in mail
+  // clients (SVG is unsupported by most clients, and a relative path falls
+  // back to the <Img> alt text).
+  const baseUrl = env.appUrl || env.publicAppUrl;
+  const logoSrc = `${baseUrl}${app.emailLogoUrl}`;
 
   return (
     <Tailwind>

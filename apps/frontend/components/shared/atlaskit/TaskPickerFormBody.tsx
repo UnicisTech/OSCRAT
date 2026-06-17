@@ -4,7 +4,7 @@ import { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
 import { useTranslation } from 'next-i18next';
 import type { Task } from '@oscrat/model';
 import { WithoutRing } from 'sharedStyles';
-import { resolveTaskTitle } from '@/lib/tasks';
+import { formatTaskLabel } from '@/lib/tasks';
 
 interface FormBodyProps {
   tasks: Task[];
@@ -52,7 +52,7 @@ const TaskPickerFormBody = ({ tasks }: FormBodyProps) => {
                   styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                   options={tasks?.map((task) => ({
                     value: task,
-                    label: resolveTaskTitle(task, t),
+                    label: formatTaskLabel(task, t),
                   }))}
                   validationState={error ? 'error' : 'default'}
                 />

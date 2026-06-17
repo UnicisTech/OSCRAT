@@ -108,6 +108,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
             color="primary"
             onClick={handleLinkTask}
             loading={isLinking}
+            disabled={isLinking || !filteredAvailableTasks || filteredAvailableTasks.length === 0}
             className="h-8"
           >
             {t('oscrat.ui.documentation.link-button')}

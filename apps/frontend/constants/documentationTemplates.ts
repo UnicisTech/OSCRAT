@@ -79,7 +79,7 @@ Hint: Detailed information about incident.
 | :---- | :---- |
 | Affected Components/Assets |   |
 | Detection Method | Options: Automated Alert (SIEM/IDS), Internal User Report, External Notification (Customer/Researcher), Audit/Review |
-| Regulatory Reporting Required? (Yes/No) | Does this incident meet the threshold for notification to authorities (CSIRT/ENSIA)? |
+| Regulatory Reporting Required? (Yes/No) | Does this incident meet the threshold for notification to authorities (CSIRT/ENISA)? |
 
 ***Incident Status***
 
@@ -222,7 +222,7 @@ _Hint: Address details of the company reporting the vulnerability._
 
 ***Reporter***
 
-_Hint: Details of the person reporting the vulnerability.__
+_Hint: Details of the person reporting the vulnerability._
 
 | Field         | Value                   |
 | :---- | :---- |
@@ -403,7 +403,7 @@ The manufacturer ensures and declares, on its sole responsibility, that the prod
 ****Module B — EU-type examination (design/type)****  
 A **notified body** examines the technical design and development (and, where relevant, specimens of critical parts) and issues an **EU-type examination certificate** if the type meets the essential requirements.  
    
-****Module C — Conformity to type based on internal production control (production).****.  
+****Module C — Conformity to type based on internal production control (production).****  
 After Module B, the manufacturer controls production to ensure **all units conform to the approved type**; no notified body is involved in this phase.  
    
 ****Module H — Conformity based on full quality assurance (company process certification)****  
@@ -467,9 +467,6 @@ Use Article 32 to determine what is allowed or required for your product categor
 * under **B+C**, re-assess **Module B** if the approved type changes significantly;   
 * under **A**, keep documentation current and reflect the actual integration/environment.
 
-   
-*Note: Applying OJEU-cited harmonised standards gives presumption of conformity for covered requirements; where only a partial fit exists, supplement with other technical solutions and document equivalence. (Blue Guide, Section 4.1.2.)*
-
 **Modules in Detail**
 
 ***Module A — Internal control (manufacturer self-assessment)***
@@ -513,7 +510,7 @@ Use Article 32 to determine what is allowed or required for your product categor
 * Covers only the tested design; if you significantly change the product, you may need a new Module B assessment.
 
    
-***Module C: Conformity to Type (Internal Production Control)*** 
+***Module C: Conformity to Type Based on Internal Production Control*** 
 
 *What it is:*
 

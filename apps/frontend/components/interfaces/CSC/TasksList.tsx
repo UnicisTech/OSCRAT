@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { TASK_CSC_PROPERTY_KEYS, type Task } from '@oscrat/model';
-import { resolveTaskTitle } from '@/lib/tasks';
+import { formatTaskLabel } from '@/lib/tasks';
 
 const TasksList = ({
   tasks,
@@ -29,7 +29,7 @@ const TasksList = ({
       {selectedTasks.map((task, index) => (
         <Link key={index} href={`/organization/${slug}/tasks/${task.taskNumber}`}>
           <div className="flex items-center justify-start space-x-2">
-            <span className="underline">{resolveTaskTitle(task, t)}</span>
+            <span className="underline">{formatTaskLabel(task, t)}</span>
           </div>
         </Link>
       ))}

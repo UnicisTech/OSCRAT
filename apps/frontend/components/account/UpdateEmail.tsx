@@ -44,17 +44,19 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
             disabled={!allowEmailChange}
           />
         </Card.Body>
-        <Card.Footer>
-          <Button
-            type="submit"
-            color="primary"
-            loading={isUpdateUserLoading}
-            disabled={!formik.dirty || !formik.isValid}
-            size="md"
-          >
-            {t('save-changes')}
-          </Button>
-        </Card.Footer>
+        {allowEmailChange && (
+          <Card.Footer>
+            <Button
+              type="submit"
+              color="primary"
+              loading={isUpdateUserLoading}
+              disabled={!formik.dirty || !formik.isValid}
+              size="md"
+            >
+              {t('save-changes')}
+            </Button>
+          </Card.Footer>
+        )}
       </Card>
     </form>
   );

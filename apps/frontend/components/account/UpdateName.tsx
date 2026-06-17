@@ -31,7 +31,12 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
           </Card.Header>
           <InputWithLabel
             type="text"
-            label={t('first-name')}
+            label={
+              <>
+                {t('first-name')}
+                <span className="ml-1 text-red-600">*</span>
+              </>
+            }
             name="firstName"
             placeholder={t('your-first-name')}
             value={formik.values.firstName}
@@ -46,7 +51,12 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
           />
           <InputWithLabel
             type="text"
-            label={t('last-name')}
+            label={
+              <>
+                {t('last-name')}
+                <span className="ml-1 text-red-600">*</span>
+              </>
+            }
             name="lastName"
             placeholder={t('your-last-name')}
             value={formik.values.lastName}

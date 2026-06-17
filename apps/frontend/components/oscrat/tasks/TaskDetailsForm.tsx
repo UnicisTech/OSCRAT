@@ -212,7 +212,10 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
   return (
     <form onSubmit={formik.handleSubmit}>
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('task-details')}</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">
+          {t('task-details')}
+          <span className="ml-2 text-gray-500">#{task.taskNumber}</span>
+        </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {hasLocalizedTitle && !task.title ? (

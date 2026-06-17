@@ -68,7 +68,8 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
 
   const currentQuestion = requirement.questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === requirement.questions.length - 1;
-  const progress = ((currentQuestionIndex + 1) / requirement.questions.length) * 100;
+  const totalQuestions = requirement.questions.length;
+  const progress = totalQuestions > 0 ? (answers.length / totalQuestions) * 100 : 0;
 
   if (!currentQuestion) return null;
 
@@ -210,9 +211,9 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
         <div className="flex items-center justify-between text-sm mb-1">
           <span className="text-gray-600">
             {t('oscrat.ui.questions-progress', {
-              answered: currentQuestionIndex,
-              total: requirement.questions.length,
-              remaining: requirement.questions.length - currentQuestionIndex,
+              answered: answers.length,
+              total: totalQuestions,
+              remaining: totalQuestions - answers.length,
             })}
           </span>
           <span className="font-medium text-gray-700">{Math.round(progress)}%</span>

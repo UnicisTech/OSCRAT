@@ -501,7 +501,9 @@
         "directorysync.delete": "Deleted directory sync",
         "documentation.create": "Created documentation",
         "documentation.update": "Updated documentation",
-        "documentation.delete": "Deleted documentation"
+        "documentation.delete": "Deleted documentation",
+        "documentation.link": "Linked documentation",
+        "documentation.unlink": "Unlinked documentation"
       }
     },
     "ui": {

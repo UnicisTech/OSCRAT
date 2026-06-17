@@ -75,7 +75,10 @@ const EditTask = ({
   
   return (
     <Modal open={visible} close={handleClose}>
-      <Modal.Header>{t('edit-task')}</Modal.Header>
+      <Modal.Header>
+        {t('edit-task')}
+        <span className="ml-2 text-gray-500">#{task.taskNumber}</span>
+      </Modal.Header>
       
       <form onSubmit={formik.handleSubmit} method="POST">
         <Modal.Body>

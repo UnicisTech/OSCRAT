@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
 import { FaDownload, FaCheckCircle, FaExclamationCircle, FaClock } from 'react-icons/fa';
-import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
+import { CONFORMITY_STATUS, getConformityStatusLabel } from '@/constants/conformityStatuses';
 import { computeRequirementsStatus, getStatusBadgeColor } from '@/utils/compliance';
 
 interface ComplianceDashboardProps {
@@ -107,7 +107,7 @@ const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(req.conformityStatus)}`}>
                       {getStatusIcon(req.conformityStatus)}
-                      {req.conformityStatus}
+                      {getConformityStatusLabel(req.conformityStatus, t)}
                     </span>
                   </td>
                 </tr>

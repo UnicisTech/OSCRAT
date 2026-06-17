@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import type { Task, Team } from '@oscrat/model';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
-import { resolveTaskTitle } from '@/lib/tasks';
+import { formatTaskLabel } from '@/lib/tasks';
 
 interface TaskListItemProps {
   task: Task;
@@ -41,7 +41,7 @@ const TaskListItem: React.FC<TaskListItemProps> = ({
   if (!ready) return null;
 
   const isAutomatic = task.originType === 'AUTOMATIC';
-  const displayTitle = resolveTaskTitle(task, t);
+  const displayTitle = formatTaskLabel(task, t);
   
   const handleRowClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on the status dropdown

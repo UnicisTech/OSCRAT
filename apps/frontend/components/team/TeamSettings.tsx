@@ -48,17 +48,29 @@ const TeamSettings = ({ team }: { team: Team }) => {
             <div className="flex flex-col gap-4">
               <InputWithLabel
                 name="name"
-                label={t('team-name')}
+                label={
+                  <>
+                    {t('team-name')}
+                    <span className="ml-1 text-red-600">*</span>
+                  </>
+                }
                 value={formik.values.name}
                 onChange={formik.handleChange}
                 error={formik.errors.name ? t(formik.errors.name) : undefined}
+                required
               />
               <InputWithLabel
                 name="slug"
-                label={t('team-slug')}
+                label={
+                  <>
+                    {t('team-slug')}
+                    <span className="ml-1 text-red-600">*</span>
+                  </>
+                }
                 value={formik.values.slug}
                 onChange={formik.handleChange}
                 error={formik.errors.slug ? t(formik.errors.slug) : undefined}
+                required
               />
             </div>
           </Card.Body>

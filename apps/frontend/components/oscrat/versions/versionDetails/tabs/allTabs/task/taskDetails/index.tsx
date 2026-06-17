@@ -8,7 +8,7 @@ import { useTask } from '@/hooks/useTask';
 import { TaskDetailsForm, TaskDetailsTabs, RiskAssessmentSection } from '@/components/oscrat/tasks';
 import { Breadcrumb } from '@/components/shared';
 import { Team } from '@oscrat/model';
-import { resolveTaskTitle } from '@/lib/tasks';
+import { formatTaskLabel, resolveTaskTitle } from '@/lib/tasks';
 // import TabsManager from '@/components/shared/TabsManager';
 // import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/allTabs/task/taskDetails/tabs';
 
@@ -54,7 +54,7 @@ function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: strin
       href: `/organization/${team.slug}/products/${routeProductId}/versions/${routeVersionId}`,
     },
     {
-      label: resolveTaskTitle(task, t) || t('task-details'),
+      label: resolveTaskTitle(task, t) ? formatTaskLabel(task, t) : t('task-details'),
       current: true,
     },
   ];
@@ -97,7 +97,7 @@ function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team:
       href: `/organization/${team.slug}/tasks`,
     },
     {
-      label: resolveTaskTitle(task, t) || t('task-details'),
+      label: resolveTaskTitle(task, t) ? formatTaskLabel(task, t) : t('task-details'),
       current: true,
     },
   ];

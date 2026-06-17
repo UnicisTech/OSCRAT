@@ -9,6 +9,13 @@ type TaskDescriptionFields = {
 export const resolveTaskTitle = (task: TaskTitleFields, t: TFunction): string =>
   task.title || (task.titleLocId ? t(task.titleLocId) : '');
 
+// Prefixes the team-scoped task number so tasks sharing a title can be told
+// apart, e.g. "#42: Patch dependency".
+export const formatTaskLabel = (
+  task: TaskTitleFields & { taskNumber: number },
+  t: TFunction
+): string => `#${task.taskNumber}: ${resolveTaskTitle(task, t)}`;
+
 export const resolveTaskDescription = (
   task: TaskDescriptionFields,
   t: TFunction

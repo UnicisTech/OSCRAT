@@ -4,7 +4,13 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
-import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
+import {
+  CONFORMITY_STATUS,
+  CONFORMITY_STATUS_ORDER,
+  conformityStatusTranslationMap,
+  getConformityStatusLabel,
+  type ConformityStatus,
+} from '@/constants/conformityStatuses';
 import { computeRequirementsStatus, getStatusBadgeColor } from '@/utils/compliance';
 import { FaCheckCircle, FaExclamationCircle, FaClock } from 'react-icons/fa';
 import type { Task } from '@oscrat/model';
@@ -24,6 +30,15 @@ const PIE_OPTIONS = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: { legend: { position: 'bottom' as const } },
+};
+
+const CONFORMITY_STATUS_COLORS: Record<ConformityStatus, string> = {
+  [CONFORMITY_STATUS.FULLY_COMPLIANT]: '#10b981',
+  [CONFORMITY_STATUS.PARTIALLY_COMPLIANT]: '#f59e0b',
+  [CONFORMITY_STATUS.NOT_COMPLIANT]: '#ef4444',
+  [CONFORMITY_STATUS.NOT_APPLICABLE]: '#9ca3af',
+  [CONFORMITY_STATUS.IN_EVALUATION]: '#3b82f6',
+  [CONFORMITY_STATUS.NOT_EVALUATED]: '#d1d5db',
 };
 
 const TASK_PIE_COLORS = [
@@ -68,14 +83,10 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
     const evaluated = requirementsStatus.filter(r => r.isEvaluated).length;
     const notEvaluated = requirementsStatus.length - evaluated;
 
-    const compliant = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.FULLY_COMPLIANT).length;
-    const partiallyCompliant = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.PARTIALLY_COMPLIANT).length;
-    const notCompliant = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_COMPLIANT).length;
-    const notApplicable = requirementsStatus.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_APPLICABLE).length;
-    const inEvaluation = requirementsStatus.filter(r => r.conformityStatus.startsWith(CONFORMITY_STATUS.IN_EVALUATION)).length;
-    const notEvaluatedConformity = requirementsStatus.filter(
-      (r) => r.conformityStatus === CONFORMITY_STATUS.NOT_EVALUATED
-    ).length;
+    const countForStatus = (status: ConformityStatus) =>
+      status === CONFORMITY_STATUS.IN_EVALUATION
+        ? requirementsStatus.filter(r => r.conformityStatus.startsWith(status)).length
+        : requirementsStatus.filter(r => r.conformityStatus === status).length;
 
     return {
       evaluation: {
@@ -84,16 +95,9 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
         colors: ['#10b981', '#ef4444'],
       },
       conformity: {
-        labels: [
-          t('oscrat.ui.dashboard.compliant'),
-          t('oscrat.ui.dashboard.partially-compliant'),
-          t('oscrat.ui.dashboard.not-compliant'),
-          t('oscrat.ui.dashboard.not-applicable'),
-          t('oscrat.ui.dashboard.in-evaluation'),
-          t('oscrat.ui.dashboard.not-evaluated'),
-        ],
-        data: [compliant, partiallyCompliant, notCompliant, notApplicable, inEvaluation, notEvaluatedConformity],
-        colors: ['#10b981', '#f59e0b', '#ef4444', '#9ca3af', '#3b82f6', '#d1d5db'],
+        labels: CONFORMITY_STATUS_ORDER.map((status) => t(conformityStatusTranslationMap[status])),
+        data: CONFORMITY_STATUS_ORDER.map(countForStatus),
+        colors: CONFORMITY_STATUS_ORDER.map((status) => CONFORMITY_STATUS_COLORS[status]),
       },
     };
   }, [requirementsStatus, t]);
@@ -321,7 +325,7 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(req.conformityStatus)}`}>
                         {statusIcon}
-                        {req.conformityStatus}
+                        {getConformityStatusLabel(req.conformityStatus, t)}
                       </span>
                     </td>
                   </tr>

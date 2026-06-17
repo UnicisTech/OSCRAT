@@ -6,6 +6,7 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useTask } from '@/hooks/useTask';
 import { Breadcrumb } from '@/components/shared';
 import { TaskDetailsForm, TaskDetailsTabs, RiskAssessmentSection } from '@/components/oscrat/tasks';
+import { formatTaskLabel, resolveTaskTitle } from '@/lib/tasks';
 
 const TaskDetails = () => {
   const router = useRouter();
@@ -44,7 +45,7 @@ const TaskDetails = () => {
       href: `/organization/${team.slug}/tasks`,
     },
     {
-      label: t('task-details'),
+      label: resolveTaskTitle(task, t) ? formatTaskLabel(task, t) : t('task-details'),
       current: true,
     },
   ];

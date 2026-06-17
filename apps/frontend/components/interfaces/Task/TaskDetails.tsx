@@ -85,7 +85,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
               <Field
                 aria-required={true}
                 name="title"
-                label="Title"
+                label={`Title (#${task.taskNumber})`}
                 isRequired
                 defaultValue={resolveTaskTitle(task, t)}
               >
