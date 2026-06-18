@@ -13,9 +13,7 @@ import env from '@/lib/env';
 
 type AccountProps = inferSSRProps<typeof getServerSideProps>;
 
-const Account: NextPageWithLayout<AccountProps> = ({
-  allowEmailChange,
-}) => {
+const Account: NextPageWithLayout<AccountProps> = ({ allowEmailChange }) => {
   const { data: session } = useSession();
   const { t } = useTranslation('common');
   const { teams } = useTeams();
@@ -39,7 +37,7 @@ const Account: NextPageWithLayout<AccountProps> = ({
     <div className="space-y-4">
       <Link
         href={dashboardHref}
-        className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
+        className="text-primary hover:text-info-emphasis inline-flex items-center text-sm font-medium"
       >
         {t('oscrat.ui.go-home')}
       </Link>

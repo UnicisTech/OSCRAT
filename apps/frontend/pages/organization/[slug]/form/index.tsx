@@ -6,7 +6,7 @@ import { useTeamContext } from '@/context/TeamContext';
 
 const TeamFormPage: NextPage & { getLayout?: typeof withTeamLayout } = () => {
   const { slug } = useTeamContext();
-  
+
   return <FormComponent teamSlug={slug} />;
 };
 

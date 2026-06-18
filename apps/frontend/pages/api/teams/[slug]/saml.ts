@@ -12,7 +12,9 @@ import {
 import type { NextApiResponse } from 'next';
 import type { SAMLSSORecord } from '@boxyhq/saml-jackson';
 
-const getConnectionAuditData = (connection: SAMLSSORecord): SsoConnectionAuditData => ({
+const getConnectionAuditData = (
+  connection: SAMLSSORecord
+): SsoConnectionAuditData => ({
   id: connection.clientID,
   name: connection.name,
   issuer: connection.idpMetadata?.entityID,
@@ -84,14 +86,10 @@ const handlePOST = async (
   });
 
   await prisma.$transaction(async (tx) => {
-    await logSsoConnectionCreated(
-      tx,
-      getConnectionAuditData(connection),
-      {
-        user,
-        team: { id: teamMember.teamId, name: teamMember.teamName },
-      }
-    );
+    await logSsoConnectionCreated(tx, getConnectionAuditData(connection), {
+      user,
+      team: { id: teamMember.teamId, name: teamMember.teamName },
+    });
   });
 
   res.status(201).json({ data: connection });
@@ -113,11 +111,11 @@ const handlePATCH = async (
 
   const { apiController } = await jackson();
 
-  const existingConnections = await apiController.getConnections({
+  const existingConnections = (await apiController.getConnections({
     tenant: teamMember.teamId,
     product: env.product,
-  }) as SAMLSSORecord[];
-  const existing = existingConnections.find(c => c.clientID === clientID);
+  })) as SAMLSSORecord[];
+  const existing = existingConnections.find((c) => c.clientID === clientID);
 
   await apiController.updateSAMLConnection({
     clientID,
@@ -131,11 +129,11 @@ const handlePATCH = async (
     product: env.product,
   });
 
-  const updatedConnections = await apiController.getConnections({
+  const updatedConnections = (await apiController.getConnections({
     tenant: teamMember.teamId,
     product: env.product,
-  }) as SAMLSSORecord[];
-  const updated = updatedConnections.find(c => c.clientID === clientID);
+  })) as SAMLSSORecord[];
+  const updated = updatedConnections.find((c) => c.clientID === clientID);
 
   if (existing && updated) {
     await prisma.$transaction(async (tx) => {
@@ -167,24 +165,20 @@ const handleDELETE = async (
 
   const { apiController } = await jackson();
 
-  const existingConnections = await apiController.getConnections({
+  const existingConnections = (await apiController.getConnections({
     tenant: teamMember.teamId,
     product: env.product,
-  }) as SAMLSSORecord[];
-  const existing = existingConnections.find(c => c.clientID === clientID);
+  })) as SAMLSSORecord[];
+  const existing = existingConnections.find((c) => c.clientID === clientID);
 
   await apiController.deleteConnections({ clientID, clientSecret });
 
   if (existing) {
     await prisma.$transaction(async (tx) => {
-      await logSsoConnectionDeleted(
-        tx,
-        getConnectionAuditData(existing),
-        {
-          user,
-          team: { id: teamMember.teamId, name: teamMember.teamName },
-        }
-      );
+      await logSsoConnectionDeleted(tx, getConnectionAuditData(existing), {
+        user,
+        team: { id: teamMember.teamId, name: teamMember.teamName },
+      });
     });
   }
 

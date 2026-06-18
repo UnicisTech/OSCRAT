@@ -10,11 +10,13 @@ const Card = (props: CardProps) => {
   const { heading, children, button } = props;
 
   return (
-    <div className="border-rounded card mb-5 w-full border dark:border-gray-600">
-      <div className="flex items-center justify-between border-b border-gray-300 bg-gray-100 px-3 py-3 text-sm font-medium text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400">
-        <div>{heading || ''}</div>
-        <div>{button ? button : null}</div>
-      </div>
+    <div className="border-rounded card bg-surface border-line mb-5 w-full border">
+      {(heading || button) && (
+        <div className="border-line bg-surface-muted text-content flex items-center justify-between border-b px-3 py-3 text-sm font-medium">
+          <div>{heading || ''}</div>
+          <div>{button ? button : null}</div>
+        </div>
+      )}
       <div>{children}</div>
     </div>
   );
@@ -29,7 +31,7 @@ const Title = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Description = ({ children }: { children: React.ReactNode }) => {
-  return <p className="text-sm text-gray-600 dark:text-gray-400">{children}</p>;
+  return <p className="text-content-secondary text-sm">{children}</p>;
 };
 
 const Header = ({ children }: { children: React.ReactNode }) => {
@@ -45,19 +47,13 @@ const Body = ({
   className?: string;
 }) => {
   return (
-    <div
-      className={`card-body gap-6 p-6 dark:bg-[color:hsla(var(--b1))] ${
-        className || ''
-      }`}
-    >
-      {children}
-    </div>
+    <div className={`card-body gap-6 p-6 ${className || ''}`}>{children}</div>
   );
 };
 
 const Footer = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="card-actions justify-end border-t bg-gray-50 p-3 dark:border-gray-600 dark:bg-inherit">
+    <div className="card-actions border-line justify-end border-t px-6 py-4">
       {children}
     </div>
   );

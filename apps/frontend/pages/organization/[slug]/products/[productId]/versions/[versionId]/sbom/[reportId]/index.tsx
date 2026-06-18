@@ -4,6 +4,7 @@ import { useTranslation } from 'next-i18next';
 import { useVersionContext } from '@/context/VersionContext';
 import { useGetSbomReportDetail } from '@/lib/api/hooks/oscrat/jobs';
 import { Loading, Breadcrumb } from '@/components/shared';
+import Button from '@/components/button';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import usePagination from '@/hooks/usePagination';
@@ -16,6 +17,7 @@ import { tableStyles } from '@/components/oscrat/tableStyles';
 import { reportStyles } from '@/components/oscrat/reportStyles';
 import { WorkerJobStatus } from '@oscrat/model';
 import ReportStatusMessage from '@/components/oscrat/ReportStatusMessage';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -33,18 +35,15 @@ function ReportHeader({
   return (
     <div className="flex items-center justify-between">
       <h1 className={reportStyles.pageTitle}>{title}</h1>
-      <button
+      <Button
+        variant="secondary"
+        size="m"
         onClick={onDownload}
         disabled={!hasAttachment}
-        className={`${reportStyles.downloadButton.base} ${
-          hasAttachment
-            ? reportStyles.downloadButton.enabled
-            : reportStyles.downloadButton.disabled
-        }`}
+        startIcon={<FaDownload size={14} />}
       >
-        <FaDownload className="mr-2" size={14} />
         {downloadLabel}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -75,21 +74,23 @@ function SbomOverviewStats({
           </p>
         </div>
         <div>
-          <p className={reportStyles.metadataLabel}>{t('oscrat.ui.scan-date')}</p>
+          <p className={reportStyles.metadataLabel}>
+            {t('oscrat.ui.scan-date')}
+          </p>
           <p className={reportStyles.metadataValue}>
-            {new Date(overview.scanDate).toLocaleDateString()}
+            {formatDateShort(overview.scanDate)}
           </p>
         </div>
         <div>
           <p className={reportStyles.metadataLabel}>
             {t('oscrat.ui.versions.sbom.syft-version')}
           </p>
-          <p className={reportStyles.metadataValue}>
-            {overview.syftVersion}
-          </p>
+          <p className={reportStyles.metadataValue}>{overview.syftVersion}</p>
         </div>
         <div>
-          <p className={reportStyles.metadataLabel}>{t('oscrat.ui.triggered-by-label')}</p>
+          <p className={reportStyles.metadataLabel}>
+            {t('oscrat.ui.triggered-by-label')}
+          </p>
           <p className={reportStyles.metadataValue}>{triggeredBy}</p>
         </div>
       </div>
@@ -117,7 +118,7 @@ function PackageTypesBreakdown({
         {Object.entries(packageTypes).map(([type, count]) => (
           <div key={type} className={reportStyles.typeCard}>
             <p className={reportStyles.metadataLabel}>{type}</p>
-            <p className="mt-1 text-xl font-semibold text-gray-900">{count}</p>
+            <p className="text-content mt-1 text-xl font-semibold">{count}</p>
           </div>
         ))}
       </div>
@@ -153,11 +154,13 @@ function PackagesTable({
   return (
     <div className={reportStyles.tableCard}>
       <div className={reportStyles.tableHeader}>
-        <h2 className="text-lg font-medium text-gray-900">
+        <h2 className="text-content text-lg font-medium">
           {t('oscrat.ui.versions.sbom.packages-section')}
         </h2>
         <p className={reportStyles.sectionSubtitle}>
-          {t('oscrat.ui.versions.sbom.packages-found', { count: packages.length })}
+          {t('oscrat.ui.versions.sbom.packages-found', {
+            count: packages.length,
+          })}
         </p>
       </div>
       <div className={tableStyles.wrapper}>
@@ -178,12 +181,14 @@ function PackagesTable({
           <tbody className={tableStyles.tbody}>
             {pageData.map((pkg: any, index: number) => (
               <tr key={index} className={tableStyles.tr}>
-                <td className={`${tableStyles.td} font-medium text-gray-900`}>
+                <td className={`${tableStyles.td} text-content font-medium`}>
                   {pkg.name}
                 </td>
                 <td className={tableStyles.td}>{pkg.version || '-'}</td>
                 <td className={tableStyles.td}>
-                  <span className={`${reportStyles.badge} bg-blue-100 text-blue-800`}>
+                  <span
+                    className={`${reportStyles.badge} bg-info-subtle text-info-emphasis`}
+                  >
                     {pkg.type}
                   </span>
                 </td>
@@ -214,7 +219,11 @@ export default function SbomSummary() {
   const { teamId, productId, versionId } = useVersionContext();
 
   const { project } = useOscratProject(teamId, productId);
-  const { version: versionData } = useOscratVersion(teamId, productId, versionId);
+  const { version: versionData } = useOscratVersion(
+    teamId,
+    productId,
+    versionId
+  );
 
   const { data: report, isLoading } = useGetSbomReportDetail(
     teamId,

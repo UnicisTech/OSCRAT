@@ -45,7 +45,7 @@ const SelectWithLabel: React.FC<SelectWithLabelProps> = ({
             <label
               htmlFor={selectId}
               className={
-                labelStyle || 'block text-sm font-medium text-gray-700 dark:text-gray-300'
+                labelStyle || 'text-content-secondary block text-sm font-medium'
               }
             >
               {label}
@@ -56,7 +56,7 @@ const SelectWithLabel: React.FC<SelectWithLabelProps> = ({
         </div>
       )}
       {descriptionText && (
-        <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">{descriptionText}</p>
+        <p className="text-content-secondary mb-2 text-sm">{descriptionText}</p>
       )}
       <select
         id={selectId}
@@ -66,7 +66,7 @@ const SelectWithLabel: React.FC<SelectWithLabelProps> = ({
         onBlur={onBlur}
         disabled={disabled}
         required={required}
-        className={`w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-blue-400 dark:focus:ring-blue-400 ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400' : ''} ${className}`
+        className={`border-line text-content-secondary shadow-2 focus:border-primary focus:ring-primary disabled:bg-surface-muted disabled:text-content-muted w-full rounded-md border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed ${error ? 'border-danger-border focus:border-danger focus:ring-danger' : ''} ${className}`
           .trim()
           .replace(/\s+/g, ' ')}
       >
@@ -77,7 +77,7 @@ const SelectWithLabel: React.FC<SelectWithLabelProps> = ({
         ))}
       </select>
       {error && (
-        <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+        <p className="text-danger mt-1 text-sm" role="alert">
           {error}
         </p>
       )}

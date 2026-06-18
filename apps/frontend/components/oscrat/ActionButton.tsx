@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '@/components/button';
 
 interface ActionButtonProps {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -8,6 +9,10 @@ interface ActionButtonProps {
   title?: string;
 }
 
+/**
+ * Compact table/toolbar action button — a thin domain wrapper over the
+ * canonical Button (secondary, small) so all buttons share one styling source.
+ */
 const ActionButton: React.FC<ActionButtonProps> = ({
   onClick,
   disabled = false,
@@ -16,19 +21,16 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   title,
 }) => {
   return (
-    <button
-      onClick={disabled ? undefined : onClick}
+    <Button
+      variant="secondary"
+      size="s"
+      onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs font-medium ${
-        disabled
-          ? 'cursor-not-allowed text-gray-400 opacity-50'
-          : 'cursor-pointer text-gray-700 hover:bg-gray-50'
-      }`}
       title={title}
+      startIcon={icon}
     >
-      <span className="mr-1">{icon}</span>
       {children}
-    </button>
+    </Button>
   );
 };
 

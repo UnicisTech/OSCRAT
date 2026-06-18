@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
-import { ComplianceNamespace, createComplianceTranslator, TECH_DOC_CHECKLIST_NAMESPACE } from '@/lib/compliance/translations';
+import {
+  ComplianceNamespace,
+  createComplianceTranslator,
+  TECH_DOC_CHECKLIST_NAMESPACE,
+} from '@/lib/compliance/translations';
 import { FaPlay, FaCheckCircle, FaRedo, FaClipboardList } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import FullScreenModal from '@/components/shared/FullScreenModal';
+import { Button } from '@/components/shared';
 
 interface AreaListProps {
   areas: ComplianceArea[];
@@ -26,9 +31,13 @@ const AreaList: React.FC<AreaListProps> = ({
   onReset,
   complianceNamespace,
   customTranslations = null,
-}) => { 
+}) => {
   const { t, ready } = useTranslation(['common', complianceNamespace]);
-  const tr = createComplianceTranslator(t, complianceNamespace, customTranslations);
+  const tr = createComplianceTranslator(
+    t,
+    complianceNamespace,
+    customTranslations
+  );
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const hasStarted =
@@ -45,80 +54,79 @@ const AreaList: React.FC<AreaListProps> = ({
   const handleCancelReset = () => {
     setShowResetConfirm(false);
   };
-  
+
   if (!ready) return null;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-h5 text-content font-bold">
           {t('oscrat.ui.areas-of-requirements')}
         </h2>
-        <button
+        <Button
+          tone="danger"
+          variant="primary"
           onClick={() => setShowResetConfirm(true)}
           disabled={!hasStarted}
-          className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors ${
-            hasStarted
-              ? 'bg-red-600 hover:bg-red-700'
-              : 'bg-red-300 cursor-not-allowed'
-          }`}
+          startIcon={<FaRedo />}
         >
-          <FaRedo />
           {t('oscrat.ui.reset-assessment')}
-        </button>
+        </Button>
       </div>
-      
+
       <div className="grid gap-4">
         {areas.map((area, index) => {
-          const isCompleted = completedAreas.some(ca => ca.id === area.id);
+          const isCompleted = completedAreas.some((ca) => ca.id === area.id);
           const progress = getAreaProgress(area.id);
           const isInProgress = progress > 0 && !isCompleted;
 
           return (
             <div
               key={area.id}
-              className={`
-                border rounded-lg p-6 transition-all duration-200 cursor-pointer
-                ${isCompleted 
-                  ? 'border-green-500 bg-green-50 hover:bg-green-100' 
+              className={`cursor-pointer rounded-lg border p-6 transition-all duration-200 ${
+                isCompleted
+                  ? 'border-success bg-success-subtle hover:bg-success-subtle'
                   : isInProgress
-                  ? 'border-blue-500 bg-blue-50 hover:bg-blue-100'
-                  : 'border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
-                }
-              `}
+                    ? 'border-info bg-info-subtle hover:bg-info-subtle'
+                    : 'border-line bg-surface hover:bg-surface-muted hover:border-line'
+              } `}
               onClick={() => onAreaSelect(index)}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-medium text-gray-900">
+                  <div className="mb-2 flex items-center gap-2">
+                    <h3 className="text-h6 text-content font-medium">
                       {area.areaType === 'checklist'
-                        ? t(area.areaOfRequirements, { ns: TECH_DOC_CHECKLIST_NAMESPACE })
+                        ? t(area.areaOfRequirements, {
+                            ns: TECH_DOC_CHECKLIST_NAMESPACE,
+                          })
                         : tr(area.areaOfRequirements)}
                     </h3>
                     {area.optional && (
-                      <span className="text-xs font-medium px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
+                      <span className="text-c1 bg-warning-subtle text-warning rounded-full px-2 py-0.5 font-medium">
                         {t('optional')}
                       </span>
                     )}
                   </div>
                   {(() => {
                     const totalCount = area.content.length;
-                    const actualCompleted = Math.round((progress / 100) * totalCount);
+                    const actualCompleted = Math.round(
+                      (progress / 100) * totalCount
+                    );
 
                     return (
                       <>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-b2 text-content-secondary">
                           {t('oscrat.ui.assessments-completed-of-total', {
                             completed: actualCompleted,
                             total: totalCount,
                           })}
                         </p>
-                        
+
                         {(isInProgress || isCompleted) && (
                           <div className="mt-3">
-                            <div className="flex items-center justify-between text-sm mb-1">
-                              <span className="text-gray-600">
+                            <div className="text-b2 mb-1 flex items-center justify-between">
+                              <span className="text-content-secondary">
                                 {isCompleted
                                   ? t('oscrat.ui.area-complete')
                                   : t('oscrat.ui.assessments-remaining', {
@@ -129,10 +137,10 @@ const AreaList: React.FC<AreaListProps> = ({
                                 {Math.floor(progress)}%
                               </span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-surface-muted h-2 w-full rounded-full">
                               <div
                                 className={`h-2 rounded-full transition-all duration-300 ${
-                                  isCompleted ? 'bg-green-500' : 'bg-blue-500'
+                                  isCompleted ? 'bg-success' : 'bg-primary'
                                 }`}
                                 style={{ width: `${progress}%` }}
                               />
@@ -143,53 +151,58 @@ const AreaList: React.FC<AreaListProps> = ({
                     );
                   })()}
                 </div>
-                
+
                 <div className="ml-4 flex-shrink-0">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAreaSelect(index);
-                      }}
-                      className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-200 transition-colors min-w-[70px]"
-                    aria-label={t(isCompleted ? 'edit' : 'oscrat.ui.start-assessment-area', { area: tr(area.areaOfRequirements) })}
-                    >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAreaSelect(index);
+                    }}
+                    className="hover:bg-surface-muted flex min-w-[70px] flex-col items-center rounded-lg p-2 transition-colors"
+                    aria-label={t(
+                      isCompleted ? 'edit' : 'oscrat.ui.start-assessment-area',
+                      { area: tr(area.areaOfRequirements) }
+                    )}
+                  >
                     {isCompleted ? (
                       <>
-                        <FaCheckCircle className="text-green-500 text-2xl mb-1" />
-                        <span className="text-xs text-green-600 font-medium">
+                        <FaCheckCircle className="text-success mb-1 text-2xl" />
+                        <span className="text-c1 text-success font-medium">
                           {t('edit')}
                         </span>
                       </>
                     ) : area.areaType === 'checklist' ? (
                       <>
-                        <FaClipboardList className="text-blue-600 text-2xl mb-1" />
-                        <span className="text-xs text-blue-600 font-medium whitespace-nowrap">
-                          {isInProgress ? t('continue') : t('oscrat.ui.open-checklist')}
+                        <FaClipboardList className="text-primary mb-1 text-2xl" />
+                        <span className="text-c1 text-primary whitespace-nowrap font-medium">
+                          {isInProgress
+                            ? t('continue')
+                            : t('oscrat.ui.open-checklist')}
                         </span>
                       </>
                     ) : (
                       <>
-                        <FaPlay className="text-blue-600 text-2xl mb-1" />
-                        <span className="text-xs text-blue-600 font-medium whitespace-nowrap">
+                        <FaPlay className="text-primary mb-1 text-2xl" />
+                        <span className="text-c1 text-primary whitespace-nowrap font-medium">
                           {isInProgress ? t('continue') : t('start')}
                         </span>
                       </>
                     )}
-                    </button>
+                  </button>
                 </div>
               </div>
             </div>
           );
         })}
       </div>
-      
+
       {completedAreas.length === areas.length && (
-        <div className="mt-8 p-6 bg-green-100 border border-green-500 rounded-lg text-center">
-          <FaCheckCircle className="text-green-600 text-4xl mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-green-800 mb-2">
+        <div className="bg-success-subtle border-success mt-8 rounded-lg border p-6 text-center">
+          <FaCheckCircle className="text-success mx-auto mb-3 text-4xl" />
+          <h3 className="text-h6 text-success-emphasis mb-2 font-bold">
             {t('oscrat.ui.all-areas-completed')}
           </h3>
-          <p className="text-green-700">
+          <p className="text-success">
             {t('oscrat.ui.compliance-assessment-ready-for-submission')}
           </p>
         </div>

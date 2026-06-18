@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Loading } from '@/components/shared';
 import app from '@/lib/app';
+import { formatDateShort } from '@/utils/dateFormat';
 
 export interface PublicDocumentationData {
   id: string;
@@ -46,13 +47,16 @@ const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
 
   if (isError || !doc) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+      <div className="bg-surface-muted flex min-h-screen flex-col items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900">404</h1>
-          <p className="mt-2 text-lg text-gray-600">
+          <h1 className="text-content text-4xl font-bold">404</h1>
+          <p className="text-content-secondary mt-2 text-lg">
             {t('oscrat.ui.documentation.public.not-found')}
           </p>
-          <Link href="/" className="mt-4 inline-block text-blue-600 hover:underline">
+          <Link
+            href="/"
+            className="text-primary mt-4 inline-block hover:underline"
+          >
             {t('oscrat.ui.go-home')}
           </Link>
         </div>
@@ -74,13 +78,13 @@ const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
         <meta name="description" content={metaDescription} />
       </Head>
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="bg-surface-muted min-h-screen">
         {/* Header */}
-        <header className="border-b bg-white shadow-sm">
+        <header className="bg-surface shadow-2 border-b">
           <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-4">
               <img src={app.logoUrl} alt={app.name} className="h-10" />
-              <span className="text-lg font-medium text-gray-700">
+              <span className="text-content-secondary text-lg font-medium">
                 {t('oscrat.ui.documentation.public.header')}
               </span>
             </div>
@@ -89,36 +93,44 @@ const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
 
         {/* Main Content */}
         <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-          <article className="rounded-lg border bg-white p-8 shadow-sm">
+          <article className="bg-surface rounded-card border-line border p-8">
             {/* Document Header */}
             <header className="mb-8 border-b pb-6">
-              <h1 className="text-3xl font-bold text-gray-900">{doc.title}</h1>
-              <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+              <h1 className="text-content text-3xl font-bold">{doc.title}</h1>
+              <div className="text-content-muted mt-3 flex flex-wrap items-center gap-4 text-sm">
                 {displayBadge && (
-                  <span className="rounded-full bg-blue-100 px-3 py-1 text-blue-700">
+                  <span className="bg-info-subtle text-info-emphasis rounded-full px-3 py-1">
                     {displayBadge}
                   </span>
                 )}
                 <span>
-                  {t('oscrat.ui.documentation.public.version', { version: doc.version })}
+                  {t('oscrat.ui.documentation.public.version', {
+                    version: doc.version,
+                  })}
                 </span>
                 <span>
                   {t('oscrat.ui.documentation.public.updated', {
-                    date: new Date(doc.updatedAt).toLocaleDateString(),
+                    date: formatDateShort(doc.updatedAt),
                   })}
                 </span>
               </div>
             </header>
 
             {/* Document Content */}
-            <div className="prose prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{doc.content}</ReactMarkdown>
+            <div className="prose prose-gray prose-headings:text-content prose-p:text-content-secondary prose-li:text-content-secondary prose-strong:text-content max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {doc.content}
+              </ReactMarkdown>
             </div>
           </article>
 
           {/* Footer */}
-          <footer className="mt-8 text-center text-sm text-gray-500">
-            <p>{t('oscrat.ui.documentation.public.footer', { appName: app.name })}</p>
+          <footer className="text-content-muted mt-8 text-center text-sm">
+            <p>
+              {t('oscrat.ui.documentation.public.footer', {
+                appName: app.name,
+              })}
+            </p>
           </footer>
         </main>
       </div>

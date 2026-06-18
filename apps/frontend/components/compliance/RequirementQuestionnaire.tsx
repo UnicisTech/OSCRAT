@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
-import { 
-  ComplianceArea, 
-  ComplianceRequirement, 
+import {
+  ComplianceArea,
+  ComplianceRequirement,
   RequirementAssessment,
   ComplianceAnswer,
-  ComplianceStatus
+  ComplianceStatus,
 } from '@/types/compliance';
-import { ComplianceNamespace, createComplianceTranslator } from '@/lib/compliance/translations';
-import { QuestionStep, ComplianceStatusSelector } from '@/components/compliance';
+import {
+  ComplianceNamespace,
+  createComplianceTranslator,
+} from '@/lib/compliance/translations';
+import {
+  QuestionStep,
+  ComplianceStatusSelector,
+} from '@/components/compliance';
 import { LuInfo } from 'react-icons/lu';
 
 interface RequirementQuestionnaireProps {
@@ -35,15 +41,21 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
   customTranslations = null,
 }) => {
   const { t, ready } = useTranslation(['common', complianceNamespace]);
-  const tr = createComplianceTranslator(t, complianceNamespace, customTranslations);
+  const tr = createComplianceTranslator(
+    t,
+    complianceNamespace,
+    customTranslations
+  );
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<ComplianceAnswer[]>(() => 
-    existingAssessment?.requirementId === requirement.reqId 
-      ? existingAssessment.answers 
+  const [answers, setAnswers] = useState<ComplianceAnswer[]>(() =>
+    existingAssessment?.requirementId === requirement.reqId
+      ? existingAssessment.answers
       : []
   );
-  const [complianceStatus, setComplianceStatus] = useState<ComplianceStatus | undefined>(
-    existingAssessment?.requirementId === requirement.reqId 
+  const [complianceStatus, setComplianceStatus] = useState<
+    ComplianceStatus | undefined
+  >(
+    existingAssessment?.requirementId === requirement.reqId
       ? existingAssessment.complianceStatus
       : undefined
   );
@@ -55,7 +67,7 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
     setCurrentQuestionIndex(0);
     setShowStatusSelection(false);
     setShowHint(false);
-    
+
     // Only use existing answers if they belong to this requirement
     if (existingAssessment?.requirementId === requirement.reqId) {
       setAnswers(existingAssessment.answers);
@@ -67,22 +79,26 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
   }, [requirement.reqId, existingAssessment?.requirementId]);
 
   const currentQuestion = requirement.questions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === requirement.questions.length - 1;
+  const isLastQuestion =
+    currentQuestionIndex === requirement.questions.length - 1;
   const totalQuestions = requirement.questions.length;
-  const progress = totalQuestions > 0 ? (answers.length / totalQuestions) * 100 : 0;
+  const progress =
+    totalQuestions > 0 ? (answers.length / totalQuestions) * 100 : 0;
 
   if (!currentQuestion) return null;
 
   const handleAnswerSubmit = (answer: ComplianceAnswer) => {
     const newAnswers = [...answers];
-    const existingIndex = newAnswers.findIndex(a => a.questionId === answer.questionId);
-    
+    const existingIndex = newAnswers.findIndex(
+      (a) => a.questionId === answer.questionId
+    );
+
     if (existingIndex >= 0) {
       newAnswers[existingIndex] = answer;
     } else {
       newAnswers.push(answer);
     }
-    
+
     setAnswers(newAnswers);
 
     if (isLastQuestion) {
@@ -112,28 +128,34 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
       complianceStatus: status,
       assessedAt: new Date().toISOString(),
     };
-    
+
     onComplete(assessment);
   };
 
-  const getExistingAnswer = (questionId: string): ComplianceAnswer | undefined => {
-    return answers.find(a => a.questionId === questionId);
+  const getExistingAnswer = (
+    questionId: string
+  ): ComplianceAnswer | undefined => {
+    return answers.find((a) => a.questionId === questionId);
   };
 
   if (!ready || !currentQuestion) return null;
 
   if (showStatusSelection) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+      <div className="mx-auto max-w-4xl">
+        <div className="bg-surface border-line rounded-card border p-8">
+          <h2 className="text-h5 text-content mb-6 font-bold">
             {t('oscrat.ui.requirement-assessment-complete')}
           </h2>
-          
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium text-gray-700 mb-2">{tr(requirement.requirement)}</h3>
-            <p className="text-sm text-gray-600">
-              {t('oscrat.ui.answered-all-questions', { count: requirement.questions.length })}
+
+          <div className="bg-surface-muted mb-6 rounded-lg p-4">
+            <h3 className="text-content-secondary mb-2 font-medium">
+              {tr(requirement.requirement)}
+            </h3>
+            <p className="text-b2 text-content-secondary">
+              {t('oscrat.ui.answered-all-questions', {
+                count: requirement.questions.length,
+              })}
             </p>
           </div>
 
@@ -147,60 +169,72 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl">
       {/* Header: area + requirement info */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-semibold text-gray-800">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-h5 text-content font-bold">
             {tr(area.areaOfRequirements)}
           </h2>
-          <span className="text-sm text-gray-600">
-            {t('oscrat.ui.requirement-n-of-m', { 
-              current: requirementIndex + 1, 
-              total: totalRequirements 
+          <span className="text-b2 text-content-secondary">
+            {t('oscrat.ui.requirement-n-of-m', {
+              current: requirementIndex + 1,
+              total: totalRequirements,
             })}
           </span>
         </div>
       </div>
 
       {/* Requirement info card */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="flex items-start justify-between mb-4">
+      <div className="bg-surface border-line rounded-card mb-6 border p-6">
+        <div className="mb-4 flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-h6 text-content mb-2 font-medium">
               {tr(requirement.requirement)}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-b2 text-content-muted">
               {t('oscrat.ui.cra-reference')}: {requirement.craReference}
             </p>
           </div>
           <button
             onClick={() => setShowHint(!showHint)}
-            className="ml-4 p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="text-primary hover:bg-info-subtle ml-4 rounded-lg p-2 transition-colors"
             aria-label={t('oscrat.ui.toggle-hint')}
           >
-            <LuInfo className="text-xl" />
+            <LuInfo className="text-h5" />
           </button>
         </div>
 
         {showHint && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          <div className="bg-info-subtle mt-4 rounded-lg p-4">
             {requirement.hint && (
               <>
-                <h4 className="font-medium text-blue-900 mb-2">{t('oscrat.ui.hint')}</h4>
-                <p className="text-sm text-blue-800 leading-relaxed">{tr(requirement.hint!)}</p>
+                <h4 className="text-info-emphasis mb-2 font-medium">
+                  {t('oscrat.ui.hint')}
+                </h4>
+                <p className="text-b2 text-info-emphasis leading-relaxed">
+                  {tr(requirement.hint!)}
+                </p>
               </>
             )}
             {requirement.genericTask && (
-              <div className={requirement.hint ? "mt-3 pt-3 border-t border-blue-200" : ""}>
-                <h5 className="text-xs font-medium text-blue-700 uppercase tracking-wide mb-1">
+              <div
+                className={
+                  requirement.hint ? 'border-info mt-3 border-t pt-3' : ''
+                }
+              >
+                <h5 className="text-c1 text-info-emphasis mb-1 font-medium uppercase tracking-wide">
                   {t('oscrat.ui.generic-task')}
                 </h5>
-                <p className="text-sm text-blue-800">{requirement.genericTask}</p>
+                <p className="text-b2 text-info-emphasis">
+                  {requirement.genericTask}
+                </p>
               </div>
             )}
             {!requirement.hint && !requirement.genericTask && (
-              <p className="text-sm text-gray-600 italic">{t('oscrat.ui.no-additional-info')}</p>
+              <p className="text-b2 text-content-secondary italic">
+                {t('oscrat.ui.no-additional-info')}
+              </p>
             )}
           </div>
         )}
@@ -208,19 +242,21 @@ const RequirementQuestionnaire: React.FC<RequirementQuestionnaireProps> = ({
 
       {/* Question progress bar */}
       <div className="mb-4">
-        <div className="flex items-center justify-between text-sm mb-1">
-          <span className="text-gray-600">
+        <div className="text-b2 mb-1 flex items-center justify-between">
+          <span className="text-content-secondary">
             {t('oscrat.ui.questions-progress', {
               answered: answers.length,
               total: totalQuestions,
               remaining: totalQuestions - answers.length,
             })}
           </span>
-          <span className="font-medium text-gray-700">{Math.round(progress)}%</span>
+          <span className="text-content-secondary font-medium">
+            {Math.round(progress)}%
+          </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="bg-surface-muted h-2 w-full rounded-full">
           <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            className="bg-primary h-2 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>

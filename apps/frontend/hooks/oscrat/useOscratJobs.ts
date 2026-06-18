@@ -58,7 +58,11 @@ export function useOscratVersionSbomReports(
     productId,
     versionId
   );
-  const deleteSbomReportMutation = useDeleteSbomReport(teamId, productId, versionId);
+  const deleteSbomReportMutation = useDeleteSbomReport(
+    teamId,
+    productId,
+    versionId
+  );
   const invalidateSbomReports = useInvalidateSbomReports();
 
   const createRepoSbomReport = async (data: CreateSbomJobRequest) => {
@@ -124,12 +128,10 @@ export function useOscratVersionVulnerabilityScanReports(
     useCreateRepoVulnerabilityScanReport(teamId, productId, versionId);
   const createSbomReportVulnerabilityScanMutation =
     useCreateSbomReportVulnerabilityScan(teamId, productId, versionId);
-  const deleteVulnerabilityScanReportMutation = useDeleteVulnerabilityScanReport(
-    teamId,
-    productId,
-    versionId
-  );
-  const invalidateVulnerabilityScanReports = useInvalidateVulnerabilityScanReports();
+  const deleteVulnerabilityScanReportMutation =
+    useDeleteVulnerabilityScanReport(teamId, productId, versionId);
+  const invalidateVulnerabilityScanReports =
+    useInvalidateVulnerabilityScanReports();
 
   const createRepoVulnerabilityScanReport = async (
     data: CreateVulnerabilityScanJobRequest
@@ -193,12 +195,10 @@ export function useOscratVersionConfigurationScanReports(
 
   const createFileConfigurationScanReportMutation =
     useCreateFileConfigurationScanReport(teamId, productId, versionId);
-  const deleteConfigurationScanReportMutation = useDeleteConfigurationScanReport(
-    teamId,
-    productId,
-    versionId
-  );
-  const invalidateConfigurationScanReports = useInvalidateConfigurationScanReports();
+  const deleteConfigurationScanReportMutation =
+    useDeleteConfigurationScanReport(teamId, productId, versionId);
+  const invalidateConfigurationScanReports =
+    useInvalidateConfigurationScanReports();
 
   const createFileConfigurationScanReport = async (file: File) => {
     const formData = new FormData();

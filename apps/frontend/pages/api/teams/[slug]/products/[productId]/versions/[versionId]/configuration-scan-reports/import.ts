@@ -28,9 +28,7 @@ interface SupportedFormat {
   version: string;
 }
 
-const toSupportedFormat = (
-  format: DetectedFormat
-): SupportedFormat | null => {
+const toSupportedFormat = (format: DetectedFormat): SupportedFormat | null => {
   switch (format.kind) {
     case CONFIGURATION_SCAN_FORMAT_KIND.ARF:
       return SUPPORTED_ARF_VERSIONS.has(format.version)
@@ -38,11 +36,17 @@ const toSupportedFormat = (
         : null;
     case CONFIGURATION_SCAN_FORMAT_KIND.XCCDF:
       return SUPPORTED_XCCDF_VERSIONS.has(format.version)
-        ? { prismaFormat: ConfigurationScanFormat.XCCDF, version: format.version }
+        ? {
+            prismaFormat: ConfigurationScanFormat.XCCDF,
+            version: format.version,
+          }
         : null;
     case CONFIGURATION_SCAN_FORMAT_KIND.OVAL:
       return isOval5(format.version)
-        ? { prismaFormat: ConfigurationScanFormat.OVAL, version: format.version }
+        ? {
+            prismaFormat: ConfigurationScanFormat.OVAL,
+            version: format.version,
+          }
         : null;
     case CONFIGURATION_SCAN_FORMAT_KIND.UNKNOWN:
       return null;
@@ -149,10 +153,7 @@ const handlePOST = async (
 
     res.status(201).json({ data: report });
   } catch (error: unknown) {
-    console.error(
-      '[Configuration Scan Reports API] File import error:',
-      error
-    );
+    console.error('[Configuration Scan Reports API] File import error:', error);
 
     if (error instanceof ApiError) {
       throw error;

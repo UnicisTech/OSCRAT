@@ -1,3 +1,5 @@
+import { formatDateTime } from '@/utils/dateFormat';
+
 const badge = { bg: 'bg-gray-100', text: 'text-gray-700' } as const;
 
 export const crudConfig = {
@@ -16,14 +18,5 @@ export const getCrudConfig = (crud: string) =>
     text: 'text-gray-700',
   };
 
-export const formatTimestamp = (date: Date | string, includeSeconds = false) => {
-  const d = new Date(date);
-  return d.toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    ...(includeSeconds && { second: '2-digit' }),
-  });
-};
+export const formatTimestamp = (date: Date | string, includeSeconds = false) =>
+  formatDateTime(date, includeSeconds);

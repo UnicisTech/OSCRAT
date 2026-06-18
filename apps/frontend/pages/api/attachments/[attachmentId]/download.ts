@@ -1,6 +1,9 @@
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import { getAttachmentWithFileById, getAttachmentLinkedEntity } from '@oscrat/model/operations';
+import {
+  getAttachmentWithFileById,
+  getAttachmentLinkedEntity,
+} from '@oscrat/model/operations';
 import { createAuditContext, CrudType, EntityType } from '@oscrat/model/audit';
 import { prisma } from '@/lib/prisma';
 import { ApiError } from '@/lib/errors';
@@ -29,7 +32,10 @@ const handleGET = async (
 ) => {
   const { attachmentId } = req.query;
 
-  const attachment = await getAttachmentWithFileById(prisma, attachmentId as string);
+  const attachment = await getAttachmentWithFileById(
+    prisma,
+    attachmentId as string
+  );
 
   if (!attachment) {
     throw new ApiError(404, 'oscrat.ui.validation.attachment-not-found');
@@ -54,7 +60,11 @@ const handleGET = async (
     crud: CrudType.Read,
     user: audit.user,
     team: audit.team,
-    target: { id: attachment.id, name: attachment.name, type: EntityType.Attachment },
+    target: {
+      id: attachment.id,
+      name: attachment.name,
+      type: EntityType.Attachment,
+    },
     productId: audit.productId,
     versionId: audit.versionId,
     metadata,

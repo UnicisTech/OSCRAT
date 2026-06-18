@@ -8,7 +8,10 @@ interface FullDocTemplateProps {
   onChange: (data: FullDocData) => void;
 }
 
-export default function FullDocTemplate({ data, onChange }: FullDocTemplateProps) {
+export default function FullDocTemplate({
+  data,
+  onChange,
+}: FullDocTemplateProps) {
   const { t } = useTranslation('common');
 
   const handleChange = (field: keyof FullDocData, value: string) => {
@@ -16,8 +19,8 @@ export default function FullDocTemplate({ data, onChange }: FullDocTemplateProps
   };
 
   return (
-    <div className="max-h-[60vh] space-y-6 overflow-y-auto rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-600 dark:bg-gray-800">
-      <h3 className="text-center text-lg font-bold uppercase text-gray-900 dark:text-white">
+    <div className="border-line bg-surface rounded-card max-h-[60vh] space-y-6 overflow-y-auto border p-6">
+      <h3 className="text-content text-center text-lg font-bold uppercase">
         {t('oscrat.ui.doc.full-declaration-title')}
       </h3>
 
@@ -66,7 +69,10 @@ export default function FullDocTemplate({ data, onChange }: FullDocTemplateProps
       </FormSection>
 
       {/* Section 2b: Authorised Representative */}
-      <FormSection number="2.b" title={t('oscrat.ui.doc.authorised-representative')}>
+      <FormSection
+        number="2.b"
+        title={t('oscrat.ui.doc.authorised-representative')}
+      >
         <FormField
           label={t('name')}
           value={data.authorisedRepName}
@@ -82,8 +88,11 @@ export default function FullDocTemplate({ data, onChange }: FullDocTemplateProps
       </FormSection>
 
       {/* Section 3: Declaration of Responsibility */}
-      <FormSection number="3" title={t('oscrat.ui.doc.declaration-of-responsibility')}>
-        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+      <FormSection
+        number="3"
+        title={t('oscrat.ui.doc.declaration-of-responsibility')}
+      >
+        <p className="text-content-secondary mt-2 text-sm">
           {t('oscrat.ui.doc.declaration-responsibility-text')}
         </p>
       </FormSection>
@@ -101,8 +110,11 @@ export default function FullDocTemplate({ data, onChange }: FullDocTemplateProps
       </FormSection>
 
       {/* Section 5: Statement of Conformity */}
-      <FormSection number="5" title={t('oscrat.ui.doc.statement-of-conformity')}>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+      <FormSection
+        number="5"
+        title={t('oscrat.ui.doc.statement-of-conformity')}
+      >
+        <p className="text-content-secondary text-sm">
           {t('oscrat.ui.doc.statement-conformity-intro')}
         </p>
         <FormField
@@ -116,7 +128,10 @@ export default function FullDocTemplate({ data, onChange }: FullDocTemplateProps
       </FormSection>
 
       {/* Section 6: Standards and Specifications */}
-      <FormSection number="6" title={t('oscrat.ui.doc.standards-specifications')}>
+      <FormSection
+        number="6"
+        title={t('oscrat.ui.doc.standards-specifications')}
+      >
         <FormField
           label=""
           value={data.standardsAndSpecs}
@@ -157,7 +172,7 @@ Certificate Identification: [Certificate Number]`}
       </FormSection>
 
       {/* Signature Section */}
-      <div className="space-y-3 border-t border-gray-200 pt-4 dark:border-gray-600">
+      <div className="border-line-subtle space-y-3 border-t pt-4">
         <FormField
           label={t('oscrat.ui.doc.signed-for')}
           value={data.manufacturerName}
@@ -182,8 +197,10 @@ Certificate Identification: [Certificate Number]`}
           placeholder="[CEO, Head of Compliance, etc.]"
         />
         <div>
-          <label className={docFormStyles.label}>{t('oscrat.ui.doc.signature')}</label>
-          <div className="h-16 rounded-md border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700" />
+          <label className={docFormStyles.label}>
+            {t('oscrat.ui.doc.signature')}
+          </label>
+          <div className="border-line bg-surface-muted rounded-input h-16 border" />
         </div>
       </div>
     </div>

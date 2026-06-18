@@ -1522,8 +1522,8 @@
         "declaration-of-conformity": "Declaration of Conformity",
         "car-required": "A Conformity Assessment Report is required before creating a Declaration of Conformity.",
         "car-options": "You can either upload a third-party assessment report (PDF/XLS) or complete the self-assessment questionnaire.",
-        "complete-self-assessment": "Complete Self-Assessment Questionnaire",
-        "upload-car": "Upload Conformity Assessment Report",
+        "complete-self-assessment": "Complete Questionnaire",
+        "upload-car": "Upload Report",
         "car-file-types": "PDF or Excel (XLS, XLSX)",
         "car-invalid-file-type": "Only PDF and Excel (XLS/XLSX) files are allowed for Conformity Assessment Reports.",
         "car-uploaded": "Conformity Assessment Report uploaded successfully",
@@ -1921,5 +1921,4 @@
     "REPO_001": "Repository operation failed - check repository access and credentials",
     "UNKNOWN": "An unexpected error occurred"
   }
-
 }

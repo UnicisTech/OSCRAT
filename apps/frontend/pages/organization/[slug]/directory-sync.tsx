@@ -11,7 +11,7 @@ import { GetServerSidePropsContext } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import { toast } from 'react-hot-toast';
 import type { NextPageWithLayout } from 'types';
 import env from '@/lib/env';
@@ -64,20 +64,14 @@ const DirectorySync: NextPageWithLayout<
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm">{t('provision')}</p>
             {directory === null ? (
-              <Button
-                onClick={() => setVisible(!visible)}
-                variant="outline"
-                color="primary"
-                size="md"
-              >
+              <Button onClick={() => setVisible(!visible)} variant="secondary">
                 {t('configure')}
               </Button>
             ) : (
               <Button
                 onClick={() => setConfirmationDialogVisible(true)}
-                variant="outline"
-                color="error"
-                size="md"
+                tone="danger"
+                variant="secondary"
               >
                 {t('remove')}
               </Button>

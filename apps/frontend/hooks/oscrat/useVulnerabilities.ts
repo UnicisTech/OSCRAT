@@ -6,7 +6,8 @@ import {
   OscratProductVulnerabilityStatus,
 } from '@oscrat/model';
 
-const OPEN_STATUSES = OPEN_VULNERABILITY_STATUSES as readonly OscratProductVulnerabilityStatus[];
+const OPEN_STATUSES =
+  OPEN_VULNERABILITY_STATUSES as readonly OscratProductVulnerabilityStatus[];
 
 export function useVulnerabilities(
   teamId: string,
@@ -20,12 +21,8 @@ export function useVulnerabilities(
     error,
   } = useGetVulnerabilities(teamId, productId, versionId);
 
-  const {
-    createVulnerability,
-    deleteVulnerability,
-    isCreating,
-    isDeleting,
-  } = useVulnerabilityCrud(teamId, productId, versionId);
+  const { createVulnerability, deleteVulnerability, isCreating, isDeleting } =
+    useVulnerabilityCrud(teamId, productId, versionId);
 
   const openCount = useMemo(() => {
     if (!vulnerabilities) return 0;

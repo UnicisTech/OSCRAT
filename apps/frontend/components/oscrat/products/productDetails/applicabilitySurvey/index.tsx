@@ -10,6 +10,7 @@ import {
 import { useTeamContext } from '@/context/TeamContext';
 import type { OscratProductDetail } from '@oscrat/model';
 import toast from 'react-hot-toast';
+import Button from '@/components/button';
 import CraViewModal from './CraViewModal';
 
 interface ApplicabilitySurveySectionProps {
@@ -27,35 +28,43 @@ export default function ApplicabilitySurveySection({
   const {
     data: assessmentsResponse,
     isLoading: isLoadingAssessments,
-    error: assessmentsError
-  } = useFindAssessments(slug, { productId: product.id }, {
-    enabled: !!product.id && !!slug,
-  });
+    error: assessmentsError,
+  } = useFindAssessments(
+    slug,
+    { productId: product.id },
+    {
+      enabled: !!product.id && !!slug,
+    }
+  );
 
   const assessments = assessmentsResponse || [];
-  
+
   const latestCRAAssessment = useMemo(() => {
     if (assessments.length === 0) {
       return undefined;
     }
-    
+
     const craAssessments = assessments.filter(
       (a) => a.type === OscratAssessmentType.CRA
     );
-    
+
     if (craAssessments.length === 0) {
       return undefined;
     }
-    
+
     return craAssessments.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )[0];
   }, [assessments]);
 
   const { data: assessmentDetailResponse } = useGetAssessmentDetail(
     slug,
     latestCRAAssessment?.id || '',
-    { enabled: showViewModal && !!latestCRAAssessment && !!latestCRAAssessment.id }
+    {
+      enabled:
+        showViewModal && !!latestCRAAssessment && !!latestCRAAssessment.id,
+    }
   );
 
   const assessmentDetail = assessmentDetailResponse || null;
@@ -95,35 +104,34 @@ export default function ApplicabilitySurveySection({
         onClose={() => setShowViewModal(false)}
         assessment={assessmentDetail}
       />
-      <div className="my-4 flex w-full items-center justify-between rounded-md border border-gray-400 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
-        <h3 className="text-sm font-medium text-black dark:text-gray-100">
+      <div className="border-line bg-surface rounded-card my-4 flex w-full items-center justify-between border px-4 py-3">
+        <h3 className="text-sm font-medium text-black">
           {t('oscrat.ui.applicability-survey')}
         </h3>
         <div className="flex items-center space-x-2">
-          <button
+          <Button
+            variant="secondary"
+            size="m"
             onClick={handleView}
             disabled={!hasAssessment || isLoadingAssessments}
-            className={`flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-              hasAssessment && !isLoadingAssessments
-                ? 'text-black hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
-                : 'cursor-not-allowed text-gray-400 opacity-50'
-            }`}
+            startIcon={<FaRegEye />}
           >
-            <FaRegEye className="mr-1.5" />
-            {isLoadingAssessments ? t('oscrat.ui.loading') : t('oscrat.ui.view')}
-          </button>
-          <button
+            {isLoadingAssessments
+              ? t('oscrat.ui.loading')
+              : t('oscrat.ui.view')}
+          </Button>
+          <Button
+            variant="secondary"
+            size="m"
             onClick={handleRetake}
-            className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-black transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            startIcon={<FaPencilAlt />}
           >
-            <FaPencilAlt className="mr-1.5" />
             {hasAssessment
               ? t('oscrat.ui.edit-retake')
               : t('oscrat.ui.take-survey')}
-          </button>
+          </Button>
         </div>
       </div>
     </>
   );
 }
-

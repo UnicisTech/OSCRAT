@@ -20,7 +20,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
   <div>
     <label
       htmlFor={id}
-      className="mb-1 block text-sm font-medium text-gray-700"
+      className="text-content-secondary mb-1 block text-sm font-medium"
     >
       {label}
     </label>
@@ -31,7 +31,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+      className="border-line placeholder-content-placeholder shadow-2 focus:border-primary focus:ring-primary rounded-input block w-full border px-3 py-2 focus:outline-none sm:text-sm"
     />
   </div>
 );

@@ -32,7 +32,10 @@ const handleGET = async (
   const data = getTeamComplianceData(role);
 
   if (!data) {
-    throw new ApiError(404, `Team compliance data not found for role "${role}"`);
+    throw new ApiError(
+      404,
+      `Team compliance data not found for role "${role}"`
+    );
   }
 
   res.status(200).json({

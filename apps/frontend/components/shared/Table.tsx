@@ -11,9 +11,9 @@ type TableProps = {
 
 function Table({ body, head }: TableProps) {
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-        <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+    <div className="overflow-x-auto">
+      <table className="text-content-secondary w-full text-left text-sm">
+        <thead className="bg-surface-muted text-content border-b border-line-header">
           <tr>{head}</tr>
         </thead>
         <tbody>{body}</tbody>
@@ -29,7 +29,7 @@ type ThProps = {
 };
 
 const Th: React.FC<ThProps> = ({ children, className, style }) => {
-  const classes = ['px-6 py-3 text-left'];
+  const classes = ['p-4 text-b2 font-medium text-left'];
 
   if (className) classes.push(className);
 
@@ -51,7 +51,7 @@ type TrProps = {
 const Tr: React.FC<TrProps> = ({ children, onClick, style }) => {
   return (
     <tr
-      className="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
+      className="bg-surface border-line-subtle border-b"
       onClick={onClick}
       style={style}
     >
@@ -69,7 +69,7 @@ type TdProps = {
 
 const Td: React.FC<TdProps> = ({ children, colSpan, style, ...rest }) => {
   return (
-    <td className="px-6 py-4" colSpan={colSpan} style={style} {...rest}>
+    <td className="p-4" colSpan={colSpan} style={style} {...rest}>
       {children}
     </td>
   );

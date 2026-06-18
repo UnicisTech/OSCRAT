@@ -2,7 +2,11 @@ import { ApiError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
 import { sendEvent } from '@/lib/svix';
 import { Role } from '@oscrat/model';
-import { getTeamMembers, removeTeamMember, updateTeamMemberRole } from 'models/team';
+import {
+  getTeamMembers,
+  removeTeamMember,
+  updateTeamMemberRole,
+} from 'models/team';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import { updateMemberRoleSchema } from '@/lib/validation/team';
 import { validateRequest } from '@/lib/validation/validateRequest';

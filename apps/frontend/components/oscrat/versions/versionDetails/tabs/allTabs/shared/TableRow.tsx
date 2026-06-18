@@ -7,12 +7,13 @@ interface TableRowProps {
   className?: string;
 }
 
-const TableRow: React.FC<TableRowProps> = ({ children, onClick, className }) => {
+const TableRow: React.FC<TableRowProps> = ({
+  children,
+  onClick,
+  className,
+}) => {
   return (
-    <tr
-      className={`${tableStyles.tr} ${className || ''}`}
-      onClick={onClick}
-    >
+    <tr className={`${tableStyles.tr} ${className || ''}`} onClick={onClick}>
       {children}
     </tr>
   );

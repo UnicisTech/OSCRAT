@@ -9,11 +9,10 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import toast from 'react-hot-toast';
 import type { NextPageWithLayout } from 'types';
 import { extractErrorMessage } from '@/lib/utils';
-
 
 const AcceptTeamInvitation: NextPageWithLayout = () => {
   const { status, data } = useSession();
@@ -23,16 +22,17 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
   const { mutateAsync: acceptInvitationMutation, isPending } =
     useAcceptInvitation();
 
-
   const acceptInvitation = async () => {
     if (!invitation) return;
-    
+
     try {
       await acceptInvitationMutation({ token: invitation.token });
       toast.success(t('oscrat.ui.invitation-accepted'));
       router.push(`/organization`);
     } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-accept-invitation')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-accept-invitation'))
+      );
     }
   };
 
@@ -41,7 +41,11 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
   }
 
   if (error || !invitation) {
-    return <Error message={(error as any)?.message || t('oscrat.ui.invitation-not-found')} />;
+    return (
+      <Error
+        message={(error as any)?.message || t('oscrat.ui.invitation-not-found')}
+      />
+    );
   }
 
   const emailMatch = data?.user?.email === invitation.email;
@@ -51,35 +55,33 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
       <Head>
         <title>{`${t('invitation-title')} ${invitation.team.name}`}</title>
       </Head>
-      <div className="rounded border-2 border-gray-300 bg-white p-6 shadow-lg">
+      <div className="border-line bg-surface shadow-8 rounded border-2 p-6">
         <div className="flex flex-col items-center space-y-6">
-          <h2 className="font-bold text-xl text-gray-900">
+          <h2 className="text-content text-xl font-bold">
             {`${invitation.team.name} ${t('team-invite')}`}
           </h2>
 
           {/* User not authenticated */}
           {status === 'unauthenticated' && (
             <>
-              <h3 className="text-center text-base text-gray-800">{t('invite-create-account')}</h3>
+              <h3 className="text-content text-center text-base">
+                {t('invite-create-account')}
+              </h3>
               <Button
-                variant="outline"
+                variant="secondary"
                 fullWidth
                 onClick={() => {
                   router.push(`/auth/join?token=${invitation.token}`);
                 }}
-                size="md"
-                className="text-gray-800 border-gray-400 hover:text-gray-900 hover:border-gray-500 hover:bg-gray-50"
               >
                 {t('create-a-new-account')}
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 fullWidth
                 onClick={() => {
                   router.push(`/auth/login?token=${invitation.token}`);
                 }}
-                size="md"
-                className="text-gray-800 border-gray-400 hover:text-gray-900 hover:border-gray-500 hover:bg-gray-50"
               >
                 {t('login')}
               </Button>
@@ -89,15 +91,15 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
           {/* User authenticated and email matches */}
           {status === 'authenticated' && emailMatch && (
             <>
-              <h3 className="text-center text-base text-gray-800">{t('accept-invite')}</h3>
+              <h3 className="text-content text-center text-base">
+                {t('accept-invite')}
+              </h3>
               <Button
                 onClick={acceptInvitation}
                 fullWidth
-                color="primary"
-                size="md"
+                variant="primary"
                 loading={isPending}
                 disabled={isPending}
-                className="text-white font-medium"
               >
                 {t('accept-invitation')}
               </Button>
@@ -107,19 +109,17 @@ const AcceptTeamInvitation: NextPageWithLayout = () => {
           {/* User authenticated and email does not match */}
           {status === 'authenticated' && !emailMatch && (
             <>
-              <p className="text-center text-sm text-gray-700">{`${t('oscrat.ui.email-mismatch-1')} ${data?.user?.email} ${t('oscrat.ui.email-mismatch-2')}`}</p>
-              <p className="text-center text-sm text-gray-700">
+              <p className="text-content-secondary text-center text-sm">{`${t('oscrat.ui.email-mismatch-1')} ${data?.user?.email} ${t('oscrat.ui.email-mismatch-2')}`}</p>
+              <p className="text-content-secondary text-center text-sm">
                 {t('oscrat.ui.email-mismatch-instructions')}
               </p>
               <Button
                 fullWidth
-                color="error"
-                size="md"
-                variant="outline"
+                tone="danger"
+                variant="secondary"
                 onClick={() => {
                   signOut();
                 }}
-                className="text-red-700 border-red-400 hover:text-red-800 hover:border-red-500 hover:bg-red-50 font-medium"
               >
                 {t('sign-out')}
               </Button>

@@ -1,6 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import Button from '@/components/button';
-import { StepProps, RiskAnswer, CraAnswer, ApplicabilityQuestion, RiskQuestion } from '@oscrat/model';
+import {
+  StepProps,
+  RiskAnswer,
+  CraAnswer,
+  ApplicabilityQuestion,
+  RiskQuestion,
+} from '@oscrat/model';
 import { useTranslation } from 'next-i18next';
 import { isApplicabilityAnswer } from '@/types/craForm';
 import { LuInfo } from 'react-icons/lu';
@@ -40,56 +46,65 @@ const Step: React.FC<StepProps> = ({
     }
   }, [router, status, session]);
 
-  const handleNext = useCallback((selectedAnswer: CraAnswer | null) => {
-    if (!selectedAnswer) return;
+  const handleNext = useCallback(
+    (selectedAnswer: CraAnswer | null) => {
+      if (!selectedAnswer) return;
 
-    const isEliminatory = isApplicabilityAnswer(selectedAnswer) ? selectedAnswer.isEliminatory : false;
-    const skipToQuestion = selectedAnswer.skipToQuestion;
+      const isEliminatory = isApplicabilityAnswer(selectedAnswer)
+        ? selectedAnswer.isEliminatory
+        : false;
+      const skipToQuestion = selectedAnswer.skipToQuestion;
 
-    // Handle skip logic
-    if (skipToQuestion) {
-      const targetStep = getStepNumberById(allSteps, skipToQuestion);
-      onSkip?.(activeStep, targetStep);
-      setStep(targetStep);
-      return;
-    }
+      // Handle skip logic
+      if (skipToQuestion) {
+        const targetStep = getStepNumberById(allSteps, skipToQuestion);
+        onSkip?.(activeStep, targetStep);
+        setStep(targetStep);
+        return;
+      }
 
-    // Handle eliminatory or final step
-    if (isEliminatory || activeStep === total) {
-      onNext();
-      return;
-    }
+      // Handle eliminatory or final step
+      if (isEliminatory || activeStep === total) {
+        onNext();
+        return;
+      }
 
-    // Proceed to next step
-    setStep(activeStep + 1);
-  }, [activeStep, allSteps, onNext, onSkip, setStep, total]);
+      // Proceed to next step
+      setStep(activeStep + 1);
+    },
+    [activeStep, allSteps, onNext, onSkip, setStep, total]
+  );
 
   const handleBack = useCallback(() => {
     if (activeStep === 1) {
       handleClose();
     }
-    const previousStep = findPreviousNonSkippedStep ? 
-      findPreviousNonSkippedStep(activeStep) : 
-      activeStep - 1;
+    const previousStep = findPreviousNonSkippedStep
+      ? findPreviousNonSkippedStep(activeStep)
+      : activeStep - 1;
     setStep(previousStep);
   }, [activeStep, findPreviousNonSkippedStep, setStep]);
 
-  const handleAnswerSelect = useCallback((answer: CraAnswer) => {
-    // Only update if this is a different answer than currently selected
-    if (selectedAnswer?.text !== answer.text) {
-      onAnswerChange(step, answer.text, answer);
-    }
-  }, [onAnswerChange, step, selectedAnswer]);
+  const handleAnswerSelect = useCallback(
+    (answer: CraAnswer) => {
+      // Only update if this is a different answer than currently selected
+      if (selectedAnswer?.text !== answer.text) {
+        onAnswerChange(step, answer.text, answer);
+      }
+    },
+    [onAnswerChange, step, selectedAnswer]
+  );
 
   const displayProperties = useMemo(() => {
-    const selectedRiskAnswer = isDropdown && selectedAnswer && 'riskLevel' in selectedAnswer 
-      ? selectedAnswer as RiskAnswer 
-      : null;
-    
+    const selectedRiskAnswer =
+      isDropdown && selectedAnswer && 'riskLevel' in selectedAnswer
+        ? (selectedAnswer as RiskAnswer)
+        : null;
+
     return {
       hint: selectedRiskAnswer?.hint || hint,
       remark: remark,
-      references: selectedRiskAnswer?.references || references
+      references: selectedRiskAnswer?.references || references,
     };
   }, [isDropdown, selectedAnswer, hint, remark, references]);
 
@@ -98,19 +113,23 @@ const Step: React.FC<StepProps> = ({
   };
 
   const renderHintSection = () => {
-    const { hint: displayHint, remark: displayRemark, references: displayReferences } = displayProperties;
-    
+    const {
+      hint: displayHint,
+      remark: displayRemark,
+      references: displayReferences,
+    } = displayProperties;
+
     if (!displayHint && !displayRemark && !displayReferences?.length) {
       return null;
     }
 
     return (
-      <div className="mb-6 w-full rounded-lg border border-blue-300 bg-blue-50 p-4">
+      <div className="bg-info-subtle border-info rounded-card mb-6 w-full border p-4">
         <div className="flex items-start gap-2">
-          <LuInfo className="h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0" />
+          <LuInfo className="text-primary mt-0.5 h-6 w-6 flex-shrink-0" />
           <div className="flex-1">
             {(displayHint || displayRemark) && (
-              <p className="text-sm text-gray-900 leading-relaxed">
+              <p className="text-content text-sm leading-relaxed">
                 {displayHint || displayRemark}
               </p>
             )}
@@ -119,14 +138,16 @@ const Step: React.FC<StepProps> = ({
               <>
                 {(displayHint || displayRemark) && <div className="h-3" />}
                 <div className="text-sm">
-                  <span className="text-gray-900">{t('oscrat.ui.references')}: </span>
+                  <span className="text-content">
+                    {t('oscrat.ui.references')}:{' '}
+                  </span>
                   {displayReferences.map((ref, index) => (
                     <span key={`${ref.url}-${index}`}>
                       <a
                         href={ref.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline"
+                        className="text-primary hover:text-primary-dark underline"
                       >
                         {ref.text}
                       </a>
@@ -144,17 +165,19 @@ const Step: React.FC<StepProps> = ({
 
   const renderAnswerOptions = () => {
     if (isDropdown) {
-      const options = answerOptions.map(answer => ({
+      const options = answerOptions.map((answer) => ({
         value: answer.text,
         label: answer.text,
-        answer: answer
+        answer: answer,
       }));
 
-      const selectedOption = selectedAnswer ? {
-        value: selectedAnswer.text,
-        label: selectedAnswer.text,
-        answer: selectedAnswer
-      } : null;
+      const selectedOption = selectedAnswer
+        ? {
+            value: selectedAnswer.text,
+            label: selectedAnswer.text,
+            answer: selectedAnswer,
+          }
+        : null;
       return (
         <div className="my-4" style={{ maxWidth: '400px' }}>
           <Select
@@ -173,12 +196,12 @@ const Step: React.FC<StepProps> = ({
             styles={{
               container: (provided) => ({
                 ...provided,
-                width: '100%'
+                width: '100%',
               }),
               control: (provided) => ({
                 ...provided,
-                minHeight: '42px'
-              })
+                minHeight: '42px',
+              }),
             }}
           />
         </div>
@@ -186,7 +209,11 @@ const Step: React.FC<StepProps> = ({
     }
 
     return (
-      <div className="my-4 flex flex-col gap-2" role="radiogroup" aria-label={question}>
+      <div
+        className="my-4 flex flex-col gap-2"
+        role="radiogroup"
+        aria-label={question}
+      >
         {answerOptions.map((answer, index) => {
           const inputId = `q${id}-ans${index}`;
           return (
@@ -200,7 +227,10 @@ const Step: React.FC<StepProps> = ({
                 id={inputId}
                 aria-describedby={answer.text}
               />
-              <label htmlFor={inputId} className="ml-2 text-gray-900 text-sm cursor-pointer">
+              <label
+                htmlFor={inputId}
+                className="text-content ml-2 cursor-pointer text-sm"
+              >
                 {answer.text}
               </label>
             </div>
@@ -213,24 +243,26 @@ const Step: React.FC<StepProps> = ({
   const renderNavigationButtons = () => (
     <div className="flex gap-2">
       {activeStep === 1 ? (
-        <Button onClick={handleBack} text={t('close')} />
+        <Button onClick={handleBack} variant="secondary" text={t('close')} />
       ) : (
-        <Button onClick={handleBack} text={t('back')} />
+        <Button onClick={handleBack} variant="secondary" text={t('back')} />
       )}
-      <Button 
-        onClick={() => handleNext(selectedAnswer)} 
-        variant="primary" 
-        text={activeStep !== total ? t('oscrat.ui.next') : t('oscrat.ui.finish')} 
+      <Button
+        onClick={() => handleNext(selectedAnswer)}
+        variant="primary"
+        text={
+          activeStep !== total ? t('oscrat.ui.next') : t('oscrat.ui.finish')
+        }
         disabled={!selectedAnswer}
       />
     </div>
   );
 
   return (
-    <div className="rounded-lg border border-gray-300 p-6">
+    <div className="bg-surface border-line rounded-card border p-6">
       {renderHintSection()}
 
-      <p className="mb-4 text-lg font-semibold text-gray-900 whitespace-pre-line">
+      <p className="text-content mb-4 whitespace-pre-line text-lg font-semibold">
         {activeStep}. {formatQuestion(question)}
       </p>
 

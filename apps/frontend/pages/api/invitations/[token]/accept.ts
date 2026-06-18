@@ -1,4 +1,8 @@
-import { getInvitation, isInvitationExpired, deleteInvitation } from 'models/invitation';
+import {
+  getInvitation,
+  isInvitationExpired,
+  deleteInvitation,
+} from 'models/invitation';
 import { addTeamMember } from 'models/team';
 import { ensureAwarenessTrainingTask } from 'models/task';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -61,8 +65,16 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   );
 
   ensureAwarenessTrainingTask(
-    invitation.team.id, userId, session.user.name!, auditInfo
-  ).catch((err) => console.error('[Awareness] Failed to create training task on invite accept:', err));
+    invitation.team.id,
+    userId,
+    session.user.name!,
+    auditInfo
+  ).catch((err) =>
+    console.error(
+      '[Awareness] Failed to create training task on invite accept:',
+      err
+    )
+  );
 
   await sendEvent(
     invitation.team.id,

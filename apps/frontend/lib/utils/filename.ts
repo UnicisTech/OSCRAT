@@ -34,13 +34,19 @@ export const generateDocumentFilename = (
 /**
  * @deprecated Use generateDocumentFilename('car', productName, date) instead
  */
-export const generateCARFilename = (productName: string, date?: Date): string => {
+export const generateCARFilename = (
+  productName: string,
+  date?: Date
+): string => {
   return generateDocumentFilename('car', productName, date);
 };
 
 /**
  * @deprecated Use generateDocumentFilename('doc', productName, date) instead
  */
-export const generateDoCFilename = (productName: string, date?: Date): string => {
+export const generateDoCFilename = (
+  productName: string,
+  date?: Date
+): string => {
   return generateDocumentFilename('doc', productName, date);
 };

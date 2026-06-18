@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next';
-import { Button, Input } from 'react-daisyui';
 
+import Button from '@/components/button';
 import { Card } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
 import type { User } from '@oscrat/model';
@@ -33,13 +33,13 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
               {t('email-address-description')}
             </Card.Description>
           </Card.Header>
-          <Input
+          <input
             type="email"
             name="email"
             placeholder={t('your-email')}
             value={formik.values.email}
             onChange={formik.handleChange}
-            className="w-full max-w-md border border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800"
+            className="border-line text-content-secondary placeholder-content-placeholder focus:border-primary focus:ring-primary rounded-input w-full max-w-md border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2"
             required
             disabled={!allowEmailChange}
           />
@@ -48,10 +48,9 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
           <Card.Footer>
             <Button
               type="submit"
-              color="primary"
+              variant="primary"
               loading={isUpdateUserLoading}
               disabled={!formik.dirty || !formik.isValid}
-              size="md"
             >
               {t('save-changes')}
             </Button>

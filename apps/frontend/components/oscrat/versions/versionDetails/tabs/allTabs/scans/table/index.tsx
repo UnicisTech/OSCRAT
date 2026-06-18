@@ -10,6 +10,7 @@ import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { ShortUuidButton } from '@/components/shared';
+import { formatDateShort } from '@/utils/dateFormat';
 import {
   TableWrapper,
   TableHeader,
@@ -60,29 +61,29 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
   const getStatusBadge = (report: VulnerabilityScanReportDetails) => {
     const statusConfig = {
       [WorkerJobStatus.COMPLETED]: {
-        color: 'text-green-600',
+        color: 'text-success',
         label: t('oscrat.ui.versions.vulnerability-scan.completed'),
       },
       [WorkerJobStatus.IN_PROGRESS]: {
-        color: 'text-blue-600',
+        color: 'text-primary',
         label: t('oscrat.ui.versions.vulnerability-scan.in-progress'),
       },
       [WorkerJobStatus.FAILED]: {
-        color: 'text-red-600',
+        color: 'text-danger',
         label: t('oscrat.ui.versions.vulnerability-scan.failed'),
       },
       [WorkerJobStatus.PENDING]: {
-        color: 'text-gray-600',
+        color: 'text-content-secondary',
         label: t('oscrat.ui.versions.vulnerability-scan.pending'),
       },
       [WorkerJobStatus.CANCELLED]: {
-        color: 'text-gray-600',
+        color: 'text-content-secondary',
         label: t('oscrat.ui.versions.vulnerability-scan.cancelled'),
       },
     };
 
     const config = statusConfig[report.status] || {
-      color: 'text-gray-600',
+      color: 'text-content-secondary',
       label: t('oscrat.ui.unknown'),
     };
 
@@ -103,53 +104,53 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
 
   if (!reports || reports.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+      <div className="text-content-muted flex flex-col items-center justify-center py-12">
         <p className="text-sm">{t('oscrat.ui.no-vulnerability-scans-added')}</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full rounded-lg">
+    <div className="rounded-card w-full">
       <TableWrapper>
-        <table className={tableStyles.table}>
+        <table className={tableStyles.tableAuto}>
           <TableHeader
             columns={[
-              { label: t('status'), className: 'w-28' },
-              { label: t('oscrat.ui.source'), className: 'w-20 text-center' },
+              { label: t('status') },
+              { label: t('oscrat.ui.source'), className: 'text-center' },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.started'),
-                className: 'w-28 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.triggered-by'),
-                className: 'w-24 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.duration'),
-                className: 'w-16 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.total'),
-                className: 'w-12 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.critical'),
-                className: 'w-12 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.high'),
-                className: 'w-12 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.medium'),
-                className: 'w-12 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.low'),
-                className: 'w-12 text-center',
+                className: 'text-center',
               },
-              { label: t('actions'), className: 'w-40 text-center' },
+              { label: t('actions'), className: 'text-center' },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -171,16 +172,11 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                       href={`/organization/${slug}/products/${productId}/versions/${versionId}/sbom/${report.sourceSbomReport.id}`}
                     />
                   ) : (
-                    <span className="text-gray-400">-</span>
+                    <span className="text-content-placeholder">-</span>
                   )}
                 </td>
                 <td className={tableStyles.tdCenter}>
-                  {new Date(report.job.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatDateShort(report.job.createdAt)}
                 </td>
                 <td
                   className={tableStyles.tdCenter}
@@ -211,7 +207,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                   <span
                     className={
                       report.scanData?.criticalCount
-                        ? 'font-semibold text-red-600'
+                        ? 'text-danger font-semibold'
                         : ''
                     }
                   >
@@ -222,7 +218,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                   <span
                     className={
                       report.scanData?.highCount
-                        ? 'font-semibold text-orange-600'
+                        ? 'text-warning font-semibold'
                         : ''
                     }
                   >
@@ -232,7 +228,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                 <td className={tableStyles.tdCenter}>
                   <span
                     className={
-                      report.scanData?.mediumCount ? 'text-yellow-600' : ''
+                      report.scanData?.mediumCount ? 'text-caution' : ''
                     }
                   >
                     {report.scanData?.mediumCount ?? '-'}
@@ -240,12 +236,12 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
                 </td>
                 <td className={tableStyles.tdCenter}>
                   <span
-                    className={report.scanData?.lowCount ? 'text-blue-600' : ''}
+                    className={report.scanData?.lowCount ? 'text-primary' : ''}
                   >
                     {report.scanData?.lowCount ?? '-'}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-center align-middle">
+                <td className="px-4 py-4 text-center align-middle">
                   <div
                     className="flex items-center justify-center space-x-1"
                     onClick={(e) => e.stopPropagation()}
@@ -294,7 +290,7 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
               <tr>
                 <td
                   colSpan={11}
-                  className="px-6 py-8 text-center text-sm text-gray-500"
+                  className="text-content-muted px-6 py-8 text-center text-sm"
                 >
                   {t('oscrat.ui.no-vulnerability-scans-added')}
                 </td>

@@ -5,7 +5,11 @@ import { withTeamLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
 import { useTask } from '@/hooks/useTask';
 import { Breadcrumb } from '@/components/shared';
-import { TaskDetailsForm, TaskDetailsTabs, RiskAssessmentSection } from '@/components/oscrat/tasks';
+import {
+  TaskDetailsForm,
+  TaskDetailsTabs,
+  RiskAssessmentSection,
+} from '@/components/oscrat/tasks';
 import { formatTaskLabel, resolveTaskTitle } from '@/lib/tasks';
 
 const TaskDetails = () => {
@@ -13,15 +17,18 @@ const TaskDetails = () => {
   const { teamContext } = useTeamContext();
   const { team, isLoading: teamLoading, isError: teamError } = teamContext;
   const { t, ready } = useTranslation('common');
-  
+
   // TODO: Create a task context
   const { taskNumber } = router.query;
-  const taskNumberString = Array.isArray(taskNumber) ? taskNumber[0] : taskNumber;
-  
-  const { task, isLoading: taskLoading, isError: taskError } = useTask(
-    team?.slug || '',
-    taskNumberString || ''
-  );
+  const taskNumberString = Array.isArray(taskNumber)
+    ? taskNumber[0]
+    : taskNumber;
+
+  const {
+    task,
+    isLoading: taskLoading,
+    isError: taskError,
+  } = useTask(team?.slug || '', taskNumberString || '');
 
   if (teamLoading || !ready) {
     return <div>{t('loading-project-details')}</div>;
@@ -54,15 +61,14 @@ const TaskDetails = () => {
     <div className="space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumb items={breadcrumbItems} />
-      
+
       {/* Task Details Form */}
       <TaskDetailsForm task={task} team={team} />
 
       {/* Risk Assessment (enabled via checkbox) */}
-      {(task.properties as Record<string, unknown>)?.enableRiskAssessment === true && (
-        <RiskAssessmentSection task={task} team={team} />
-      )}
-      
+      {(task.properties as Record<string, unknown>)?.enableRiskAssessment ===
+        true && <RiskAssessmentSection task={task} team={team} />}
+
       {/* Tab Manager */}
       <TaskDetailsTabs task={task} team={team} />
     </div>

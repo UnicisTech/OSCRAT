@@ -2,9 +2,21 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { ComplianceNamespace } from '@/lib/compliance/translations';
-import { FaDownload, FaCheckCircle, FaExclamationCircle, FaClock } from 'react-icons/fa';
-import { CONFORMITY_STATUS, getConformityStatusLabel } from '@/constants/conformityStatuses';
-import { computeRequirementsStatus, getStatusBadgeColor } from '@/utils/compliance';
+import {
+  FaDownload,
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaClock,
+} from 'react-icons/fa';
+import {
+  CONFORMITY_STATUS,
+  getConformityStatusLabel,
+} from '@/constants/conformityStatuses';
+import {
+  computeRequirementsStatus,
+  getStatusBadgeColor,
+} from '@/utils/compliance';
+import { Button } from '@/components/shared';
 
 interface ComplianceDashboardProps {
   complianceData: ComplianceArea[];
@@ -22,19 +34,25 @@ const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
   const { t, ready } = useTranslation(['common', complianceNamespace]);
 
   const requirementsStatus = useMemo(
-    () => computeRequirementsStatus(complianceData, state.assessments, t, complianceNamespace),
+    () =>
+      computeRequirementsStatus(
+        complianceData,
+        state.assessments,
+        t,
+        complianceNamespace
+      ),
     [complianceData, state.assessments, t, complianceNamespace]
   );
 
   const getStatusIcon = (status: string) => {
     if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) {
-      return <FaCheckCircle className="text-green-500" />;
+      return <FaCheckCircle className="text-success" />;
     } else if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) {
-      return <FaClock className="text-blue-500" />;
+      return <FaClock className="text-info" />;
     } else if (status === CONFORMITY_STATUS.NOT_EVALUATED) {
-      return <FaExclamationCircle className="text-gray-400" />;
+      return <FaExclamationCircle className="text-content-placeholder" />;
     } else if (status === CONFORMITY_STATUS.NOT_COMPLIANT) {
-      return <FaExclamationCircle className="text-red-500" />;
+      return <FaExclamationCircle className="text-danger" />;
     }
     return null;
   };
@@ -45,67 +63,73 @@ const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">
+        <h2 className="text-h4 text-content font-bold">
           {t('oscrat.ui.dashboard.title')}
         </h2>
-        <button
+        <Button
+          variant="primary"
           onClick={onExportPDF}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          startIcon={<FaDownload />}
         >
-          <FaDownload />
           {t('oscrat.ui.dashboard.export-pdf')}
-        </button>
+        </Button>
       </div>
 
       {/* Status Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+      <div className="bg-surface border-line rounded-card overflow-hidden border">
+        <div className="border-line-subtle border-b px-4 py-4">
+          <h3 className="text-h6 text-content font-medium">
             {t('oscrat.ui.dashboard.requirements-status')}
           </h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="divide-line-subtle min-w-full divide-y">
+            <thead className="bg-surface-muted border-b border-line-header">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="text-content p-4 text-left text-b2 font-medium">
                   {t('oscrat.ui.dashboard.requirement-id')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="text-content p-4 text-left text-b2 font-medium">
                   {t('oscrat.ui.dashboard.requirement-name')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="text-content p-4 text-left text-b2 font-medium">
                   {t('oscrat.ui.dashboard.area')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="text-content p-4 text-left text-b2 font-medium">
                   {t('oscrat.ui.dashboard.evaluation-status')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="text-content p-4 text-left text-b2 font-medium">
                   {t('oscrat.ui.dashboard.conformity-status')}
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-surface divide-line-subtle divide-y">
               {requirementsStatus.map((req) => (
-                <tr key={req.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <tr key={req.id} className="hover:bg-surface-muted">
+                  <td className="text-b2 text-content whitespace-nowrap px-4 py-4 font-medium">
                     {req.id}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {req.name}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="text-b2 text-content px-4 py-4">{req.name}</td>
+                  <td className="text-b2 text-content-secondary px-4 py-4">
                     {req.areaName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      req.isEvaluated ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {req.isEvaluated ? t('oscrat.ui.dashboard.evaluated') : t('oscrat.ui.dashboard.not-evaluated')}
+                  <td className="text-b2 whitespace-nowrap px-4 py-4">
+                    <span
+                      className={`text-c1 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-medium ${
+                        req.isEvaluated
+                          ? 'bg-success-subtle text-success-emphasis'
+                          : 'bg-surface-muted text-content'
+                      }`}
+                    >
+                      {req.isEvaluated
+                        ? t('oscrat.ui.dashboard.evaluated')
+                        : t('oscrat.ui.dashboard.not-evaluated')}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(req.conformityStatus)}`}>
+                  <td className="text-b2 whitespace-nowrap px-4 py-4">
+                    <span
+                      className={`text-c1 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-medium ${getStatusBadgeColor(req.conformityStatus)}`}
+                    >
                       {getStatusIcon(req.conformityStatus)}
                       {getConformityStatusLabel(req.conformityStatus, t)}
                     </span>
@@ -121,4 +145,3 @@ const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({
 };
 
 export default ComplianceDashboard;
-

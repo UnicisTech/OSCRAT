@@ -13,10 +13,7 @@
             "questionId": "Q1",
             "questionText": "area-1.IO1.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false
@@ -30,10 +27,7 @@
             "questionId": "Q2",
             "questionText": "area-1.IO1.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false
@@ -56,10 +50,7 @@
             "questionId": "Q1",
             "questionText": "area-1.IO2.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false
@@ -73,10 +64,7 @@
             "questionId": "Q2",
             "questionText": "area-1.IO2.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false
@@ -90,10 +78,7 @@
             "questionId": "Q3",
             "questionText": "area-1.IO2.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false
@@ -107,10 +92,7 @@
             "questionId": "Q4",
             "questionText": "area-1.IO2.questions.Q4.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false
@@ -124,10 +106,7 @@
             "questionId": "Q5",
             "questionText": "area-1.IO2.questions.Q5.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false
@@ -141,10 +120,7 @@
             "questionId": "Q6",
             "questionText": "area-1.IO2.questions.Q6.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false

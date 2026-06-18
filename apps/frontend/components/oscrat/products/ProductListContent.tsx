@@ -1,8 +1,10 @@
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useTranslation } from 'next-i18next';
 import { useTeamContext } from '@/context/TeamContext';
 import { useTeamProducts } from '@/lib/api/hooks/teams';
 import { useProductFiltering } from '@/hooks/useProductFiltering';
+import Header from '@/components/oscrat/shared/header';
 import SearchBar from '@/components/oscrat/products/productsList/searchBar';
 import ProductComponent from '@/components/oscrat/products/productsList/product';
 import {
@@ -16,6 +18,7 @@ import PaginationControls from '@/components/shared/PaginationControls';
 const PRODUCTS_PER_PAGE = 12;
 
 export function ProductListContent() {
+  const { t } = useTranslation('common');
   const { slug: teamId } = useTeamContext();
   const { data: products, isLoading, isError } = useTeamProducts(teamId);
   const router = useRouter();
@@ -60,18 +63,24 @@ export function ProductListContent() {
 
   return (
     <div className="flex w-full flex-col justify-center">
-      <SearchBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        onAddProduct={navigateToAddPage}
-        filterOptions={filterOptions}
-        activeFilters={activeFilters}
-        onFilterChange={
-          handleFilterChange as (filterType: any, value: string) => void
+      <Header
+        title={t('oscrat.ui.products-list')}
+        subtitle={t('oscrat.ui.add-new-product-verify')}
+        actions={
+          <SearchBar
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            onAddProduct={navigateToAddPage}
+            filterOptions={filterOptions}
+            activeFilters={activeFilters}
+            onFilterChange={
+              handleFilterChange as (filterType: any, value: string) => void
+            }
+          />
         }
       />
 
-      <div className="flex w-full flex-col gap-4 rounded-lg bg-white dark:bg-gray-800">
+      <div className="bg-surface rounded-card flex w-full flex-col gap-4">
         {filteredProducts.length === 0 ? (
           <EmptyState />
         ) : (

@@ -9,6 +9,7 @@ import { getErrorCodeTranslationKey } from '@/utils/errorCodeTranslation';
 import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
+import { formatDateShort } from '@/utils/dateFormat';
 import {
   TableWrapper,
   TableHeader,
@@ -28,9 +29,9 @@ const formatNumeric = (value: number | undefined) =>
   typeof value === 'number' ? value : '-';
 
 const FORMAT_BADGE_CLASS: Record<ConfigurationScanFormat, string> = {
-  [ConfigurationScanFormat.ARF]: 'bg-purple-100 text-purple-800',
-  [ConfigurationScanFormat.XCCDF]: 'bg-indigo-100 text-indigo-800',
-  [ConfigurationScanFormat.OVAL]: 'bg-teal-100 text-teal-800',
+  [ConfigurationScanFormat.ARF]: 'bg-surface-muted text-content-secondary',
+  [ConfigurationScanFormat.XCCDF]: 'bg-info-subtle text-info-emphasis',
+  [ConfigurationScanFormat.OVAL]: 'bg-success-subtle text-success-emphasis',
 };
 
 const Table: React.FC<ConfigurationTableProps> = ({
@@ -68,29 +69,29 @@ const Table: React.FC<ConfigurationTableProps> = ({
   const getStatusBadge = (report: ConfigurationScanReportDetails) => {
     const statusConfig = {
       [WorkerJobStatus.COMPLETED]: {
-        color: 'text-green-600',
+        color: 'text-success',
         label: t('oscrat.ui.versions.configuration.completed'),
       },
       [WorkerJobStatus.IN_PROGRESS]: {
-        color: 'text-blue-600',
+        color: 'text-primary',
         label: t('oscrat.ui.versions.configuration.in-progress'),
       },
       [WorkerJobStatus.FAILED]: {
-        color: 'text-red-600',
+        color: 'text-danger',
         label: t('oscrat.ui.versions.configuration.failed'),
       },
       [WorkerJobStatus.PENDING]: {
-        color: 'text-gray-600',
+        color: 'text-content-secondary',
         label: t('oscrat.ui.versions.configuration.pending'),
       },
       [WorkerJobStatus.CANCELLED]: {
-        color: 'text-gray-600',
+        color: 'text-content-secondary',
         label: t('oscrat.ui.versions.configuration.cancelled'),
       },
     };
 
     const config = statusConfig[report.status] || {
-      color: 'text-gray-600',
+      color: 'text-content-secondary',
       label: t('oscrat.ui.unknown'),
     };
 
@@ -111,48 +112,48 @@ const Table: React.FC<ConfigurationTableProps> = ({
 
   if (!reports || reports.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+      <div className="text-content-muted flex flex-col items-center justify-center py-12">
         <p className="text-sm">{t('oscrat.ui.no-config-scan-added')}</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full rounded-lg">
+    <div className="rounded-card w-full">
       <TableWrapper>
-        <table className={tableStyles.table}>
+        <table className={tableStyles.tableAuto}>
           <TableHeader
             columns={[
-              { label: t('status'), className: 'w-28' },
+              { label: t('status') },
               {
                 label: t('oscrat.ui.versions.configuration.format'),
-                className: 'w-24 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.configuration.started'),
-                className: 'w-28 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.configuration.triggered-by'),
-                className: 'w-24 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.configuration.duration'),
-                className: 'w-16 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.configuration.total-rules'),
-                className: 'w-16 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.configuration.pass-count'),
-                className: 'w-16 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.configuration.fail-count'),
-                className: 'w-16 text-center',
+                className: 'text-center',
               },
-              { label: t('actions'), className: 'w-40 text-center' },
+              { label: t('actions'), className: 'text-center' },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -177,15 +178,7 @@ const Table: React.FC<ConfigurationTableProps> = ({
                     </span>
                   </td>
                   <td className={tableStyles.tdCenter}>
-                    {new Date(report.job.createdAt).toLocaleDateString(
-                      'en-US',
-                      {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      }
-                    )}
+                    {formatDateShort(report.job.createdAt)}
                   </td>
                   <td
                     className={tableStyles.tdCenter}
@@ -218,7 +211,7 @@ const Table: React.FC<ConfigurationTableProps> = ({
                   <td className={tableStyles.tdCenter}>
                     {formatNumeric(summary?.failCount)}
                   </td>
-                  <td className="px-6 py-4 text-center align-middle">
+                  <td className="px-4 py-4 text-center align-middle">
                     <div
                       className="flex items-center justify-center space-x-1"
                       onClick={(e) => e.stopPropagation()}

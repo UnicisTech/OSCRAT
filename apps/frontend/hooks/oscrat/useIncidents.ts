@@ -41,14 +41,22 @@ export function useIncidents(
     enabled: !!incidentId,
   });
 
-  const createIncidentMutation = useCreateIncident(teamId, productId, versionId);
+  const createIncidentMutation = useCreateIncident(
+    teamId,
+    productId,
+    versionId
+  );
   const updateIncidentMutation = useUpdateIncident(
     teamId,
     productId,
     versionId,
     incidentId || ''
   );
-  const deleteIncidentMutation = useDeleteIncident(teamId, productId, versionId);
+  const deleteIncidentMutation = useDeleteIncident(
+    teamId,
+    productId,
+    versionId
+  );
 
   const createIncident = async (data: OscratIncidentCreate) => {
     return createIncidentMutation.mutateAsync(data);

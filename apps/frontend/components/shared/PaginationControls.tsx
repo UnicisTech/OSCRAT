@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
+import Button from '@/components/button';
 
 interface PaginationControlsProps {
   currentPage: number;
@@ -34,7 +35,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
     <div className="mt-4 flex justify-center pb-4">
       <div className="inline-flex flex-col items-center">
         {showItemCount && totalItems > 0 && (
-          <p className="mb-2 text-sm text-gray-600">
+          <p className="text-content-secondary mb-2 text-sm">
             {t('showing-items', {
               start: startItem,
               end: endItem,
@@ -43,39 +44,33 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
             })}
           </p>
         )}
-        <div className="inline-flex">
-          <button
+        <div className="inline-flex items-stretch">
+          <Button
+            variant="secondary"
+            size="s"
             onClick={goToPreviousPage}
             disabled={prevButtonDisabled}
             title={t('previous-page')}
             aria-label={t('previous-page')}
-            className={`rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${
-              prevButtonDisabled
-                ? 'cursor-not-allowed text-gray-400'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <FaChevronLeft />
-          </button>
+            className="rounded-r-none"
+            icon={<FaChevronLeft />}
+          />
           <span
-            className="border-b border-t border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700"
+            className="border-line bg-surface text-content-secondary flex items-center border-b border-t px-4 py-2 text-sm font-medium"
             aria-current="page"
           >
             {currentPage} / {totalPages}
           </span>
-          <button
+          <Button
+            variant="secondary"
+            size="s"
             onClick={goToNextPage}
             disabled={nextButtonDisabled}
             title={t('next-page')}
             aria-label={t('next-page')}
-            className={`rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${
-              nextButtonDisabled
-                ? 'cursor-not-allowed text-gray-400'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <FaChevronRight />
-          </button>
+            className="rounded-l-none"
+            icon={<FaChevronRight />}
+          />
         </div>
       </div>
     </div>

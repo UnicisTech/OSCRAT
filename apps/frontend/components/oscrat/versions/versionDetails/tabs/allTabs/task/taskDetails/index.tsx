@@ -16,10 +16,17 @@ interface TaskDetailsProps {
   taskNumber: string;
 }
 
-function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: string; team: Team }) {
+function TaskDetailsWithVersionContext({
+  taskNumber,
+  team,
+}: {
+  taskNumber: string;
+  team: Team;
+}) {
   const { t } = useTranslation('common');
   const router = useRouter();
-  const { productId: routeProductId, versionId: routeVersionId } = router.query as { productId: string; versionId: string };
+  const { productId: routeProductId, versionId: routeVersionId } =
+    router.query as { productId: string; versionId: string };
   const { productContext } = useProductContext();
   const { versionContext } = useVersionContext();
   const { task, isLoading, isError } = useTask(team.slug, taskNumber);
@@ -27,7 +34,9 @@ function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: strin
   if (isLoading) {
     return (
       <div className="flex flex-col p-4">
-        <div className="text-center text-gray-500">{t('loading-task-details')}</div>
+        <div className="text-content-muted text-center">
+          {t('loading-task-details')}
+        </div>
       </div>
     );
   }
@@ -35,7 +44,7 @@ function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: strin
   if (isError || !task) {
     return (
       <div className="flex flex-col p-4">
-        <div className="text-center text-red-500">{t('task-not-found')}</div>
+        <div className="text-danger text-center">{t('task-not-found')}</div>
       </div>
     );
   }
@@ -71,14 +80,22 @@ function TaskDetailsWithVersionContext({ taskNumber, team }: { taskNumber: strin
   );
 }
 
-function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team: Team }) {
+function TaskDetailsStandalone({
+  taskNumber,
+  team,
+}: {
+  taskNumber: string;
+  team: Team;
+}) {
   const { t } = useTranslation('common');
   const { task, isLoading, isError } = useTask(team.slug, taskNumber);
 
   if (isLoading) {
     return (
       <div className="flex flex-col p-4">
-        <div className="text-center text-gray-500">{t('loading-task-details')}</div>
+        <div className="text-content-muted text-center">
+          {t('loading-task-details')}
+        </div>
       </div>
     );
   }
@@ -86,7 +103,7 @@ function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team:
   if (isError || !task) {
     return (
       <div className="flex flex-col p-4">
-        <div className="text-center text-red-500">{t('task-not-found')}</div>
+        <div className="text-danger text-center">{t('task-not-found')}</div>
       </div>
     );
   }
@@ -116,7 +133,10 @@ function TaskDetailsStandalone({ taskNumber, team }: { taskNumber: string; team:
 
 export default function TaskDetails({ taskNumber }: TaskDetailsProps) {
   const router = useRouter();
-  const { productId, versionId } = router.query as { productId?: string; versionId?: string };
+  const { productId, versionId } = router.query as {
+    productId?: string;
+    versionId?: string;
+  };
   const { teamContext } = useTeamContext();
   const { team } = teamContext as { team: Team };
   const { t } = useTranslation('common');
@@ -124,13 +144,17 @@ export default function TaskDetails({ taskNumber }: TaskDetailsProps) {
   if (!team) {
     return (
       <div className="flex flex-col p-4">
-        <div className="text-center text-gray-500">{t('loading-task-details')}</div>
+        <div className="text-content-muted text-center">
+          {t('loading-task-details')}
+        </div>
       </div>
     );
   }
 
   if (productId && versionId) {
-    return <TaskDetailsWithVersionContext taskNumber={taskNumber} team={team} />;
+    return (
+      <TaskDetailsWithVersionContext taskNumber={taskNumber} team={team} />
+    );
   }
 
   return <TaskDetailsStandalone taskNumber={taskNumber} team={team} />;

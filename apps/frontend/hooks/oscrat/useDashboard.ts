@@ -20,4 +20,3 @@ export function useDashboard(teamId: string) {
     error,
   };
 }
-

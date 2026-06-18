@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
+import Button from '@/components/button';
 
 // --- TYPE DEFINITIONS ---
 
@@ -116,14 +117,14 @@ export default function Index() {
     advisoryId: string;
   }> = ({ summaryText, advisoryId }) => (
     <div className="mb-6">
-      <h2 className="mb-2 text-sm text-gray-600">Summary</h2>
-      <p className="mb-4 text-sm font-bold leading-relaxed text-gray-900">
+      <h2 className="text-content-secondary mb-2 text-sm">Summary</h2>
+      <p className="text-content mb-4 text-sm font-bold leading-relaxed">
         {summaryText}
       </p>
-      <h3 className="mb-1 text-xs font-semibold text-gray-500">
+      <h3 className="text-content-muted mb-1 text-xs font-semibold">
         {t('oscrat.ui.advisory-ids')}
       </h3>
-      <p className="text-sm font-semibold text-gray-900">{advisoryId}</p>
+      <p className="text-content text-sm font-semibold">{advisoryId}</p>
     </div>
   );
 
@@ -133,32 +134,32 @@ export default function Index() {
     assigner: string;
     references: string[];
   }> = ({ publishedDate, updatedDate, assigner, references }) => (
-    <div className="mb-6 border-b border-t border-gray-200 py-4">
+    <div className="border-line-subtle mb-6 border-b border-t py-4">
       <div className="mb-4 grid grid-cols-2 gap-6 md:grid-cols-3">
         <div>
-          <h3 className="mb-1 text-xs font-semibold text-gray-500">
+          <h3 className="text-content-muted mb-1 text-xs font-semibold">
             {t('oscrat.ui.published')}
           </h3>
-          <p className="text-sm font-semibold text-gray-900">{publishedDate}</p>
+          <p className="text-content text-sm font-semibold">{publishedDate}</p>
         </div>
         <div>
-          <h3 className="mb-1 text-xs font-semibold text-gray-500">
+          <h3 className="text-content-muted mb-1 text-xs font-semibold">
             {t('oscrat.ui.updated')}
           </h3>
-          <p className="text-sm font-semibold text-gray-900">{updatedDate}</p>
+          <p className="text-content text-sm font-semibold">{updatedDate}</p>
         </div>
         <div>
-          <h3 className="mb-1 text-xs font-semibold text-gray-500">
+          <h3 className="text-content-muted mb-1 text-xs font-semibold">
             {t('oscrat.ui.assigner')}
           </h3>
-          <p className="text-sm font-semibold text-gray-900">{assigner}</p>
+          <p className="text-content text-sm font-semibold">{assigner}</p>
         </div>
       </div>
       <div>
-        <h3 className="mb-1 text-xs font-semibold text-gray-500">
+        <h3 className="text-content-muted mb-1 text-xs font-semibold">
           {t('oscrat.ui.references')}
         </h3>
-        <p className="text-sm text-gray-900">
+        <p className="text-content text-sm">
           {references.length > 0 ? references.join(', ') : '-'}
         </p>
       </div>
@@ -181,20 +182,19 @@ export default function Index() {
     return (
       <div>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-600">Attachment</h2>
-          <button
-            onClick={handleAddDocument}
-            className="rounded-md border border-gray-400 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-          >
+          <h2 className="text-content-secondary text-sm font-semibold">
+            Attachment
+          </h2>
+          <Button variant="secondary" size="m" onClick={handleAddDocument}>
             {t('add-documents')}
-          </button>
+          </Button>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-200 text-xs uppercase text-gray-700">
+          <table className="text-content-secondary w-full text-left text-sm">
+            <thead className="bg-surface-muted text-content border-b border-line-header">
               <tr>
                 {tableHeaders.map((h) => (
-                  <th key={h} className="px-6 py-3">
+                  <th key={h} className="p-4 text-b2 font-medium">
                     {h}
                   </th>
                 ))}
@@ -204,23 +204,24 @@ export default function Index() {
               {attachments.map((file) => (
                 <tr
                   key={file.id}
-                  className="border-b bg-white text-gray-900 hover:bg-gray-50"
+                  className="bg-surface text-content hover:bg-surface-muted border-b"
                 >
-                  <td className="px-6 py-4 font-medium">{file.name}</td>
-                  <td className="px-6 py-4">{file.type}</td>
-                  <td className="px-6 py-4">{file.version}</td>
-                  <td className="px-6 py-4">{file.dateAdded}</td>
-                  <td className="px-6 py-4">{file.addedBy}</td>
-                  <td className="px-6 py-4">{file.lastEdited}</td>
-                  <td className="px-6 py-4">{file.editedBy}</td>
-                  <td className="px-6 py-4 text-center">
-                    <button
+                  <td className="px-4 py-4 font-medium">{file.name}</td>
+                  <td className="px-4 py-4">{file.type}</td>
+                  <td className="px-4 py-4">{file.version}</td>
+                  <td className="px-4 py-4">{file.dateAdded}</td>
+                  <td className="px-4 py-4">{file.addedBy}</td>
+                  <td className="px-4 py-4">{file.lastEdited}</td>
+                  <td className="px-4 py-4">{file.editedBy}</td>
+                  <td className="px-4 py-4 text-center">
+                    <Button
+                      variant="tertiary"
+                      size="s"
                       onClick={() => handleMoreAction(file.id)}
-                      className="flex items-center gap-x-2 text-gray-900"
+                      startIcon={<BsThreeDotsVertical size={16} />}
                     >
-                      <BsThreeDotsVertical size={16} />
-                      <p>{t('more')}</p>
-                    </button>
+                      {t('more')}
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -233,7 +234,7 @@ export default function Index() {
 
   return (
     <div className="w-full">
-      <div className="mx-auto w-full rounded-lg border border-gray-400 bg-white p-4">
+      <div className="border-line bg-surface rounded-card mx-auto w-full border p-4">
         <SummarySection
           summaryText={vulnerabilityData.summaryText}
           advisoryId={vulnerabilityData.advisoryId}

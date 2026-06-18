@@ -1,3 +1,10 @@
-node_modules
-.next
-out
+# Dependencies
+**/node_modules
+
+# Build output & generated artifacts (regenerated, never hand-formatted)
+**/.next
+**/out
+**/dist
+**/coverage
+**/.turbo
+**/*.tsbuildinfo

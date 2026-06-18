@@ -26,10 +26,10 @@ export default function RadioOption<T extends string>({
 
   return (
     <label
-      className={`flex cursor-pointer ${descKey ? 'flex-col' : 'items-center'} rounded-lg border p-4 ${
+      className={`flex cursor-pointer ${descKey ? 'flex-col' : 'items-center'} rounded-card border p-4 ${
         isSelected
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-          : 'border-gray-200 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700'
+          ? 'border-info bg-info-subtle'
+          : 'border-line-subtle hover:bg-surface-muted'
       }`}
     >
       <div className="flex items-center">
@@ -39,16 +39,14 @@ export default function RadioOption<T extends string>({
           value={value}
           checked={isSelected}
           onChange={(e) => onChange(e.target.value as T)}
-          className="h-4 w-4 text-blue-600"
+          className="text-primary h-4 w-4"
         />
-        <span className={`ml-3 ${descKey ? 'font-medium' : ''} text-gray-900 dark:text-white`}>
+        <span className={`ml-3 ${descKey ? 'font-medium' : ''} text-content`}>
           {t(labelKey)}
         </span>
       </div>
       {descKey && (
-        <p className="ml-7 mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {t(descKey)}
-        </p>
+        <p className="text-content-muted ml-7 mt-1 text-sm">{t(descKey)}</p>
       )}
     </label>
   );

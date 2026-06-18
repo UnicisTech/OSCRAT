@@ -1,6 +1,4 @@
-import { Badge as BaseBadge } from 'react-daisyui';
-
-type BadgeColor = 'ghost' | 'secondary' | 'primary' | 'info' | 'success' | 'warning' | 'neutral' | 'accent' | 'error';
+import Badge, { BadgeColor } from './Badge';
 
 const colors: Record<string, BadgeColor> = {
   todo: 'ghost',
@@ -15,14 +13,7 @@ const colors: Record<string, BadgeColor> = {
 
 const StatusBadge = ({ label, value }: { label: string; value: string }) => {
   const color = colors[value.toLowerCase()] || 'ghost';
-  return (
-    <BaseBadge
-      className="whitespace-nowrap rounded py-2 text-xs text-white"
-      color={color}
-    >
-      {label}
-    </BaseBadge>
-  );
+  return <Badge color={color}>{label}</Badge>;
 };
 
 export default StatusBadge;

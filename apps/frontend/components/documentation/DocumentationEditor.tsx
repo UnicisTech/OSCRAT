@@ -44,7 +44,9 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
   const [visibility, setVisibility] = useState<DocumentationVisibility>(
     DocumentationVisibility.PRIVATE
   );
-  const [status, setStatus] = useState<DocumentationStatus>(DocumentationStatus.DRAFT);
+  const [status, setStatus] = useState<DocumentationStatus>(
+    DocumentationStatus.DRAFT
+  );
   const [hasChanges, setHasChanges] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -112,7 +114,13 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
     }
 
     const result = await asyncWithToast(
-      () => updateDocumentation({ title: title.trim(), content, visibility, status }),
+      () =>
+        updateDocumentation({
+          title: title.trim(),
+          content,
+          visibility,
+          status,
+        }),
       t('oscrat.ui.documentation.saved'),
       t('error')
     );
@@ -143,7 +151,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
 
   if (!documentation) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="text-content-muted p-4 text-center">
         {t('oscrat.ui.documentation.not-found')}
       </div>
     );

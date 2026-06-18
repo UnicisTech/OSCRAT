@@ -1,10 +1,10 @@
+import Button from '@/components/button';
 import { Card, InputWithLabel } from '@/components/shared';
 import { Team } from '@oscrat/model';
 import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
 import { useTeam } from '@/hooks/useTeam';
 import { extractErrorMessage } from '@/lib/utils';
@@ -51,7 +51,7 @@ const TeamSettings = ({ team }: { team: Team }) => {
                 label={
                   <>
                     {t('team-name')}
-                    <span className="ml-1 text-red-600">*</span>
+                    <span className="text-danger ml-1">*</span>
                   </>
                 }
                 value={formik.values.name}
@@ -64,7 +64,7 @@ const TeamSettings = ({ team }: { team: Team }) => {
                 label={
                   <>
                     {t('team-slug')}
-                    <span className="ml-1 text-red-600">*</span>
+                    <span className="text-danger ml-1">*</span>
                   </>
                 }
                 value={formik.values.slug}
@@ -79,10 +79,9 @@ const TeamSettings = ({ team }: { team: Team }) => {
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  color="primary"
+                  variant="primary"
                   loading={formik.isSubmitting || isLoading}
                   disabled={!formik.isValid || !formik.dirty}
-                  size="md"
                 >
                   {t('save-changes')}
                 </Button>

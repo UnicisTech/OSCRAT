@@ -26,9 +26,9 @@ const Result: React.FC<ResultWithFormStateProps> = ({
   const { t, ready } = useTranslation('common');
   const { data: session, status } = useSession();
   const isEditMode = !!productId;
-  
+
   if (!ready) return null;
-  
+
   const isAuthenticated = status === 'authenticated' && session;
 
   const handleLogin = () => {
@@ -58,15 +58,15 @@ const Result: React.FC<ResultWithFormStateProps> = ({
         <>
           <Button
             onClick={handleAddProduct}
-            className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
+            className="w-full sm:w-auto"
             text={t('oscrat.ui.add-product')}
             variant="primary"
           />
           <Button
             onClick={handleTryAgain}
-            className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
+            className="w-full sm:w-auto"
             text={t('oscrat.ui.try-again')}
-            variant="normal"
+            variant="secondary"
           />
         </>
       );
@@ -76,13 +76,13 @@ const Result: React.FC<ResultWithFormStateProps> = ({
       <>
         <Button
           onClick={handleRegister}
-          className="w-full rounded-lg bg-white px-8 py-3 font-medium transition-colors hover:bg-blue-50 sm:w-auto"
+          className="w-full sm:w-auto"
           text={t('register')}
-          variant="normal"
+          variant="secondary"
         />
         <Button
           onClick={handleLogin}
-          className="w-full rounded-lg px-8 py-3 font-medium text-white shadow-md transition-colors sm:w-auto"
+          className="w-full sm:w-auto"
           text={t('log-in')}
           variant="primary"
         />
@@ -93,38 +93,38 @@ const Result: React.FC<ResultWithFormStateProps> = ({
   if (!isEligible) {
     return (
       <div className="flex flex-col items-center justify-center p-4 font-['Inter',_sans-serif]">
-        <div className="w-full max-w-2xl rounded-lg border-2 bg-white p-8 text-center md:p-12 md:pb-0">
+        <div className="bg-surface rounded-card w-full max-w-2xl border-2 p-8 text-center md:p-12 md:pb-0">
           <div className="mb-6">
-            <LuCheckCircle className="mx-auto h-16 w-16 text-green-500" />
+            <LuCheckCircle className="text-success mx-auto h-16 w-16" />
           </div>
-          
-          <h1 className="mb-4 text-2xl font-semibold text-gray-800 md:text-3xl">
+
+          <h1 className="text-content mb-4 text-2xl font-semibold md:text-3xl">
             {t('oscrat.ui.no-qualification-required')}
           </h1>
-          
-          <p className="mb-8 text-sm text-gray-600 md:text-base">
+
+          <p className="text-content-secondary mb-8 text-sm md:text-base">
             {t('oscrat.ui.product-no-qualification-desc')}
             <br />
             {t('oscrat.ui.check-another-product-desc')}
           </p>
-          
+
           <div className="mb-8 flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
             <Button
               onClick={handleGoHome}
-              className="w-full rounded-lg border border-black bg-white px-8 py-3 font-medium text-black transition-colors sm:w-auto"
+              className="w-full sm:w-auto"
               text={t('oscrat.ui.go-home')}
-              variant="normal"
+              variant="secondary"
             />
             <Button
               onClick={handleTryAgain}
-              className="w-full rounded-lg bg-blue-600 px-8 py-3 font-medium text-white shadow-md transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 sm:w-auto"
+              className="w-full sm:w-auto"
               text={t('oscrat.ui.try-again')}
               variant="primary"
             />
           </div>
         </div>
-        
-        <p className="mt-8 max-w-2xl px-4 text-center text-xs text-gray-500">
+
+        <p className="text-content-muted mt-8 max-w-2xl px-4 text-center text-xs">
           {t('oscrat.ui.self-assessment-note')}
         </p>
       </div>
@@ -133,38 +133,39 @@ const Result: React.FC<ResultWithFormStateProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-2xl rounded-lg bg-white p-8 text-center shadow-xl md:p-12 md:pb-4">
+      <div className="bg-surface shadow-16 rounded-card w-full max-w-2xl p-8 text-center md:p-12 md:pb-4">
         <div className="mb-6">
-          <LuFileWarning className="mx-auto h-16 w-16 text-orange-500" />
+          <LuFileWarning className="text-warning mx-auto h-16 w-16" />
         </div>
-        
-        <h1 className="mb-4 text-2xl font-semibold text-gray-800 md:text-3xl">
-          { isAuthenticated ? t('oscrat.ui.product-requires-assessment') : t('oscrat.ui.continue-eligibility-check')}
+
+        <h1 className="text-content mb-4 text-2xl font-semibold md:text-3xl">
+          {isAuthenticated
+            ? t('oscrat.ui.product-requires-assessment')
+            : t('oscrat.ui.continue-eligibility-check')}
         </h1>
-        
-        <p className="mb-6 text-sm text-gray-600 md:text-base">
-          {t('oscrat.ui.product-within-scope')} 
+
+        <p className="text-content-secondary mb-6 text-sm md:text-base">
+          {t('oscrat.ui.product-within-scope')}
           {highestRiskLevel && (
-            <span className="font-semibold text-gray-700">
+            <span className="text-content-secondary font-semibold">
               {formatRiskLevel(highestRiskLevel)}
             </span>
-          )}.
+          )}
+          .
           <br />
           {!isAuthenticated && t('oscrat.ui.log-in-or-register')}
         </p>
-        
+
         <div className="mb-8 flex flex-col justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
           {renderEligibleButtons()}
         </div>
 
         <Divider />
 
-        <p className="mt-4 mb-2 max-w-2xl px-4 text-center text-xs text-gray-500">
-        {t('oscrat.ui.self-assessment-note')}
-      </p>
+        <p className="text-content-muted mb-2 mt-4 max-w-2xl px-4 text-center text-xs">
+          {t('oscrat.ui.self-assessment-note')}
+        </p>
       </div>
-      
-   
     </div>
   );
 };

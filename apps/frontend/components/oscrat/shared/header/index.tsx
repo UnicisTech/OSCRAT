@@ -1,8 +1,13 @@
+import React from 'react';
+import Button from '@/components/button';
+
 interface HeaderProps {
   title: string;
   subtitle?: string;
   buttonText?: string;
   onButtonClick?: () => void;
+  /** Custom controls rendered on the right side of the header (e.g. a search/filter toolbar). */
+  actions?: React.ReactNode;
 }
 
 export default function Header({
@@ -10,29 +15,23 @@ export default function Header({
   subtitle,
   buttonText,
   onButtonClick,
+  actions,
 }: HeaderProps) {
   return (
     <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 className="text-[24px] font-semibold">
-          {title}
-        </h1>
+        <h1 className="text-[24px] font-semibold">{title}</h1>
         {subtitle && (
-          <p className="text-[12px] text-gray-500">
-            {subtitle}
-          </p>
+          <p className="text-content-muted text-[12px]">{subtitle}</p>
         )}
       </div>
 
       <div className="flex items-center gap-2">
+        {actions}
         {buttonText && onButtonClick && (
-          <button
-            type="button"
-            className="h-9 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700"
-            onClick={onButtonClick}
-          >
+          <Button type="button" variant="primary" onClick={onButtonClick}>
             {buttonText}
-          </button>
+          </Button>
         )}
       </div>
     </div>

@@ -1,20 +1,13 @@
 import { useTranslation } from 'next-i18next';
-import { BsExclamationCircleFill } from 'react-icons/bs';
-import { getBorderClass } from '@/lib/borderUtils';
 import { usePathname, useRouter } from 'next/navigation';
 import type { OscratProductVersionSummary } from '@oscrat/model';
 import React from 'react';
 import { getProductVersionStatusKey } from '@/utils/translation';
-
-const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-green-100 dark:bg-green-900',
-  ARCHIVED: 'bg-red-100 dark:bg-red-900',
-  DEPRECATED: 'bg-gray-200 dark:bg-orange-900',
-  DEFAULT: 'bg-gray-100 dark:bg-gray-900',
-};
-
-const getStatusColorClass = (status: string): string =>
-  STATUS_COLORS[status] || STATUS_COLORS.DEFAULT;
+import Button from '@/components/button';
+import Card from '@/components/oscrat/shared/Card';
+import MetaField from '@/components/oscrat/shared/MetaField';
+import CountChip from '@/components/oscrat/shared/CountChip';
+import StatusPill from '@/components/oscrat/shared/StatusPill';
 
 interface VersionProps {
   data: OscratProductVersionSummary;
@@ -37,162 +30,82 @@ const Version: React.FC<VersionProps> = ({
 
   const { id, version: title, status } = data;
 
+  const openLabel = (count: number) =>
+    count > 0 ? `${count} ${t('oscrat.ui.open')}` : t('oscrat.ui.none');
+
+  const showMoreButton = (
+    <Button
+      variant="secondary"
+      size="m"
+      onClick={() => handleShowMore()}
+      text={t('oscrat.ui.show-more')}
+    />
+  );
+
   // If status is not supported, show simplified variant
   if (variant === 'notSupported') {
     return (
-      <div className="flex flex-col gap-2 rounded-lg border border-gray-400 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <Card className="flex flex-col gap-2">
         <div className="flex items-center">
           <div className="flex flex-1 flex-col justify-center">
-            <div className="font-bold text-black dark:text-gray-100">
-              <div className="text-[16px]">{title}</div>
+            <div className="text-h6 text-content font-bold">
+              {t('version')} - {title}
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex flex-col">
-              <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-                {t('status')}
-              </span>
-              <span
-                className={`inline-flex w-fit rounded-full px-2 py-1 text-sm font-semibold capitalize text-black ${getStatusColorClass(status)}`}
-              >
-                {t(getProductVersionStatusKey(status))}
-              </span>
-            </div>
+            <MetaField label={t('status')}>
+              <StatusPill
+                status={status}
+                label={t(getProductVersionStatusKey(status))}
+              />
+            </MetaField>
           </div>
 
-          <div className="ml-12 flex flex-1 justify-end font-medium text-gray-600">
-            <button
-              onClick={() => handleShowMore()}
-              className="rounded border border-gray-400 px-6 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
-            >
-              {t('oscrat.ui.show-more')}
-            </button>
-          </div>
+          <div className="ml-12 flex flex-1 justify-end">{showMoreButton}</div>
         </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-gray-400 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center">
-        <div className="flex flex-1 flex-col justify-center">
-          <div className="font-bold text-black dark:text-gray-100">
-            <div className="text-[16px]">{title}</div>
-          </div>
+    <Card className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-8">
+        <div className="text-h6 text-content font-bold">
+          {t('version')} - {title}
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300 md:w-[50%] md:grid-cols-4">
-          <div className="min-w-0 flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('status')}
-            </span>
-            <span
-              className={`inline-flex w-fit rounded-full px-2 py-1 text-sm font-semibold capitalize text-black ${getStatusColorClass(status)}`}
-            >
-              {t(getProductVersionStatusKey(status))}
-            </span>
-          </div>
-          <div className="min-w-0 flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.incidents')}
-            </span>
-            <div
-              className={`inline-flex font-semibold text-black dark:text-gray-100`}
-            >
-              {data.openIncidents > 0 ? (
-                <div
-                  className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                    data.openIncidents
-                  )}`}
-                >
-                  <BsExclamationCircleFill className="text-red-600" />
-                  <p>
-                    {data.openIncidents} {t('oscrat.ui.open')}
-                  </p>
-                </div>
-              ) : (
-                <p
-                  className={`rounded-full border px-2 py-0.5 ${getBorderClass(
-                    data.openIncidents
-                  )}`}
-                >
-                  {t('oscrat.ui.none')}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="min-w-0 flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.vulnerabilities')}
-            </span>
-            <div
-              className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}
-            >
-              {data.openVulnerabilities > 0 ? (
-                <div
-                  className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                    data.openVulnerabilities
-                  )}`}
-                >
-                  <BsExclamationCircleFill className="text-red-600" />
-                  <p>
-                    {data.openVulnerabilities} {t('oscrat.ui.open')}
-                  </p>
-                </div>
-              ) : (
-                <p
-                  className={`rounded-full border px-2 py-0.5 ${getBorderClass(
-                    data.openVulnerabilities
-                  )}`}
-                >
-                  {t('oscrat.ui.none')}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="min-w-0 flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.tasks.title')}
-            </span>
-            <div
-              className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}
-            >
-              {data.openTasks > 0 ? (
-                <div
-                  className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                    data.openTasks
-                  )}`}
-                >
-                  <BsExclamationCircleFill className="text-blue-600" />
-                  <p>
-                    {data.openTasks} {t('oscrat.ui.open')}
-                  </p>
-                </div>
-              ) : (
-                <p
-                  className={`rounded-full border px-2 py-0.5 ${getBorderClass(
-                    data.openTasks
-                  )}`}
-                >
-                  {t('oscrat.ui.none')}
-                </p>
-              )}
-            </div>
-          </div>
+        <div className="text-content-secondary text-b2 flex flex-wrap items-start gap-8">
+          <MetaField className="min-w-0" label={t('status')}>
+            <StatusPill
+              status={status}
+              label={t(getProductVersionStatusKey(status))}
+            />
+          </MetaField>
+          <MetaField className="min-w-0" label={t('oscrat.ui.incidents')}>
+            <CountChip
+              count={data.openIncidents}
+              displayText={openLabel(data.openIncidents)}
+            />
+          </MetaField>
+          <MetaField className="min-w-0" label={t('oscrat.ui.vulnerabilities')}>
+            <CountChip
+              count={data.openVulnerabilities}
+              displayText={openLabel(data.openVulnerabilities)}
+            />
+          </MetaField>
+          <MetaField className="min-w-0" label={t('oscrat.ui.tasks.title')}>
+            <CountChip
+              count={data.openTasks}
+              displayText={openLabel(data.openTasks)}
+              iconClassName="text-primary"
+            />
+          </MetaField>
         </div>
 
-        <div className="ml-12 flex flex-1 justify-end font-medium text-gray-600">
-          <button
-            onClick={() => handleShowMore()}
-            className="rounded border border-gray-400 px-6 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
-          >
-            {t('oscrat.ui.show-more')}
-          </button>
-        </div>
+        <div className="flex justify-end">{showMoreButton}</div>
       </div>
-    </div>
+    </Card>
   );
 };
 

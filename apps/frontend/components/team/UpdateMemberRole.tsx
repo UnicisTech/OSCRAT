@@ -25,17 +25,13 @@ const UpdateMemberRole = ({ team, member }: UpdateMemberRoleProps) => {
 
   return (
     <select
-      className="select select-bordered select-sm rounded bg-white text-black border-gray-300 "
+      className="select select-bordered select-sm bg-surface border-line rounded text-black"
       onChange={(e) => handleRoleUpdate(e.target.value)}
       value={member.role}
       disabled={isLoading}
     >
       {availableRoles.map((role) => (
-        <option 
-          value={role.id} 
-          key={role.id}
-          className="bg-white text-black "
-        >
+        <option value={role.id} key={role.id} className="bg-surface text-black">
           {role.id}
         </option>
       ))}

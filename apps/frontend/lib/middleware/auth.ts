@@ -139,7 +139,10 @@ export function withTeamAuth<T = any>(resourceAction?: [Resource, Action]) {
       const { productId, versionId } = req.query;
       (req as AuthenticatedTeamRequest).auditInfo = {
         user: { id: context.user.id, name: context.user.name },
-        team: { id: context.teamMember.teamId, name: context.teamMember.teamName },
+        team: {
+          id: context.teamMember.teamId,
+          name: context.teamMember.teamName,
+        },
         ...(productId && { productId: productId as string }),
         ...(versionId && { versionId: versionId as string }),
       };

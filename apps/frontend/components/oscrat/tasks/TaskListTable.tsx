@@ -18,35 +18,38 @@ const TaskListTable: React.FC<TaskListTableProps> = ({
   statusDropdown,
 }) => {
   const { t, ready } = useTranslation('common');
-  
+
   if (!ready) return null;
 
   return (
-    <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-gray-200 text-left text-sm text-gray-600">
-        <thead className="bg-gray-50">
+    <div className="bg-surface border-line rounded-card overflow-x-auto border">
+      <table className="text-content-secondary divide-line-subtle min-w-full divide-y text-left text-sm">
+        <thead className="bg-surface-muted">
           <tr>
-            <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 w-auto min-w-[300px]">
+            <th className="text-content w-auto min-w-[300px] p-4 text-b2 font-medium">
               {t('task')}
             </th>
-            <th className="hidden md:table-cell px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap">
+            <th className="text-content hidden whitespace-nowrap p-4 text-b2 font-medium md:table-cell">
               {t('product')}
             </th>
-            <th className="hidden lg:table-cell px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap">
+            <th className="text-content hidden whitespace-nowrap p-4 text-b2 font-medium lg:table-cell">
               {t('version')}
             </th>
-            <th className="hidden sm:table-cell px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap">
+            <th className="text-content hidden whitespace-nowrap p-4 text-b2 font-medium sm:table-cell">
               {t('due-date')}
             </th>
-            <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap">
+            <th className="text-content whitespace-nowrap p-4 text-b2 font-medium">
               {t('status')}
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
+        <tbody className="bg-surface divide-line-subtle divide-y">
           {tasks.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+              <td
+                colSpan={5}
+                className="text-content-muted px-6 py-8 text-center"
+              >
                 {t('no-tasks-yet')}
               </td>
             </tr>

@@ -74,7 +74,7 @@ export function useUploadVersionAttachment(
       });
 
       if (filters?.vulnerabilityId) {
-          queryClient.invalidateQueries({
+        queryClient.invalidateQueries({
           queryKey: queryKeys.oscrat.projects.versions.vulnerabilities.detail(
             teamId,
             versionId,

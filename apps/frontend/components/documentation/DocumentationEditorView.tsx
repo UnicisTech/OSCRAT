@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import { Button } from 'react-daisyui';
+import { Button } from '@/components/shared';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
 import MarkdownEditor from '@/components/shared/MarkdownEditorDynamic';
@@ -96,7 +96,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{documentation.title}</h1>
-          <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
+          <div className="text-content-muted mt-1 flex items-center gap-4 text-sm">
             {documentation.productName && (
               <span>
                 {t('product')}: {documentation.productName}
@@ -108,7 +108,8 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
               </span>
             )}
             <span>
-              {t('oscrat.ui.documentation.doc-version')}: {documentation.version}
+              {t('oscrat.ui.documentation.doc-version')}:{' '}
+              {documentation.version}
             </span>
           </div>
         </div>
@@ -117,16 +118,16 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
           {canManage && hasChanges && (
             <>
               <Button
-                color="ghost"
-                size="sm"
+                variant="tertiary"
+                size="m"
                 onClick={onUndo}
                 disabled={isUpdating}
               >
                 {t('undo')}
               </Button>
               <Button
-                color="primary"
-                size="sm"
+                variant="primary"
+                size="m"
                 onClick={onSave}
                 loading={isUpdating}
               >
@@ -135,20 +136,15 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
             </>
           )}
           {canManage && !isArchived && (
-            <Button
-              color="warning"
-              size="sm"
-              variant="outline"
-              onClick={onArchive}
-            >
+            <Button variant="secondary" size="m" onClick={onArchive}>
               {t('oscrat.ui.documentation.archive.action')}
             </Button>
           )}
           {canDelete && (
             <Button
-              color="error"
-              size="sm"
-              variant="outline"
+              tone="danger"
+              variant="secondary"
+              size="m"
               onClick={() => onShowDeleteModal(true)}
             >
               {t('delete')}
@@ -211,13 +207,13 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
                   );
                 }}
                 disabled={!canManage}
-                className="h-4 w-4 rounded border-gray-300"
+                className="border-line h-4 w-4 rounded"
               />
               <label htmlFor="public" className="text-sm">
                 {t('oscrat.ui.documentation.visibility.public-checkbox')}
               </label>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="text-content-muted mt-1 text-xs">
               {visibility === DocumentationVisibility.PUBLIC
                 ? t('oscrat.ui.documentation.visibility.public-hint')
                 : t('oscrat.ui.documentation.visibility.private-hint')}
@@ -239,7 +235,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
       <div>
         <label className="mb-2 block text-sm font-medium">{t('content')}</label>
         {canEdit ? (
-          <div className="rounded-md border border-gray-200 max-h-[600px] overflow-y-auto">
+          <div className="border-line-subtle rounded-card max-h-[600px] overflow-y-auto border">
             <MarkdownEditor
               key={editorKey}
               markdown={content}
@@ -248,7 +244,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
             />
           </div>
         ) : (
-          <div className="rounded-md border border-gray-200 bg-gray-50 opacity-75 max-h-[600px] overflow-y-auto">
+          <div className="border-line-subtle bg-surface-muted rounded-card max-h-[600px] overflow-y-auto border opacity-75">
             <MarkdownEditor
               key={editorKey}
               markdown={content}

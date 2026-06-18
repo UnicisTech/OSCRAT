@@ -116,9 +116,9 @@ const Attachments = ({ task }: { task: Task }) => {
             <div
               className={`flex flex-wrap ${
                 attachments.length ? 'justify-start' : 'justify-center'
-              } h-full w-full border-2 bg-white px-4 py-2 transition dark:bg-[color:hsla(var(--b1))] ${
-                isDragOver ? 'border-blue-400' : 'border-gray-300'
-              } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
+              } bg-surface h-full w-full border-2 px-4 py-2 transition ${
+                isDragOver ? 'border-info' : 'border-line'
+              } hover:border-line rounded-card cursor-pointer appearance-none border-dashed focus:outline-none`}
             >
               {attachments.map((attachment, index: number) => (
                 <AttachmentsCard
@@ -142,9 +142,9 @@ const Attachments = ({ task }: { task: Task }) => {
       <div
         className={`flex flex-wrap ${
           attachments.length ? 'justify-start' : 'justify-center'
-        } h-full w-full border-2 bg-white px-4 py-2 transition dark:bg-[color:hsla(var(--b1))] ${
-          isDragOver ? 'border-blue-400' : 'border-gray-300'
-        } cursor-pointer appearance-none rounded-md border-dashed hover:border-gray-400 focus:outline-none`}
+        } bg-surface h-full w-full border-2 px-4 py-2 transition ${
+          isDragOver ? 'border-info' : 'border-line'
+        } hover:border-line rounded-card cursor-pointer appearance-none border-dashed focus:outline-none`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -165,7 +165,7 @@ const Attachments = ({ task }: { task: Task }) => {
             <span className="flex items-center space-x-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-gray-600 dark:text-gray-400"
+                className="text-content-secondary h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -177,11 +177,11 @@ const Attachments = ({ task }: { task: Task }) => {
                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 1 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                 />
               </svg>
-              <span className="font-medium text-gray-600 dark:text-gray-400">
+              <span className="text-content-secondary font-medium">
                 {isDragOver
                   ? 'Release to attach files'
                   : 'Drop files to attach, or '}
-                <span className="text-blue-600 underline">browse</span>
+                <span className="text-primary underline">browse</span>
               </span>
             </span>
           </div>

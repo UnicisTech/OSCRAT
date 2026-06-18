@@ -36,15 +36,16 @@ export interface CRAAssessmentRawData {
  * before accessing its properties.
  */
 export function validateComplianceAssessmentRawData(
- data: unknown
+  data: unknown
 ): data is ComplianceAssessmentRawData {
   if (!data || typeof data !== 'object') return false;
-  
+
   const obj = data as Record<string, unknown>;
-  if (!obj.compliance_results || typeof obj.compliance_results !== 'object') return false;
-  
+  if (!obj.compliance_results || typeof obj.compliance_results !== 'object')
+    return false;
+
   const results = obj.compliance_results as Record<string, unknown>;
-  
+
   return (
     Array.isArray(results.assessments) &&
     Array.isArray(results.completedAreas) &&
@@ -62,11 +63,15 @@ export function isCRAAssessmentRawData(
   data: unknown
 ): data is CRAAssessmentRawData {
   if (!data || typeof data !== 'object') return false;
-  
+
   const obj = data as Record<string, unknown>;
-  if (!obj.questionnaire_results || typeof obj.questionnaire_results !== 'object') return false;
-  
+  if (
+    !obj.questionnaire_results ||
+    typeof obj.questionnaire_results !== 'object'
+  )
+    return false;
+
   const results = obj.questionnaire_results as Record<string, unknown>;
-  
+
   return typeof results.answers === 'object' && results.answers !== null;
 }

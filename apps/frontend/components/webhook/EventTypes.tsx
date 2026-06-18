@@ -31,10 +31,10 @@ const EventTypes = ({
           name="eventTypes"
           value={eventType}
           onChange={onChange}
-          className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+          className="border-line bg-surface-muted text-primary focus:ring-primary h-4 w-4 rounded focus:ring-2"
           defaultChecked={values ? values.includes(eventType) : false}
         />
-        <label className="ml-2 text-sm text-gray-900">{eventType}</label>
+        <label className="text-content ml-2 text-sm">{eventType}</label>
       </div>
     );
   });
@@ -43,7 +43,7 @@ const EventTypes = ({
     <>
       {events}
       {error && typeof error === 'string' && (
-        <div className="label-text-alt text-red-500">{error}</div>
+        <div className="label-text-alt text-danger">{error}</div>
       )}
     </>
   );

@@ -24,7 +24,9 @@ export default async function handler(
   }
 
   const { slug, docSlug } = await validateRequest(querySchema, req.query);
-  const doc = await getPublicDocumentation(slug, docSlug, { includeContent: true }) as DocumentationDetails | null;
+  const doc = (await getPublicDocumentation(slug, docSlug, {
+    includeContent: true,
+  })) as DocumentationDetails | null;
 
   if (!doc) {
     throw new ApiError(404, 'Documentation not found');

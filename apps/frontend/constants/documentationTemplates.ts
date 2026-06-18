@@ -627,7 +627,7 @@ Under H:
 `;
 
 const TEMPLATES_RAW: Record<TemplateType, DocumentationTemplate> = {
-  'empty': {
+  empty: {
     id: 'empty',
     name: 'Empty Document',
     markdown: '',

@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '@/components/button';
 
 interface TabActionButtonProps {
   onClick?: () => void;
@@ -9,6 +10,12 @@ interface TabActionButtonProps {
   variant?: 'primary' | 'secondary' | 'icon-only';
 }
 
+/**
+ * Tab toolbar action button — a thin domain wrapper over the canonical Button
+ * (secondary, medium) so all buttons share one styling source. The legacy
+ * `variant` values all map onto the outlined secondary style; `icon-only`
+ * renders a square icon button.
+ */
 const TabActionButton: React.FC<TabActionButtonProps> = ({
   onClick,
   disabled = false,
@@ -17,41 +24,20 @@ const TabActionButton: React.FC<TabActionButtonProps> = ({
   title,
   variant = 'primary',
 }) => {
-  const baseClasses = 'inline-flex items-center rounded-md border bg-white text-sm font-medium leading-5 hover:bg-gray-50';
-  const justifyClass = variant === 'icon-only' ? 'justify-center' : '';
-
-  const sizeClasses = {
-    primary: 'px-4 py-2',
-    secondary: 'px-4 py-2',
-    'icon-only': 'px-2.5 py-2',
-  };
-
-  const colorClasses = {
-    primary: 'border-gray-300 text-gray-900',
-    secondary: 'border-gray-300 text-gray-600',
-    'icon-only': 'border-gray-300 text-gray-700',
-  };
-
-  const stateClasses = disabled
-    ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
-    : colorClasses[variant];
-
-  const className = `${baseClasses} ${justifyClass} ${sizeClasses[variant]} ${stateClasses}`;
+  const iconOnly = variant === 'icon-only';
 
   return (
-    <button
-      onClick={disabled ? undefined : onClick}
+    <Button
+      variant="secondary"
+      size="m"
+      onClick={onClick}
       disabled={disabled}
-      className={className}
       title={title}
+      icon={iconOnly ? icon : undefined}
+      startIcon={iconOnly ? undefined : icon}
     >
-      {icon && (
-        <span className={variant !== 'icon-only' && children ? 'mr-2' : ''}>
-          <span className="flex h-5 w-5 items-center justify-center">{icon}</span>
-        </span>
-      )}
-      {children}
-    </button>
+      {iconOnly ? undefined : children}
+    </Button>
   );
 };
 

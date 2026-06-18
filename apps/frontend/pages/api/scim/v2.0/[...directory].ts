@@ -87,7 +87,11 @@ const handleEvents = async (event: DirectorySyncEvent) => {
     };
     await addTeamMember(teamId, user.id, Role.MEMBER, auditInfo);
     ensureAwarenessTrainingTask(teamId, user.id, userName, auditInfo).catch(
-      (err) => console.error('[Awareness] Failed to create training task on SCIM create:', err)
+      (err) =>
+        console.error(
+          '[Awareness] Failed to create training task on SCIM create:',
+          err
+        )
     );
   }
 
@@ -122,7 +126,11 @@ const handleEvents = async (event: DirectorySyncEvent) => {
       };
       await addTeamMember(teamId, user.id, Role.MEMBER, auditInfo);
       ensureAwarenessTrainingTask(teamId, user.id, userName, auditInfo).catch(
-        (err) => console.error('[Awareness] Failed to create training task on SCIM update:', err)
+        (err) =>
+          console.error(
+            '[Awareness] Failed to create training task on SCIM update:',
+            err
+          )
       );
 
       return;

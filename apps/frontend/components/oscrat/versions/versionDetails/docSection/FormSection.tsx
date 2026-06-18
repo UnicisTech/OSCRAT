@@ -19,7 +19,9 @@ export function FormField({
   multiline = false,
   rows = 3,
 }: FormFieldProps) {
-  const inputClasses = readOnly ? docFormStyles.inputReadOnly : docFormStyles.input;
+  const inputClasses = readOnly
+    ? docFormStyles.inputReadOnly
+    : docFormStyles.input;
 
   return (
     <div>
@@ -31,7 +33,9 @@ export function FormField({
           placeholder={placeholder}
           rows={rows}
           readOnly={readOnly}
-          className={readOnly ? docFormStyles.inputReadOnly : docFormStyles.textarea}
+          className={
+            readOnly ? docFormStyles.inputReadOnly : docFormStyles.textarea
+          }
         />
       ) : (
         <input

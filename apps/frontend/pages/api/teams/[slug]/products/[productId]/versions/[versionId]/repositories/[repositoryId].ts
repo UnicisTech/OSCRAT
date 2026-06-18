@@ -131,7 +131,12 @@ const handleDELETE = async (
 
   const { repositoryId } = req.query;
 
-  await deleteRepository(prisma, teamMember.teamId, repositoryId as string, req.auditInfo);
+  await deleteRepository(
+    prisma,
+    teamMember.teamId,
+    repositoryId as string,
+    req.auditInfo
+  );
 
   res.status(200).json({ data: {} });
 };

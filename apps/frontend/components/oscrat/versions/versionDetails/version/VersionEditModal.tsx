@@ -5,7 +5,11 @@ import { FullScreenModal } from '@/components/shared';
 import type { OscratProductVersionUpdate } from '@oscrat/model';
 import { useFormik } from 'formik';
 import { versionUpdateSchema } from '@/lib/validation/version';
-import { formStyles, getInputClassName, getSelectClassName } from '@/utils/formStyles';
+import {
+  formStyles,
+  getInputClassName,
+  getSelectClassName,
+} from '@/utils/formStyles';
 import { getProductVersionStatusKey } from '@/utils/translation';
 
 interface VersionEditModalProps {
@@ -50,8 +54,12 @@ const VersionEditModal: React.FC<VersionEditModalProps> = ({
       onSave({
         version: values.version.trim(),
         status: values.status as OscratProductVersionStatus,
-        releaseDate: values.releaseDate ? new Date(values.releaseDate) : undefined,
-        supportEndDate: values.supportEndDate ? new Date(values.supportEndDate) : undefined,
+        releaseDate: values.releaseDate
+          ? new Date(values.releaseDate)
+          : undefined,
+        supportEndDate: values.supportEndDate
+          ? new Date(values.supportEndDate)
+          : undefined,
       });
     },
   });
@@ -81,26 +89,26 @@ const VersionEditModal: React.FC<VersionEditModalProps> = ({
             value={formik.values.version}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={getInputClassName(!!(formik.touched.version && formik.errors.version))}
+            className={getInputClassName(
+              !!(formik.touched.version && formik.errors.version)
+            )}
             placeholder={t('oscrat.ui.version-name')}
           />
           {formik.touched.version && formik.errors.version && (
-            <p className={formStyles.error.text}>
-              {t(formik.errors.version)}
-            </p>
+            <p className={formStyles.error.text}>{t(formik.errors.version)}</p>
           )}
         </div>
 
         <div>
-          <label className={formStyles.label.default}>
-            {t('status')}
-          </label>
+          <label className={formStyles.label.default}>{t('status')}</label>
           <select
             name="status"
             value={formik.values.status}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className={getSelectClassName(!!(formik.touched.status && formik.errors.status))}
+            className={getSelectClassName(
+              !!(formik.touched.status && formik.errors.status)
+            )}
           >
             {versionStatuses.map((status) => (
               <option key={status} value={status}>
@@ -109,9 +117,7 @@ const VersionEditModal: React.FC<VersionEditModalProps> = ({
             ))}
           </select>
           {formik.touched.status && formik.errors.status && (
-            <p className={formStyles.error.text}>
-              {t(formik.errors.status)}
-            </p>
+            <p className={formStyles.error.text}>{t(formik.errors.status)}</p>
           )}
         </div>
 
@@ -148,4 +154,3 @@ const VersionEditModal: React.FC<VersionEditModalProps> = ({
 };
 
 export default VersionEditModal;
-

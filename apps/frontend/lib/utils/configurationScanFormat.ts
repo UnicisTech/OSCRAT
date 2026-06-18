@@ -12,7 +12,10 @@ export type ConfigurationScanFormat =
   | { kind: typeof CONFIGURATION_SCAN_FORMAT_KIND.ARF; version: string }
   | { kind: typeof CONFIGURATION_SCAN_FORMAT_KIND.XCCDF; version: string }
   | { kind: typeof CONFIGURATION_SCAN_FORMAT_KIND.OVAL; version: string }
-  | { kind: typeof CONFIGURATION_SCAN_FORMAT_KIND.UNKNOWN; rootElement?: string };
+  | {
+      kind: typeof CONFIGURATION_SCAN_FORMAT_KIND.UNKNOWN;
+      rootElement?: string;
+    };
 
 const ARF_NAMESPACE_PREFIX =
   'http://scap.nist.gov/schema/asset-reporting-format/';
@@ -62,7 +65,10 @@ export function detectConfigurationScanFormat(
   if (localName === 'asset-report-collection') {
     const versionMatch = ARF_NAMESPACE_PATTERN.exec(attrs);
     if (versionMatch)
-      return { kind: CONFIGURATION_SCAN_FORMAT_KIND.ARF, version: versionMatch[1] };
+      return {
+        kind: CONFIGURATION_SCAN_FORMAT_KIND.ARF,
+        version: versionMatch[1],
+      };
     if (attrs.includes(ARF_NAMESPACE_PREFIX)) {
       return { kind: CONFIGURATION_SCAN_FORMAT_KIND.ARF, version: 'unknown' };
     }
@@ -71,7 +77,10 @@ export function detectConfigurationScanFormat(
   if (localName === 'Benchmark') {
     const versionMatch = XCCDF_NAMESPACE_PATTERN.exec(attrs);
     if (versionMatch)
-      return { kind: CONFIGURATION_SCAN_FORMAT_KIND.XCCDF, version: versionMatch[1] };
+      return {
+        kind: CONFIGURATION_SCAN_FORMAT_KIND.XCCDF,
+        version: versionMatch[1],
+      };
     if (attrs.includes(XCCDF_NAMESPACE_PREFIX)) {
       return { kind: CONFIGURATION_SCAN_FORMAT_KIND.XCCDF, version: 'unknown' };
     }
@@ -80,16 +89,25 @@ export function detectConfigurationScanFormat(
   if (localName === 'oval_results') {
     const schemaVersion = OVAL_SCHEMA_VERSION_PATTERN.exec(cleaned);
     if (schemaVersion)
-      return { kind: CONFIGURATION_SCAN_FORMAT_KIND.OVAL, version: schemaVersion[1] };
+      return {
+        kind: CONFIGURATION_SCAN_FORMAT_KIND.OVAL,
+        version: schemaVersion[1],
+      };
     const nsVersion = OVAL_RESULTS_NAMESPACE_PATTERN.exec(attrs);
     if (nsVersion)
-      return { kind: CONFIGURATION_SCAN_FORMAT_KIND.OVAL, version: nsVersion[1] };
+      return {
+        kind: CONFIGURATION_SCAN_FORMAT_KIND.OVAL,
+        version: nsVersion[1],
+      };
     if (attrs.includes(OVAL_RESULTS_NAMESPACE_PREFIX)) {
       return { kind: CONFIGURATION_SCAN_FORMAT_KIND.OVAL, version: 'unknown' };
     }
   }
 
-  return { kind: CONFIGURATION_SCAN_FORMAT_KIND.UNKNOWN, rootElement: localName };
+  return {
+    kind: CONFIGURATION_SCAN_FORMAT_KIND.UNKNOWN,
+    rootElement: localName,
+  };
 }
 
 /** Human-readable label for a detected format, used in error messages. */

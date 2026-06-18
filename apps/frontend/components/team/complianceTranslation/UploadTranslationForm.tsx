@@ -3,6 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { FaDownload, FaUpload } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { AccessControl } from '@/components/shared/AccessControl';
+import Button from '@/components/button';
 import { downloadJson } from '@/lib/utils/download';
 import {
   TRANSLATION_NAMESPACES,
@@ -15,7 +16,9 @@ import {
 interface UploadTranslationFormProps {
   upsertData: (dataKey: string, payload: string) => Promise<unknown>;
   fetchDataItem: (dataKey: string) => Promise<{ payload: string } | null>;
-  fetchComplianceTemplate: (namespace: string) => Promise<Record<string, string>>;
+  fetchComplianceTemplate: (
+    namespace: string
+  ) => Promise<Record<string, string>>;
   existingTranslations: ExistingTranslation[];
   isLoading: boolean;
   isUpserting: boolean;
@@ -31,11 +34,16 @@ const UploadTranslationForm: React.FC<UploadTranslationFormProps> = ({
 }) => {
   const { t } = useTranslation('common');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedNamespace, setSelectedNamespace] = useState<TranslationNamespaceKey>('team-manufacturer');
+  const [selectedNamespace, setSelectedNamespace] =
+    useState<TranslationNamespaceKey>('team-manufacturer');
   const [selectedLanguage, setSelectedLanguage] = useState('en');
 
   const existingTranslation = useMemo(
-    () => existingTranslations.find((tr) => tr.namespace === selectedNamespace && tr.language === selectedLanguage),
+    () =>
+      existingTranslations.find(
+        (tr) =>
+          tr.namespace === selectedNamespace && tr.language === selectedLanguage
+      ),
     [existingTranslations, selectedNamespace, selectedLanguage]
   );
 
@@ -54,7 +62,10 @@ const UploadTranslationForm: React.FC<UploadTranslationFormProps> = ({
     try {
       const data = await fetchDataItem(existingTranslation.dataKey);
       if (data?.payload) {
-        downloadJson(data.payload, `${selectedNamespace}-${selectedLanguage}.json`);
+        downloadJson(
+          data.payload,
+          `${selectedNamespace}-${selectedLanguage}.json`
+        );
         toast.success(t('oscrat.ui.compliance-translation.download-success'));
       }
     } catch {
@@ -69,18 +80,21 @@ const UploadTranslationForm: React.FC<UploadTranslationFormProps> = ({
     try {
       const text = await file.text();
       const uploadedData = JSON.parse(text) as Record<string, string>;
-      
+
       const templateData = await fetchComplianceTemplate(selectedNamespace);
       const templateKeys = Object.keys(templateData);
       const jsonKeys = Object.keys(uploadedData);
-      
+
       if (!templateKeys.every((key) => jsonKeys.includes(key))) {
         toast.error(t('oscrat.ui.compliance-translation.invalid-json'));
         if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
-      
-      await upsertData(buildTranslationDataKey(selectedNamespace, selectedLanguage), text);
+
+      await upsertData(
+        buildTranslationDataKey(selectedNamespace, selectedLanguage),
+        text
+      );
       toast.success(t('oscrat.ui.compliance-translation.upload-success'));
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
@@ -93,74 +107,102 @@ const UploadTranslationForm: React.FC<UploadTranslationFormProps> = ({
     }
   };
 
-  const btnOutline = 'btn btn-outline btn-sm flex items-center gap-2';
-  const btnPrimary = 'btn btn-primary btn-sm flex items-center gap-2';
-
   return (
     <AccessControl resource="team" actions={['update']}>
       <div className="space-y-4">
-        <h3 className="text-lg font-medium">{t('oscrat.ui.compliance-translation.upload-new')}</h3>
+        <h3 className="text-lg font-medium">
+          {t('oscrat.ui.compliance-translation.upload-new')}
+        </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="mb-1 block text-sm font-medium">
               {t('oscrat.ui.compliance-translation.assessment-type')}
             </label>
             <select
-              className="select select-bordered w-full bg-white dark:bg-base-100"
+              className="select select-bordered bg-surface w-full"
               value={selectedNamespace}
-              onChange={(e) => setSelectedNamespace(e.target.value as TranslationNamespaceKey)}
+              onChange={(e) =>
+                setSelectedNamespace(e.target.value as TranslationNamespaceKey)
+              }
             >
-              {Object.entries(TRANSLATION_NAMESPACES).map(([key, { label }]) => (
-                <option key={key} value={key}>{label}</option>
-              ))}
+              {Object.entries(TRANSLATION_NAMESPACES).map(
+                ([key, { label }]) => (
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
+                )
+              )}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="mb-1 block text-sm font-medium">
               {t('oscrat.ui.compliance-translation.language')}
             </label>
             <select
-              className="select select-bordered w-full bg-white dark:bg-base-100"
+              className="select select-bordered bg-surface w-full"
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
             >
               {SUPPORTED_LANGUAGES.map(({ code, label }) => (
-                <option key={code} value={code}>{label}</option>
+                <option key={code} value={code}>
+                  {label}
+                </option>
               ))}
             </select>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button type="button" className={btnOutline} onClick={handleDownloadTemplate}>
-            <FaDownload />
+          <Button
+            type="button"
+            variant="secondary"
+            size="m"
+            startIcon={<FaDownload />}
+            onClick={handleDownloadTemplate}
+          >
             {t('oscrat.ui.compliance-translation.download-template')}
-          </button>
+          </Button>
 
           {existingTranslation && (
-            <button type="button" className={btnOutline} onClick={handleDownloadExisting}>
-              <FaDownload />
+            <Button
+              type="button"
+              variant="secondary"
+              size="m"
+              startIcon={<FaDownload />}
+              onClick={handleDownloadExisting}
+            >
               {t('oscrat.ui.compliance-translation.download-existing')}
-            </button>
+            </Button>
           )}
 
-          <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileUpload} className="hidden" />
-          <button
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <Button
             type="button"
-            className={btnPrimary}
+            variant="primary"
+            size="m"
+            startIcon={<FaUpload />}
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading || isUpserting}
           >
-            <FaUpload />
-            {isUpserting ? t('oscrat.ui.uploading') : t('oscrat.ui.compliance-translation.upload-translation')}
-          </button>
+            {isUpserting
+              ? t('oscrat.ui.uploading')
+              : t('oscrat.ui.compliance-translation.upload-translation')}
+          </Button>
         </div>
 
-        <div className="text-xs text-gray-500">
-          <p className="font-medium mb-1">{t('oscrat.ui.compliance-translation.workflow-title')}</p>
-          <ol className="list-decimal list-inside flex flex-col gap-1">
+        <div className="text-content-muted text-xs">
+          <p className="mb-1 font-medium">
+            {t('oscrat.ui.compliance-translation.workflow-title')}
+          </p>
+          <ol className="flex list-inside list-decimal flex-col gap-1">
             <li>{t('oscrat.ui.compliance-translation.workflow-step-1')}</li>
             <li>{t('oscrat.ui.compliance-translation.workflow-step-2')}</li>
             <li>{t('oscrat.ui.compliance-translation.workflow-step-3')}</li>

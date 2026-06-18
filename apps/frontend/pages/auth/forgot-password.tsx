@@ -11,7 +11,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRef, type ReactElement, useState } from 'react';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import toast from 'react-hot-toast';
 import type { ApiResponse, NextPageWithLayout } from 'types';
 import * as Yup from 'yup';
@@ -72,8 +72,8 @@ const ForgotPassword: NextPageWithLayout<
               placeholder="Email"
               value={formik.values.email}
               error={
-                formik.touched.email && formik.errors.email 
-                  ? t(formik.errors.email) 
+                formik.touched.email && formik.errors.email
+                  ? t(formik.errors.email)
                   : undefined
               }
               onChange={formik.handleChange}
@@ -87,18 +87,16 @@ const ForgotPassword: NextPageWithLayout<
           <div className="mt-4">
             <Button
               type="submit"
-              color="primary"
+              variant="primary"
               loading={formik.isSubmitting}
-              active={formik.dirty}
               fullWidth
-              size="md"
             >
               {t('email-password-reset-link')}
             </Button>
           </div>
         </form>
       </div>
-      <p className="mt-3 text-center text-sm text-gray-600">
+      <p className="text-content-secondary mt-3 text-center text-sm">
         {t('already-have-an-account')}
         <Link
           href="/auth/login"

@@ -3,7 +3,10 @@ import type { NextApiResponse } from 'next';
 import * as Yup from 'yup';
 import { ApiError } from '@/lib/errors';
 import { validateRequest } from '@/lib/validation/validateRequest';
-import { linkDocumentationToTask, unlinkDocumentationFromTask } from 'models/documentation';
+import {
+  linkDocumentationToTask,
+  unlinkDocumentationFromTask,
+} from 'models/documentation';
 
 const taskLinkSchema = Yup.object({
   taskId: Yup.number().required('taskId is required').positive().integer(),

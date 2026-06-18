@@ -14,9 +14,9 @@ const CraForm: React.FC<CraFormProps> = ({
   onFormCompleted,
   initialFormState,
 }) => {
-  const allQuestions: (CraQuestion)[] = [
+  const allQuestions: CraQuestion[] = [
     ...data.applicabilityQuestions,
-    ...data.riskQuestions
+    ...data.riskQuestions,
   ];
   const TOTAL_QUESTIONS = allQuestions.length;
 
@@ -39,34 +39,37 @@ const CraForm: React.FC<CraFormProps> = ({
   const handleNext = useCallback(() => {
     const currentQuestion = allQuestions[activeStep - 1];
     const currentAnswer = answers[currentQuestion.id];
-    
+
     if (!currentAnswer) return;
-    
-    const isEliminatory = checkIsEliminatory(currentQuestion, currentAnswer.answer.text);
-    
+
+    const isEliminatory = checkIsEliminatory(
+      currentQuestion,
+      currentAnswer.answer.text
+    );
+
     if (isEliminatory) {
       setIsNotEligible(true);
       setShowResult(true);
       return;
     }
-    
+
     if (activeStep === TOTAL_QUESTIONS) {
       setIsNotEligible(false);
       setHighestRisk(highestRiskLevel);
       setShowResult(true);
-    
+
       const completedState = {
         answers,
         activeStep,
         skippedQuestions: Array.from(skippedQuestions),
         highestRiskLevel,
         completed: true,
-        completedAt: new Date().toISOString()
+        completedAt: new Date().toISOString(),
       };
-      
+
       // Save to localStorage for temporary storage until product is created
       saveFormState(completedState);
-      
+
       onFormCompleted?.(completedState);
     } else {
       setActiveStep(activeStep + 1);
@@ -82,11 +85,11 @@ const CraForm: React.FC<CraFormProps> = ({
     setShowResult,
     setHighestRisk,
     onFormCompleted,
-    TOTAL_QUESTIONS
+    TOTAL_QUESTIONS,
   ]);
 
   return (
-    <div className="flex flex-col gap-4 max-w-2xl mx-auto">
+    <div className="mx-auto flex max-w-2xl flex-col gap-4">
       <ProgressBar total={TOTAL_QUESTIONS} step={activeStep} />
 
       {allQuestions.map((step, index) => {

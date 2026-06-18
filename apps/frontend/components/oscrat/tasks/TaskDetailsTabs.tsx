@@ -2,7 +2,13 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
-import { FaUpload, FaDownload, FaTrash, FaLink, FaUnlink } from 'react-icons/fa';
+import {
+  FaUpload,
+  FaDownload,
+  FaTrash,
+  FaLink,
+  FaUnlink,
+} from 'react-icons/fa';
 import type { Task, Team } from '@oscrat/model';
 import {
   useGetTaskLinkedDocumentation,
@@ -16,10 +22,12 @@ import { documentationEndpoints } from '@/lib/api/endpoints/documentation';
 import { queryClient } from '@/lib/api/hooks';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { StatusBadge, Loading } from '@/components/shared';
+import Button from '@/components/button';
 import useCanAccess from '@/hooks/useCanAccess';
 import { useComments } from '@/hooks/useComments';
 import { extractErrorMessage } from '@/lib/utils';
 import { checkExtensionAndMIMEType } from '@/utils/fileValidation';
+import { formatDateShort, formatDateTime } from '@/utils/dateFormat';
 import type { Attachment } from '@/types';
 
 interface TaskDetailsTabsProps {
@@ -46,10 +54,8 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
   const canUpdateTask = canAccess('task', ['update']);
 
   // Documentation
-  const { data: linkedDocs, isLoading: isLoadingDocs } = useGetTaskLinkedDocumentation(
-    team.slug,
-    taskNumberStr
-  );
+  const { data: linkedDocs, isLoading: isLoadingDocs } =
+    useGetTaskLinkedDocumentation(team.slug, taskNumberStr);
   const { data: allDocs } = useListDocumentation(team.slug);
   const [showLinkDocPicker, setShowLinkDocPicker] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState('');
@@ -63,10 +69,8 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
   } = useComments(team.slug, taskNumberStr);
 
   // Attachments
-  const { data: attachments, isLoading: isLoadingAttachments } = useGetTaskAttachments(
-    team.slug,
-    taskNumberStr
-  );
+  const { data: attachments, isLoading: isLoadingAttachments } =
+    useGetTaskAttachments(team.slug, taskNumberStr);
   const uploadMutation = useUploadTaskAttachment(team.slug, taskNumberStr);
   const deleteMutation = useDeleteTaskAttachment(team.slug, taskNumberStr);
   const downloadMutation = useDownloadAttachment();
@@ -98,7 +102,10 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
         queryKey: queryKeys.teams.tasks.documentation(team.slug, taskNumberStr),
       });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.teams.documentation.detail(team.slug, selectedDocId),
+        queryKey: queryKeys.teams.documentation.detail(
+          team.slug,
+          selectedDocId
+        ),
       });
       toast.success(t('oscrat.ui.documentation.linked'));
       setShowLinkDocPicker(false);
@@ -110,20 +117,28 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     }
   }, [selectedDocId, team.slug, task.id, taskNumberStr, t]);
 
-  const handleUnlinkDoc = useCallback(async (docId: string) => {
-    try {
-      await documentationEndpoints.unlinkTask(team.slug, docId, task.id);
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.teams.tasks.documentation(team.slug, taskNumberStr),
-      });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.teams.documentation.detail(team.slug, docId),
-      });
-      toast.success(t('oscrat.ui.documentation.unlinked'));
-    } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, 'Failed to unlink documentation'));
-    }
-  }, [team.slug, task.id, taskNumberStr, t]);
+  const handleUnlinkDoc = useCallback(
+    async (docId: string) => {
+      try {
+        await documentationEndpoints.unlinkTask(team.slug, docId, task.id);
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.teams.tasks.documentation(
+            team.slug,
+            taskNumberStr
+          ),
+        });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.teams.documentation.detail(team.slug, docId),
+        });
+        toast.success(t('oscrat.ui.documentation.unlinked'));
+      } catch (error: unknown) {
+        toast.error(
+          extractErrorMessage(error, 'Failed to unlink documentation')
+        );
+      }
+    },
+    [team.slug, task.id, taskNumberStr, t]
+  );
 
   // --- Comments ---
   const handleAddComment = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -141,23 +156,28 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
   };
 
   // --- Attachments (explicit button-triggered, no useEffect) ---
-  const handleUploadFile = useCallback(async (file: File) => {
-    if (!checkExtensionAndMIMEType(file)) {
-      toast.error(t('oscrat.ui.file-upload-allowed-types'));
-      return;
-    }
-    try {
-      await uploadMutation.mutateAsync({
-        file,
-        taskId: task.id,
-        slug: team.slug,
-        versionId: task.versionId ?? undefined,
-      });
-      toast.success(t('oscrat.ui.file-uploaded-successfully'));
-    } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file')));
-    }
-  }, [uploadMutation, task.id, team.slug, t]);
+  const handleUploadFile = useCallback(
+    async (file: File) => {
+      if (!checkExtensionAndMIMEType(file)) {
+        toast.error(t('oscrat.ui.file-upload-allowed-types'));
+        return;
+      }
+      try {
+        await uploadMutation.mutateAsync({
+          file,
+          taskId: task.id,
+          slug: team.slug,
+          versionId: task.versionId ?? undefined,
+        });
+        toast.success(t('oscrat.ui.file-uploaded-successfully'));
+      } catch (error: unknown) {
+        toast.error(
+          extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file'))
+        );
+      }
+    },
+    [uploadMutation, task.id, team.slug, t]
+  );
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -186,18 +206,27 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     }
   };
 
-  const handleDownloadAttachment = async (attachmentId: string, filename: string) => {
+  const handleDownloadAttachment = async (
+    attachmentId: string,
+    filename: string
+  ) => {
     try {
       await downloadMutation.mutateAsync({ attachmentId, filename });
     } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-download')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-download'))
+      );
     }
   };
 
   // --- Tab content renderers ---
   const renderDocumentationTab = () => {
     if (isLoadingDocs) {
-      return <div className="p-6"><Loading /></div>;
+      return (
+        <div className="p-6">
+          <Loading />
+        </div>
+      );
     }
 
     return (
@@ -209,94 +238,136 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
                 <select
                   value={selectedDocId}
                   onChange={(e) => setSelectedDocId(e.target.value)}
-                  className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border-line focus:border-primary focus:ring-primary rounded-input border px-3 py-1.5 text-sm focus:outline-none focus:ring-2"
                 >
-                  <option value="">{t('oscrat.ui.select-documentation')}</option>
+                  <option value="">
+                    {t('oscrat.ui.select-documentation')}
+                  </option>
                   {availableDocsToLink.map((doc) => (
-                    <option key={doc.id} value={doc.id}>{doc.title}</option>
+                    <option key={doc.id} value={doc.id}>
+                      {doc.title}
+                    </option>
                   ))}
                 </select>
-                <button
+                <Button
+                  variant="primary"
+                  size="m"
                   onClick={handleLinkDoc}
                   disabled={!selectedDocId || isLinkingDoc}
-                  className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-                >
-                  {t('oscrat.ui.link')}
-                </button>
-                <button
-                  onClick={() => { setShowLinkDocPicker(false); setSelectedDocId(''); }}
-                  className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-                >
-                  {t('cancel')}
-                </button>
+                  text={t('oscrat.ui.link')}
+                />
+                <Button
+                  variant="secondary"
+                  size="m"
+                  onClick={() => {
+                    setShowLinkDocPicker(false);
+                    setSelectedDocId('');
+                  }}
+                  text={t('cancel')}
+                />
               </div>
             ) : (
-              <button
+              <Button
+                variant="secondary"
+                size="m"
                 onClick={() => setShowLinkDocPicker(true)}
-                className="flex items-center gap-2 rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <FaLink size={12} />
-                {t('oscrat.ui.link-documentation')}
-              </button>
+                startIcon={<FaLink size={12} />}
+                text={t('oscrat.ui.link-documentation')}
+              />
             )}
           </div>
         )}
 
         {linkedDocs && linkedDocs.length > 0 ? (
-          <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200 text-left text-sm text-gray-600">
-              <thead className="bg-gray-50">
+          <div className="bg-surface border-line rounded-card overflow-x-auto border">
+            <table className="text-content-secondary divide-line-subtle min-w-full divide-y text-left text-sm">
+              <thead className="bg-surface-muted text-content border-line-header border-b">
                 <tr>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700">{t('title')}</th>
-                  <th className="hidden md:table-cell px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap">{t('oscrat.ui.documentation.level.label')}</th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap">{t('status')}</th>
-                  <th className="hidden sm:table-cell px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap">{t('visibility')}</th>
-                  <th className="hidden lg:table-cell px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap">{t('updated')}</th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('title')}
+                  </th>
+                  <th className="text-content text-b2 hidden whitespace-nowrap p-4 font-medium md:table-cell">
+                    {t('oscrat.ui.documentation.level.label')}
+                  </th>
+                  <th className="text-content text-b2 whitespace-nowrap p-4 font-medium">
+                    {t('status')}
+                  </th>
+                  <th className="text-content text-b2 hidden whitespace-nowrap p-4 font-medium sm:table-cell">
+                    {t('visibility')}
+                  </th>
+                  <th className="text-content text-b2 hidden whitespace-nowrap p-4 font-medium lg:table-cell">
+                    {t('updated')}
+                  </th>
                   {canUpdateTask && (
-                    <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-700 whitespace-nowrap text-right">{t('actions')}</th>
+                    <th className="text-content text-b2 whitespace-nowrap p-4 text-right font-medium">
+                      {t('actions')}
+                    </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
+              <tbody className="bg-surface divide-line-subtle divide-y">
                 {linkedDocs.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleDocClick(doc.id)}>
+                  <tr
+                    key={doc.id}
+                    className="hover:bg-surface-muted cursor-pointer"
+                    onClick={() => handleDocClick(doc.id)}
+                  >
                     <td className="px-4 py-3">
                       <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">{doc.title}</span>
+                        <span className="text-content font-medium">
+                          {doc.title}
+                        </span>
                         {doc.productName && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-content-muted text-xs">
                             {doc.productName}
                             {doc.versionName && ` ${doc.versionName}`}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3">
-                      <span className="text-sm text-gray-600">
-                        {doc.productName ? t('oscrat.ui.documentation.level.product') : t('oscrat.ui.documentation.level.organization')}
+                    <td className="hidden px-4 py-3 md:table-cell">
+                      <span className="text-content-secondary text-sm">
+                        {doc.productName
+                          ? t('oscrat.ui.documentation.level.product')
+                          : t('oscrat.ui.documentation.level.organization')}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <StatusBadge value={doc.status} label={t(`oscrat.ui.documentation.status.${doc.status.toLowerCase()}`)} />
+                      <StatusBadge
+                        value={doc.status}
+                        label={t(
+                          `oscrat.ui.documentation.status.${doc.status.toLowerCase()}`
+                        )}
+                      />
                     </td>
-                    <td className="hidden sm:table-cell px-4 py-3">
-                      <span className={`text-sm ${doc.visibility === 'PUBLIC' ? 'text-green-600' : 'text-gray-500'}`}>
-                        {doc.visibility === 'PUBLIC' ? t('oscrat.ui.documentation.visibility.public') : t('oscrat.ui.documentation.visibility.private')}
+                    <td className="hidden px-4 py-3 sm:table-cell">
+                      <span
+                        className={`text-sm ${doc.visibility === 'PUBLIC' ? 'text-success' : 'text-content-muted'}`}
+                      >
+                        {doc.visibility === 'PUBLIC'
+                          ? t('oscrat.ui.documentation.visibility.public')
+                          : t('oscrat.ui.documentation.visibility.private')}
                       </span>
                     </td>
-                    <td className="hidden lg:table-cell px-4 py-3">
-                      <span className="text-sm text-gray-500">{new Date(doc.updatedAt).toLocaleDateString()}</span>
+                    <td className="hidden px-4 py-3 lg:table-cell">
+                      <span className="text-content-muted text-sm">
+                        {formatDateShort(doc.updatedAt)}
+                      </span>
                     </td>
                     {canUpdateTask && (
                       <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleUnlinkDoc(doc.id); }}
-                          className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                        <Button
+                          variant="tertiary"
+                          tone="danger"
+                          size="s"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUnlinkDoc(doc.id);
+                          }}
                           title={t('oscrat.ui.unlink-documentation')}
-                        >
-                          <FaUnlink size={12} />
-                          {t('oscrat.ui.unlink')}
-                        </button>
+                          startIcon={<FaUnlink size={12} />}
+                          text={t('oscrat.ui.unlink')}
+                        />
                       </td>
                     )}
                   </tr>
@@ -305,8 +376,10 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
             </table>
           </div>
         ) : (
-          <div className="p-6 text-center text-gray-500">
-            <p className="italic">{t('oscrat.ui.tasks.no-linked-documentation')}</p>
+          <div className="text-content-muted p-6 text-center">
+            <p className="italic">
+              {t('oscrat.ui.tasks.no-linked-documentation')}
+            </p>
           </div>
         )}
       </div>
@@ -314,25 +387,28 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
   };
 
   const renderCommentsTab = () => (
-    <div className="rounded-lg bg-white p-6 shadow-sm space-y-6">
+    <div className="bg-surface border-line rounded-card space-y-6 border p-6">
       {canUpdateTask && (
         <form onSubmit={handleAddComment} className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">{t('oscrat.ui.new-comment')}</label>
+          <label className="text-content-secondary block text-sm font-medium">
+            {t('oscrat.ui.new-comment')}
+          </label>
           <textarea
             value={newComment}
             onChange={(event) => setNewComment(event.target.value)}
             placeholder={t('oscrat.ui.new-comment')}
             rows={4}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border-line text-content-secondary focus:ring-primary rounded-input w-full border px-3 py-2 focus:outline-none focus:ring-2"
           />
-          {commentError && <p className="text-sm text-red-600">{commentError}</p>}
-          <button
+          {commentError && (
+            <p className="text-danger text-sm">{commentError}</p>
+          )}
+          <Button
             type="submit"
+            variant="primary"
             disabled={!newComment.trim()}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-          >
-            {t('oscrat.ui.add-comment')}
-          </button>
+            text={t('oscrat.ui.add-comment')}
+          />
         </form>
       )}
 
@@ -341,17 +417,28 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
       ) : comments && comments.length > 0 ? (
         <div className="space-y-3">
           {comments.map((comment) => (
-            <div key={comment.id} className="rounded-md border border-gray-200 p-3">
+            <div
+              key={comment.id}
+              className="border-line-subtle rounded-card border p-3"
+            >
               <div className="mb-1 flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-900">{comment.createdBy?.name || '\u2014'}</p>
-                <p className="text-xs text-gray-500">{new Date(comment.createdAt).toLocaleString()}</p>
+                <p className="text-content text-sm font-medium">
+                  {comment.createdBy?.name || '\u2014'}
+                </p>
+                <p className="text-content-muted text-xs">
+                  {formatDateTime(comment.createdAt)}
+                </p>
               </div>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{comment.text}</p>
+              <p className="text-content-secondary whitespace-pre-wrap text-sm">
+                {comment.text}
+              </p>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm italic text-gray-500">{t('oscrat.ui.no-comments-yet')}</p>
+        <p className="text-content-muted text-sm italic">
+          {t('oscrat.ui.no-comments-yet')}
+        </p>
       )}
     </div>
   );
@@ -360,7 +447,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     const attachmentsList: Attachment[] = attachments || [];
 
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm space-y-6">
+      <div className="bg-surface border-line rounded-card space-y-6 border p-6">
         {canUpdateTask && (
           <div>
             <input
@@ -370,24 +457,40 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
               onChange={handleFileInputChange}
             />
             <div
-              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(true); }}
-              onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDragOver(false); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDragOver(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDragOver(false);
+              }}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`flex cursor-pointer items-center justify-center rounded-md border-2 border-dashed px-4 py-6 text-center transition-colors ${
-                isDragOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+              className={`rounded-card flex cursor-pointer items-center justify-center border-2 border-dashed px-4 py-6 text-center transition-colors ${
+                isDragOver
+                  ? 'border-info bg-info-subtle'
+                  : 'border-line hover:border-line'
               }`}
             >
               <div className="space-y-1">
-                <FaUpload className="mx-auto h-6 w-6 text-gray-400" />
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium text-blue-600">{t('click-to-upload')}</span>{' '}
-                  <span className="text-gray-500">{t('oscrat.ui.or-drag-and-drop')}</span>
+                <FaUpload className="text-content-placeholder mx-auto h-6 w-6" />
+                <p className="text-content-secondary text-sm">
+                  <span className="text-primary font-medium">
+                    {t('click-to-upload')}
+                  </span>{' '}
+                  <span className="text-content-muted">
+                    {t('oscrat.ui.or-drag-and-drop')}
+                  </span>
                 </p>
               </div>
             </div>
             {uploadMutation.isPending && (
-              <p className="mt-2 text-sm text-blue-600">{t('oscrat.ui.uploading')}</p>
+              <p className="text-primary mt-2 text-sm">
+                {t('oscrat.ui.uploading')}
+              </p>
             )}
           </div>
         )}
@@ -397,42 +500,53 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
         ) : attachmentsList.length > 0 ? (
           <div className="space-y-2">
             {attachmentsList.map((attachment) => (
-              <div key={attachment.id} className="flex items-center justify-between rounded-md border border-gray-200 p-3">
-                <div className="flex flex-col min-w-0">
-                  <p className="truncate font-medium text-gray-900 text-sm">{attachment.name}</p>
-                  <p className="text-xs text-gray-500">
+              <div
+                key={attachment.id}
+                className="border-line-subtle rounded-card flex items-center justify-between border p-3"
+              >
+                <div className="flex min-w-0 flex-col">
+                  <p className="text-content truncate text-sm font-medium">
+                    {attachment.name}
+                  </p>
+                  <p className="text-content-muted text-xs">
                     {(attachment.fileSize / 1024).toFixed(1)} KB
                     {attachment.mimeType && ` \u2022 ${attachment.mimeType}`}
-                    {attachment.createdByUser && ` \u2022 ${attachment.createdByUser.name}`}
+                    {attachment.createdByUser &&
+                      ` \u2022 ${attachment.createdByUser.name}`}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 ml-4 shrink-0">
-                  <button
-                    onClick={() => handleDownloadAttachment(attachment.id, attachment.name)}
+                <div className="ml-4 flex shrink-0 items-center gap-2">
+                  <Button
+                    variant="tertiary"
+                    size="s"
+                    onClick={() =>
+                      handleDownloadAttachment(attachment.id, attachment.name)
+                    }
                     disabled={downloadMutation.isPending}
-                    className="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50"
                     title={t('oscrat.ui.download')}
-                  >
-                    <FaDownload size={12} />
-                    {t('oscrat.ui.download')}
-                  </button>
+                    startIcon={<FaDownload size={12} />}
+                    text={t('oscrat.ui.download')}
+                  />
                   {canUpdateTask && (
-                    <button
+                    <Button
+                      variant="tertiary"
+                      tone="danger"
+                      size="s"
                       onClick={() => handleDeleteAttachment(attachment.id)}
                       disabled={deleteMutation.isPending}
-                      className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
                       title={t('delete')}
-                    >
-                      <FaTrash size={12} />
-                      {t('delete')}
-                    </button>
+                      startIcon={<FaTrash size={12} />}
+                      text={t('delete')}
+                    />
                   )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm italic text-gray-500">{t('oscrat.ui.no-attachments')}</p>
+          <p className="text-content-muted text-sm italic">
+            {t('oscrat.ui.no-attachments')}
+          </p>
         )}
       </div>
     );
@@ -440,10 +554,14 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
 
   const renderTabContent = (tabId: TabKey) => {
     switch (tabId) {
-      case 'documentation': return renderDocumentationTab();
-      case 'comments': return renderCommentsTab();
-      case 'attachments': return renderAttachmentsTab();
-      default: return null;
+      case 'documentation':
+        return renderDocumentationTab();
+      case 'comments':
+        return renderCommentsTab();
+      case 'attachments':
+        return renderAttachmentsTab();
+      default:
+        return null;
     }
   };
 
@@ -451,7 +569,11 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
 
   return (
     <div className="mt-6">
-      <div className="flex justify-start" role="tablist" aria-label="Task information sections">
+      <div
+        className="flex justify-start"
+        role="tablist"
+        aria-label="Task information sections"
+      >
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -463,7 +585,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
             onClick={() => setActiveTab(tab.id)}
             className={`${
               activeTab === tab.id
-                ? 'active-tab-button border-b-2 border-blue-500 font-medium text-blue-500'
+                ? 'active-tab-button border-info text-info border-b-2 font-medium'
                 : 'inactive-tab-button'
             } mr-1 cursor-pointer px-4 py-2`}
           >

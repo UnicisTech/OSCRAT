@@ -3,8 +3,8 @@ import { resetPasswordSchema } from '@/lib/validation/auth';
 import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
+import Button from '@/components/button';
 import { useResetPassword } from '@/hooks/useResetPassword';
 import type { ApiError } from '@/types';
 
@@ -26,7 +26,7 @@ const ResetPassword = () => {
           token,
           password: values.password,
         });
-        
+
         formik.resetForm();
         toast.success(t('password-updated'));
         router.push('/auth/login');
@@ -48,8 +48,8 @@ const ResetPassword = () => {
             placeholder={t('new-password')}
             value={formik.values.password}
             error={
-              formik.touched.password && formik.errors.password 
-                ? t(formik.errors.password) 
+              formik.touched.password && formik.errors.password
+                ? t(formik.errors.password)
                 : undefined
             }
             onChange={formik.handleChange}
@@ -69,14 +69,7 @@ const ResetPassword = () => {
           />
         </div>
         <div className="mt-4">
-          <Button
-            type="submit"
-            color="primary"
-            loading={isLoading}
-            active={formik.dirty}
-            fullWidth
-            size="md"
-          >
+          <Button type="submit" variant="primary" loading={isLoading} fullWidth>
             {t('reset-password')}
           </Button>
         </div>

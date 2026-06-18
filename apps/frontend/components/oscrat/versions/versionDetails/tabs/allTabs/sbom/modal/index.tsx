@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUpload } from 'react-icons/fa';
-import { IoClose } from 'react-icons/io5';
 import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
+import Button from '@/components/button';
+import Modal from '@/components/shared/Modal';
 
 interface ImportModalProps {
   isOpen: boolean;
@@ -15,7 +16,6 @@ const ImportModal: React.FC<ImportModalProps> = ({
   onClose,
   onImportAsJob,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('No file chosen');
 
@@ -27,28 +27,6 @@ const ImportModal: React.FC<ImportModalProps> = ({
       setFileName(t('oscrat.ui.versions.sbom.no-file-chosen'));
     }
   }, [ready, t, fileName]);
-
-  // Handle closing the modal when clicking outside of it
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose]);
 
   if (!ready) {
     return null;
@@ -89,43 +67,28 @@ const ImportModal: React.FC<ImportModalProps> = ({
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
-      <div
-        ref={modalRef}
-        className="animate-fade-in-up flex w-full max-w-md flex-col rounded-lg bg-white shadow-2xl"
-      >
-        <header className="flex items-center justify-between border-b border-gray-200 p-4">
-          <h2 className="text-lg font-semibold text-gray-800">
-            {t('import-file')}
-          </h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <IoClose size={24} />
-          </button>
-        </header>
-        <form onSubmit={handleSubmit}>
-          <main className="space-y-4 p-6">
+    <Modal open={isOpen} close={handleClose} size="sm">
+      <Modal.Header>{t('import-file')}</Modal.Header>
+      <form onSubmit={handleSubmit}>
+        <Modal.Body>
+          <div className="space-y-4">
             <div className="mb-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-content-secondary text-sm">
                 {t('oscrat.ui.versions.sbom.import-description')}
               </p>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="text-content-secondary mb-1 block text-sm font-medium">
                 {t('file')}
               </label>
-              <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
+              <div className="border-line rounded-card mt-1 flex justify-center border-2 border-dashed px-6 pb-6 pt-5">
                 <div className="space-y-1 text-center">
-                  <FaUpload className="mx-auto h-12 w-12 text-gray-400" />
-                  <div className="flex text-sm text-gray-600">
+                  <FaUpload className="text-content-placeholder mx-auto h-12 w-12" />
+                  <div className="text-content-secondary flex text-sm">
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 hover:text-blue-500"
+                      className="bg-surface text-primary focus-within:ring-primary hover:text-info rounded-input relative cursor-pointer font-medium focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2"
                     >
                       <span>{t('upload-a-file')}</span>
                       <input
@@ -139,29 +102,23 @@ const ImportModal: React.FC<ImportModalProps> = ({
                     </label>
                     <p className="pl-1">{t('or-drag-and-drop')}</p>
                   </div>
-                  <p className="text-xs text-gray-500">{fileName}</p>
+                  <p className="text-content-muted text-xs">{fileName}</p>
                 </div>
               </div>
             </div>
-          </main>
-          <footer className="flex items-center justify-end space-x-3 rounded-b-lg border-t border-gray-200 bg-gray-50 p-4">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              {t('cancel')}
-            </button>
-            <button
-              type="submit"
-              className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              {t('import')}
-            </button>
-          </footer>
-        </form>
-      </div>
-    </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleClose}
+            text={t('cancel')}
+          />
+          <Button type="submit" variant="primary" text={t('import')} />
+        </Modal.Footer>
+      </form>
+    </Modal>
   );
 };
 

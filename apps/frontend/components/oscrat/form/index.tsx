@@ -20,8 +20,9 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
     isNotEligible: false,
     highestRisk: null,
   });
-  const [completedFormState, setCompletedFormState] = useState<FormState | null>(null);
-  
+  const [completedFormState, setCompletedFormState] =
+    useState<FormState | null>(null);
+
   const {
     isEditMode,
     initialFormState,
@@ -37,7 +38,9 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
       highestRisk: null,
     });
     setCompletedFormState(null);
-    const formPath = teamSlug ? `/organization/${teamSlug}/form${productId ? `?productId=${productId}` : ''}` : '/form';
+    const formPath = teamSlug
+      ? `/organization/${teamSlug}/form${productId ? `?productId=${productId}` : ''}`
+      : '/form';
     router.push(formPath);
   };
 
@@ -52,10 +55,21 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
 
   // Handle eliminatory case in edit mode (when result shown but no form completion)
   useEffect(() => {
-    if (isEditMode && state.showResult && state.isNotEligible && !isProcessing) {
+    if (
+      isEditMode &&
+      state.showResult &&
+      state.isNotEligible &&
+      !isProcessing
+    ) {
       handleNotApplicable();
     }
-  }, [isEditMode, state.showResult, state.isNotEligible, isProcessing, handleNotApplicable]);
+  }, [
+    isEditMode,
+    state.showResult,
+    state.isNotEligible,
+    isProcessing,
+    handleNotApplicable,
+  ]);
 
   if (!ready) return null;
 
@@ -63,16 +77,16 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
   if (isEditMode && state.showResult && isProcessing) {
     return (
       <div className="flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-2xl rounded-lg bg-white p-8 text-center shadow-xl dark:bg-gray-800">
+        <div className="bg-surface shadow-16 rounded-card w-full max-w-2xl p-8 text-center">
           <div className="mb-6">
-            <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+            <div className="border-primary mx-auto h-16 w-16 animate-spin rounded-full border-4 border-t-transparent"></div>
           </div>
-          <h1 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-100">
-            {state.isNotEligible 
+          <h1 className="text-content mb-4 text-2xl font-semibold">
+            {state.isNotEligible
               ? t('oscrat.ui.processing-not-applicable-result')
               : t('oscrat.ui.processing-assessment-update')}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-content-secondary text-sm">
             {state.isNotEligible
               ? t('oscrat.ui.redirecting-to-product-page')
               : t('oscrat.ui.updating-product-category')}
@@ -98,9 +112,15 @@ const FormPage: React.FC<FormPageProps> = ({ teamSlug }) => {
 
   return (
     <CraForm
-      setIsNotEligible={(value) => setState(prev => ({ ...prev, isNotEligible: value }))}
-      setShowResult={(value) => setState(prev => ({ ...prev, showResult: value }))}
-      setHighestRisk={(value) => setState(prev => ({ ...prev, highestRisk: value }))}
+      setIsNotEligible={(value) =>
+        setState((prev) => ({ ...prev, isNotEligible: value }))
+      }
+      setShowResult={(value) =>
+        setState((prev) => ({ ...prev, showResult: value }))
+      }
+      setHighestRisk={(value) =>
+        setState((prev) => ({ ...prev, highestRisk: value }))
+      }
       onFormCompleted={handleFormCompleted}
       initialFormState={initialFormState}
     />

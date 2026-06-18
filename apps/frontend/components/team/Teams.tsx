@@ -5,7 +5,7 @@ import { useTeam } from 'hooks/useTeam';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import toast from 'react-hot-toast';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
 import { WithLoadingAndError } from '@/components/shared';
@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import { useAcceptInvitation } from '@/lib/api/hooks/invitations';
 import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const TEAMS_PER_PAGE = 10;
 
@@ -42,7 +43,7 @@ const Teams = () => {
   useEffect(() => {
     const handleInvitationAcceptance = async () => {
       const inviteToken = router.query.token as string;
-      
+
       if (inviteToken) {
         try {
           await acceptInvitationMutation({ token: inviteToken });
@@ -50,8 +51,13 @@ const Teams = () => {
           router.replace('/organization', undefined, { shallow: true });
         } catch (error: unknown) {
           console.error('Failed to accept invitation:', error);
-          toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-accept-invitation')));
-          
+          toast.error(
+            extractErrorMessage(
+              error,
+              t('oscrat.ui.failed-to-accept-invitation')
+            )
+          );
+
           router.replace('/organization', undefined, { shallow: true });
         }
       }
@@ -96,73 +102,71 @@ const Teams = () => {
               <h2 className="text-xl font-medium leading-none tracking-tight">
                 {t('all-teams')}
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-content-muted text-sm">
                 {hasTeams ? t('team-listed') : t('no-teams-yet')}
               </p>
             </div>
             <Button
-              color="primary"
-              variant="outline"
-              size="md"
+              variant="primary"
               onClick={() => setCreateTeamVisible(!createTeamVisible)}
             >
               {t('create-team')}
             </Button>
           </div>
-          
-            <table className="dark:border-base-200 table w-full border-b text-sm">
-              <thead className="dark:bg-base-200 bg-gray-200 text-gray-600 dark:text-gray-400">
-                <tr>
-                  <th>{t('name')}</th>
-                  <th>{t('members')}</th>
-                  <th>{t('created-at')}</th>
-                  <th>{t('actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedTeams.map((team) => (
-                  <tr key={team.id}>
-                    <td>
-                      <Link href={`/organization/${team.slug}/dashboard`}>
-                        <div className="flex items-center justify-start space-x-2">
-                          <LetterAvatar name={team.name} />
-                          <span className="underline">{team.name}</span>
-                        </div>
-                      </Link>
-                    </td>
-                    <td>{team.membersCount}</td>
-                    <td>{new Date(team.createdAt).toDateString()}</td>
-                    <td>
-                      <Button
-                        variant="outline"
-                        size="xs"
-                        color="error"
-                        onClick={() => {
-                          setSelectedTeam(team);
-                          setAskConfirmation(true);
-                        }}
-                      >
-                        {t('leave-team')}
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
 
-            {totalPages > 1 && (
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                prevButtonDisabled={prevButtonDisabled}
-                nextButtonDisabled={nextButtonDisabled}
-                goToPreviousPage={goToPreviousPage}
-                goToNextPage={goToNextPage}
-                showItemCount
-                totalItems={teamsList.length}
-                itemsPerPage={TEAMS_PER_PAGE}
-              />
-            )}
+          <table className="table w-full border-b text-sm">
+            <thead className="bg-surface-muted text-content border-line-header border-b">
+              <tr>
+                <th className="text-b2 p-4 font-medium">{t('name')}</th>
+                <th className="text-b2 p-4 font-medium">{t('members')}</th>
+                <th className="text-b2 p-4 font-medium">{t('created-at')}</th>
+                <th className="text-b2 p-4 font-medium">{t('actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedTeams.map((team) => (
+                <tr key={team.id}>
+                  <td>
+                    <Link href={`/organization/${team.slug}/dashboard`}>
+                      <div className="flex items-center justify-start space-x-2">
+                        <LetterAvatar name={team.name} />
+                        <span className="underline">{team.name}</span>
+                      </div>
+                    </Link>
+                  </td>
+                  <td>{team.membersCount}</td>
+                  <td>{formatDateShort(team.createdAt)}</td>
+                  <td>
+                    <Button
+                      variant="secondary"
+                      tone="danger"
+                      size="s"
+                      onClick={() => {
+                        setSelectedTeam(team);
+                        setAskConfirmation(true);
+                      }}
+                    >
+                      {t('leave-team')}
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {totalPages > 1 && (
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              prevButtonDisabled={prevButtonDisabled}
+              nextButtonDisabled={nextButtonDisabled}
+              goToPreviousPage={goToPreviousPage}
+              goToNextPage={goToNextPage}
+              showItemCount
+              totalItems={teamsList.length}
+              itemsPerPage={TEAMS_PER_PAGE}
+            />
+          )}
 
           <ConfirmationDialog
             visible={askConfirmation}

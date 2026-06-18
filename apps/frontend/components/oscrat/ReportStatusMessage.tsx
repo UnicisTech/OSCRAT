@@ -6,7 +6,9 @@ interface ReportStatusMessageProps {
   status: WorkerJobStatus | null | undefined;
 }
 
-export default function ReportStatusMessage({ status }: ReportStatusMessageProps) {
+export default function ReportStatusMessage({
+  status,
+}: ReportStatusMessageProps) {
   const { t } = useTranslation('common');
 
   if (!status) {
@@ -26,8 +28,8 @@ export default function ReportStatusMessage({ status }: ReportStatusMessageProps
   // For any other status (pending, in progress, failed, cancelled)
   return (
     <div className={reportStyles.card}>
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <div className="py-12 text-center">
+        <h2 className="text-content mb-2 text-xl font-semibold">
           {t('oscrat.ui.report-not-available')}
         </h2>
       </div>

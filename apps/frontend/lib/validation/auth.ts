@@ -38,7 +38,7 @@ export const resetPasswordSchema = Yup.object().shape({
  */
 export const joinWithInvitationSchema = Yup.object().shape({
   firstName: nameSchema.required('oscrat.ui.validation.first-name-required'),
-  lastName: nameSchema.required('oscrat.ui.validation.last-name-required'), 
+  lastName: nameSchema.required('oscrat.ui.validation.last-name-required'),
   password: passwordSchema.required('oscrat.ui.validation.password-required'),
   retypePassword: Yup.string()
     .required('oscrat.ui.validation.password-confirm-required')
@@ -49,8 +49,12 @@ export const joinWithInvitationSchema = Yup.object().shape({
  * Validation schema for updating password
  */
 export const updatePasswordSchema = Yup.object().shape({
-  currentPassword: Yup.string().required('oscrat.ui.validation.current-password-required'),
-  newPassword: passwordSchema.required('oscrat.ui.validation.new-password-required'),
+  currentPassword: Yup.string().required(
+    'oscrat.ui.validation.current-password-required'
+  ),
+  newPassword: passwordSchema.required(
+    'oscrat.ui.validation.new-password-required'
+  ),
 });
 
 /**
@@ -81,8 +85,12 @@ export type MagicLinkData = Yup.InferType<typeof magicLinkSchema>;
 export type LoginData = Yup.InferType<typeof loginSchema>;
 export type ForgotPasswordData = Yup.InferType<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = Yup.InferType<typeof resetPasswordSchema>;
-export type JoinWithInvitationData = Yup.InferType<typeof joinWithInvitationSchema>;
+export type JoinWithInvitationData = Yup.InferType<
+  typeof joinWithInvitationSchema
+>;
 export type UpdatePasswordData = Yup.InferType<typeof updatePasswordSchema>;
 export type UpdateEmailData = Yup.InferType<typeof updateEmailSchema>;
 export type UpdateNameData = Yup.InferType<typeof updateNameSchema>;
-export type JoinOrgWithInvitationData = Yup.InferType<typeof joinOrgWithInvitationSchema>;
+export type JoinOrgWithInvitationData = Yup.InferType<
+  typeof joinOrgWithInvitationSchema
+>;

@@ -23,7 +23,8 @@ export function useGetAssessmentDetail(
 ) {
   return useQuery({
     queryKey: queryKeys.oscrat.assessments.detail(teamSlug, assessmentId),
-    queryFn: () => oscratAssessmentEndpoints.getAssessmentDetail(teamSlug, assessmentId),
+    queryFn: () =>
+      oscratAssessmentEndpoints.getAssessmentDetail(teamSlug, assessmentId),
     enabled: options?.enabled !== false && !!assessmentId,
   });
 }
@@ -48,10 +49,14 @@ export function useUpdateAssessment(teamSlug: string) {
     }: {
       assessmentId: string;
       data: { schemaVersion?: string; rawData?: Record<string, any> };
-    }) => oscratAssessmentEndpoints.updateAssessment(teamSlug, assessmentId, data),
+    }) =>
+      oscratAssessmentEndpoints.updateAssessment(teamSlug, assessmentId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.assessments.detail(teamSlug, variables.assessmentId),
+        queryKey: queryKeys.oscrat.assessments.detail(
+          teamSlug,
+          variables.assessmentId
+        ),
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.assessments.all(teamSlug),

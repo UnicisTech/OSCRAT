@@ -1,6 +1,6 @@
 import { useTranslation } from 'next-i18next';
-import { Button } from 'react-daisyui';
 
+import Button from '@/components/button';
 import { Card, InputWithLabel } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
 import { updatePasswordSchema } from '@/lib/validation/auth';
@@ -62,10 +62,9 @@ const UpdatePassword = () => {
           <div className="flex justify-end">
             <Button
               type="submit"
-              color="primary"
+              variant="primary"
               loading={isUpdatePasswordLoading}
               disabled={!formik.dirty || !formik.isValid}
-              size="md"
             >
               {t('change-password')}
             </Button>

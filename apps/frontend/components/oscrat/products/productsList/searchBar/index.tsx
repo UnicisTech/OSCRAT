@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { OscratProductCategory, OscratOrganizationRole } from '@oscrat/model';
 import { getProductCategoryKey, getOrgRoleKey } from '@/utils/translation';
+import Button from '@/components/button';
 
 interface FilterableProductFields {
   category?: string;
@@ -116,111 +117,99 @@ export default function SearchBar({
   ];
 
   return (
-    <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 className="text-[24px] font-semibold">
-          {t('oscrat.ui.products-list')}
-        </h1>
-        <p className="text-[12px] text-gray-500">
-          {t('oscrat.ui.add-new-product-verify')}
-        </p>
+    <div className="flex items-center gap-2">
+      <div className="relative">
+        <MagnifyingGlassIcon className="text-content-placeholder pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+        <input
+          type="text"
+          placeholder={t('search-by-title')}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border-line rounded-input focus:border-primary focus:ring-primary h-10 w-full border py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 md:w-56"
+        />
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className="relative">
-          <MagnifyingGlassIcon className="absolute right-4 top-2.5 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder={t('search-by-title')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-9 max-w-[150px] !rounded-full border border-gray-300 py-2 pl-4 pr-8 text-sm"
-          />
-        </div>
-
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex h-9 w-9 items-center justify-center rounded bg-white hover:bg-gray-50"
-          >
-            <FunnelIcon className="h-5 w-5 text-black" />
-          </button>
-          {showFilters && (
-            <div className="absolute right-0 z-10 mt-2 w-72 origin-top-right rounded-md bg-white p-4 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  {t('filters')}
-                </h3>
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-600"
-                  title={t('close-filters')}
-                >
-                  <XMarkIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                </button>
-              </div>
-              {allowedFilterKeys.map((key) => {
-                const options = filterOptions[key];
-                if (!options) return null;
-
-                return (
-                  <div key={key} className="mb-4">
-                    <label
-                      htmlFor={`filter-${key}`}
-                      className="block text-sm font-medium capitalize text-gray-700 dark:text-gray-300"
-                    >
-                      {formatKey(key)}
-                    </label>
-                    <div className="flex items-center">
-                      <select
-                        id={`filter-${key}`}
-                        name={`filter-${key}`}
-                        value={activeFilters[key] || ''}
-                        onChange={(e) =>
-                          handleFilterSelect(
-                            key as keyof FilterableProductFields,
-                            e.target.value
-                          )
-                        }
-                        className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                      >
-                        <option value="">{t('all')}</option>
-                        {options.map((option) => (
-                          <option key={option} value={option}>
-                            {getOptionLabel(key, option)}
-                          </option>
-                        ))}
-                      </select>
-                      {activeFilters[key] && (
-                        <button
-                          onClick={() =>
-                            clearFilter(key as keyof FilterableProductFields)
-                          }
-                          className="ml-2 rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-600"
-                          title={`${t('clear')} ${formatKey(key)} ${t('filter')}`}
-                        >
-                          <XMarkIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="mr-1 h-7 w-[2px] bg-gray-300" />
-
-        <button
+      <div className="relative">
+        <Button
           type="button"
-          className="h-9 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700"
-          onClick={onAddProduct}
-        >
-          {t('add-product')}
-        </button>
+          variant="secondary"
+          size="l"
+          onClick={() => setShowFilters(!showFilters)}
+          title={t('filters')}
+          aria-expanded={showFilters}
+          icon={<FunnelIcon />}
+        />
+        {showFilters && (
+          <div className="bg-surface shadow-8 rounded-card absolute right-0 z-10 mt-2 w-72 origin-top-right p-4 ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-content text-lg font-medium">
+                {t('filters')}
+              </h3>
+              <Button
+                variant="tertiary"
+                size="m"
+                onClick={() => setShowFilters(false)}
+                title={t('close-filters')}
+                icon={<XMarkIcon className="text-content-muted h-5 w-5" />}
+              />
+            </div>
+            {allowedFilterKeys.map((key) => {
+              const options = filterOptions[key];
+              if (!options) return null;
+
+              return (
+                <div key={key} className="mb-4">
+                  <label
+                    htmlFor={`filter-${key}`}
+                    className="text-content-secondary block text-sm font-medium capitalize"
+                  >
+                    {formatKey(key)}
+                  </label>
+                  <div className="flex items-center">
+                    <select
+                      id={`filter-${key}`}
+                      name={`filter-${key}`}
+                      value={activeFilters[key] || ''}
+                      onChange={(e) =>
+                        handleFilterSelect(
+                          key as keyof FilterableProductFields,
+                          e.target.value
+                        )
+                      }
+                      className="border-line focus:border-primary focus:ring-primary rounded-input mt-1 block w-full py-2 pl-3 pr-10 text-base focus:outline-none sm:text-sm"
+                    >
+                      <option value="">{t('all')}</option>
+                      {options.map((option) => (
+                        <option key={option} value={option}>
+                          {getOptionLabel(key, option)}
+                        </option>
+                      ))}
+                    </select>
+                    {activeFilters[key] && (
+                      <Button
+                        variant="tertiary"
+                        size="s"
+                        className="ml-2"
+                        onClick={() =>
+                          clearFilter(key as keyof FilterableProductFields)
+                        }
+                        title={`${t('clear')} ${formatKey(key)} ${t('filter')}`}
+                        icon={
+                          <XMarkIcon className="text-content-muted h-4 w-4" />
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
+
+      <Button type="button" variant="primary" onClick={onAddProduct}>
+        {t('add-product')}
+      </Button>
     </div>
   );
 }

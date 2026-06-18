@@ -2,9 +2,13 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { OscratProductSummary } from '@oscrat/model';
 import { getProductCategoryKey, getProductTypeKey } from '@/utils/translation';
-import StatusBadge from './StatusBadge';
+import Button from '@/components/button';
 import ActiveBadge from './ActiveBadge';
-import InfoField from './InfoField';
+import Card from '@/components/oscrat/shared/Card';
+import Divider from '@/components/oscrat/shared/Divider';
+import MetaField from '@/components/oscrat/shared/MetaField';
+import CountChip from '@/components/oscrat/shared/CountChip';
+import AcronymBadge from '@/components/oscrat/shared/AcronymBadge';
 
 interface ProductProps {
   project: OscratProductSummary;
@@ -49,97 +53,88 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
   if (!ready) return null;
 
   return (
-    <article
-      className="flex flex-col gap-2 rounded-lg border border-gray-400 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+    <Card
+      as="article"
+      className="flex flex-col gap-3"
       aria-labelledby={`product-${project.id}-title`}
     >
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3
             id={`product-${project.id}-title`}
-            className="text-sm font-semibold text-black dark:text-gray-100"
+            className="text-content text-h6 font-bold"
           >
             {project.name}
           </h3>
           {project.acronym && (
-            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-400/20">
-              {project.acronym}
-            </span>
+            <AcronymBadge acronym={project.acronym} size="sm" />
           )}
         </div>
 
         <nav
-          className="flex gap-6 font-medium text-gray-600"
+          className="text-content-secondary flex items-center gap-4 font-medium"
           role="navigation"
           aria-label="Product actions"
         >
           <ActiveBadge status={project.status} />
 
           {onShowMore && (
-            <button
+            <Button
+              variant="secondary"
+              size="m"
               onClick={onShowMore}
-              className="rounded border border-gray-400 px-6 py-1 text-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
               aria-label={`Show more details for ${project.name}`}
             >
               {t('oscrat.ui.show-more')}
-            </button>
+            </Button>
           )}
         </nav>
       </header>
 
-      <hr className="my-2 w-full border-gray-200 dark:border-gray-600" />
+      <Divider />
 
       <section
-        className="grid grid-cols-6 gap-4 text-sm text-gray-700 dark:text-gray-300"
+        className="text-content-secondary text-b2 grid grid-cols-6 gap-4"
         aria-label="Product details"
       >
-        <InfoField
+        <MetaField
           label={t('oscrat.ui.category')}
           value={t(getProductCategoryKey(project.productCategory))}
         />
 
-        <InfoField
+        <MetaField
           label={t('oscrat.ui.product-type')}
           value={t(getProductTypeKey(project.type))}
         />
 
-        <div className="flex flex-col">
-          <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-            {t('oscrat.ui.open-incidents')}:
-          </span>
-          <StatusBadge
+        <MetaField label={t('oscrat.ui.open-incidents')}>
+          <CountChip
             count={openIncidents}
             displayText={displayIncidents}
             ariaLabel={`${openIncidents} open incidents for ${project.name}`}
           />
-        </div>
+        </MetaField>
 
-        <div className="flex flex-col">
-          <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-            {t('oscrat.ui.open-vulnerabilities')}:
-          </span>
-          <StatusBadge
+        <MetaField label={t('oscrat.ui.open-vulnerabilities')}>
+          <CountChip
             count={openVulnerabilities}
             displayText={displayVulnerabilities}
             ariaLabel={`${openVulnerabilities} open vulnerabilities for ${project.name}`}
           />
-        </div>
+        </MetaField>
 
-        <InfoField
+        <MetaField
           label={t('oscrat.ui.external-reporting')}
           value={reportingOrganizations}
         />
 
-        <div className="flex flex-col">
-          <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-            {t('status')}:
-          </span>
-          <span className="font-semibold capitalize text-black dark:text-gray-100">
+        <MetaField label={t('status')}>
+          <span className="text-b2 text-content font-medium capitalize">
             {t(complianceStatusKey)}
           </span>
-        </div>
+        </MetaField>
       </section>
-    </article>
+    </Card>
   );
 };
 

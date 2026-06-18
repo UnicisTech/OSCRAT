@@ -64,7 +64,7 @@ const ProcessingActivitiesAnalysis = ({
             {/* <ControlSelector controlValue={control} handler={controlHandler} /> */}
           </div>
         </div>
-        <div className="mb-4 flex items-center gap-2 rounded bg-gray-100 px-2 py-1 dark:bg-gray-800">
+        <div className="bg-surface-muted mb-4 flex items-center gap-2 rounded px-2 py-1">
           <h4>Total number of controls</h4>
           <span className="font-sans text-sm font-bold">
             {Object.keys(statuses).length}
@@ -81,7 +81,7 @@ const ProcessingActivitiesAnalysis = ({
         >
           <div
             style={{ width: '49%' }}
-            className="stats stat-value dark:bg-base-100 bg-white p-4 shadow"
+            className="stats stat-value bg-surface p-4 shadow"
           >
             <PieChart
               page_name={`dashboard`}
@@ -92,7 +92,7 @@ const ProcessingActivitiesAnalysis = ({
           </div>
           <div
             style={{ width: '49%' }}
-            className="stats stat-value dark:bg-base-100 bg-white p-4 shadow"
+            className="stats stat-value bg-surface p-4 shadow"
           >
             <RadarChart iso={cscIso} statuses={statuses} />
           </div>

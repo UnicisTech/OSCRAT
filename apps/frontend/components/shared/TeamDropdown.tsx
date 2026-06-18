@@ -76,21 +76,21 @@ const TeamDropdown = () => {
     <div className="dropdown w-full">
       <div
         tabIndex={0}
-        className="flex h-10 cursor-pointer items-center justify-between rounded border border-gray-300 px-4 text-sm text-black dark:border-gray-600"
+        className="border-line text-b2 text-content rounded-input flex h-12 cursor-pointer items-center justify-between border px-4"
       >
         <span className="truncate">{currentTeam?.name}</span>
         <ChevronUpDownIcon className="h-5 w-5" />
       </div>
       <ul
         tabIndex={0}
-        className="dropdown-content dark:bg-base-100 w-full rounded border bg-white p-2 px-2 text-[#212121] shadow-md dark:border-gray-600"
+        className="dropdown-content bg-surface text-content shadow-4 rounded-input w-full border p-2 px-2"
       >
         {menus.map(({ id, name, items }) => {
           return (
             <React.Fragment key={id}>
               {name && (
                 <li
-                  className="px-2 py-1 text-xs text-gray-500"
+                  className="text-content-muted px-2 py-1 text-xs"
                   key={`${id}-name`}
                 >
                   {name}
@@ -106,8 +106,8 @@ const TeamDropdown = () => {
                   }}
                 >
                   <Link href={item.href}>
-                    <div className="flex items-center gap-2 rounded px-2 py-2 text-sm font-medium hover:bg-gray-100 focus:bg-gray-100 focus:outline-none hover:dark:text-black">
-                      <item.icon className="h-5 w-5 shrink-0" /> 
+                    <div className="hover:bg-surface-muted focus:bg-surface-muted flex items-center gap-2 rounded px-2 py-2 text-sm font-medium focus:outline-none">
+                      <item.icon className="h-5 w-5 shrink-0" />
                       <span className="truncate">{item.name}</span>
                     </div>
                   </Link>

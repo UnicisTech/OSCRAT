@@ -27,8 +27,8 @@ const ExistingTranslationsTable: React.FC<ExistingTranslationsTableProps> = ({
 
   if (translations.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-        <FaLanguage className="mx-auto text-4xl mb-2 opacity-50" />
+      <div className="text-content-muted py-8 text-center">
+        <FaLanguage className="mx-auto mb-2 text-4xl opacity-50" />
         <p>{t('oscrat.ui.compliance-translation.no-translations')}</p>
       </div>
     );
@@ -37,17 +37,30 @@ const ExistingTranslationsTable: React.FC<ExistingTranslationsTableProps> = ({
   return (
     <div className="overflow-x-auto">
       <table className="table w-full">
-        <thead>
+        <thead className="bg-surface-muted text-content border-b border-line-header">
           <tr>
-            <th>{t('oscrat.ui.compliance-translation.assessment-type')}</th>
-            <th>{t('oscrat.ui.compliance-translation.language')}</th>
-            <th>{t('oscrat.ui.last-edited')}</th>
-            <th>{t('oscrat.ui.actions')}</th>
+            <th className="p-4 text-b2 font-medium">
+              {t('oscrat.ui.compliance-translation.assessment-type')}
+            </th>
+            <th className="p-4 text-b2 font-medium">
+              {t('oscrat.ui.compliance-translation.language')}
+            </th>
+            <th className="p-4 text-b2 font-medium">
+              {t('oscrat.ui.last-edited')}
+            </th>
+            <th className="p-4 text-b2 font-medium">
+              {t('oscrat.ui.actions')}
+            </th>
           </tr>
         </thead>
         <tbody>
           {translations.map((translation) => (
-            <TranslationRow key={translation.dataKey} translation={translation} teamSlug={teamSlug} t={t} />
+            <TranslationRow
+              key={translation.dataKey}
+              translation={translation}
+              teamSlug={teamSlug}
+              t={t}
+            />
           ))}
         </tbody>
       </table>

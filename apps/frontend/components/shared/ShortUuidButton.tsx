@@ -28,8 +28,8 @@ const ShortUuidButton: React.FC<ShortUuidButtonProps> = ({
       disabled={disabled}
       className={`text-sm underline ${
         disabled
-          ? 'cursor-not-allowed text-gray-400'
-          : 'cursor-pointer text-blue-600 hover:text-blue-800'
+          ? 'text-content-placeholder cursor-not-allowed'
+          : 'text-primary hover:text-primary-dark cursor-pointer'
       }`}
       type="button"
     >

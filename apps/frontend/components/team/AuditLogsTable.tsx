@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import Table from '@/components/shared/Table';
+import Button from '@/components/button';
 import { useTranslation } from 'next-i18next';
 import type { OscratAuditLog } from '@oscrat/model';
 import AuditDetailsModal from './AuditDetailsModal';
-import { getAuditActionTranslationKey, oscratEntityTypeTranslationMap } from '@/utils/translation';
+import {
+  getAuditActionTranslationKey,
+  oscratEntityTypeTranslationMap,
+} from '@/utils/translation';
 import { getCrudConfig, formatTimestamp } from '@/lib/auditUtils';
 import { formatNameWithUuidFallback } from '@/lib/utils';
 
@@ -30,7 +34,7 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="text-gray-500">{t('loading')}</div>
+        <div className="text-content-muted">{t('loading')}</div>
       </div>
     );
   }
@@ -38,7 +42,7 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
   if (logs.length === 0) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="text-gray-500">{t('no-audit-logs')}</div>
+        <div className="text-content-muted">{t('no-audit-logs')}</div>
       </div>
     );
   }
@@ -58,7 +62,7 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
         body={logs.map((log) => (
           <Table.tr key={log.id}>
             <Table.td>
-              <span className="text-sm text-gray-600">
+              <span className="text-content-secondary text-sm">
                 {formatTimestamp(log.createdAt)}
               </span>
             </Table.td>
@@ -68,7 +72,9 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
                   {log.userName || log.userId}
                 </span>
                 {log.userEmail && (
-                  <span className="text-xs text-gray-500">{log.userEmail}</span>
+                  <span className="text-content-muted text-xs">
+                    {log.userEmail}
+                  </span>
                 )}
               </div>
             </Table.td>
@@ -80,18 +86,28 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${crud.bg} ${crud.text}`}
                     >
-                      {t(crud.labelKey, { defaultValue: log.crud.toUpperCase() })}
+                      {t(crud.labelKey, {
+                        defaultValue: log.crud.toUpperCase(),
+                      })}
                     </span>
                   );
                 })()}
-                <span className="text-sm">{t(getAuditActionTranslationKey(log.action), { defaultValue: log.action })}</span>
+                <span className="text-sm">
+                  {t(getAuditActionTranslationKey(log.action), {
+                    defaultValue: log.action,
+                  })}
+                </span>
               </div>
             </Table.td>
             <Table.td>
               <div className="flex flex-col">
-                <span className="font-medium">{t(oscratEntityTypeTranslationMap[log.targetType], { defaultValue: log.targetType })}</span>
+                <span className="font-medium">
+                  {t(oscratEntityTypeTranslationMap[log.targetType], {
+                    defaultValue: log.targetType,
+                  })}
+                </span>
                 {log.targetName && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-content-muted text-xs">
                     {formatNameWithUuidFallback(log.targetName, t)}
                   </span>
                 )}
@@ -99,12 +115,12 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
             </Table.td>
             <Table.td>
               {log.metadata && (
-                <button
+                <Button
+                  variant="tertiary"
+                  size="m"
                   onClick={() => handleViewDetails(log)}
-                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  {t('view-details')}
-                </button>
+                  text={t('view-details')}
+                />
               )}
             </Table.td>
           </Table.tr>

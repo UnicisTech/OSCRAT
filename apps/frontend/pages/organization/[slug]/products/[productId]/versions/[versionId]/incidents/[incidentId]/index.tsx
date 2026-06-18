@@ -17,6 +17,7 @@ import { IncidentStatus } from '@oscrat/model';
 import normalizeText from '@/utils/normalizeText';
 import { formatDateLong } from '@/utils/dateFormat';
 import { Breadcrumb, FullScreenModal } from '@/components/shared';
+import Button from '@/components/button';
 
 function IncidentDetailsPage() {
   const { t, ready } = useTranslation('common');
@@ -28,25 +29,22 @@ function IncidentDetailsPage() {
 
   const version = versionContext.version;
   const project = productContext.project;
-  const { downloadAttachment, uploadAttachment, deleteAttachment } = useVersionAttachments(
-    teamId,
-    productId,
-    versionId,
-    { incidentId: incidentId as string }
-  );
+  const { downloadAttachment, uploadAttachment, deleteAttachment } =
+    useVersionAttachments(teamId, productId, versionId, {
+      incidentId: incidentId as string,
+    });
   const { members } = useTeamMembers(slug);
-  
-  const { incident, isLoading, isDetailError, detailError, updateIncident } = useIncidents(
-    teamId,
-    productId,
-    versionId,
-    incidentId as string
-  );
+
+  const { incident, isLoading, isDetailError, detailError, updateIncident } =
+    useIncidents(teamId, productId, versionId, incidentId as string);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [showDeleteAttachmentModal, setShowDeleteAttachmentModal] = useState(false);
-  const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
+  const [showDeleteAttachmentModal, setShowDeleteAttachmentModal] =
+    useState(false);
+  const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(
+    null
+  );
   const [showCompleteModal, setShowCompleteModal] = useState(false);
 
   const handleEdit = () => {
@@ -69,7 +67,10 @@ function IncidentDetailsPage() {
       setShowCompleteModal(false);
     } catch (error: unknown) {
       toast.error(
-        extractErrorMessage(error, t('oscrat.ui.versions.incidents.failed-to-complete'))
+        extractErrorMessage(
+          error,
+          t('oscrat.ui.versions.incidents.failed-to-complete')
+        )
       );
     }
   };
@@ -83,18 +84,25 @@ function IncidentDetailsPage() {
       await uploadAttachment(file);
       toast.success(t('oscrat.ui.file-uploaded-successfully'));
     } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file'))
+      );
     } finally {
       setUploadingFile(false);
     }
   };
 
-  const handleDownloadAttachment = async (attachmentId: string, filename: string) => {
+  const handleDownloadAttachment = async (
+    attachmentId: string,
+    filename: string
+  ) => {
     try {
       await downloadAttachment(attachmentId, filename);
       toast.success(t('oscrat.ui.download-starting'));
     } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-download')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-download'))
+      );
     }
   };
 
@@ -112,7 +120,9 @@ function IncidentDetailsPage() {
       setShowDeleteAttachmentModal(false);
       setAttachmentToDelete(null);
     } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-delete-attachment')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-delete-attachment'))
+      );
     }
   };
 
@@ -129,8 +139,11 @@ function IncidentDetailsPage() {
 
   if (isDetailError || !incident) {
     return (
-      <div className="text-red-600">
-        {extractErrorMessage(detailError, t('oscrat.ui.versions.incidents.failed-to-load'))}
+      <div className="text-danger">
+        {extractErrorMessage(
+          detailError,
+          t('oscrat.ui.versions.incidents.failed-to-load')
+        )}
       </div>
     );
   }
@@ -159,51 +172,53 @@ function IncidentDetailsPage() {
       <Breadcrumb items={breadcrumbItems} />
       <div className="mx-auto max-w-7xl space-y-6 p-6">
         {/* Section 1: Basic Incident Information */}
-        <div className="rounded-lg border border-gray-300 bg-white p-6">
+        <div className="border-line bg-surface rounded-lg border p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-content text-2xl font-bold">
               {t('oscrat.ui.versions.incidents.incident-details')}
             </h1>
             <div className="flex gap-2">
-              <button
+              <Button
+                variant="secondary"
+                size="m"
                 onClick={handleEdit}
                 disabled={incident.status === IncidentStatus.COMPLETED}
-                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
                 {t('oscrat.ui.edit')}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
+                size="m"
                 onClick={handleComplete}
                 disabled={incident.status === IncidentStatus.COMPLETED}
-                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
                 {t('oscrat.ui.complete-incident')}
-              </button>
+              </Button>
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.classification')}
               </label>
-              <p className="mt-1 text-lg font-semibold text-gray-900">
+              <p className="text-content mt-1 text-lg font-semibold">
                 {normalizeText(incident.classification)}
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.attack-type')}
               </label>
-              <p className="mt-1 text-lg font-semibold text-gray-900">
+              <p className="text-content mt-1 text-lg font-semibold">
                 {normalizeText(incident.attackType)}
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.asset-details')}
               </label>
-              <p className="mt-1 text-lg font-semibold text-gray-900">
+              <p className="text-content mt-1 text-lg font-semibold">
                 {incident.assetDetails || '-'}
               </p>
             </div>
@@ -211,135 +226,137 @@ function IncidentDetailsPage() {
         </div>
 
         {/* Section 2: Extended Incident Data */}
-        <div className="rounded-lg border border-gray-300 bg-white p-6">
-          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+        <div className="border-line bg-surface rounded-lg border p-6">
+          <h2 className="text-content mb-4 text-xl font-semibold">
             {t('oscrat.ui.versions.incidents.extended-data')}
           </h2>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.reporter')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {incident.reporter.name} ({incident.reporter.email})
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.date-of-detection')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {formatDateLong(incident.dateOfDetection)}
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.published-date')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {formatDateLong(incident.createdAt)}
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.added-by')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
-                {incident.createdByUser?.name || '-'} {incident.createdByUser?.email && `(${incident.createdByUser.email})`}
+              <p className="text-content mt-1 text-base">
+                {incident.createdByUser?.name || '-'}{' '}
+                {incident.createdByUser?.email &&
+                  `(${incident.createdByUser.email})`}
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.last-edited')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {formatDateLong(incident.updatedAt)}
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.edited-by')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
-                {incident.updatedByUser?.name || '-'} {incident.updatedByUser?.email && `(${incident.updatedByUser.email})`}
+              <p className="text-content mt-1 text-base">
+                {incident.updatedByUser?.name || '-'}{' '}
+                {incident.updatedByUser?.email &&
+                  `(${incident.updatedByUser.email})`}
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.severity')}
               </label>
-              <p className="mt-1 text-base font-semibold text-gray-900">
+              <p className="text-content mt-1 text-base font-semibold">
                 {normalizeText(incident.severity)}
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.handling-date')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {formatDateLong(incident.handlingDate)}
               </p>
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.description')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {incident.description}
               </p>
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.corrective-actions')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {incident.correctiveActions || '-'}
               </p>
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.root-cause')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {incident.rootCause || '-'}
               </p>
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.scope')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
-                {incident.scope}
-              </p>
+              <p className="text-content mt-1 text-base">{incident.scope}</p>
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-500">
+              <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.preventive-actions')}
               </label>
-              <p className="mt-1 text-base text-gray-900">
+              <p className="text-content mt-1 text-base">
                 {incident.preventiveActions || '-'}
               </p>
             </div>
 
             {incident.suspectedUnlawfulAct && (
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-500">
+                <label className="text-content-muted block text-sm font-medium">
                   {t('oscrat.ui.versions.incidents.unlawful-act-description')}
                 </label>
-                <p className="mt-1 text-base text-gray-900">
+                <p className="text-content mt-1 text-base">
                   {incident.unlawfulActDescription || '-'}
                 </p>
               </div>
@@ -347,10 +364,10 @@ function IncidentDetailsPage() {
 
             {incident.crossBorderImpact && (
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-500">
+                <label className="text-content-muted block text-sm font-medium">
                   {t('oscrat.ui.versions.incidents.cross-border-details')}
                 </label>
-                <p className="mt-1 text-base text-gray-900">
+                <p className="text-content mt-1 text-base">
                   {incident.crossBorderImpactDetails || '-'}
                 </p>
               </div>
@@ -359,26 +376,28 @@ function IncidentDetailsPage() {
         </div>
 
         {/* Section 3: Attachments */}
-        <div className="rounded-lg border border-gray-300 bg-white p-6">
+        <div className="border-line bg-surface rounded-lg border p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-content text-xl font-semibold">
               {t('oscrat.ui.attachments')}
             </h2>
             <div className="flex items-center gap-2">
-              <label className="inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <label className="border-line bg-surface text-content-secondary hover:bg-surface-muted inline-flex cursor-pointer items-center rounded-md border px-4 py-2 text-sm font-medium">
                 <input
                   type="file"
                   onChange={handleFileUpload}
                   disabled={uploadingFile}
                   className="hidden"
                 />
-                {uploadingFile ? t('oscrat.ui.uploading') : t('oscrat.ui.add-document')}
+                {uploadingFile
+                  ? t('oscrat.ui.uploading')
+                  : t('oscrat.ui.add-document')}
               </label>
               <div
                 className="tooltip tooltip-left"
                 data-tip={`${t('oscrat.ui.file-upload-max-size')} • ${t('oscrat.ui.file-upload-allowed-types')}`}
               >
-                <FaInfoCircle className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                <FaInfoCircle className="text-content-placeholder hover:text-content-secondary h-5 w-5" />
               </div>
             </div>
           </div>
@@ -390,8 +409,12 @@ function IncidentDetailsPage() {
                   <tr>
                     <th className={tableStyles.th}>{t('oscrat.ui.name')}</th>
                     <th className={tableStyles.th}>{t('oscrat.ui.type')}</th>
-                    <th className={tableStyles.th}>{t('oscrat.ui.date-added')}</th>
-                    <th className={tableStyles.th}>{t('oscrat.ui.added-by')}</th>
+                    <th className={tableStyles.th}>
+                      {t('oscrat.ui.date-added')}
+                    </th>
+                    <th className={tableStyles.th}>
+                      {t('oscrat.ui.added-by')}
+                    </th>
                     <th className={tableStyles.th}>{t('oscrat.ui.actions')}</th>
                   </tr>
                 </thead>
@@ -399,7 +422,9 @@ function IncidentDetailsPage() {
                   {incident.attachments.map((attachment) => (
                     <tr key={attachment.id} className={tableStyles.tr}>
                       <td className={tableStyles.td}>{attachment.name}</td>
-                      <td className={tableStyles.td}>{attachment.mimeType || '-'}</td>
+                      <td className={tableStyles.td}>
+                        {attachment.mimeType || '-'}
+                      </td>
                       <td className={tableStyles.td}>
                         {formatDateLong(attachment.createdAt)}
                       </td>
@@ -408,22 +433,30 @@ function IncidentDetailsPage() {
                       </td>
                       <td className={tableStyles.td}>
                         <div className="flex items-center justify-start space-x-4">
-                          <button
+                          <Button
+                            variant="tertiary"
+                            size="s"
+                            startIcon={<FaDownload size={12} />}
                             onClick={() =>
-                              handleDownloadAttachment(attachment.id, attachment.name)
+                              handleDownloadAttachment(
+                                attachment.id,
+                                attachment.name
+                              )
                             }
-                            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800"
                           >
-                            <FaDownload size={12} />
                             {t('oscrat.ui.download')}
-                          </button>
-                          <button
-                            onClick={() => handleDeleteAttachment(attachment.id)}
-                            className="inline-flex items-center gap-1 text-red-600 hover:text-red-800"
+                          </Button>
+                          <Button
+                            variant="tertiary"
+                            tone="danger"
+                            size="s"
+                            startIcon={<FaTrash size={12} />}
+                            onClick={() =>
+                              handleDeleteAttachment(attachment.id)
+                            }
                           >
-                            <FaTrash size={12} />
                             {t('oscrat.ui.delete')}
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -432,7 +465,7 @@ function IncidentDetailsPage() {
               </table>
             </div>
           ) : (
-            <p className="text-center text-gray-500">
+            <p className="text-content-muted text-center">
               {t('oscrat.ui.no-attachments')}
             </p>
           )}
@@ -445,11 +478,11 @@ function IncidentDetailsPage() {
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           incident={incident}
-          onSave={async (data) => void await updateIncident(data)}
+          onSave={async (data) => void (await updateIncident(data))}
           version={version}
           product={project}
           teamMembers={members}
-          attachments={incident.attachments.map(att => ({
+          attachments={incident.attachments.map((att) => ({
             id: att.id,
             name: att.name,
             mimeType: att.mimeType || undefined,
@@ -494,4 +527,3 @@ IncidentDetailsPage.getLayout = withProductDetailLayout;
 export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';
 
 export default IncidentDetailsPage;
-

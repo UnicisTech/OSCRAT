@@ -23,7 +23,10 @@ const AllTasks = () => {
   }
 
   const { tasks, isLoading: tasksLoading } = useTasks(team.slug);
-  const { data: products, isLoading: productsLoading } = useSearchProducts(team.slug, { includeVersions: true });
+  const { data: products, isLoading: productsLoading } = useSearchProducts(
+    team.slug,
+    { includeVersions: true }
+  );
 
   if (!ready || !products || !tasks) {
     return null;
@@ -37,14 +40,14 @@ const AllTasks = () => {
         buttonText={t('oscrat.ui.add-task')}
         onButtonClick={() => setCreateTaskVisible(true)}
       />
-      
+
       <div className="mt-6">
-          <TaskList 
-            tasks={tasks} 
-            team={team}
-            products={products}
-            isLoading={tasksLoading || productsLoading}
-          />
+        <TaskList
+          tasks={tasks}
+          team={team}
+          products={products}
+          isLoading={tasksLoading || productsLoading}
+        />
       </div>
 
       <CreateTask

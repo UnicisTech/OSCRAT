@@ -9,13 +9,19 @@ import { withProductLayout } from '@/lib/layout-helpers';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
 import { Breadcrumb } from '@/components/shared';
-import { 
+import Button from '@/components/button';
+import {
   OscratProductVersionStatus,
-  type OscratProductVersionCreate 
+  type OscratProductVersionCreate,
 } from '@oscrat/model';
 import { useFormik } from 'formik';
 import { versionCreateSchema } from '@/lib/validation/version';
-import { getInputClassName, getTextareaClassName, getSelectClassName, formStyles } from '@/utils/formStyles';
+import {
+  getInputClassName,
+  getTextareaClassName,
+  getSelectClassName,
+  formStyles,
+} from '@/utils/formStyles';
 import { getProductVersionStatusKey } from '@/utils/translation';
 
 function NewProductVersionPage() {
@@ -51,7 +57,9 @@ function NewProductVersionPage() {
         toast.success(t('oscrat.ui.version-created-successfully'));
         router.push(`/organization/${slug}/products/${productId}`);
       } catch (error: unknown) {
-        toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-create-version')));
+        toast.error(
+          extractErrorMessage(error, t('oscrat.ui.failed-to-create-version'))
+        );
       } finally {
         setIsSubmitting(false);
       }
@@ -85,19 +93,19 @@ function NewProductVersionPage() {
     <>
       <Breadcrumb items={breadcrumbItems} />
       <div className="mx-auto max-w-5xl p-6">
-        <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-content mb-6 text-2xl font-bold">
           {t('oscrat.ui.add-new-product-version')}
         </h1>
 
         <form onSubmit={formik.handleSubmit} className="space-y-6">
           {/* Product Information (Read-Only) */}
-          <div className="rounded-lg border border-gray-300 bg-gray-50 p-6 dark:border-gray-600 dark:bg-gray-800">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <div className="border-line bg-surface-muted rounded-lg border p-6">
+            <h2 className="text-content mb-4 text-lg font-semibold">
               {t('oscrat.ui.product-information')}
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-content-secondary block text-sm font-medium">
                   {t('oscrat.ui.product-acronym')}
                 </label>
                 <input
@@ -108,7 +116,7 @@ function NewProductVersionPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-content-secondary block text-sm font-medium">
                   {t('oscrat.ui.product-name')}
                 </label>
                 <input
@@ -122,8 +130,8 @@ function NewProductVersionPage() {
           </div>
 
           {/* New Version Information */}
-          <div className="rounded-lg border border-gray-300 bg-white p-6 dark:border-gray-600 dark:bg-gray-900">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <div className="border-line bg-surface rounded-lg border p-6">
+            <h2 className="text-content mb-4 text-lg font-semibold">
               {t('oscrat.ui.new-version-information')}
             </h2>
             <div className="space-y-6">
@@ -138,7 +146,9 @@ function NewProductVersionPage() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   placeholder="e.g., 1.2.4"
-                  className={getInputClassName(!!(formik.touched.version && formik.errors.version))}
+                  className={getInputClassName(
+                    !!(formik.touched.version && formik.errors.version)
+                  )}
                   disabled={isSubmitting}
                 />
                 {formik.touched.version && formik.errors.version && (
@@ -159,7 +169,9 @@ function NewProductVersionPage() {
                   onBlur={formik.handleBlur}
                   rows={4}
                   placeholder={t('oscrat.ui.type-here')}
-                  className={getTextareaClassName(!!(formik.touched.description && formik.errors.description))}
+                  className={getTextareaClassName(
+                    !!(formik.touched.description && formik.errors.description)
+                  )}
                   disabled={isSubmitting}
                 />
                 {formik.touched.description && formik.errors.description && (
@@ -178,7 +190,9 @@ function NewProductVersionPage() {
                   value={formik.values.status}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className={getSelectClassName(!!(formik.touched.status && formik.errors.status))}
+                  className={getSelectClassName(
+                    !!(formik.touched.status && formik.errors.status)
+                  )}
                   disabled={isSubmitting}
                 >
                   {STATUS_OPTIONS.map((statusOption) => (
@@ -198,21 +212,23 @@ function NewProductVersionPage() {
 
           {/* Actions */}
           <div className="flex justify-end gap-4">
-            <button
+            <Button
+              variant="secondary"
               type="button"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               {t('oscrat.ui.back')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
               type="submit"
               disabled={isSubmitting || !formik.isValid}
-              className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {isSubmitting ? t('oscrat.ui.creating') : t('oscrat.ui.create-version')}
-            </button>
+              {isSubmitting
+                ? t('oscrat.ui.creating')
+                : t('oscrat.ui.create-version')}
+            </Button>
           </div>
         </form>
       </div>
@@ -225,4 +241,3 @@ NewProductVersionPage.getLayout = withProductLayout;
 export { getCommonServerSideProps as getServerSideProps } from '@/lib/server-helpers';
 
 export default NewProductVersionPage;
-

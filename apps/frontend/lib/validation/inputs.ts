@@ -1,5 +1,8 @@
 import * as Yup from 'yup';
-import { parsePhoneNumberFromString, isValidPhoneNumber } from 'libphonenumber-js';
+import {
+  parsePhoneNumberFromString,
+  isValidPhoneNumber,
+} from 'libphonenumber-js';
 import DOMPurify from 'isomorphic-dompurify';
 import { stdnum } from 'stdnum';
 import { passwordPolicies } from '@/lib/common';
@@ -14,9 +17,10 @@ function validateTaxIDAgainstAllCountries(taxID: string): boolean {
       if (typeof validator.validate === 'function') {
         try {
           const validationResult = validator.validate(taxID);
-          const isValid = typeof validationResult === 'boolean' 
-            ? validationResult 
-            : validationResult.isValid;
+          const isValid =
+            typeof validationResult === 'boolean'
+              ? validationResult
+              : validationResult.isValid;
 
           if (isValid) {
             return true;
@@ -54,40 +58,51 @@ export const emailSchema = Yup.string()
   .trim()
   .lowercase()
   .email('oscrat.ui.validation.email-invalid')
-  .test('domain-validation', 'oscrat.ui.validation.email-invalid-domain', function (value) {
-    if (!value) return false;
+  .test(
+    'domain-validation',
+    'oscrat.ui.validation.email-invalid-domain',
+    function (value) {
+      if (!value) return false;
 
-    const [, domain] = value.split('@');
-    if (!domain || !domain.includes('.')) return false;
+      const [, domain] = value.split('@');
+      if (!domain || !domain.includes('.')) return false;
 
-    const parts = domain.split('.');
-    if (parts.length < 2) return false;
-    if (parts.some(part => part.length === 0)) return false;
-    if (parts[parts.length - 1].length < 2) return false;
+      const parts = domain.split('.');
+      if (parts.length < 2) return false;
+      if (parts.some((part) => part.length === 0)) return false;
+      if (parts[parts.length - 1].length < 2) return false;
 
-    return true;
-  })
+      return true;
+    }
+  )
   .max(100, 'oscrat.ui.validation.email-too-long');
 
-
-export const phoneSchema = Yup.string()
-  .test('phone-validation', 'oscrat.ui.validation.phone-invalid', function(value) {
+export const phoneSchema = Yup.string().test(
+  'phone-validation',
+  'oscrat.ui.validation.phone-invalid',
+  function (value) {
     const normalizedValue = value?.trim();
     if (!normalizedValue) return true;
-    
+
     const { parent } = this;
     const countryCode = parent.countryCode;
-    
+
     // Prefix requiredness is handled by parent schema (e.g. teamCreationSchema).
     if (!countryCode) return true;
-    
+
     try {
-      const phoneNumber = parsePhoneNumberFromString(normalizedValue, countryCode);
-      return phoneNumber ? isValidPhoneNumber(phoneNumber.number, countryCode) : false;
+      const phoneNumber = parsePhoneNumberFromString(
+        normalizedValue,
+        countryCode
+      );
+      return phoneNumber
+        ? isValidPhoneNumber(phoneNumber.number, countryCode)
+        : false;
     } catch {
       return false;
     }
-  });
+  }
+);
 
 export const passwordSchema = Yup.string()
   .required('oscrat.ui.validation.password-required')
@@ -105,10 +120,14 @@ export const postalAddressSchema = Yup.string()
 
 export const taxIdSchema = Yup.string()
   .trim()
-  .test('tax-id-validation', 'oscrat.ui.validation.tax-id-invalid', function(value) {
-    if (!value) return true;
-    return validateTaxIDAgainstAllCountries(value);
-  });
+  .test(
+    'tax-id-validation',
+    'oscrat.ui.validation.tax-id-invalid',
+    function (value) {
+      if (!value) return true;
+      return validateTaxIDAgainstAllCountries(value);
+    }
+  );
 
 export const additionalInfoSchema = Yup.string()
   .trim()
@@ -161,7 +180,6 @@ export const descriptionSchema = Yup.string()
     if (!value) return value;
     return DOMPurify.sanitize(value, { ALLOWED_TAGS: [] });
   });
-
 
 export const advisoryIdSchema = Yup.string()
   .trim()

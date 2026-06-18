@@ -41,7 +41,7 @@ const PerPageSelector = ({ perPage, setPerPage }: PerPageSelectorProps) => {
             }
           }}
           tabIndex={0}
-          className="btn btn-outline btn-sm flex cursor-pointer items-center justify-between rounded border border-gray-300 px-4 text-sm font-bold"
+          className="border-line bg-surface text-content hover:bg-surface-muted rounded-input flex cursor-pointer items-center justify-between border px-4 py-1.5 text-sm font-bold transition-colors"
         >
           <div>{perPage}</div>
           <ChevronUpDownIcon className="h-5 w-5" />
@@ -49,7 +49,7 @@ const PerPageSelector = ({ perPage, setPerPage }: PerPageSelectorProps) => {
         <ul
           ref={tabRef}
           tabIndex={0}
-          className="dropdown-content bg-base-100 w-full rounded border p-2 px-2 shadow-md"
+          className="dropdown-content bg-surface border-line shadow-4 rounded-input w-full border p-2 px-2"
         >
           {perPageOptions.map((item, index) => (
             <div
@@ -60,7 +60,7 @@ const PerPageSelector = ({ perPage, setPerPage }: PerPageSelectorProps) => {
                 }
                 setPerPage(item.value);
               }}
-              className="flex cursor-pointer items-center gap-2 rounded px-2 py-2 text-sm font-medium hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+              className="hover:bg-surface-muted focus:bg-surface-muted flex cursor-pointer items-center gap-2 rounded px-2 py-2 text-sm font-medium focus:outline-none"
             >
               {item.label}
             </div>

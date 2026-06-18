@@ -1,7 +1,11 @@
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
-import { getDocumentation, updateDocumentation, deleteDocumentation } from 'models/documentation';
+import {
+  getDocumentation,
+  updateDocumentation,
+  deleteDocumentation,
+} from 'models/documentation';
 import { documentationUpdateSchema } from '@/lib/validation/documentation';
 import { validateRequest } from '@/lib/validation/validateRequest';
 

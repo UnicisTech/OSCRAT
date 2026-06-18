@@ -66,8 +66,10 @@ const AuditLogsPage: NextPageWithLayout<AuditLogsPageProps> = ({
       <TeamTab activeTab="audit-logs" team={team} teamFeatures={teamFeatures} />
       <Card>
         <Card.Body>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">{t('audit-logs')}</h2>
+          <div className="flex items-center justify-between">
+            <Card.Header>
+              <Card.Title>{t('audit-logs')}</Card.Title>
+            </Card.Header>
             <AuditLogsFilters
               filters={filters}
               onFilterChange={updateFilters}

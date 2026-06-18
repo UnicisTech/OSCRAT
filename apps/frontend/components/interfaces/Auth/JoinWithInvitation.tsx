@@ -1,11 +1,11 @@
 import { useFormik } from 'formik';
-import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import type { User } from '@oscrat/model';
 import type { ApiResponse } from 'types';
 import { InputWithLabel, Loading, Error } from '@/components/shared';
+import Button from '@/components/button';
 import { useInvitation } from 'hooks/useInvitation';
 import { joinOrgWithInvitationSchema } from '@/lib/validation/auth';
 
@@ -66,8 +66,8 @@ const JoinWithInvitation = ({
         placeholder="Your name"
         value={formik.values.name}
         error={
-          formik.touched.name && formik.errors.name 
-            ? t(formik.errors.name) 
+          formik.touched.name && formik.errors.name
+            ? t(formik.errors.name)
             : undefined
         }
         onChange={formik.handleChange}
@@ -79,21 +79,17 @@ const JoinWithInvitation = ({
         placeholder="first.last@name.com"
         value={formik.values.email}
         error={
-          formik.touched.email && formik.errors.email 
-            ? t(String(formik.errors.email)) 
+          formik.touched.email && formik.errors.email
+            ? t(String(formik.errors.email))
             : undefined
         }
         onChange={formik.handleChange}
       />
       <Button
         type="submit"
-        color="primary"
+        variant="primary"
         loading={formik.isSubmitting}
-        disabled={
-          formik.isSubmitting || 
-          !formik.isValid || 
-          !formik.dirty
-        }
+        disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
         fullWidth
       >
         {t('create-account')}

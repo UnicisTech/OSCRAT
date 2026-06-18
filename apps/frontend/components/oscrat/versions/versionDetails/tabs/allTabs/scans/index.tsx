@@ -1,5 +1,8 @@
 import Table from './table';
-import { TabHeader, TabActionButton } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import {
+  TabHeader,
+  TabActionButton,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { useOscratVersionVulnerabilityScanReports } from '@/hooks/oscrat/useOscratJobs';
 import { useAttachments } from '@/hooks/useAttachments';
 import toast from 'react-hot-toast';
@@ -12,11 +15,8 @@ export default function Vulnerabilities() {
   const { teamId, productId, versionId } = useVersionContext();
   const { t } = useTranslation('common');
 
-  const {
-    reports,
-    deleteVulnerabilityScanReport,
-    refreshReports,
-  } = useOscratVersionVulnerabilityScanReports(teamId, productId, versionId);
+  const { reports, deleteVulnerabilityScanReport, refreshReports } =
+    useOscratVersionVulnerabilityScanReports(teamId, productId, versionId);
 
   const { downloadAttachment } = useAttachments();
 
@@ -40,7 +40,9 @@ export default function Vulnerabilities() {
 
   const handleDelete = async (reportId: string) => {
     if (
-      !window.confirm(t('oscrat.ui.versions.vulnerability-scan.confirm-delete-job'))
+      !window.confirm(
+        t('oscrat.ui.versions.vulnerability-scan.confirm-delete-job')
+      )
     ) {
       return;
     }
@@ -60,7 +62,7 @@ export default function Vulnerabilities() {
   };
 
   return (
-    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+    <div className="border-line bg-surface rounded-card flex w-full flex-col items-center border p-4">
       <div className="w-full">
         <TabHeader title={t('oscrat.ui.versions.vulnerability-scan.scan-jobs')}>
           <TabActionButton

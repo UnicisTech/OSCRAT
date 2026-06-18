@@ -5,7 +5,8 @@ export const COMPLIANCE_TYPES = {
   VERSION: 'version',
 } as const;
 
-export type ComplianceType = typeof COMPLIANCE_TYPES[keyof typeof COMPLIANCE_TYPES];
+export type ComplianceType =
+  (typeof COMPLIANCE_TYPES)[keyof typeof COMPLIANCE_TYPES];
 
 export const COMPLIANCE_NAMESPACES = {
   TEAM_MANUFACTURER: 'compliance-team-manufacturer-4a',
@@ -18,34 +19,43 @@ export const COMPLIANCE_NAMESPACES = {
   VERSION_DATA_STEWARD: 'compliance-version-sme-manufacturer-7b',
 } as const;
 
-export const TECH_DOC_CHECKLIST_NAMESPACE = 'compliance-tech-doc-checklist' as const;
+export const TECH_DOC_CHECKLIST_NAMESPACE =
+  'compliance-tech-doc-checklist' as const;
 
 export type ComplianceNamespace =
-  | typeof COMPLIANCE_NAMESPACES[keyof typeof COMPLIANCE_NAMESPACES]
+  | (typeof COMPLIANCE_NAMESPACES)[keyof typeof COMPLIANCE_NAMESPACES]
   | typeof TECH_DOC_CHECKLIST_NAMESPACE;
 
 /**
  * Maps organization role to compliance assessment namespace
  */
-export function getComplianceNamespace(role: OscratOrganizationRole, type: ComplianceType): ComplianceNamespace {
+export function getComplianceNamespace(
+  role: OscratOrganizationRole,
+  type: ComplianceType
+): ComplianceNamespace {
   const roleFileMap: Record<OscratOrganizationRole, ComplianceNamespace> = {
-    [OscratOrganizationRole.MANUFACTURER]: type === 'team' 
-      ? COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER 
-      : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER,
-    [OscratOrganizationRole.DISTRIBUTOR]: type === 'team' 
-      ? COMPLIANCE_NAMESPACES.TEAM_DISTRIBUTOR 
-      : COMPLIANCE_NAMESPACES.VERSION_DISTRIBUTOR,
-    [OscratOrganizationRole.IMPORTER]: type === 'team' 
-      ? COMPLIANCE_NAMESPACES.TEAM_IMPORTER 
-      : COMPLIANCE_NAMESPACES.VERSION_IMPORTER,
-    [OscratOrganizationRole.DATA_STEWARD]: type === 'team' 
-      ? COMPLIANCE_NAMESPACES.TEAM_DATA_STEWARD 
-      : COMPLIANCE_NAMESPACES.VERSION_DATA_STEWARD,
-    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]: type === 'team'
-      ? COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER
-      : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER,
+    [OscratOrganizationRole.MANUFACTURER]:
+      type === 'team'
+        ? COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER
+        : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER,
+    [OscratOrganizationRole.DISTRIBUTOR]:
+      type === 'team'
+        ? COMPLIANCE_NAMESPACES.TEAM_DISTRIBUTOR
+        : COMPLIANCE_NAMESPACES.VERSION_DISTRIBUTOR,
+    [OscratOrganizationRole.IMPORTER]:
+      type === 'team'
+        ? COMPLIANCE_NAMESPACES.TEAM_IMPORTER
+        : COMPLIANCE_NAMESPACES.VERSION_IMPORTER,
+    [OscratOrganizationRole.DATA_STEWARD]:
+      type === 'team'
+        ? COMPLIANCE_NAMESPACES.TEAM_DATA_STEWARD
+        : COMPLIANCE_NAMESPACES.VERSION_DATA_STEWARD,
+    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]:
+      type === 'team'
+        ? COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER
+        : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER,
   };
-  
+
   return roleFileMap[role];
 }
 
@@ -53,7 +63,10 @@ export function getComplianceNamespace(role: OscratOrganizationRole, type: Compl
  * Get all compliance namespaces for preloading
  */
 export function getAllComplianceNamespaces(): ComplianceNamespace[] {
-  return [...Object.values(COMPLIANCE_NAMESPACES), TECH_DOC_CHECKLIST_NAMESPACE];
+  return [
+    ...Object.values(COMPLIANCE_NAMESPACES),
+    TECH_DOC_CHECKLIST_NAMESPACE,
+  ];
 }
 
 /**

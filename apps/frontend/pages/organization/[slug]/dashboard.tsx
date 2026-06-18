@@ -4,10 +4,14 @@ import { GetServerSidePropsContext } from 'next';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { withTeamLayout } from '@/lib/layout-helpers';
+import Header from '@/components/oscrat/shared/header';
 import CompletedAppCheck from '@/components/oscrat/dashboard/CompletedAppCheck';
 // import TasksAndProducts from '@/components/oscrat/dashboard/TasksAndProducts';
 import RecentActivities from '@/components/oscrat/dashboard/RecentActivities';
-import { ComplianceCharts, exportComplianceToPDF } from '@/components/compliance';
+import {
+  ComplianceCharts,
+  exportComplianceToPDF,
+} from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { useTeamContext } from '@/context/TeamContext';
 import { ComplianceState } from '@/types/compliance';
@@ -17,25 +21,31 @@ import { FaDownload, FaPlayCircle } from 'react-icons/fa';
 import { OscratAssessmentType } from '@oscrat/model';
 import { loadFormState } from '@/utils/craForm';
 import type { FormState } from '@/types/craForm';
-import { useAssessments, useOscratAssessment } from '@/hooks/oscrat/useOscratAssessment';
+import {
+  useAssessments,
+  useOscratAssessment,
+} from '@/hooks/oscrat/useOscratAssessment';
 import { useLatestAssessment } from '@/hooks/oscrat/useLatestAssessment';
 import { transformOrgAssessmentToComplianceState } from '@/utils/compliance';
 import { buildPDFTranslations } from '@/lib/compliance/pdfTranslations';
 import useTasks from '@/hooks/useTasks';
+import Button from '@/components/button';
 
 const TeamDashboard = () => {
   const { teamContext } = useTeamContext();
   const team = teamContext.team!;
   const router = useRouter();
-  
+
   const complianceNamespace = useMemo(() => {
     return getComplianceNamespace(getRoleForTeam(team.orgRoles[0]), 'team');
   }, [team.orgRoles]);
-  
+
   const { t, ready } = useTranslation(['common', complianceNamespace]);
 
   // Check localStorage for completed CRA form data (before product creation)
-  const [completedCraForm, setCompletedCraForm] = useState<FormState | null>(null);
+  const [completedCraForm, setCompletedCraForm] = useState<FormState | null>(
+    null
+  );
 
   useEffect(() => {
     const formState = loadFormState();
@@ -56,16 +66,20 @@ const TeamDashboard = () => {
 
   const { tasks: teamTasks } = useTasks(team.slug);
 
-  const { assessments, isLoading: isLoadingAssessments } = useAssessments(team.slug);
+  const { assessments, isLoading: isLoadingAssessments } = useAssessments(
+    team.slug
+  );
 
-  const latestOrgAssessmentId = useLatestAssessment(assessments, OscratAssessmentType.ORG);
+  const latestOrgAssessmentId = useLatestAssessment(
+    assessments,
+    OscratAssessmentType.ORG
+  );
 
   // Fetch the detailed assessment with rawData
-  const { assessment: assessmentDetail, isLoading: isLoadingAssessmentDetail } = useOscratAssessment(
-    team.slug,
-    latestOrgAssessmentId || '',
-    { enabled: !!latestOrgAssessmentId }
-  );
+  const { assessment: assessmentDetail, isLoading: isLoadingAssessmentDetail } =
+    useOscratAssessment(team.slug, latestOrgAssessmentId || '', {
+      enabled: !!latestOrgAssessmentId,
+    });
 
   const complianceState = useMemo<ComplianceState | null>(() => {
     if (assessmentDetail?.rawData) {
@@ -74,10 +88,10 @@ const TeamDashboard = () => {
         team.orgRoles[0]
       );
     }
-    
+
     const storageKey = `team_compliance_${team.id}`;
     const saved = localStorage.getItem(storageKey);
-    
+
     if (saved) {
       try {
         return JSON.parse(saved) as ComplianceState;
@@ -85,7 +99,7 @@ const TeamDashboard = () => {
         localStorage.removeItem(storageKey);
       }
     }
-    
+
     // Initialize empty state for newly created teams
     return {
       productId: team.id,
@@ -103,7 +117,12 @@ const TeamDashboard = () => {
     };
   }, [team.id, team.orgRoles, assessmentDetail]);
 
-  const showCharts = !isComplianceLoading && !isLoadingAssessments && !isLoadingAssessmentDetail && complianceData && complianceData.length > 0;
+  const showCharts =
+    !isComplianceLoading &&
+    !isLoadingAssessments &&
+    !isLoadingAssessmentDetail &&
+    complianceData &&
+    complianceData.length > 0;
 
   const handleExportPDF = async () => {
     if (!complianceData || !complianceState || !ready) return;
@@ -130,40 +149,37 @@ const TeamDashboard = () => {
 
   return (
     <>
-      <div className="flex flex-col pb-6">
-        <h2 className="mb-2 text-xl font-semibold">{t('dashboard')}</h2>
-      </div>
-      <div className="space-y-6">
+      <Header title={t('dashboard')} />
+      <div className="space-y-8">
         {shouldShowCompletedAppCheck && completedCraForm?.highestRiskLevel && (
           <CompletedAppCheck riskLevel={completedCraForm.highestRiskLevel} />
         )}
         {showCharts && complianceState && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-content text-h6 font-bold">
                 {t('oscrat.ui.team-compliance-assessment')}
               </h2>
               <div className="flex items-center gap-3">
                 {!complianceState.completed && (
-                  <button
+                  <Button
+                    variant="primary"
                     onClick={handleGoToAssessment}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    startIcon={<FaPlayCircle />}
                   >
-                    <FaPlayCircle />
-                    {complianceState.started 
+                    {complianceState.started
                       ? t('oscrat.ui.dashboard.continue-assessment')
-                      : t('oscrat.ui.dashboard.start-assessment')
-                    }
-                  </button>
+                      : t('oscrat.ui.dashboard.start-assessment')}
+                  </Button>
                 )}
                 {complianceState.completed && (
-                  <button
+                  <Button
+                    variant="primary"
                     onClick={handleExportPDF}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    startIcon={<FaDownload />}
                   >
-                    <FaDownload />
                     {t('oscrat.ui.dashboard.export-pdf')}
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -186,8 +202,10 @@ TeamDashboard.getLayout = withTeamLayout;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { locale } = context;
-  const { getAllComplianceNamespaces } = await import('@/lib/compliance/translations');
-  
+  const { getAllComplianceNamespaces } = await import(
+    '@/lib/compliance/translations'
+  );
+
   const namespaces = ['common', ...getAllComplianceNamespaces()];
 
   return {

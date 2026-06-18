@@ -1,12 +1,18 @@
 import ImportModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/configuration/modal';
 import Table from '@/components/oscrat/versions/versionDetails/tabs/allTabs/configuration/table';
-import { TabHeader, TabActionButton } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import {
+  TabHeader,
+  TabActionButton,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { useOscratVersionConfigurationScanReports } from '@/hooks/oscrat/useOscratJobs';
 import { useAttachments } from '@/hooks/useAttachments';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useVersionContext } from '@/context/VersionContext';
-import { extractErrorMessage, extractTranslatedErrorMessage } from '@/lib/utils';
+import {
+  extractErrorMessage,
+  extractTranslatedErrorMessage,
+} from '@/lib/utils';
 import { useTranslation } from 'next-i18next';
 import { HiOutlineRefresh } from 'react-icons/hi';
 
@@ -82,7 +88,7 @@ export default function Configuration() {
   };
 
   return (
-    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+    <div className="border-line bg-surface rounded-card flex w-full flex-col items-center border p-4">
       <div className="w-full">
         <TabHeader title={t('oscrat.ui.versions.configuration.scan-jobs')}>
           <TabActionButton

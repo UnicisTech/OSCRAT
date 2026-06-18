@@ -37,7 +37,10 @@ const handleGET = async (
     throw new ApiError(404, 'Task not found');
   }
 
-  const documentations = await getDocumentationsForTask(teamMember.teamId, task.id);
+  const documentations = await getDocumentationsForTask(
+    teamMember.teamId,
+    task.id
+  );
 
   return res.status(200).json({ data: documentations, error: null });
 };

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useFormik } from 'formik';
 import { InputWithLabel } from '@/components/shared';
+import Button from '@/components/button';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
@@ -101,8 +102,8 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
                 value={formik.values.firstName}
                 label={t('first-name')}
                 error={
-                  formik.touched.firstName && formik.errors.firstName 
-                    ? t(formik.errors.firstName) 
+                  formik.touched.firstName && formik.errors.firstName
+                    ? t(formik.errors.firstName)
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -118,8 +119,8 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
                 value={formik.values.lastName}
                 label={t('last-name')}
                 error={
-                  formik.touched.lastName && formik.errors.lastName 
-                    ? t(formik.errors.lastName) 
+                  formik.touched.lastName && formik.errors.lastName
+                    ? t(formik.errors.lastName)
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -137,8 +138,8 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
               value={formik.values.email}
               label={t('email')}
               error={
-                formik.touched.email && formik.errors.email 
-                  ? t(formik.errors.email) 
+                formik.touched.email && formik.errors.email
+                  ? t(formik.errors.email)
                   : undefined
               }
               onChange={formik.handleChange}
@@ -156,7 +157,7 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
                 value={formik.values.password}
                 label={t('password')}
                 error={
-                  formik.touched.password && formik.errors.password 
+                  formik.touched.password && formik.errors.password
                     ? t(formik.errors.password)
                     : undefined
                 }
@@ -173,8 +174,8 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
                 value={formik.values.retypePassword}
                 label={t('confirm-password')}
                 error={
-                  formik.touched.retypePassword && formik.errors.retypePassword 
-                    ? t(formik.errors.retypePassword) 
+                  formik.touched.retypePassword && formik.errors.retypePassword
+                    ? t(formik.errors.retypePassword)
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -197,28 +198,24 @@ const Signup = ({ recaptchaSiteKey }: SignupProps) => {
 
         {/* Action Buttons */}
         <div className="flex justify-start space-x-3">
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => {
               router.push('/auth/login');
             }}
-            className="rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             {t('cancel')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
+            variant="primary"
             disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
-            className={`rounded-md px-6 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-              formik.isSubmitting || !formik.isValid || !formik.dirty
-                ? 'cursor-not-allowed bg-gray-400'
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
           >
             {formik.isSubmitting
               ? t('oscrat.ui.creating')
               : t('create-account')}
-          </button>
+          </Button>
         </div>
 
         {/* Terms and Conditions */}

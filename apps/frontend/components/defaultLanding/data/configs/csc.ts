@@ -254,15 +254,16 @@ const taskStatusOptions: { label: string; value: number }[] = [
 
 const getOptionStyle = (label: string) => {
   const styles: Record<string, string> = {
-    'Not Applicable': 'bg-gray-500 text-white font-bold',
-    'Not Performed': 'bg-red-600 text-white font-bold',
-    'Performed Informally': 'bg-pink-700 text-white font-bold',
-    Planned: 'bg-gray-700 text-white font-bold',
-    'Well Defined': 'bg-yellow-500 text-white font-bold',
-    'Quantitatively Controlled': 'bg-green-500 text-white font-bold',
-    'Continuously Improving': 'bg-green-700 text-white font-bold',
+    'Not Applicable': 'bg-surface-inverse text-content-inverse font-bold',
+    'Not Performed': 'bg-danger text-content-inverse font-bold',
+    'Performed Informally': 'bg-warning text-content-inverse font-bold',
+    Planned: 'bg-surface-inverse text-content-inverse font-bold',
+    'Well Defined': 'bg-warning text-content-inverse font-bold',
+    'Quantitatively Controlled': 'bg-success text-content-inverse font-bold',
+    'Continuously Improving':
+      'bg-success-emphasis text-content-inverse font-bold',
   };
-  return styles[label] || 'bg-white text-black';
+  return styles[label] || 'bg-surface text-content';
 };
 
 export {

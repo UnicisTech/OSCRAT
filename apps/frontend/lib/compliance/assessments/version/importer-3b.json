@@ -13,10 +13,7 @@
             "questionId": "ESP1-Q1",
             "questionText": "area-1.ESP1.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": true,
@@ -27,10 +24,7 @@
             "questionId": "ESP1-Q2",
             "questionText": "area-1.ESP1.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -40,10 +34,7 @@
             "questionId": "ESP1-Q3",
             "questionText": "area-1.ESP1.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -53,10 +44,7 @@
             "questionId": "ESP1-Q4",
             "questionText": "area-1.ESP1.questions.Q4.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -75,10 +63,7 @@
             "questionId": "ESP2-Q1",
             "questionText": "area-1.ESP2.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false,
@@ -89,10 +74,7 @@
             "questionId": "ESP2-Q2",
             "questionText": "area-1.ESP2.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false,
@@ -118,10 +100,7 @@
             "questionId": "ESP2-Q5",
             "questionText": "area-1.ESP2.questions.Q5.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -136,10 +115,7 @@
             "questionId": "ESP2-Q7",
             "questionText": "area-1.ESP2.questions.Q7.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false,
@@ -164,10 +140,7 @@
             "questionId": "ESP3-Q2",
             "questionText": "area-1.ESP3.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -177,10 +150,7 @@
             "questionId": "ESP3-Q3",
             "questionText": "area-1.ESP3.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -200,10 +170,7 @@
             "questionId": "ESP3-Q6",
             "questionText": "area-1.ESP3.questions.Q6.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false,
@@ -228,10 +195,7 @@
             "questionId": "ESP4-Q1",
             "questionText": "area-1.ESP4.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -241,10 +205,7 @@
             "questionId": "ESP4-Q2",
             "questionText": "area-1.ESP4.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -254,10 +215,7 @@
             "questionId": "ESP4-Q3",
             "questionText": "area-1.ESP4.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -281,10 +239,7 @@
             "questionId": "ESP5-Q2",
             "questionText": "area-1.ESP5.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -294,10 +249,7 @@
             "questionId": "ESP5-Q3",
             "questionText": "area-1.ESP5.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -322,10 +274,7 @@
             "questionId": "ESP6-Q1",
             "questionText": "area-2.ESP6.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -335,10 +284,7 @@
             "questionId": "ESP6-Q2",
             "questionText": "area-2.ESP6.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -357,10 +303,7 @@
             "questionId": "ESP7-Q1",
             "questionText": "area-2.ESP7.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -370,10 +313,7 @@
             "questionId": "ESP7-Q2",
             "questionText": "area-2.ESP7.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -383,10 +323,7 @@
             "questionId": "ESP7-Q3",
             "questionText": "area-2.ESP7.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -443,10 +380,7 @@
             "questionId": "ESP10-Q1",
             "questionText": "area-2.ESP10.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -470,10 +404,7 @@
             "questionId": "ESP11-Q1",
             "questionText": "area-2.ESP11.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -483,10 +414,7 @@
             "questionId": "ESP11-Q2",
             "questionText": "area-2.ESP11.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -505,10 +433,7 @@
             "questionId": "ESP12-Q1",
             "questionText": "area-2.ESP12.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -518,10 +443,7 @@
             "questionId": "ESP12-Q2",
             "questionText": "area-2.ESP12.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -545,10 +467,7 @@
             "questionId": "ESP13-Q2",
             "questionText": "area-2.ESP13.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -572,10 +491,7 @@
             "questionId": "ESP14-Q2",
             "questionText": "area-2.ESP14.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -594,10 +510,7 @@
             "questionId": "ESP15-Q1",
             "questionText": "area-2.ESP15.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -621,10 +534,7 @@
             "questionId": "ESP16-Q1",
             "questionText": "area-2.ESP16.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -634,10 +544,7 @@
             "questionId": "ESP16-Q2",
             "questionText": "area-2.ESP16.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -656,10 +563,7 @@
             "questionId": "ESP17-Q1",
             "questionText": "area-2.ESP17.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -669,10 +573,7 @@
             "questionId": "ESP17-Q2",
             "questionText": "area-2.ESP17.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false

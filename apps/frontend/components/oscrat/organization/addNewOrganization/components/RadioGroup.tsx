@@ -16,7 +16,7 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
   onChange,
 }) => (
   <div>
-    <label className="mb-2 block text-sm font-medium text-gray-700">
+    <label className="text-content-secondary mb-2 block text-sm font-medium">
       {label}
     </label>
     <div className="flex items-center space-x-6">
@@ -29,11 +29,11 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
             value={option.value}
             checked={selectedValue === option.value}
             onChange={onChange}
-            className="h-4 w-4 border-gray-300 accent-gray-800 focus:ring-blue-500"
+            className="border-line focus:ring-primary h-4 w-4 accent-gray-800"
           />
           <label
             htmlFor={`${name}-${option.value}`}
-            className="ml-2 block text-sm text-gray-900"
+            className="text-content ml-2 block text-sm"
           >
             {option.label}
           </label>

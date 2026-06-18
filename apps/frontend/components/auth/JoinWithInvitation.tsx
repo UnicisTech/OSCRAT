@@ -4,6 +4,7 @@ import { useFormik } from 'formik';
 import { useInvitation } from 'hooks/useInvitation';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Button from '@/components/button';
 import toast from 'react-hot-toast';
 import { useRef, useState } from 'react';
 import GoogleReCAPTCHA from '../shared/GoogleReCAPTCHA';
@@ -186,28 +187,25 @@ const JoinWithInvitation = ({
 
         {/* Action Buttons */}
         <div className="flex justify-start space-x-3">
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => {
               router.push('/auth/login');
             }}
-            className="rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             {t('cancel')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
+            variant="primary"
+            loading={formik.isSubmitting}
             disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
-            className={`rounded-md px-6 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-              formik.isSubmitting || !formik.isValid || !formik.dirty
-                ? 'cursor-not-allowed bg-gray-400'
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
           >
             {formik.isSubmitting
               ? t('oscrat.ui.creating')
               : t('create-account')}
-          </button>
+          </Button>
         </div>
 
         {/* Terms and Conditions */}

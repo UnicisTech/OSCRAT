@@ -2,10 +2,7 @@ import { slugify } from '@oscrat/model/utils/slugify';
 import { ApiError } from '@/lib/errors';
 import { createTeam, getTeams } from 'models/team';
 import { ensureAwarenessTrainingTask } from 'models/task';
-import {
-  withUserAuth,
-  type AuthenticatedUserRequest,
-} from '@/lib/middleware';
+import { withUserAuth, type AuthenticatedUserRequest } from '@/lib/middleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { TeamCreateData, TeamCreateRequest } from '@oscrat/model';
@@ -50,8 +47,8 @@ const handlePOST = async (
 
   // Check if user already belongs to a team with this slug
   const userTeams = await getTeams(user.id);
-  const teamExists = userTeams.some(team => team.slug === slug);
-  
+  const teamExists = userTeams.some((team) => team.slug === slug);
+
   if (teamExists) {
     throw new ApiError(400, 'You already have a team with this name.');
   }
@@ -74,8 +71,14 @@ const handlePOST = async (
   try {
     team = await createTeam(teamData);
   } catch (error) {
-    if (error instanceof Error && error.message.includes('Unique constraint failed on the fields: (`slug`)')) {
-      throw new ApiError(400, 'This team name is already taken. Please choose a different name.');
+    if (
+      error instanceof Error &&
+      error.message.includes('Unique constraint failed on the fields: (`slug`)')
+    ) {
+      throw new ApiError(
+        400,
+        'This team name is already taken. Please choose a different name.'
+      );
     }
     throw error;
   }
@@ -88,7 +91,10 @@ const handlePOST = async (
     user: { id: user.id, name: user.name },
     team: { id: team.id, name: team.name },
   }).catch((err) =>
-    console.error('[Awareness] Failed to create training task on team create:', err)
+    console.error(
+      '[Awareness] Failed to create training task on team create:',
+      err
+    )
   );
 
   recordMetric('team.created');

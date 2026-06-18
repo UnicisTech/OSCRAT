@@ -32,7 +32,8 @@ const ComplianceAssessmentWrapper: React.FC<Props> = ({
   complianceType,
   isAssessmentStarted = false,
 }) => {
-  const [translations, setTranslations] = useState<TranslationsState>(undefined);
+  const [translations, setTranslations] =
+    useState<TranslationsState>(undefined);
 
   if (translations === undefined) {
     return (

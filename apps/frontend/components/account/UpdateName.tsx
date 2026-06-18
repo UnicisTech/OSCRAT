@@ -1,7 +1,7 @@
 import { useTranslation } from 'next-i18next';
-import { Button } from 'react-daisyui';
 import type { User } from '@oscrat/model';
 
+import Button from '@/components/button';
 import { Card, InputWithLabel } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
 import { updateNameSchema } from '@/lib/validation/auth';
@@ -34,15 +34,15 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
             label={
               <>
                 {t('first-name')}
-                <span className="ml-1 text-red-600">*</span>
+                <span className="text-danger ml-1">*</span>
               </>
             }
             name="firstName"
             placeholder={t('your-first-name')}
             value={formik.values.firstName}
             error={
-              formik.touched.firstName && formik.errors.firstName 
-                ? t(formik.errors.firstName) 
+              formik.touched.firstName && formik.errors.firstName
+                ? t(formik.errors.firstName)
                 : undefined
             }
             onChange={formik.handleChange}
@@ -54,15 +54,15 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
             label={
               <>
                 {t('last-name')}
-                <span className="ml-1 text-red-600">*</span>
+                <span className="text-danger ml-1">*</span>
               </>
             }
             name="lastName"
             placeholder={t('your-last-name')}
             value={formik.values.lastName}
             error={
-              formik.touched.lastName && formik.errors.lastName 
-                ? t(formik.errors.lastName) 
+              formik.touched.lastName && formik.errors.lastName
+                ? t(formik.errors.lastName)
                 : undefined
             }
             onChange={formik.handleChange}
@@ -73,10 +73,9 @@ const UpdateName = ({ user }: { user: Partial<User> }) => {
         <Card.Footer>
           <Button
             type="submit"
-            color="primary"
+            variant="primary"
             loading={isUpdateUserLoading}
             disabled={!formik.dirty || !formik.isValid}
-            size="md"
           >
             {t('save-changes')}
           </Button>

@@ -3,11 +3,18 @@ import { IoAdd } from 'react-icons/io5';
 import { FaDownload, FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import type { Attachment } from '@/types';
-import { TabHeader, TableWrapper, TableHeader, TableRow, TabActionButton } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import {
+  TabHeader,
+  TableWrapper,
+  TableHeader,
+  TableRow,
+  TabActionButton,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
 import ActionButton from '@/components/oscrat/ActionButton';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -50,10 +57,7 @@ const FileTable: React.FC<FileTableProps> = ({
   return (
     <div className="w-full">
       <TabHeader title={t('oscrat.ui.files')}>
-        <TabActionButton
-          onClick={onAddFileClick}
-          icon={<IoAdd size={18} />}
-        >
+        <TabActionButton onClick={onAddFileClick} icon={<IoAdd size={18} />}>
           {t('oscrat.ui.add-file')}
         </TabActionButton>
       </TabHeader>
@@ -64,7 +68,10 @@ const FileTable: React.FC<FileTableProps> = ({
           <tbody className={tableStyles.tbody}>
             {(!attachments || attachments.length === 0) && (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-sm text-gray-500">
+                <td
+                  colSpan={5}
+                  className="text-content-muted px-6 py-8 text-center text-sm"
+                >
                   {t('oscrat.ui.no-files-added')}
                 </td>
               </tr>
@@ -78,7 +85,7 @@ const FileTable: React.FC<FileTableProps> = ({
                   {attachment.description || t('oscrat.ui.no-description')}
                 </td>
                 <td className={tableStyles.td}>
-                  {new Date(attachment.createdAt).toLocaleDateString('en-GB')}
+                  {formatDateShort(attachment.createdAt)}
                 </td>
                 <td className={tableStyles.td}>
                   {attachment.createdByUser

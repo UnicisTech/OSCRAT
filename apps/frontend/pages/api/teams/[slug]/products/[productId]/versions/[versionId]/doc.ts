@@ -46,7 +46,10 @@ const handleGET = async (
   const { teamMember } = req.teamContext;
   const { versionId } = req.query;
 
-  const attachment = await getVersionDoC(teamMember.teamId, versionId as string);
+  const attachment = await getVersionDoC(
+    teamMember.teamId,
+    versionId as string
+  );
 
   // Not having a DoC is a valid state - return null data with 200
   res.status(200).json({ data: attachment, error: null });
@@ -106,8 +109,11 @@ const handleDELETE = async (
   const { teamMember } = req.teamContext;
   const { versionId } = req.query;
 
-  const version = await deleteVersionDoC(teamMember.teamId, versionId as string, req.auditInfo);
+  const version = await deleteVersionDoC(
+    teamMember.teamId,
+    versionId as string,
+    req.auditInfo
+  );
 
   res.status(200).json({ data: { version }, error: null });
 };
-

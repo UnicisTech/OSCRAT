@@ -1,9 +1,10 @@
 import React from 'react';
 import toast from 'react-hot-toast';
-import { Modal, Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import { useFormik } from 'formik';
 import { useTask } from 'hooks/useTask';
+import { Button } from '@/components/shared';
+import Modal from '@/components/shared/Modal';
 
 const DeleteTask = ({
   taskNumber,
@@ -36,33 +37,33 @@ const DeleteTask = ({
   });
 
   return (
-    <Modal open={visible}>
+    <Modal open={visible} close={() => setVisible(false)} size="sm">
       <form onSubmit={formik.handleSubmit} method="POST">
-        <Modal.Header className="font-bold">{`Delete task`}</Modal.Header>
+        <Modal.Header>{`Delete task`}</Modal.Header>
         <Modal.Body>
           <div className="mt-2 flex flex-col space-y-4">
             <p>{t('delete-task-warning')}</p>
           </div>
         </Modal.Body>
-        <Modal.Actions>
-          <Button
-            type="submit"
-            color="error"
-            loading={formik.isSubmitting}
-            active={formik.dirty}
-          >
-            {t('delete')}
-          </Button>
+        <Modal.Footer>
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={() => {
               setVisible(!visible);
             }}
           >
             {t('close')}
           </Button>
-        </Modal.Actions>
+          <Button
+            type="submit"
+            tone="danger"
+            variant="primary"
+            loading={formik.isSubmitting}
+          >
+            {t('delete')}
+          </Button>
+        </Modal.Footer>
       </form>
     </Modal>
   );

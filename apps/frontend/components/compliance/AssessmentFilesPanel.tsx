@@ -4,6 +4,8 @@ import { FaUpload, FaDownload, FaTrash, FaFile } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useAssessmentAttachments } from '@/hooks/oscrat/useAssessmentAttachments';
 import { extractErrorMessage } from '@/lib/utils';
+import { Button } from '@/components/shared';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const FILE_ACCEPT =
@@ -59,7 +61,10 @@ const AssessmentFilesPanel: React.FC<AssessmentFilesPanelProps> = ({
       await downloadAttachment(id, filename);
     } catch (error: unknown) {
       toast.error(
-        extractErrorMessage(error, t('oscrat.ui.assessment-file-download-failed'))
+        extractErrorMessage(
+          error,
+          t('oscrat.ui.assessment-file-download-failed')
+        )
       );
     } finally {
       setDownloadingFiles((prev) => {
@@ -82,13 +87,13 @@ const AssessmentFilesPanel: React.FC<AssessmentFilesPanelProps> = ({
   };
 
   return (
-    <div className="mt-8 border border-gray-200 rounded-lg p-6 bg-white">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-semibold text-gray-800">
+    <div className="border-line rounded-card bg-surface mt-8 border p-6">
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-content text-lg font-semibold">
           {t('oscrat.ui.assessment-files')}
         </h3>
         {assessmentId && (
-          <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+          <label className="border-line text-content-secondary bg-surface hover:bg-surface-muted rounded-input inline-flex cursor-pointer items-center border px-4 py-2 text-sm font-medium">
             <FaUpload className="mr-2" />
             {t('oscrat.ui.add-file')}
             <input
@@ -100,58 +105,59 @@ const AssessmentFilesPanel: React.FC<AssessmentFilesPanelProps> = ({
           </label>
         )}
       </div>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-content-muted mb-4 text-sm">
         {t('oscrat.ui.assessment-files-description')}
       </p>
 
       {!assessmentId ? (
-        <p className="text-sm text-gray-500 italic">
+        <p className="text-content-muted text-sm italic">
           {t('oscrat.ui.assessment-files-not-started')}
         </p>
       ) : isLoading && attachments.length === 0 ? (
-        <p className="text-sm text-gray-500">{t('oscrat.ui.loading')}</p>
+        <p className="text-content-muted text-sm">{t('oscrat.ui.loading')}</p>
       ) : attachments.length === 0 ? (
-        <p className="text-sm text-gray-500 italic">
+        <p className="text-content-muted text-sm italic">
           {t('oscrat.ui.no-files-added')}
         </p>
       ) : (
-        <ul className="divide-y divide-gray-200 border border-gray-200 rounded-md">
+        <ul className="divide-line-subtle border-line rounded-input divide-y border">
           {attachments.map((attachment) => (
             <li
               key={attachment.id}
               className="flex items-center justify-between px-4 py-3"
             >
-              <div className="flex items-center min-w-0">
-                <FaFile className="text-gray-400 mr-3 flex-shrink-0" />
+              <div className="flex min-w-0 items-center">
+                <FaFile className="text-content-placeholder mr-3 flex-shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">
+                  <p className="text-content truncate text-sm font-medium">
                     {attachment.name}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(attachment.createdAt).toLocaleDateString('en-GB')}
+                  <p className="text-content-muted text-xs">
+                    {formatDateShort(attachment.createdAt)}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <button
-                  type="button"
+              <div className="flex flex-shrink-0 items-center gap-2">
+                <Button
+                  variant="tertiary"
+                  size="s"
                   onClick={() => handleDownload(attachment.id, attachment.name)}
                   disabled={downloadingFiles.has(attachment.id)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-md disabled:opacity-50"
                   title={t('oscrat.ui.download')}
+                  startIcon={<FaDownload size={12} />}
                 >
-                  <FaDownload size={12} />
                   {t('oscrat.ui.download')}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="tertiary"
+                  tone="danger"
+                  size="s"
                   onClick={() => handleDelete(attachment.id)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-md"
                   title={t('delete')}
+                  startIcon={<FaTrash size={12} />}
                 >
-                  <FaTrash size={12} />
                   {t('delete')}
-                </button>
+                </Button>
               </div>
             </li>
           ))}

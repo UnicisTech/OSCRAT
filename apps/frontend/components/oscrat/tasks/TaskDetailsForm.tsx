@@ -14,6 +14,7 @@ import { useFormik } from 'formik';
 import { createTaskUpdateSchema } from '@/lib/validation/task';
 import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
 import type { ApiError } from '@/types';
+import Button from '@/components/button';
 
 interface TaskDetailsFormProps {
   task: Task;
@@ -23,14 +24,14 @@ interface TaskDetailsFormProps {
 const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
   const { t } = useTranslation('common');
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
-  
+
   const { members } = useTeamMembers(team.slug);
   const { project: product } = useOscratProject(
     team.slug,
     task.productId || '',
     { enabled: !!task.productId }
   );
-  
+
   const { version } = useOscratVersion(
     team.slug,
     task.productId || '',
@@ -46,14 +47,17 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
   const resolvedTitle = resolveTaskTitle(task, t);
   const resolvedDescription = resolveTaskDescription(task, t);
 
-  const initialValues: UpdateTaskData = useMemo(() => ({
-    title: task?.title || '',
-    status: task?.status,
-    duedate: task?.duedate ? new Date(task.duedate) : undefined,
-    description: task?.description || '',
-    assigneeId: task?.assigneeId || null,
-  }), [task]);
-  
+  const initialValues: UpdateTaskData = useMemo(
+    () => ({
+      title: task?.title || '',
+      status: task?.status,
+      duedate: task?.duedate ? new Date(task.duedate) : undefined,
+      description: task?.description || '',
+      assigneeId: task?.assigneeId || null,
+    }),
+    [task]
+  );
+
   const formik = useFormik<UpdateTaskData>({
     initialValues,
     validationSchema,
@@ -96,28 +100,35 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
     }
   };
 
-  const handleInputChange = (field: keyof UpdateTaskData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const newValue = e.target.value;
-    
-    if (field === 'duedate') {
-      const dateValue = newValue ? new Date(newValue) : undefined;
-      formik.setFieldValue(field, dateValue);
+  const handleInputChange =
+    (field: keyof UpdateTaskData) =>
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >
+    ) => {
+      const newValue = e.target.value;
 
-      if (dateValue && dateValue < new Date()) {
-        formik.setFieldError(field, 'oscrat.ui.validation.task-due-date-past');
-        toast.error(t('oscrat.ui.validation.task-due-date-past'));
-        formik.setFieldValue(field, new Date());
-        return;
+      if (field === 'duedate') {
+        const dateValue = newValue ? new Date(newValue) : undefined;
+        formik.setFieldValue(field, dateValue);
+
+        if (dateValue && dateValue < new Date()) {
+          formik.setFieldError(
+            field,
+            'oscrat.ui.validation.task-due-date-past'
+          );
+          toast.error(t('oscrat.ui.validation.task-due-date-past'));
+          formik.setFieldValue(field, new Date());
+          return;
+        }
+      } else if (field === 'assigneeId') {
+        const assigneeValue = newValue || null;
+        formik.setFieldValue(field, assigneeValue);
+      } else {
+        formik.setFieldValue(field, newValue);
       }
-    } else if (field === 'assigneeId') {
-      const assigneeValue = newValue || null;
-      formik.setFieldValue(field, assigneeValue);
-    } else {
-      formik.setFieldValue(field, newValue);
-    }
-  };
+    };
 
   const renderField = (
     field: keyof UpdateTaskData,
@@ -128,17 +139,18 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
   ) => {
     const fieldValue = formik.values[field];
     const fieldError = formik.errors[field];
-    
-    const displayValue = field === 'duedate' && fieldValue instanceof Date 
-      ? fieldValue.toISOString().split('T')[0] 
-      : fieldValue || '';
-    
+
+    const displayValue =
+      field === 'duedate' && fieldValue instanceof Date
+        ? fieldValue.toISOString().split('T')[0]
+        : fieldValue || '';
+
     return (
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="text-content-secondary block text-sm font-medium">
           {label}
         </label>
-        
+
         {type === 'input' && (
           <>
             <input
@@ -147,16 +159,18 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
               onChange={handleInputChange(field)}
               type={field === 'duedate' ? 'date' : 'text'}
               disabled={disabled || formik.isSubmitting}
-              className={`w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 ${
-                fieldError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
+              className={`border-line text-content-secondary shadow-2 focus:border-primary focus:ring-primary disabled:bg-surface-muted disabled:text-content-muted rounded-input w-full border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed ${
+                fieldError
+                  ? 'border-danger-border focus:border-danger focus:ring-danger'
+                  : ''
               }`}
             />
             {fieldError && (
-              <p className="mt-1 text-sm text-red-600">{t(fieldError)}</p>
+              <p className="text-danger mt-1 text-sm">{t(fieldError)}</p>
             )}
           </>
         )}
-        
+
         {type === 'select' && (
           <>
             <select
@@ -164,8 +178,10 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
               value={displayValue as string}
               onChange={handleInputChange(field)}
               disabled={disabled || formik.isSubmitting}
-              className={`w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 ${
-                fieldError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
+              className={`border-line text-content-secondary shadow-2 focus:border-primary focus:ring-primary disabled:bg-surface-muted disabled:text-content-muted rounded-input w-full border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed ${
+                fieldError
+                  ? 'border-danger-border focus:border-danger focus:ring-danger'
+                  : ''
               }`}
             >
               {options.map((option) => (
@@ -175,11 +191,11 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
               ))}
             </select>
             {fieldError && (
-              <p className="mt-1 text-sm text-red-600">{t(fieldError)}</p>
+              <p className="text-danger mt-1 text-sm">{t(fieldError)}</p>
             )}
           </>
         )}
-        
+
         {type === 'textarea' && (
           <>
             <textarea
@@ -188,13 +204,15 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
               onChange={handleInputChange(field)}
               rows={3}
               disabled={disabled || formik.isSubmitting}
-              className={`w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 resize-none ${
-                fieldError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
+              className={`border-line text-content-secondary shadow-2 focus:border-primary focus:ring-primary disabled:bg-surface-muted disabled:text-content-muted rounded-input w-full resize-none border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed ${
+                fieldError
+                  ? 'border-danger-border focus:border-danger focus:ring-danger'
+                  : ''
               }`}
               placeholder={`${t('enter')} ${label.toLowerCase()}...`}
             />
             {fieldError && (
-              <p className="mt-1 text-sm text-red-600">{t(fieldError)}</p>
+              <p className="text-danger mt-1 text-sm">{t(fieldError)}</p>
             )}
           </>
         )}
@@ -204,118 +222,137 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
 
   const isAutomatic = task.originType === 'AUTOMATIC';
   const OriginIcon = isAutomatic ? CogIcon : HandRaisedIcon;
-  const originLabel = isAutomatic ? t('oscrat.ui.task-origin-automatic') : t('oscrat.ui.task-origin-manual');
-  const originBadgeClass = isAutomatic 
-    ? 'bg-blue-100 text-blue-700 border-blue-200' 
-    : 'bg-amber-100 text-amber-700 border-amber-200';
+  const originLabel = isAutomatic
+    ? t('oscrat.ui.task-origin-automatic')
+    : t('oscrat.ui.task-origin-manual');
+  const originBadgeClass = isAutomatic
+    ? 'bg-info-subtle text-info-emphasis border-info'
+    : 'bg-warning-subtle text-warning border-warning-border';
 
   return (
     <form onSubmit={formik.handleSubmit}>
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">
+      <div className="border-line bg-surface rounded-card border p-6">
+        <h2 className="text-content mb-6 text-lg font-semibold">
           {t('task-details')}
-          <span className="ml-2 text-gray-500">#{task.taskNumber}</span>
+          <span className="text-content-muted ml-2">#{task.taskNumber}</span>
         </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {hasLocalizedTitle && !task.title ? (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="text-content-secondary block text-sm font-medium">
                 {t('task-name')}
               </label>
               <input
                 value={resolvedTitle}
                 readOnly
                 disabled
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+                className="border-line-subtle bg-surface-muted text-content-secondary rounded-input w-full cursor-not-allowed border px-3 py-2"
               />
             </div>
           ) : (
             renderField('title', t('task-name'))
           )}
-          
+
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">{t('origin')}</label>
-            <div className={`w-full rounded-md border px-3 py-2 flex items-center gap-2 ${originBadgeClass}`}>
+            <label className="text-content-secondary block text-sm font-medium">
+              {t('origin')}
+            </label>
+            <div
+              className={`rounded-input flex w-full items-center gap-2 border px-3 py-2 ${originBadgeClass}`}
+            >
               <OriginIcon className="h-4 w-4" />
               <span className="font-medium">{originLabel}</span>
             </div>
           </div>
-          
+
           {!task.productId && !task.versionId && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">{t('team')}</label>
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('team')}
+              </label>
               <input
                 type="text"
                 value={team.name}
                 readOnly
                 disabled
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+                className="border-line-subtle bg-surface-muted text-content-secondary rounded-input w-full cursor-not-allowed border px-3 py-2"
               />
             </div>
           )}
-          
+
           {task.productId && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">{t('product')}</label>
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('product')}
+              </label>
               <input
                 type="text"
                 value={product?.name || '—'}
                 readOnly
                 disabled
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+                className="border-line-subtle bg-surface-muted text-content-secondary rounded-input w-full cursor-not-allowed border px-3 py-2"
               />
             </div>
           )}
-          
+
           {task.versionId && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">{t('version')}</label>
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('version')}
+              </label>
               <input
                 type="text"
                 value={version?.version || '—'}
                 readOnly
                 disabled
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+                className="border-line-subtle bg-surface-muted text-content-secondary rounded-input w-full cursor-not-allowed border px-3 py-2"
               />
             </div>
           )}
           {renderField('duedate', t('due-date'))}
-          {renderField('status', t('status'), 'select', Object.values(TaskStatus).map(s => ({ 
-            value: s, 
-            label: t(getTaskStatusTranslationKey(s))
-           })))}
-          
+          {renderField(
+            'status',
+            t('status'),
+            'select',
+            Object.values(TaskStatus).map((s) => ({
+              value: s,
+              label: t(getTaskStatusTranslationKey(s)),
+            }))
+          )}
+
           {renderField('assigneeId', t('assignee'), 'select', [
             { value: '', label: t('unassigned') },
-            ...(members?.map(member => ({
+            ...(members?.map((member) => ({
               value: member.userId,
-              label: member.user.name
-            })) || [])
+              label: member.user.name,
+            })) || []),
           ])}
-          
+
           <div className="lg:col-span-3">
             {hasLocalizedDescription && !task.description ? (
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-content-secondary block text-sm font-medium">
                   {t('description')}
                 </label>
-                <div className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-gray-700 text-sm whitespace-pre-line">
-                  {resolvedDescription.split(/(https?:\/\/[^\s]+)/g).map((segment, i) =>
-                    /^https?:\/\//.test(segment) ? (
-                      <a
-                        key={i}
-                        href={segment}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline hover:text-blue-800 break-all"
-                      >
-                        {segment}
-                      </a>
-                    ) : (
-                      <React.Fragment key={i}>{segment}</React.Fragment>
-                    )
-                  )}
+                <div className="border-line-subtle bg-surface-muted text-content-secondary rounded-input w-full whitespace-pre-line border px-3 py-3 text-sm">
+                  {resolvedDescription
+                    .split(/(https?:\/\/[^\s]+)/g)
+                    .map((segment, i) =>
+                      /^https?:\/\//.test(segment) ? (
+                        <a
+                          key={i}
+                          href={segment}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary break-all underline hover:opacity-80"
+                        >
+                          {segment}
+                        </a>
+                      ) : (
+                        <React.Fragment key={i}>{segment}</React.Fragment>
+                      )
+                    )}
                 </div>
               </div>
             ) : (
@@ -323,32 +360,34 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
             )}
           </div>
 
-          <div className="flex items-center gap-2 mt-4">
+          <div className="mt-4 flex items-center gap-2">
             <input
               type="checkbox"
               id="enableRiskAssessment"
               checked={enableRiskAssessment}
               onChange={(e) => handleRiskAssessmentToggle(e.target.checked)}
               disabled={formik.isSubmitting}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed"
+              className="border-line text-primary focus:ring-primary h-4 w-4 rounded disabled:cursor-not-allowed"
             />
             <label
               htmlFor="enableRiskAssessment"
-              className="text-sm font-medium text-gray-700"
+              className="text-content-secondary text-sm font-medium"
             >
               {t('oscrat.ui.enable-risk-assessment')}
             </label>
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end border-t border-gray-200 pt-4">
-          <button
+        <div className="border-line-subtle mt-6 flex justify-end border-t pt-4">
+          <Button
             type="submit"
+            variant="primary"
             disabled={formik.isSubmitting || !formik.dirty}
-            className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {formik.isSubmitting ? t('oscrat.ui.saving') : t('oscrat.ui.save-changes')}
-          </button>
+            {formik.isSubmitting
+              ? t('oscrat.ui.saving')
+              : t('oscrat.ui.save-changes')}
+          </Button>
         </div>
       </div>
     </form>

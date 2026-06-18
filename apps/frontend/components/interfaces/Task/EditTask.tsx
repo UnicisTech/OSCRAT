@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import toast from 'react-hot-toast';
 import Modal from '@/components/shared/Modal';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import { useTranslation } from 'next-i18next';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
@@ -10,7 +10,10 @@ import { TaskStatus } from '@oscrat/model';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { useTask } from 'hooks/useTask';
 import { useFormik } from 'formik';
-import { createTaskUpdateSchema, type TaskUpdateData } from '@/lib/validation/task';
+import {
+  createTaskUpdateSchema,
+  type TaskUpdateData,
+} from '@/lib/validation/task';
 import { resolveTaskTitle } from '@/lib/tasks';
 import type { ApiError } from '@/types';
 
@@ -28,14 +31,17 @@ const EditTask = ({
   const { t, ready } = useTranslation('common');
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
   const validationSchema = useMemo(() => createTaskUpdateSchema(), []);
-  
-  const initialValues: TaskUpdateData = useMemo(() => ({
-    title: resolveTaskTitle(task, t),
-    status: task?.status || '',
-    duedate: task?.duedate ? new Date(task.duedate) : undefined,
-    description: task?.description || '',
-  }), [task, t]);
-  
+
+  const initialValues: TaskUpdateData = useMemo(
+    () => ({
+      title: resolveTaskTitle(task, t),
+      status: task?.status || '',
+      duedate: task?.duedate ? new Date(task.duedate) : undefined,
+      description: task?.description || '',
+    }),
+    [task, t]
+  );
+
   const formik = useFormik<TaskUpdateData>({
     initialValues,
     validationSchema,
@@ -50,7 +56,7 @@ const EditTask = ({
           duedate: values.duedate,
           description: values.description?.trim() || '',
         };
-        
+
         await updateTask(updateData);
         toast.success(t('task-updated'));
         setVisible(false);
@@ -72,14 +78,14 @@ const EditTask = ({
   };
 
   if (!ready) return null;
-  
+
   return (
     <Modal open={visible} close={handleClose}>
       <Modal.Header>
         {t('edit-task')}
-        <span className="ml-2 text-gray-500">#{task.taskNumber}</span>
+        <span className="text-content-muted ml-2">#{task.taskNumber}</span>
       </Modal.Header>
-      
+
       <form onSubmit={formik.handleSubmit} method="POST">
         <Modal.Body>
           <div className="space-y-4">
@@ -92,34 +98,40 @@ const EditTask = ({
               required
               placeholder={t('task-title-placeholder')}
             />
-            
+
             <SelectWithLabel
               name="status"
               label={t('status')}
               value={formik.values.status || ''}
               onChange={formik.handleChange}
-              options={Object.values(TaskStatus).map(status => ({
+              options={Object.values(TaskStatus).map((status) => ({
                 value: status,
                 label: t(getTaskStatusTranslationKey(status)),
               }))}
               error={formik.errors.status ? t(formik.errors.status) : undefined}
               required
             />
-            
+
             <InputWithLabel
               type="date"
               name="duedate"
               label={t('due-date')}
-              value={formik.values.duedate instanceof Date ? formik.values.duedate.toISOString().split('T')[0] : ''}
+              value={
+                formik.values.duedate instanceof Date
+                  ? formik.values.duedate.toISOString().split('T')[0]
+                  : ''
+              }
               onChange={handleDateChange}
-              error={formik.errors.duedate ? t(formik.errors.duedate) : undefined}
+              error={
+                formik.errors.duedate ? t(formik.errors.duedate) : undefined
+              }
               required
             />
-            
+
             <div className="w-full">
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="text-content-secondary mb-2 block text-sm font-medium"
               >
                 {t('description')}
               </label>
@@ -129,31 +141,32 @@ const EditTask = ({
                 value={formik.values.description || ''}
                 onChange={formik.handleChange}
                 rows={4}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 placeholder-gray-400 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border-line text-content-secondary placeholder-content-placeholder shadow-2 focus:border-primary focus:ring-primary rounded-input w-full border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2"
                 placeholder={t('task-description-placeholder')}
               />
               {formik.errors.description && (
-                <p className="mt-1 text-sm text-red-600">{t(formik.errors.description)}</p>
+                <p className="text-danger mt-1 text-sm">
+                  {t(formik.errors.description)}
+                </p>
               )}
             </div>
           </div>
         </Modal.Body>
-        
+
         <Modal.Footer>
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={handleClose}
             disabled={formik.isSubmitting}
-            className="text-gray-800 border-gray-300 hover:bg-gray-50"
           >
             {t('close')}
           </Button>
           <Button
             type="submit"
+            variant="primary"
             loading={formik.isSubmitting}
             disabled={formik.isSubmitting}
-            className="bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 border-0"
           >
             {t('save-changes')}
           </Button>

@@ -8,10 +8,20 @@ import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { useVersionCompliance } from '@/hooks/oscrat/useVersionCompliance';
-import { ComplianceCharts, exportComplianceToPDF } from '@/components/compliance';
-import { TabHeader, TabActionButton, TabLoading } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import {
+  ComplianceCharts,
+  exportComplianceToPDF,
+} from '@/components/compliance';
+import {
+  TabHeader,
+  TabActionButton,
+  TabLoading,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import ConfirmationModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/repository/confirmationModal';
-import { getComplianceNamespace, COMPLIANCE_NAMESPACES } from '@/lib/compliance/translations';
+import {
+  getComplianceNamespace,
+  COMPLIANCE_NAMESPACES,
+} from '@/lib/compliance/translations';
 import { buildPDFTranslations } from '@/lib/compliance/pdfTranslations';
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { FaDownload, FaPlayCircle, FaRedo } from 'react-icons/fa';
@@ -35,7 +45,11 @@ export default function Compliance() {
   const [isResetting, setIsResetting] = useState(false);
 
   const { project } = useOscratProject(teamId, productId);
-  const { version: versionData } = useOscratVersion(teamId, productId, versionId);
+  const { version: versionData } = useOscratVersion(
+    teamId,
+    productId,
+    versionId
+  );
 
   const { complianceData, isLoading: isLoadingData } = useComplianceData({
     teamSlug: team?.slug || '',
@@ -44,17 +58,18 @@ export default function Compliance() {
     enabled: !!team && !!versionData,
   });
 
-  const { complianceState: dbComplianceState, resetAssessment } = useVersionCompliance({
-    teamSlug,
-    productId,
-    versionId,
-    teamRole: team?.orgRoles[0] as OscratOrganizationRole,
-    userId: session?.user?.id,
-  });
+  const { complianceState: dbComplianceState, resetAssessment } =
+    useVersionCompliance({
+      teamSlug,
+      productId,
+      versionId,
+      teamRole: team?.orgRoles[0] as OscratOrganizationRole,
+      userId: session?.user?.id,
+    });
 
   const { tasks: allTeamTasks } = useTasks(teamSlug);
   const versionTasks = useMemo(
-    () => (allTeamTasks || []).filter(task => task.versionId === versionId),
+    () => (allTeamTasks || []).filter((task) => task.versionId === versionId),
     [allTeamTasks, versionId]
   );
 
@@ -64,7 +79,7 @@ export default function Compliance() {
   const complianceState = useMemo(() => {
     if (dbComplianceState) return dbComplianceState;
     if (!team?.orgRoles[0]) return null;
-    
+
     return {
       productId: versionId,
       teamRole: team.orgRoles[0],
@@ -82,11 +97,20 @@ export default function Compliance() {
   }, [dbComplianceState, versionId, team?.orgRoles]);
 
   const handleNavigateToCompliance = () => {
-    router.push(`/organization/${team?.slug}/products/${productId}/versions/${versionId}/compliance`);
+    router.push(
+      `/organization/${team?.slug}/products/${productId}/versions/${versionId}/compliance`
+    );
   };
 
   const handleExportPDF = async () => {
-    if (!complianceData || !complianceState || !team || !project || !versionData) return;
+    if (
+      !complianceData ||
+      !complianceState ||
+      !team ||
+      !project ||
+      !versionData
+    )
+      return;
 
     const pdfTranslations = buildPDFTranslations(t);
 
@@ -126,18 +150,21 @@ export default function Compliance() {
     return <TabLoading />;
   }
 
-  const showCharts = complianceData && complianceState && complianceData.length > 0;
+  const showCharts =
+    complianceData && complianceState && complianceData.length > 0;
 
   if (!showCharts) {
     return (
-      <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-8">
-        <p className="text-gray-500">{t('oscrat.ui.versions.compliance.no-data')}</p>
+      <div className="border-line bg-surface rounded-card flex w-full flex-col items-center border p-8">
+        <p className="text-content-muted">
+          {t('oscrat.ui.versions.compliance.no-data')}
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="flex w-full flex-col rounded-lg border border-gray-400 bg-white p-4">
+    <div className="border-line bg-surface rounded-card flex w-full flex-col border p-4">
       <div className="w-full">
         <TabHeader title={t('oscrat.ui.compliance-assessment')}>
           {!complianceState.completed && (
@@ -152,10 +179,7 @@ export default function Compliance() {
           )}
           {complianceState.completed && (
             <>
-              <TabActionButton
-                onClick={handleExportPDF}
-                icon={<FaDownload />}
-              >
+              <TabActionButton onClick={handleExportPDF} icon={<FaDownload />}>
                 {t('oscrat.ui.dashboard.export-pdf')}
               </TabActionButton>
               <TabActionButton
@@ -190,4 +214,3 @@ export default function Compliance() {
     </div>
   );
 }
-

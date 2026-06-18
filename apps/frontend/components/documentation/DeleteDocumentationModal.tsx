@@ -25,10 +25,12 @@ const DeleteDocumentationModal: React.FC<Props> = ({
       onConfirm={onConfirm}
       onCancel={() => setVisible(false)}
     >
-      <p className="text-gray-600">
-        {t('oscrat.ui.documentation.delete.confirm', { title: documentation?.title })}
+      <p className="text-content-secondary">
+        {t('oscrat.ui.documentation.delete.confirm', {
+          title: documentation?.title,
+        })}
       </p>
-      <p className="mt-2 text-sm text-gray-500">
+      <p className="text-content-muted mt-2 text-sm">
         {t('oscrat.ui.documentation.delete.warning')}
       </p>
     </ConfirmationDialog>

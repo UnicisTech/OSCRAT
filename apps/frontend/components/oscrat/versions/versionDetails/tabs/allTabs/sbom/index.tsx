@@ -1,6 +1,9 @@
 import ImportModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/sbom/modal';
 import Table from '@/components/oscrat/versions/versionDetails/tabs/allTabs/sbom/table';
-import { TabHeader, TabActionButton } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import {
+  TabHeader,
+  TabActionButton,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
 import { useOscratVersionSbomReports } from '@/hooks/oscrat/useOscratJobs';
 import { useCreateSbomReportVulnerabilityScan } from '@/lib/api/hooks/oscrat/jobs';
@@ -29,11 +32,8 @@ export default function Sbom() {
     refreshReports,
   } = useOscratVersionSbomReports(teamId, productId, versionId);
 
-  const createSbomReportVulnerabilityScanMutation = useCreateSbomReportVulnerabilityScan(
-    teamId,
-    productId,
-    versionId
-  );
+  const createSbomReportVulnerabilityScanMutation =
+    useCreateSbomReportVulnerabilityScan(teamId, productId, versionId);
 
   const { downloadAttachment } = useAttachments();
   const handleCreateRepoSbomReport = async () => {
@@ -127,7 +127,7 @@ export default function Sbom() {
     version?.repository && Object.keys(version.repository).length > 0;
 
   return (
-    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+    <div className="border-line bg-surface rounded-card flex w-full flex-col items-center border p-4">
       <div className="w-full">
         <TabHeader title={t('oscrat.ui.versions.sbom.generation-jobs')}>
           <TabActionButton

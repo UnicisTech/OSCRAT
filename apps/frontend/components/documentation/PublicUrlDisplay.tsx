@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
 import env from '@/lib/env';
+import { Button } from '@/components/shared';
 
 interface PublicUrlDisplayProps {
   slug: string;
@@ -31,8 +31,8 @@ const PublicUrlDisplay: React.FC<PublicUrlDisplayProps> = ({
   };
 
   return (
-    <div className="rounded-md border border-green-200 bg-green-50 p-4">
-      <label className="block text-sm font-medium text-green-800 mb-2">
+    <div className="bg-success-subtle border-success-border rounded-card border p-4">
+      <label className="text-success-emphasis mb-2 block text-sm font-medium">
         {t('oscrat.ui.documentation.public-url')}
       </label>
       <div className="flex items-center gap-2">
@@ -40,9 +40,9 @@ const PublicUrlDisplay: React.FC<PublicUrlDisplayProps> = ({
           type="text"
           readOnly
           value={publicUrl}
-          className="flex-1 rounded-md border border-green-300 bg-white px-3 py-2 text-sm text-gray-700"
+          className="border-success-border bg-surface text-content-secondary rounded-input flex-1 border px-3 py-2 text-sm"
         />
-        <Button size="sm" variant="outline" onClick={handleCopy}>
+        <Button size="m" variant="secondary" onClick={handleCopy}>
           {t('oscrat.ui.documentation.copy-url')}
         </Button>
       </div>

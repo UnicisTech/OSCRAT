@@ -79,4 +79,3 @@ export function useComplianceState({
     clearComplianceState,
   };
 }
-

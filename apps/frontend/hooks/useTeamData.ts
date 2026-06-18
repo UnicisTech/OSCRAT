@@ -5,7 +5,10 @@ import {
   useUpsertTeamData,
   useDeleteTeamData,
 } from '@/lib/api/hooks/teamData';
-import { teamDataEndpoints, type TeamDataUpsertRequest } from '@/lib/api/endpoints/teamData';
+import {
+  teamDataEndpoints,
+  type TeamDataUpsertRequest,
+} from '@/lib/api/endpoints/teamData';
 
 export const DATA_KEY_NAMESPACES = {
   COMPLIANCE: 'compliance',

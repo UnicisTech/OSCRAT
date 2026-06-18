@@ -1,11 +1,13 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-import { IoCloudUpload, IoDownload, IoTrash } from 'react-icons/io5';
+import { IoDownload, IoTrash } from 'react-icons/io5';
 import toast from 'react-hot-toast';
 import type { Attachment } from '@oscrat/model';
 import { formatFileSize } from '@/lib/utils';
 import { validateBrowserFile } from '@/lib/utils/docFileValidation';
 import { getFileIcon } from '@/lib/utils/fileIcons';
+import Button from '@/components/button';
+import { formatDateShort } from '@/utils/dateFormat';
 
 /**
  * Props for the CAR (Conformity Assessment Report) upload component.
@@ -40,7 +42,6 @@ export default function CarUpload({
 }: CarUploadProps) {
   const { t } = useTranslation('common');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
 
   const handleFileSelect = async (file: File) => {
     if (!validateBrowserFile(file, 'car')) {
@@ -51,13 +52,6 @@ export default function CarUpload({
     await onUpload(file);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFileSelect(file);
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleFileSelect(file);
@@ -66,50 +60,40 @@ export default function CarUpload({
 
   if (car) {
     return (
-      <div className="flex items-center justify-between rounded-lg border border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700">
+      <div className="border-line bg-surface-muted rounded-card flex items-center justify-between border p-4">
         <div className="flex items-center gap-3">
           {getFileIcon(car.mimeType ?? undefined)}
           <div>
-            <p className="font-medium text-gray-900 dark:text-white">{car.name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {formatFileSize(car.fileSize)} • {new Date(car.createdAt).toLocaleDateString()}
+            <p className="text-content font-medium">{car.name}</p>
+            <p className="text-content-muted text-sm">
+              {formatFileSize(car.fileSize)} • {formatDateShort(car.createdAt)}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <a
             href={downloadUrl}
-            className="flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="bg-primary hover:bg-primary-dark text-content-inverse rounded-input flex items-center gap-1 px-3 py-1.5 text-sm font-medium"
           >
             <IoDownload className="h-4 w-4" />
             {t('download')}
           </a>
-          <button
+          <Button
+            tone="danger"
+            variant="secondary"
+            size="m"
             onClick={onDelete}
-            className="flex items-center gap-1 rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-red-900/20"
+            startIcon={<IoTrash className="h-4 w-4" />}
           >
-            <IoTrash className="h-4 w-4" />
             {t('delete')}
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className={`relative rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
-        dragOver
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-          : 'border-gray-300 hover:border-gray-400 dark:border-gray-600'
-      }`}
-      onDragOver={(e) => {
-        e.preventDefault();
-        setDragOver(true);
-      }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={handleDrop}
-    >
+    <>
       <input
         ref={fileInputRef}
         type="file"
@@ -118,18 +102,16 @@ export default function CarUpload({
         className="hidden"
         id="car-upload"
       />
-      <label htmlFor="car-upload" className="cursor-pointer">
-        <IoCloudUpload className="mx-auto h-12 w-12 text-gray-400" />
-        <p className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-          {isUploading
-            ? t('oscrat.ui.doc.uploading')
-            : t('oscrat.ui.doc.upload-car')}
-        </p>
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-          {t('oscrat.ui.doc.car-file-types')}
-        </p>
-      </label>
-    </div>
+      <Button
+        variant="primary"
+        size="m"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={isUploading}
+      >
+        {isUploading
+          ? t('oscrat.ui.doc.uploading')
+          : t('oscrat.ui.doc.upload-car')}
+      </Button>
+    </>
   );
 }
-

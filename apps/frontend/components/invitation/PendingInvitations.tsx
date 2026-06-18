@@ -3,9 +3,10 @@ import { Invitation, Team } from '@oscrat/model';
 import { useInvitations } from 'hooks/useInvitations';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
-import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
+import Button from '@/components/button';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
+import { formatDateShort } from '@/utils/dateFormat';
 const PendingInvitations = ({ team }: { team: Team }) => {
   const [selectedInvitation, setSelectedInvitation] =
     useState<Invitation | null>(null);
@@ -49,17 +50,17 @@ const PendingInvitations = ({ team }: { team: Team }) => {
         <h2 className="text-xl font-medium leading-none tracking-tight">
           {t('pending-invitations')}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-content-muted text-sm">
           {t('description-invitations')}
         </p>
       </div>
       <table className="table w-full border-b text-sm">
-        <thead className="bg-gray-200 text-gray-600">
+        <thead className="bg-surface-muted text-content border-line-header border-b">
           <tr>
-            <th>{t('email')}</th>
-            <th>{t('role')}</th>
-            <th>{t('expires-at')}</th>
-            <th>{t('action')}</th>
+            <th className="text-b2 p-4 font-medium">{t('email')}</th>
+            <th className="text-b2 p-4 font-medium">{t('role')}</th>
+            <th className="text-b2 p-4 font-medium">{t('expires-at')}</th>
+            <th className="text-b2 p-4 font-medium">{t('action')}</th>
           </tr>
         </thead>
         <tbody>
@@ -73,12 +74,12 @@ const PendingInvitations = ({ team }: { team: Team }) => {
                   </div>
                 </td>
                 <td>{invitation.role}</td>
-                <td>{new Date(invitation.expires).toDateString()}</td>
+                <td>{formatDateShort(invitation.expires)}</td>
                 <td>
                   <Button
-                    size="sm"
-                    color="error"
-                    variant="outline"
+                    size="m"
+                    tone="danger"
+                    variant="secondary"
                     onClick={() => {
                       setSelectedInvitation(invitation);
                       setConfirmationDialogVisible(true);

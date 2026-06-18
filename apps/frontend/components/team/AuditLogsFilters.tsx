@@ -3,10 +3,15 @@ import { useTranslation } from 'next-i18next';
 import Select, { type ValueType } from '@atlaskit/select';
 import { DatePicker } from '@atlaskit/datetime-picker';
 import { WithoutRing } from 'sharedStyles';
-import { CrudType, type AuditLogFilterOptions, type OscratAuditLogQueryParams } from '@oscrat/model';
+import {
+  CrudType,
+  type AuditLogFilterOptions,
+  type OscratAuditLogQueryParams,
+} from '@oscrat/model';
 import { crudConfig } from '@/lib/auditUtils';
 import { oscratEntityTypeTranslationMap } from '@/utils/translation';
-import { Button } from 'react-daisyui';
+import { getFilterSelectStyles } from '@/components/shared/filterSelectStyles';
+import Button from '@/components/button';
 
 interface Option {
   label: string;
@@ -35,10 +40,12 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
   }));
 
   // Build entity type options
-  const entityOptions: Option[] = (filterOptions?.targetTypes ?? []).map((type) => ({
-    label: t(oscratEntityTypeTranslationMap[type], { defaultValue: type }),
-    value: type,
-  }));
+  const entityOptions: Option[] = (filterOptions?.targetTypes ?? []).map(
+    (type) => ({
+      label: t(oscratEntityTypeTranslationMap[type], { defaultValue: type }),
+      value: type,
+    })
+  );
 
   // Build crud options using CrudType from model and labels from crudConfig
   const crudOptions: Option[] = Object.entries(CrudType).map(([key, value]) => {
@@ -50,13 +57,20 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
   });
 
   // Get current values for selects
-  const currentUserOption = userOptions.find((o) => o.value === filters.userId) || null;
-  const currentEntityOption = entityOptions.find((o) => o.value === filters.targetType) || null;
-  const currentCrudOption = crudOptions.find((o) => o.value === filters.crud) || null;
+  const currentUserOption =
+    userOptions.find((o) => o.value === filters.userId) || null;
+  const currentEntityOption =
+    entityOptions.find((o) => o.value === filters.targetType) || null;
+  const currentCrudOption =
+    crudOptions.find((o) => o.value === filters.crud) || null;
 
   // Check if any filter is active
   const hasActiveFilters =
-    filters.userId || filters.targetType || filters.crud || filters.startDate || filters.endDate;
+    filters.userId ||
+    filters.targetType ||
+    filters.crud ||
+    filters.startDate ||
+    filters.endDate;
 
   const handleUserChange = (option: ValueType<Option, false>) => {
     onFilterChange({ ...filters, userId: option?.value || undefined });
@@ -95,6 +109,7 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
             isClearable
             isLoading={isLoadingOptions}
             spacing="compact"
+            styles={getFilterSelectStyles<Option>()}
           />
         </WithoutRing>
       </div>
@@ -110,6 +125,7 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
             isClearable
             isLoading={isLoadingOptions}
             spacing="compact"
+            styles={getFilterSelectStyles<Option>()}
           />
         </WithoutRing>
       </div>
@@ -124,6 +140,7 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
             placeholder={t('all-operations')}
             isClearable
             spacing="compact"
+            styles={getFilterSelectStyles<Option>()}
           />
         </WithoutRing>
       </div>
@@ -131,7 +148,10 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
       <div className="min-w-[120px]">
         <WithoutRing>
           <DatePicker
-            selectProps={{ inputId: 'audit-filter-start-date' }}
+            selectProps={{
+              inputId: 'audit-filter-start-date',
+              styles: getFilterSelectStyles(),
+            }}
             value={filters.startDate || ''}
             onChange={handleStartDateChange}
             placeholder={t('from')}
@@ -143,7 +163,10 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
       <div className="min-w-[120px]">
         <WithoutRing>
           <DatePicker
-            selectProps={{ inputId: 'audit-filter-end-date' }}
+            selectProps={{
+              inputId: 'audit-filter-end-date',
+              styles: getFilterSelectStyles(),
+            }}
             value={filters.endDate || ''}
             onChange={handleEndDateChange}
             placeholder={t('to')}
@@ -153,11 +176,7 @@ const AuditLogsFilters: React.FC<AuditLogsFiltersProps> = ({
       </div>
 
       {hasActiveFilters && (
-        <Button
-          color="ghost"
-          size="sm"
-          onClick={handleClearFilters}
-        >
+        <Button variant="tertiary" size="m" onClick={handleClearFilters}>
           {t('clear-filters')}
         </Button>
       )}

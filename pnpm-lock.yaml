@@ -178,7 +178,7 @@ importers:
         version: 1.9.2(next@16.1.2(@babel/core@7.28.0)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       '@tailwindcss/typography':
         specifier: 0.5.13
-        version: 0.5.13(tailwindcss@3.4.3)
+        version: 0.5.13
       '@tanstack/react-query':
         specifier: ^5.69.0
         version: 5.83.0(react@18.3.1)
@@ -293,9 +293,6 @@ importers:
       next-remove-imports:
         specifier: ^1.0.12
         version: 1.0.12(webpack@5.100.2)
-      next-themes:
-        specifier: ^0.4.4
-        version: 0.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nodemailer:
         specifier: 6.9.13
         version: 6.9.13
@@ -311,9 +308,6 @@ importers:
       react-chartjs-2:
         specifier: ^5.2.0
         version: 5.3.0(chart.js@4.5.0)(react@18.3.1)
-      react-daisyui:
-        specifier: 5.0.0
-        version: 5.0.0(daisyui@4.12.24(postcss@8.4.38))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.3)
       react-datepicker:
         specifier: ^6.9.0
         version: 6.9.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -7318,12 +7312,6 @@ packages:
   next-remove-imports@1.0.12:
     resolution: {integrity: sha512-3tdL6VuSykJ/mcUwxfjQ+Fd4OpEmrwWVHtLZ/fhNcSaToWCutUp7nrfIww7/4CURe9I7BDCQE9AWl4fkY3YZOQ==}
 
-  next-themes@0.4.6:
-    resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
-    peerDependencies:
-      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
-
   next-tick@1.1.0:
     resolution: {integrity: sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==}
 
@@ -8188,14 +8176,6 @@ packages:
     resolution: {integrity: sha512-ma2FePH0z3px2+WOu6h+YycZcEvFmmxIlAb62cF52bG86eMySciO/EQZeQMXd07kPCYB0a1dWDT5J+KE9mCDUw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
-
-  react-daisyui@5.0.0:
-    resolution: {integrity: sha512-j1cugAxALmIbihycGBh7P9H3UXrfsvqu84qM6O55l7nOKST43IjUkZjmNav/7s0ZaUpa9Y+52mFchUb2zvon1A==}
-    peerDependencies:
-      daisyui: ^4.4.6
-      react: '>=16'
-      react-dom: '>=16'
-      tailwindcss: '>=3.2.7'
 
   react-datepicker@6.9.0:
     resolution: {integrity: sha512-QTxuzeem7BUfVFWv+g5WuvzT0c5BPo+XTCNbMTZKSZQLU+cMMwSUHwspaxuIcDlwNcOH0tiJ+bh1fJ2yxOGYWA==}
@@ -14677,13 +14657,12 @@ snapshots:
     dependencies:
       '@swc/counter': 0.1.3
 
-  '@tailwindcss/typography@0.5.13(tailwindcss@3.4.3)':
+  '@tailwindcss/typography@0.5.13':
     dependencies:
       lodash.castarray: 4.4.0
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 3.4.3
 
   '@tanstack/query-core@5.83.0': {}
 
@@ -18761,11 +18740,6 @@ snapshots:
       - supports-color
       - webpack
 
-  next-themes@0.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
   next-tick@1.1.0: {}
 
   next@14.1.4(@babel/core@7.24.5)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
@@ -19584,13 +19558,6 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
       react: 18.3.1
-
-  react-daisyui@5.0.0(daisyui@4.12.24(postcss@8.4.38))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.3):
-    dependencies:
-      daisyui: 4.12.24(postcss@8.4.38)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      tailwindcss: 3.4.3
 
   react-datepicker@6.9.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:

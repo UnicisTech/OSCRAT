@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'next-i18next';
-import { Button } from 'react-daisyui';
 import { XMarkIcon, LinkIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Button } from '@/components/shared';
 import { CreateTask } from '@/components/interfaces/Task';
 import { TaskStatus, type TeamDetail } from '@oscrat/model';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
@@ -71,25 +71,27 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
   });
 
   return (
-    <div className="rounded-lg border border-gray-200 p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium flex items-center gap-2">
+    <div className="border-line bg-surface rounded-card border p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-lg font-medium">
           <LinkIcon className="h-5 w-5" />
           {t('oscrat.ui.documentation.linked-tasks')}
         </h3>
       </div>
 
       {canEdit && (
-        <div className="flex items-end gap-2 mb-4">
+        <div className="mb-4 flex items-end gap-2">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="text-content-secondary mb-1 block text-sm font-medium">
               {t('oscrat.ui.documentation.link-task')}
             </label>
             <select
               value={selectedTaskId}
               onChange={(e) => setSelectedTaskId(e.target.value)}
-              className="w-full h-8 rounded-md border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              disabled={!filteredAvailableTasks || filteredAvailableTasks.length === 0}
+              className="border-line focus:border-primary focus:ring-primary rounded-input h-8 w-full border px-3 text-sm focus:outline-none focus:ring-1"
+              disabled={
+                !filteredAvailableTasks || filteredAvailableTasks.length === 0
+              }
             >
               <option value="">
                 {filteredAvailableTasks && filteredAvailableTasks.length > 0
@@ -104,24 +106,27 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
             </select>
           </div>
           <Button
-            size="sm"
-            color="primary"
+            size="m"
+            variant="primary"
             onClick={handleLinkTask}
             loading={isLinking}
-            disabled={isLinking || !filteredAvailableTasks || filteredAvailableTasks.length === 0}
+            disabled={
+              isLinking ||
+              !filteredAvailableTasks ||
+              filteredAvailableTasks.length === 0
+            }
             className="h-8"
           >
             {t('oscrat.ui.documentation.link-button')}
           </Button>
           <Button
-            size="sm"
-            color="success"
-            variant="outline"
+            size="m"
+            variant="secondary"
             onClick={() => setCreateTaskVisible(true)}
-            className="flex items-center gap-1 h-8"
+            className="h-8"
             disabled={isLinking}
+            startIcon={<PlusIcon className="h-4 w-4" />}
           >
-            <PlusIcon className="h-4 w-4" />
             {t('oscrat.ui.documentation.new-task')}
           </Button>
         </div>
@@ -132,38 +137,39 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
           {linkedTasks.map((task) => (
             <div
               key={task.taskId}
-              className="flex items-center justify-between rounded-md border border-gray-100 bg-gray-50 px-3 py-2"
+              className="bg-surface-muted border-line-subtle rounded-input flex items-center justify-between border px-3 py-2"
             >
               <a
                 href={`/organization/${slug}/tasks/${task.taskNumber}`}
-                className="text-blue-600 hover:underline"
+                className="text-primary hover:underline"
               >
                 #{task.taskNumber}: {resolveTaskTitle(task, t)}
-                <span className="ml-2 text-sm text-gray-500">
+                <span className="text-content-muted ml-2 text-sm">
                   ({t(getTaskStatusTranslationKey(task.status as TaskStatus))})
                 </span>
               </a>
               {canEdit && (
-                <button
+                <Button
+                  variant="tertiary"
+                  tone="danger"
+                  size="m"
                   onClick={() => handleUnlinkTask(task.taskId)}
-                  className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title={t('oscrat.ui.documentation.unlink-task')}
                   disabled={isUnlinking}
-                >
-                  <XMarkIcon className="h-5 w-5" />
-                </button>
+                  icon={<XMarkIcon className="h-5 w-5" />}
+                />
               )}
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-500 italic">
+        <p className="text-content-muted text-sm italic">
           {t('oscrat.ui.documentation.no-linked-tasks')}
         </p>
       )}
 
       {isPublic && (
-        <p className="mt-4 text-xs text-amber-600">
+        <p className="text-warning mt-4 text-xs">
           {t('oscrat.ui.documentation.backlinks-hidden-public')}
         </p>
       )}

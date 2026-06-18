@@ -61,7 +61,12 @@ const handlePUT = async (
   }
 
   const data = req.body;
-  const task = await updateTask(taskNumberAsNumber, slug as string, data, req.auditInfo);
+  const task = await updateTask(
+    taskNumberAsNumber,
+    slug as string,
+    data,
+    req.auditInfo
+  );
 
   if (!task) {
     throw new ApiError(404, 'Task not found');
@@ -91,7 +96,11 @@ const handleDELETE = async (
     throw new ApiError(400, 'Invalid task number');
   }
 
-  const task = await deleteTask(taskNumberAsNumber, slug as string, req.auditInfo);
+  const task = await deleteTask(
+    taskNumberAsNumber,
+    slug as string,
+    req.auditInfo
+  );
 
   if (!task) {
     throw new ApiError(404, 'Task not found');

@@ -46,8 +46,10 @@ const handleGET = async (
   const { teamMember } = req.teamContext;
   const { versionId } = req.query;
 
-  const attachment = await getVersionCAR(teamMember.teamId, versionId as string);
-
+  const attachment = await getVersionCAR(
+    teamMember.teamId,
+    versionId as string
+  );
 
   res.status(200).json({ data: attachment, error: null });
 };
@@ -103,8 +105,11 @@ const handleDELETE = async (
   const { teamMember } = req.teamContext;
   const { versionId } = req.query;
 
-  const version = await deleteVersionCAR(teamMember.teamId, versionId as string, req.auditInfo);
+  const version = await deleteVersionCAR(
+    teamMember.teamId,
+    versionId as string,
+    req.auditInfo
+  );
 
   res.status(200).json({ data: { version }, error: null });
 };
-

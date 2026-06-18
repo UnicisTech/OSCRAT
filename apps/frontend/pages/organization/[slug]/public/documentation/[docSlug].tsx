@@ -3,7 +3,10 @@ import { useRouter } from 'next/router';
 import { useQuery } from '@tanstack/react-query';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSidePropsContext } from 'next';
-import { documentationEndpoints, type PublicDocumentation } from '@/lib/api/endpoints/documentation';
+import {
+  documentationEndpoints,
+  type PublicDocumentation,
+} from '@/lib/api/endpoints/documentation';
 import { PublicDocumentationLayout } from '@/components/documentation';
 import app from '@/lib/app';
 
@@ -11,7 +14,11 @@ function PublicDocumentationPage() {
   const router = useRouter();
   const { slug, docSlug } = router.query as { slug: string; docSlug: string };
 
-  const { data: doc, isLoading, isError } = useQuery<PublicDocumentation>({
+  const {
+    data: doc,
+    isLoading,
+    isError,
+  } = useQuery<PublicDocumentation>({
     queryKey: ['public-documentation', slug, docSlug],
     queryFn: () => documentationEndpoints.getPublic(slug, docSlug),
     enabled: !!slug && !!docSlug,

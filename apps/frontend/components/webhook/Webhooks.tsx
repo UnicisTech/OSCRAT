@@ -4,14 +4,15 @@ import { Team } from '@oscrat/model';
 import { useWebhooks } from 'hooks/useWebhooks';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
-import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
 import type { EndpointOut } from 'svix';
 
+import Button from '@/components/button';
 import CreateWebhook from './CreateWebhook';
 import EditWebhook from './EditWebhook';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
 import { extractErrorMessage } from '@/lib/utils';
+import { formatDateTime } from '@/utils/dateFormat';
 
 const Webhooks = ({ team }: { team: Team }) => {
   const { t } = useTranslation('common');
@@ -50,14 +51,12 @@ const Webhooks = ({ team }: { team: Team }) => {
             <h2 className="text-xl font-medium leading-none tracking-tight">
               Webhooks
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-content-muted text-sm">
               Webhooks are used to send notifications to your external apps.
             </p>
           </div>
           <Button
-            color="primary"
-            variant="outline"
-            size="md"
+            variant="primary"
             onClick={() => setCreateWebhookVisible(!createWebhookVisible)}
           >
             {t('add-webhook')}
@@ -67,13 +66,21 @@ const Webhooks = ({ team }: { team: Team }) => {
           <EmptyState title={t('no-webhook-title')} />
         ) : (
           <div className="overflow-x-auto">
-            <table className="dark:border-base-200 table w-full border-b text-sm">
-              <thead className="bg-base-200">
+            <table className="table w-full border-b text-sm">
+              <thead className="bg-surface-muted border-line-header border-b">
                 <tr>
-                  <th>{t('name')}</th>
-                  <th>{t('url')}</th>
-                  <th>{t('created-at')}</th>
-                  <th>{t('action')}</th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('name')}
+                  </th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('url')}
+                  </th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('created-at')}
+                  </th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('action')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -82,12 +89,12 @@ const Webhooks = ({ team }: { team: Team }) => {
                     <tr key={webhook.id}>
                       <td>{webhook.description}</td>
                       <td>{webhook.url}</td>
-                      <td>{webhook.createdAt.toLocaleString()}</td>
+                      <td>{formatDateTime(webhook.createdAt)}</td>
                       <td>
                         <div className="flex space-x-2">
                           <Button
-                            size="xs"
-                            variant="outline"
+                            size="s"
+                            variant="secondary"
                             onClick={() => {
                               setEndpoint(webhook);
                               setUpdateWebhookVisible(!updateWebhookVisible);
@@ -96,9 +103,9 @@ const Webhooks = ({ team }: { team: Team }) => {
                             {t('edit')}
                           </Button>
                           <Button
-                            size="xs"
-                            color="error"
-                            variant="outline"
+                            size="s"
+                            tone="danger"
+                            variant="secondary"
                             onClick={() => {
                               setSelectedWebhook(webhook);
                               setConfirmationDialogVisible(true);

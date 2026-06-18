@@ -31,27 +31,26 @@ export default withApiHandler(handler);
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   // Create backend-specific schema without retypePassword
   const backendSignupSchema = userSignupSchema.omit(['retypePassword']);
-  
+
   let validatedData;
   try {
-    validatedData = await backendSignupSchema.validate(req.body, { abortEarly: false });
+    validatedData = await backendSignupSchema.validate(req.body, {
+      abortEarly: false,
+    });
   } catch (error) {
     if (error instanceof Error && (error as any).errors) {
       const validationErrors = (error as any).errors;
-      throw new ApiError(400, `Validation failed: ${validationErrors.join(', ')}`);
+      throw new ApiError(
+        400,
+        `Validation failed: ${validationErrors.join(', ')}`
+      );
     } else {
       throw new ApiError(400, `Validation failed`);
     }
   }
 
-  const {
-    firstName,
-    lastName,
-    email,
-    password,
-    inviteToken,
-    recaptchaToken,
-  } = validatedData;
+  const { firstName, lastName, email, password, inviteToken, recaptchaToken } =
+    validatedData;
   const name = `${firstName} ${lastName}`;
 
   // Validate recaptcha if provided
@@ -68,9 +67,12 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   if (inviteToken) {
     try {
       invitation = await getInvitation({ token: inviteToken });
-      
+
       if (await isInvitationExpired(invitation)) {
-        throw new ApiError(400, 'Invitation expired. Please request a new one.');
+        throw new ApiError(
+          400,
+          'Invitation expired. Please request a new one.'
+        );
       }
     } catch (error: any) {
       throw new ApiError(400, `Failed to get invitation: ${error.message}`);
@@ -93,8 +95,6 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     throw new ApiError(500, `Failed to check existing user: ${error.message}`);
   }
 
-
-
   // Create user
   let user;
   try {
@@ -109,8 +109,6 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (error: any) {
     throw new ApiError(500, `Failed to create user: ${error.message}`);
   }
-
-
 
   // Send account verification email
   if (env.confirmEmail && !user.emailVerified) {

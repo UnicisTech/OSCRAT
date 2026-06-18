@@ -128,7 +128,7 @@ const CscDashboard = ({
       >
         <div
           style={{ width: '49%' }}
-          className="stats stat-value dark:bg-base-100 bg-white py-4 pl-4 shadow"
+          className="stats stat-value bg-surface py-4 pl-4 shadow"
         >
           <PieChart
             page_name={`csc`}

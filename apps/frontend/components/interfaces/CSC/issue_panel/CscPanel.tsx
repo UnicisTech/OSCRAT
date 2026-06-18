@@ -6,7 +6,7 @@ import React, {
   SetStateAction,
 } from 'react';
 import toast from 'react-hot-toast';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import ControlBlock from './ControlBlock';
@@ -146,18 +146,12 @@ const CscPanel = ({
             }}
           >
             <div style={{ margin: '0 5px' }}>
-              <Button
-                color="primary"
-                variant="outline"
-                size="sm"
-                onClick={addControl}
-                active={isDeleting || isSaving}
-              >
+              <Button variant="primary" size="m" onClick={addControl}>
                 + Add Control
               </Button>
             </div>
             <div style={{ margin: '0 5px' }}>
-              <Button variant="outline" size="sm" onClick={deleteControls}>
+              <Button variant="secondary" size="m" onClick={deleteControls}>
                 {t('remove')}
               </Button>
             </div>

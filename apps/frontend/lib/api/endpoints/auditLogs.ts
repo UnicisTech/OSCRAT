@@ -10,5 +10,7 @@ export const auditLogEndpoints = {
     api.post<OscratPaginatedAuditLogs>(`/teams/${teamSlug}/audit-logs`, params),
 
   getFilterOptions: (teamSlug: string) =>
-    api.get<AuditLogFilterOptions>(`/teams/${teamSlug}/audit-logs/filter-options`),
+    api.get<AuditLogFilterOptions>(
+      `/teams/${teamSlug}/audit-logs/filter-options`
+    ),
 };

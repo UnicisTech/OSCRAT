@@ -31,7 +31,9 @@ export type DocumentationListFilter = {
 
 export const documentationEndpoints = {
   list: (slug: string, filter?: DocumentationListFilter) =>
-    api.get<DocumentationSummary[]>(`/teams/${slug}/documentation`, { params: filter }),
+    api.get<DocumentationSummary[]>(`/teams/${slug}/documentation`, {
+      params: filter,
+    }),
 
   get: (slug: string, docId: string) =>
     api.get<DocumentationDetails>(`/teams/${slug}/documentation/${docId}`),
@@ -40,23 +42,39 @@ export const documentationEndpoints = {
     api.post<DocumentationDetails>(`/teams/${slug}/documentation`, data),
 
   update: (slug: string, docId: string, data: UpdateDocumentationData) =>
-    api.put<DocumentationDetails>(`/teams/${slug}/documentation/${docId}`, data),
+    api.put<DocumentationDetails>(
+      `/teams/${slug}/documentation/${docId}`,
+      data
+    ),
 
   delete: (slug: string, docId: string) =>
     api.delete<void>(`/teams/${slug}/documentation/${docId}`),
 
   linkTask: (slug: string, docId: string, taskId: number) =>
-    api.post<{ linked: boolean }>(`/teams/${slug}/documentation/${docId}/tasks`, { taskId }),
+    api.post<{ linked: boolean }>(
+      `/teams/${slug}/documentation/${docId}/tasks`,
+      { taskId }
+    ),
 
   unlinkTask: (slug: string, docId: string, taskId: number) =>
-    api.delete<{ unlinked: boolean }>(`/teams/${slug}/documentation/${docId}/tasks`, {
-      data: { taskId },
-    }),
+    api.delete<{ unlinked: boolean }>(
+      `/teams/${slug}/documentation/${docId}/tasks`,
+      {
+        data: { taskId },
+      }
+    ),
 
   getPublic: (teamSlug: string, docSlug: string) =>
-    api.get<PublicDocumentation>(`/teams/${teamSlug}/public/documentation/${docSlug}`),
+    api.get<PublicDocumentation>(
+      `/teams/${teamSlug}/public/documentation/${docSlug}`
+    ),
 
-  getPublicProduct: (teamSlug: string, productId: string, versionId: string, docSlug: string) =>
+  getPublicProduct: (
+    teamSlug: string,
+    productId: string,
+    versionId: string,
+    docSlug: string
+  ) =>
     api.get<PublicProductDocumentation>(
       `/teams/${teamSlug}/public/products/${productId}/versions/${versionId}/documentation/${docSlug}`
     ),

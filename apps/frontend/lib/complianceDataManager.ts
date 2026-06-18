@@ -44,14 +44,18 @@ function createComplianceDataManager(config: ComplianceDataConfig) {
         const checklistPath = path.join(DATA_PATH, 'tech-doc-checklist.json');
         const checklist = loadJsonFile<ComplianceArea>(checklistPath);
         if (checklist) {
-          const isOptional = role === OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE;
+          const isOptional =
+            role === OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE;
           areas = [...areas, { ...checklist, optional: isOptional }];
         }
       }
 
       return areas.length > 0 ? areas : null;
     } catch (error) {
-      console.error(`Error reading ${config.errorPrefix} data for ${role}:`, error);
+      console.error(
+        `Error reading ${config.errorPrefix} data for ${role}:`,
+        error
+      );
       return null;
     }
   }
@@ -83,4 +87,3 @@ const teamDataManager = createComplianceDataManager({
 
 export const getComplianceData = versionDataManager.getData;
 export const getTeamComplianceData = teamDataManager.getData;
-

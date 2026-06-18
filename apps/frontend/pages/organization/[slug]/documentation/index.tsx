@@ -3,7 +3,10 @@ import { withTeamLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
 import { useTranslation } from 'next-i18next';
 import Header from '@/components/oscrat/shared/header';
-import { DocumentationList, CreateDocumentationModal } from '@/components/documentation';
+import {
+  DocumentationList,
+  CreateDocumentationModal,
+} from '@/components/documentation';
 
 const DocumentationPage = () => {
   const { teamContext } = useTeamContext();
@@ -27,7 +30,7 @@ const DocumentationPage = () => {
         buttonText={t('oscrat.ui.documentation.add')}
         onButtonClick={() => setCreateVisible(true)}
       />
-      
+
       <div className="mt-6">
         <DocumentationList />
       </div>

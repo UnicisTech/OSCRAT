@@ -2,14 +2,17 @@ import React from 'react';
 
 type DetailItemVariant = 'default' | 'large';
 
-const VARIANT_STYLES: Record<DetailItemVariant, { label: string; value: string }> = {
+const VARIANT_STYLES: Record<
+  DetailItemVariant,
+  { label: string; value: string }
+> = {
   default: {
-    label: 'mb-1 text-xs text-gray-500',
-    value: 'text-sm font-semibold text-gray-800',
+    label: 'mb-1 text-xs text-content-muted',
+    value: 'text-sm font-semibold text-content',
   },
   large: {
-    label: 'mb-1 text-sm text-gray-600',
-    value: 'text-xl font-bold text-gray-800',
+    label: 'mb-1 text-sm text-content-secondary',
+    value: 'text-xl font-bold text-content',
   },
 };
 

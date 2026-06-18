@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaRegEye } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
+import Button from '@/components/button';
 
 // --- TYPE DEFINITIONS ---
 
@@ -45,16 +46,16 @@ export default function App() {
 
   return (
     <div className="flex w-full justify-center">
-      <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
+      <div className="border-line bg-surface rounded-card w-full border p-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-900">
-            <thead className="bg-gray-200 text-xs text-gray-900">
+          <table className="text-content w-full text-left text-sm">
+            <thead className="bg-surface-muted text-content border-b border-line-header">
               <tr>
                 {tableHeaders.map((header, index) => (
                   <th
                     key={header}
                     scope="col"
-                    className={`px-6 py-3 ${
+                    className={`p-4 text-b2 font-medium ${
                       index === 0
                         ? 'w-32 pl-8'
                         : index === 1
@@ -73,20 +74,21 @@ export default function App() {
               {eventLog.map((event) => (
                 <tr
                   key={event.id}
-                  className="border-t bg-white hover:bg-gray-50"
+                  className="bg-surface hover:bg-surface-muted border-t"
                 >
-                  <td className="w-48 whitespace-nowrap px-6 py-4 pl-8 font-medium text-gray-900">
+                  <td className="text-content w-48 whitespace-nowrap px-4 py-4 pl-8 font-medium">
                     {event.dateAdded}
                   </td>
-                  <td className="px-6 py-4">{event.type}</td>
-                  <td className="w-24 px-6 py-4 pr-8 text-right">
-                    <button
+                  <td className="px-4 py-4">{event.type}</td>
+                  <td className="w-24 px-4 py-4 pr-8 text-right">
+                    <Button
+                      variant="tertiary"
+                      size="m"
                       onClick={() => handlePreview(event.id)}
-                      className="flex items-center justify-end text-xs font-medium text-gray-900"
+                      startIcon={<FaRegEye />}
                     >
-                      <FaRegEye className="mr-2" />
                       {t('preview')}
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}

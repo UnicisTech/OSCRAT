@@ -3,7 +3,10 @@ import { useRouter } from 'next/router';
 import { useQuery } from '@tanstack/react-query';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetServerSidePropsContext } from 'next';
-import { documentationEndpoints, type PublicProductDocumentation } from '@/lib/api/endpoints/documentation';
+import {
+  documentationEndpoints,
+  type PublicProductDocumentation,
+} from '@/lib/api/endpoints/documentation';
 import { PublicDocumentationLayout } from '@/components/documentation';
 import app from '@/lib/app';
 
@@ -16,13 +19,31 @@ function PublicProductDocumentationPage() {
     docSlug: string;
   };
 
-  const { data: doc, isLoading, isError } = useQuery<PublicProductDocumentation>({
-    queryKey: ['public-product-documentation', slug, productId, versionId, docSlug],
-    queryFn: () => documentationEndpoints.getPublicProduct(slug, productId, versionId, docSlug),
+  const {
+    data: doc,
+    isLoading,
+    isError,
+  } = useQuery<PublicProductDocumentation>({
+    queryKey: [
+      'public-product-documentation',
+      slug,
+      productId,
+      versionId,
+      docSlug,
+    ],
+    queryFn: () =>
+      documentationEndpoints.getPublicProduct(
+        slug,
+        productId,
+        versionId,
+        docSlug
+      ),
     enabled: !!slug && !!productId && !!versionId && !!docSlug,
   });
 
-  const productBadge = doc ? `${doc.productName} ${doc.versionName}` : undefined;
+  const productBadge = doc
+    ? `${doc.productName} ${doc.versionName}`
+    : undefined;
 
   return (
     <PublicDocumentationLayout
@@ -30,7 +51,9 @@ function PublicProductDocumentationPage() {
       isLoading={isLoading}
       isError={isError}
       metaTitle={
-        doc ? `${doc.title} | ${doc.productName} ${doc.versionName} | ${app.name}` : app.name
+        doc
+          ? `${doc.title} | ${doc.productName} ${doc.versionName} | ${app.name}`
+          : app.name
       }
       metaDescription={
         doc
@@ -42,7 +65,9 @@ function PublicProductDocumentationPage() {
   );
 }
 
-PublicProductDocumentationPage.getLayout = function getLayout(page: ReactElement) {
+PublicProductDocumentationPage.getLayout = function getLayout(
+  page: ReactElement
+) {
   return page;
 };
 

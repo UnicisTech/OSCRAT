@@ -42,7 +42,10 @@ const getFileExtension = (filename: string): string => {
 /**
  * Validate a file against allowed types for CAR or DoC
  */
-export const validateDocFile = (file: formidable.File, type: FileType): boolean => {
+export const validateDocFile = (
+  file: formidable.File,
+  type: FileType
+): boolean => {
   const config = FILE_CONFIGS[type];
   const ext = getFileExtension(file.originalFilename || '');
   const mimeType = file.mimetype || '';

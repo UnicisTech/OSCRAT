@@ -90,7 +90,12 @@ const handleDELETE = async (
 
   const { incidentId } = req.query;
 
-  await deleteIncident(prisma, teamMember.teamId, incidentId as string, req.auditInfo);
+  await deleteIncident(
+    prisma,
+    teamMember.teamId,
+    incidentId as string,
+    req.auditInfo
+  );
 
   res.status(200).json({ data: {} });
 };

@@ -1,6 +1,7 @@
 import React, { useCallback, MouseEvent, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Modal, Button } from 'react-daisyui';
+import { Button } from '@/components/shared';
+import Modal from '@/components/shared/Modal';
 import { useTranslation } from 'next-i18next';
 import type { Attachment } from 'types';
 import { useTaskAttachments } from '@/hooks/useTaskAttachments';
@@ -44,29 +45,32 @@ const DeleteAttachment = ({
   );
 
   return (
-    <Modal open={visible}>
-      <Modal.Header className="font-bold">
-        {t('attachment-delete')}
-      </Modal.Header>
+    <Modal open={visible} close={() => setVisible(false)} size="sm">
+      <Modal.Header>{t('attachment-delete')}</Modal.Header>
       <Modal.Body>
         <div className="mt-2 flex flex-col space-y-4">
           <p>Attachment will be deleted.</p>
         </div>
       </Modal.Body>
-      <Modal.Actions>
-        <Button color="error" onClick={deleteHandler} loading={isLoading}>
-          {t('delete')}
-        </Button>
+      <Modal.Footer>
         <Button
           type="button"
-          variant="outline"
+          variant="secondary"
           onClick={() => {
             setVisible(!visible);
           }}
         >
           {t('close')}
         </Button>
-      </Modal.Actions>
+        <Button
+          tone="danger"
+          variant="primary"
+          onClick={deleteHandler}
+          loading={isLoading}
+        >
+          {t('delete')}
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };

@@ -29,7 +29,10 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
 
   const tabs = useMemo(() => {
     if (!project?.versions?.length) return null;
-    return createTabsConfig(project.versions as OscratProductDetail['versions'], t);
+    return createTabsConfig(
+      project.versions as OscratProductDetail['versions'],
+      t
+    );
   }, [project?.versions, t]);
 
   const handleDelete = async () => {
@@ -46,7 +49,9 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
       router.replace(redirectPath);
     } catch (error) {
       setIsRedirecting(false);
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-delete-product')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-delete-product'))
+      );
     }
   };
 
@@ -55,7 +60,9 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
       await updateProject(updatedData);
       toast.success(t('oscrat.ui.product-updated-successfully'));
     } catch (error) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-update-product')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-update-product'))
+      );
     }
   };
 

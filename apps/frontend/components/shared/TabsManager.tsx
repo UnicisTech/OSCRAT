@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Button from '@/components/button';
 import NotSupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/notSupported';
 import SupportedTab from '@/components/oscrat/products/productDetails/tabs/allTabs/supported';
 import { OscratProductVersionSummary } from '@oscrat/model';
@@ -57,7 +58,7 @@ export default function TabsManager({
             onClick={() => handleTabChange(tab.id)}
             className={`${
               activeTab === tab.id
-                ? 'active-tab-button border-b-2 border-blue-500 font-medium text-blue-500'
+                ? 'active-tab-button border-info text-info border-b-2 font-medium'
                 : 'inactive-tab-button'
             } mr-1 cursor-pointer px-4 py-2`}
           >
@@ -66,13 +67,14 @@ export default function TabsManager({
         ))}
 
         {buttonText && onButtonClick && (
-          <button
+          <Button
             type="button"
-            className="ml-auto rounded border border-gray-300 bg-transparent px-4 py-2 text-sm font-medium text-black hover:bg-gray-100"
+            variant="primary"
+            size="m"
+            className="ml-auto"
             onClick={onButtonClick}
-          >
-            {buttonText}
-          </button>
+            text={buttonText}
+          />
         )}
       </div>
 

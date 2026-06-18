@@ -28,12 +28,12 @@ export default function AuthLayout({
             height={200}
           />
           {heading && (
-            <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
+            <h2 className="text-content mt-6 text-center text-2xl font-bold leading-9 tracking-tight">
               {t(heading)}
             </h2>
           )}
           {description && (
-            <p className="text-center font-semibold text-gray-600 dark:text-white">
+            <p className="text-content-secondary text-center font-semibold">
               {t(description)}
             </p>
           )}

@@ -11,7 +11,10 @@ import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { COMPLIANCE_TYPES } from '@/lib/compliance/translations';
-import { useAssessments, useOscratAssessment } from '@/hooks/oscrat/useOscratAssessment';
+import {
+  useAssessments,
+  useOscratAssessment,
+} from '@/hooks/oscrat/useOscratAssessment';
 import { useLatestAssessment } from '@/hooks/oscrat/useLatestAssessment';
 import { transformVersionAssessmentToComplianceState } from '@/utils/compliance';
 import { OscratAssessmentType } from '@oscrat/model';
@@ -21,7 +24,11 @@ const CompliancePage = () => {
   const { teamContext } = useTeamContext();
   const { teamId, productId, versionId } = useVersionContext();
   const { project } = useOscratProject(teamId, productId);
-  const { version: versionData } = useOscratVersion(teamId, productId, versionId);
+  const { version: versionData } = useOscratVersion(
+    teamId,
+    productId,
+    versionId
+  );
 
   const team = teamContext.team;
   if (!team) return null;
@@ -31,9 +38,13 @@ const CompliancePage = () => {
     [productId, versionId]
   );
 
-  const { assessments, isLoading: isLoadingAssessments } = useAssessments(team.slug, assessmentScope, {
-    enabled: !!team && !!versionData,
-  });
+  const { assessments, isLoading: isLoadingAssessments } = useAssessments(
+    team.slug,
+    assessmentScope,
+    {
+      enabled: !!team && !!versionData,
+    }
+  );
 
   const latestVersionComplianceId = useLatestAssessment(
     assessments,
@@ -64,7 +75,14 @@ const CompliancePage = () => {
     enabled: !!team && !!versionData,
   });
 
-  if (!ready || isLoading || isLoadingAssessments || !complianceData || !project || !versionData) {
+  if (
+    !ready ||
+    isLoading ||
+    isLoadingAssessments ||
+    !complianceData ||
+    !project ||
+    !versionData
+  ) {
     return <Loading />;
   }
 
@@ -91,12 +109,12 @@ const CompliancePage = () => {
     <div className="max-w-7xl p-6">
       <Breadcrumb items={breadcrumbItems} />
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-white">
+        <h1 className="text-content mb-2 text-2xl font-bold">
           {t('oscrat.ui.product-compliance-assessment')}
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t('oscrat.ui.compliance-assessment-description', { 
-            productName: `${project.name} (${versionData.version})`
+        <p className="text-content-secondary">
+          {t('oscrat.ui.compliance-assessment-description', {
+            productName: `${project.name} (${versionData.version})`,
           })}
         </p>
       </div>
@@ -121,8 +139,10 @@ CompliancePage.getLayout = withProductDetailLayout;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { getCommonServerSideProps } = await import('@/lib/server-helpers');
-  const { getAllComplianceNamespaces } = await import('@/lib/compliance/translations');
-  
+  const { getAllComplianceNamespaces } = await import(
+    '@/lib/compliance/translations'
+  );
+
   return getCommonServerSideProps(context, getAllComplianceNamespaces());
 }
 

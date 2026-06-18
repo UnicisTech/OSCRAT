@@ -11,8 +11,10 @@ export default function TeamLayout({ children }: TeamLayoutProps) {
     <TeamContextProvider>
       <div className="flex h-screen">
         <SidePanel />
-        <main className="flex-1 bg-white py-10 text-black dark:bg-black dark:text-white overflow-y-auto">
-          <div className="mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
+        <main className="bg-surface-sunken flex-1 overflow-y-auto py-10 text-black">
+          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            {children}
+          </div>
         </main>
       </div>
     </TeamContextProvider>

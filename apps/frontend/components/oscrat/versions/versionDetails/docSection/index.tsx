@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { FaFileContract, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import {
+  FaFileContract,
+  FaCheckCircle,
+  FaExclamationTriangle,
+} from 'react-icons/fa';
 import { IoAdd } from 'react-icons/io5';
 import toast from 'react-hot-toast';
 
@@ -14,7 +18,9 @@ import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { extractErrorMessage } from '@/lib/utils';
 import { OscratProductVersionStatus } from '@oscrat/model';
 import ConfirmationModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/repository/confirmationModal';
+import Button from '@/components/button';
 
+import SuccessBadge from '@/components/oscrat/shared/SuccessBadge';
 import CarUpload from './CarUpload';
 import DocDisplay from './DocDisplay';
 import DocWizard from './DocWizard';
@@ -57,7 +63,9 @@ export default function DocSection() {
       await uploadCAR(file);
       toast.success(t('oscrat.ui.doc.car-uploaded'));
     } catch (error) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.doc.car-upload-failed')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.doc.car-upload-failed'))
+      );
     }
   };
 
@@ -68,7 +76,9 @@ export default function DocSection() {
       toast.success(t('oscrat.ui.doc.car-deleted'));
       setShowDeleteCARModal(false);
     } catch (error) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.doc.car-delete-failed')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.doc.car-delete-failed'))
+      );
     } finally {
       setIsDeletingCAR(false);
     }
@@ -80,7 +90,9 @@ export default function DocSection() {
       await uploadDoC(file, false);
       toast.success(t('oscrat.ui.doc.doc-generated'));
     } catch (error) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.doc.doc-generate-failed')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.doc.doc-generate-failed'))
+      );
     }
   };
 
@@ -89,7 +101,9 @@ export default function DocSection() {
       await uploadDoC(file, true);
       toast.success(t('oscrat.ui.doc.doc-signed-uploaded'));
     } catch (error) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.doc.doc-upload-failed')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.doc.doc-upload-failed'))
+      );
     }
   };
 
@@ -100,14 +114,18 @@ export default function DocSection() {
       toast.success(t('oscrat.ui.doc.doc-deleted'));
       setShowDeleteDoCModal(false);
     } catch (error) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.doc.doc-delete-failed')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.doc.doc-delete-failed'))
+      );
     } finally {
       setIsDeletingDoC(false);
     }
   };
 
   const handleNavigateToCompliance = () => {
-    router.push(`/organization/${team?.slug}/products/${productId}/versions/${versionId}/compliance`);
+    router.push(
+      `/organization/${team?.slug}/products/${productId}/versions/${versionId}/compliance`
+    );
   };
 
   if (isLoading || !team || !project || !version) {
@@ -115,63 +133,75 @@ export default function DocSection() {
   }
 
   const isReadyForMarket =
-    hasCAR &&
-    hasDoC &&
-    version.status === OscratProductVersionStatus.SUPPORTED;
+    hasCAR && hasDoC && version.status === OscratProductVersionStatus.SUPPORTED;
 
   return (
-    <div className="mt-4 rounded-lg border border-gray-300 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div className="border-line bg-surface rounded-card mt-4 border p-6">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <FaFileContract className="h-6 w-6 text-blue-600" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <FaFileContract className="text-primary h-6 w-6" />
+          <h2 className="text-content text-h6 font-bold">
             {t('oscrat.ui.doc.section-title')}
           </h2>
           {isReadyForMarket && (
-            <span className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-100">
-              <FaCheckCircle className="h-3 w-3" />
-              {t('oscrat.ui.doc.ready-for-market')}
-            </span>
+            <SuccessBadge
+              icon={<FaCheckCircle className="h-3 w-3" />}
+              label={t('oscrat.ui.doc.ready-for-market')}
+            />
           )}
         </div>
       </div>
 
       {/* Step 1: CAR Section */}
       <div className="mb-6">
-        <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          {t('oscrat.ui.doc.prerequisite')}: {t('oscrat.ui.doc.conformity-assessment-report')}
+        <h3 className="text-content-secondary mb-2 text-sm font-medium">
+          {t('oscrat.ui.doc.prerequisite')}:{' '}
+          {t('oscrat.ui.doc.conformity-assessment-report')}
         </h3>
 
-        {!hasCAR && (
-          <div className="mb-3 flex items-start gap-2 rounded-md bg-amber-50 p-3 dark:bg-amber-900/20">
-            <FaExclamationTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" />
-            <div className="text-sm text-amber-700 dark:text-amber-400">
-              <p className="font-medium">{t('oscrat.ui.doc.car-required')}</p>
-              <p className="mt-1">{t('oscrat.ui.doc.car-options')}</p>
-              <button
+        {hasCAR ? (
+          <CarUpload
+            car={car}
+            onUpload={handleUploadCAR}
+            onDelete={() => setShowDeleteCARModal(true)}
+            downloadUrl={carDownloadUrl}
+            isUploading={isUploadingCAR}
+          />
+        ) : (
+          <div className="bg-warning-subtle border-warning rounded-input flex items-start gap-3 border px-4 py-3">
+            <FaExclamationTriangle className="text-warning mt-0.5 h-6 w-6 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-b2 text-content font-medium">
+                {t('oscrat.ui.doc.car-required')}
+              </p>
+              <p className="text-c1 text-content-secondary mt-1">
+                {t('oscrat.ui.doc.car-options')}
+              </p>
+            </div>
+            <div className="flex flex-shrink-0 items-center gap-3">
+              <Button
+                variant="secondary"
+                size="m"
                 onClick={handleNavigateToCompliance}
-                className="mt-2 text-blue-600 underline hover:text-blue-800 dark:text-blue-400"
-              >
-                {t('oscrat.ui.doc.complete-self-assessment')}
-              </button>
+                text={t('oscrat.ui.doc.complete-self-assessment')}
+              />
+              <CarUpload
+                car={undefined}
+                onUpload={handleUploadCAR}
+                onDelete={() => setShowDeleteCARModal(true)}
+                downloadUrl={carDownloadUrl}
+                isUploading={isUploadingCAR}
+              />
             </div>
           </div>
         )}
-
-        <CarUpload
-          car={car}
-          onUpload={handleUploadCAR}
-          onDelete={() => setShowDeleteCARModal(true)}
-          downloadUrl={carDownloadUrl}
-          isUploading={isUploadingCAR}
-        />
       </div>
 
       {/* Step 2: DoC Section (only shown if CAR exists) */}
       {hasCAR && (
-        <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
-          <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="border-line-subtle border-t pt-6">
+          <h3 className="text-content-secondary mb-3 text-sm font-medium">
             {t('oscrat.ui.doc.declaration-of-conformity')}
           </h3>
 
@@ -185,13 +215,14 @@ export default function DocSection() {
               versionStatus={version.status}
             />
           ) : (
-            <button
+            <Button
+              variant="tertiary"
+              fullWidth
               onClick={() => setShowWizard(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 py-8 text-gray-600 transition-colors hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-            >
-              <IoAdd className="h-6 w-6" />
-              <span className="font-medium">{t('oscrat.ui.doc.create-doc')}</span>
-            </button>
+              startIcon={<IoAdd className="h-6 w-6" />}
+              className="border-line bg-surface-muted text-content-secondary hover:border-info hover:bg-info-subtle hover:text-primary rounded-card border-2 border-dashed py-8 font-medium transition-colors"
+              text={t('oscrat.ui.doc.create-doc')}
+            />
           )}
         </div>
       )}
@@ -235,4 +266,3 @@ export default function DocSection() {
     </div>
   );
 }
-

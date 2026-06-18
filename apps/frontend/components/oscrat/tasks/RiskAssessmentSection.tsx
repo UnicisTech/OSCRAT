@@ -4,11 +4,15 @@ import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
 import type { Task, Team } from '@oscrat/model';
+import Button from '@/components/button';
 import { useTask } from '@/hooks/useTask';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { riskDetailsSchema, riskTreatmentSchema } from '@/lib/validation/risk';
-import type { RiskDetailsFormValues, RiskTreatmentFormValues } from '@/lib/validation/risk';
+import type {
+  RiskDetailsFormValues,
+  RiskTreatmentFormValues,
+} from '@/lib/validation/risk';
 import {
   RISK_LEVELS,
   RISK_CATEGORIES,
@@ -16,7 +20,10 @@ import {
   type RiskLevel,
   type TaskRiskProperties,
 } from '@/types/risk';
-import { calculateExposure, RISK_LEVEL_BADGE_CLASSES } from '@/utils/riskCalculation';
+import {
+  calculateExposure,
+  RISK_LEVEL_BADGE_CLASSES,
+} from '@/utils/riskCalculation';
 import type { ApiError } from '@/types';
 
 interface RiskAssessmentSectionProps {
@@ -24,7 +31,10 @@ interface RiskAssessmentSectionProps {
   team: Team;
 }
 
-const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, team }) => {
+const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({
+  task,
+  team,
+}) => {
   const { t } = useTranslation('common');
   const { updateTask } = useTask(team.slug, task.taskNumber.toString());
   const { members } = useTeamMembers(team.slug);
@@ -39,20 +49,27 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
   const existingDetails = existingProps?.riskDetails;
   const existingTreatment = existingProps?.riskTreatment;
 
-  const detailsInitial: RiskDetailsFormValues = useMemo(() => ({
-    threat: existingDetails?.threat || '',
-    category: existingDetails?.category || [],
-    likelihood: existingDetails?.likelihood || ('' as RiskLevel),
-    impact: existingDetails?.impact || ('' as RiskLevel),
-    ownerId: existingDetails?.ownerId || '',
-  }), [existingDetails]);
+  const detailsInitial: RiskDetailsFormValues = useMemo(
+    () => ({
+      threat: existingDetails?.threat || '',
+      category: existingDetails?.category || [],
+      likelihood: existingDetails?.likelihood || ('' as RiskLevel),
+      impact: existingDetails?.impact || ('' as RiskLevel),
+      ownerId: existingDetails?.ownerId || '',
+    }),
+    [existingDetails]
+  );
 
-  const treatmentInitial: RiskTreatmentFormValues = useMemo(() => ({
-    treatment: existingTreatment?.treatment || ('' as any),
-    measures: existingTreatment?.measures || '',
-    residualExposure: existingTreatment?.residualExposure || ('' as RiskLevel),
-    responsibleId: existingTreatment?.responsibleId || '',
-  }), [existingTreatment]);
+  const treatmentInitial: RiskTreatmentFormValues = useMemo(
+    () => ({
+      treatment: existingTreatment?.treatment || ('' as any),
+      measures: existingTreatment?.measures || '',
+      residualExposure:
+        existingTreatment?.residualExposure || ('' as RiskLevel),
+      responsibleId: existingTreatment?.responsibleId || '',
+    }),
+    [existingTreatment]
+  );
 
   const detailsFormik = useFormik<RiskDetailsFormValues>({
     initialValues: detailsInitial,
@@ -99,10 +116,17 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
 
   const computedExposure = useMemo(() => {
     if (detailsFormik.values.likelihood && detailsFormik.values.impact) {
-      return calculateExposure(detailsFormik.values.likelihood, detailsFormik.values.impact);
+      return calculateExposure(
+        detailsFormik.values.likelihood,
+        detailsFormik.values.impact
+      );
     }
     return existingDetails?.exposure || null;
-  }, [detailsFormik.values.likelihood, detailsFormik.values.impact, existingDetails?.exposure]);
+  }, [
+    detailsFormik.values.likelihood,
+    detailsFormik.values.impact,
+    existingDetails?.exposure,
+  ]);
 
   const isSection1Complete = useMemo(() => {
     const v = detailsFormik.values;
@@ -125,45 +149,51 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
     t(`oscrat.ui.risk.level-${level.toLowerCase()}`);
 
   const selectClass = (hasError: boolean) =>
-    `w-full rounded-md border px-3 py-2 text-gray-700 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 ${
-      hasError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300'
+    `w-full rounded-input border px-3 py-2 text-content-secondary shadow-2 transition-colors duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-content-muted ${
+      hasError
+        ? 'border-danger-border focus:border-danger focus:ring-danger'
+        : 'border-line'
     }`;
 
   const textareaClass = (hasError: boolean) =>
-    `w-full rounded-md border px-3 py-2 text-gray-700 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 resize-none ${
-      hasError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300'
+    `w-full rounded-input border px-3 py-2 text-content-secondary shadow-2 transition-colors duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-content-muted resize-none ${
+      hasError
+        ? 'border-danger-border focus:border-danger focus:ring-danger'
+        : 'border-line'
     }`;
 
-  const requiredMark = <span className="ml-1 text-red-600">*</span>;
+  const requiredMark = <span className="text-danger ml-1">*</span>;
 
   return (
     <div className="space-y-6">
       {/* Section 1: Risk Details */}
       <form onSubmit={detailsFormik.handleSubmit}>
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">
+        <div className="border-line bg-surface rounded-card border p-6">
+          <h2 className="text-content mb-6 text-lg font-semibold">
             {t('oscrat.ui.risk.section-details')}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Asset (read-only, from product) */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('oscrat.ui.risk.asset')}{requiredMark}
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('oscrat.ui.risk.asset')}
+                {requiredMark}
               </label>
               <input
                 type="text"
                 value={product?.name || t('oscrat.ui.risk.no-product-linked')}
                 readOnly
                 disabled
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed"
+                className="border-line-subtle bg-surface-muted text-content-secondary rounded-input w-full cursor-not-allowed border px-3 py-2"
               />
             </div>
 
             {/* Owner */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('oscrat.ui.risk.owner')}{requiredMark}
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('oscrat.ui.risk.owner')}
+                {requiredMark}
               </label>
               <select
                 name="ownerId"
@@ -171,24 +201,31 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
                 onChange={detailsFormik.handleChange}
                 onBlur={detailsFormik.handleBlur}
                 disabled={detailsFormik.isSubmitting}
-                className={selectClass(!!detailsFormik.touched.ownerId && !!detailsFormik.errors.ownerId)}
+                className={selectClass(
+                  !!detailsFormik.touched.ownerId &&
+                    !!detailsFormik.errors.ownerId
+                )}
               >
                 <option value="">{t('oscrat.ui.risk.select-owner')}</option>
-                {members?.map(member => (
+                {members?.map((member) => (
                   <option key={member.userId} value={member.userId}>
                     {member.user.name}
                   </option>
                 ))}
               </select>
-              {detailsFormik.touched.ownerId && detailsFormik.errors.ownerId && (
-                <p className="mt-1 text-sm text-red-600">{t(detailsFormik.errors.ownerId)}</p>
-              )}
+              {detailsFormik.touched.ownerId &&
+                detailsFormik.errors.ownerId && (
+                  <p className="text-danger mt-1 text-sm">
+                    {t(detailsFormik.errors.ownerId)}
+                  </p>
+                )}
             </div>
 
             {/* Likelihood */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('oscrat.ui.risk.likelihood')}{requiredMark}
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('oscrat.ui.risk.likelihood')}
+                {requiredMark}
               </label>
               <select
                 name="likelihood"
@@ -196,22 +233,31 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
                 onChange={detailsFormik.handleChange}
                 onBlur={detailsFormik.handleBlur}
                 disabled={detailsFormik.isSubmitting}
-                className={selectClass(!!detailsFormik.touched.likelihood && !!detailsFormik.errors.likelihood)}
+                className={selectClass(
+                  !!detailsFormik.touched.likelihood &&
+                    !!detailsFormik.errors.likelihood
+                )}
               >
                 <option value="">{t('oscrat.ui.risk.select-level')}</option>
-                {RISK_LEVELS.map(level => (
-                  <option key={level} value={level}>{riskLevelLabel(level)}</option>
+                {RISK_LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {riskLevelLabel(level)}
+                  </option>
                 ))}
               </select>
-              {detailsFormik.touched.likelihood && detailsFormik.errors.likelihood && (
-                <p className="mt-1 text-sm text-red-600">{t(detailsFormik.errors.likelihood)}</p>
-              )}
+              {detailsFormik.touched.likelihood &&
+                detailsFormik.errors.likelihood && (
+                  <p className="text-danger mt-1 text-sm">
+                    {t(detailsFormik.errors.likelihood)}
+                  </p>
+                )}
             </div>
 
             {/* Impact */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('oscrat.ui.risk.impact')}{requiredMark}
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('oscrat.ui.risk.impact')}
+                {requiredMark}
               </label>
               <select
                 name="impact"
@@ -219,29 +265,38 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
                 onChange={detailsFormik.handleChange}
                 onBlur={detailsFormik.handleBlur}
                 disabled={detailsFormik.isSubmitting}
-                className={selectClass(!!detailsFormik.touched.impact && !!detailsFormik.errors.impact)}
+                className={selectClass(
+                  !!detailsFormik.touched.impact &&
+                    !!detailsFormik.errors.impact
+                )}
               >
                 <option value="">{t('oscrat.ui.risk.select-level')}</option>
-                {RISK_LEVELS.map(level => (
-                  <option key={level} value={level}>{riskLevelLabel(level)}</option>
+                {RISK_LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {riskLevelLabel(level)}
+                  </option>
                 ))}
               </select>
               {detailsFormik.touched.impact && detailsFormik.errors.impact && (
-                <p className="mt-1 text-sm text-red-600">{t(detailsFormik.errors.impact)}</p>
+                <p className="text-danger mt-1 text-sm">
+                  {t(detailsFormik.errors.impact)}
+                </p>
               )}
             </div>
 
             {/* Exposure (auto-calculated) */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="text-content-secondary block text-sm font-medium">
                 {t('oscrat.ui.risk.exposure')}
               </label>
               {computedExposure ? (
-                <div className={`w-full rounded-md border px-3 py-2 font-medium ${RISK_LEVEL_BADGE_CLASSES[computedExposure]}`}>
+                <div
+                  className={`rounded-input w-full border px-3 py-2 font-medium ${RISK_LEVEL_BADGE_CLASSES[computedExposure]}`}
+                >
                   {riskLevelLabel(computedExposure)}
                 </div>
               ) : (
-                <div className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-400 italic">
+                <div className="border-line-subtle bg-surface-muted text-content-placeholder rounded-input w-full border px-3 py-2 italic">
                   —
                 </div>
               )}
@@ -249,41 +304,51 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
 
             {/* Category (multi-select checkboxes) */}
             <div className="space-y-2 lg:col-span-3">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('oscrat.ui.risk.category')}{requiredMark}
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('oscrat.ui.risk.category')}
+                {requiredMark}
               </label>
               <div className="flex flex-wrap gap-4">
-                {RISK_CATEGORIES.map(cat => (
-                  <label key={cat} className="inline-flex items-center gap-2 cursor-pointer">
+                {RISK_CATEGORIES.map((cat) => (
+                  <label
+                    key={cat}
+                    className="inline-flex cursor-pointer items-center gap-2"
+                  >
                     <input
                       type="checkbox"
-                      checked={detailsFormik.values.category?.includes(cat) || false}
+                      checked={
+                        detailsFormik.values.category?.includes(cat) || false
+                      }
                       onChange={() => {
                         const current = detailsFormik.values.category || [];
                         const next = current.includes(cat)
-                          ? current.filter(c => c !== cat)
+                          ? current.filter((c) => c !== cat)
                           : [...current, cat];
                         detailsFormik.setFieldValue('category', next);
                         detailsFormik.setFieldTouched('category', true, false);
                       }}
                       disabled={detailsFormik.isSubmitting}
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="border-line text-primary focus:ring-primary h-4 w-4 rounded"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-content-secondary text-sm">
                       {t(`oscrat.ui.risk.category-${cat.toLowerCase()}`)}
                     </span>
                   </label>
                 ))}
               </div>
-              {detailsFormik.touched.category && detailsFormik.errors.category && (
-                <p className="mt-1 text-sm text-red-600">{t(String(detailsFormik.errors.category))}</p>
-              )}
+              {detailsFormik.touched.category &&
+                detailsFormik.errors.category && (
+                  <p className="text-danger mt-1 text-sm">
+                    {t(String(detailsFormik.errors.category))}
+                  </p>
+                )}
             </div>
 
             {/* Threat */}
             <div className="space-y-2 lg:col-span-3">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('oscrat.ui.risk.threat')}{requiredMark}
+              <label className="text-content-secondary block text-sm font-medium">
+                {t('oscrat.ui.risk.threat')}
+                {requiredMark}
               </label>
               <textarea
                 name="threat"
@@ -292,121 +357,162 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
                 onBlur={detailsFormik.handleBlur}
                 rows={4}
                 disabled={detailsFormik.isSubmitting}
-                className={textareaClass(!!detailsFormik.touched.threat && !!detailsFormik.errors.threat)}
+                className={textareaClass(
+                  !!detailsFormik.touched.threat &&
+                    !!detailsFormik.errors.threat
+                )}
                 placeholder={t('oscrat.ui.risk.threat-placeholder')}
               />
               {detailsFormik.touched.threat && detailsFormik.errors.threat && (
-                <p className="mt-1 text-sm text-red-600">{t(detailsFormik.errors.threat)}</p>
+                <p className="text-danger mt-1 text-sm">
+                  {t(detailsFormik.errors.threat)}
+                </p>
               )}
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end border-t border-gray-200 pt-4">
-            <button
+          <div className="border-line-subtle mt-6 flex justify-end border-t pt-4">
+            <Button
               type="submit"
+              variant="primary"
+              loading={detailsFormik.isSubmitting}
               disabled={detailsFormik.isSubmitting || !detailsFormik.dirty}
-              className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {detailsFormik.isSubmitting ? t('oscrat.ui.saving') : t('oscrat.ui.risk.save-risk-details')}
-            </button>
+              {detailsFormik.isSubmitting
+                ? t('oscrat.ui.saving')
+                : t('oscrat.ui.risk.save-risk-details')}
+            </Button>
           </div>
         </div>
       </form>
 
       {/* Section 2: Risk Treatment */}
       <form onSubmit={treatmentFormik.handleSubmit}>
-        <div className={`rounded-lg border bg-white p-6 shadow-sm ${
-          isSection1Complete ? 'border-gray-200' : 'border-gray-200 opacity-60'
-        }`}>
-          <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <div
+          className={`bg-surface rounded-card border-line border p-6 ${
+            isSection1Complete
+              ? 'border-line-subtle'
+              : 'border-line-subtle opacity-60'
+          }`}
+        >
+          <div className="mb-6 flex items-center gap-3">
+            <h2 className="text-content text-lg font-semibold">
               {t('oscrat.ui.risk.section-treatment')}
             </h2>
             {!isSection1Complete && (
-              <div className="flex items-center gap-1.5 rounded-md bg-amber-50 border border-amber-200 px-3 py-1">
-                <LockClosedIcon className="h-4 w-4 text-amber-600" />
-                <span className="text-xs font-medium text-amber-700">
+              <div className="bg-warning-subtle border-warning-border rounded-input flex items-center gap-1.5 border px-3 py-1">
+                <LockClosedIcon className="text-warning h-4 w-4" />
+                <span className="text-warning text-xs font-medium">
                   {t('oscrat.ui.risk.section-treatment-locked')}
                 </span>
               </div>
             )}
           </div>
 
-          <fieldset disabled={!isSection1Complete || treatmentFormik.isSubmitting}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <fieldset
+            disabled={!isSection1Complete || treatmentFormik.isSubmitting}
+          >
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Treatment */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('oscrat.ui.risk.treatment')}{requiredMark}
+                <label className="text-content-secondary block text-sm font-medium">
+                  {t('oscrat.ui.risk.treatment')}
+                  {requiredMark}
                 </label>
                 <select
                   name="treatment"
                   value={treatmentFormik.values.treatment}
                   onChange={treatmentFormik.handleChange}
                   onBlur={treatmentFormik.handleBlur}
-                  className={selectClass(!!treatmentFormik.touched.treatment && !!treatmentFormik.errors.treatment)}
+                  className={selectClass(
+                    !!treatmentFormik.touched.treatment &&
+                      !!treatmentFormik.errors.treatment
+                  )}
                 >
-                  <option value="">{t('oscrat.ui.risk.select-treatment')}</option>
-                  {RISK_TREATMENT_OPTIONS.map(opt => (
+                  <option value="">
+                    {t('oscrat.ui.risk.select-treatment')}
+                  </option>
+                  {RISK_TREATMENT_OPTIONS.map((opt) => (
                     <option key={opt} value={opt}>
                       {t(`oscrat.ui.risk.treatment-${opt.toLowerCase()}`)}
                     </option>
                   ))}
                 </select>
-                {treatmentFormik.touched.treatment && treatmentFormik.errors.treatment && (
-                  <p className="mt-1 text-sm text-red-600">{t(treatmentFormik.errors.treatment)}</p>
-                )}
+                {treatmentFormik.touched.treatment &&
+                  treatmentFormik.errors.treatment && (
+                    <p className="text-danger mt-1 text-sm">
+                      {t(treatmentFormik.errors.treatment)}
+                    </p>
+                  )}
               </div>
 
               {/* Residual Exposure */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('oscrat.ui.risk.residual-exposure')}{requiredMark}
+                <label className="text-content-secondary block text-sm font-medium">
+                  {t('oscrat.ui.risk.residual-exposure')}
+                  {requiredMark}
                 </label>
                 <select
                   name="residualExposure"
                   value={treatmentFormik.values.residualExposure}
                   onChange={treatmentFormik.handleChange}
                   onBlur={treatmentFormik.handleBlur}
-                  className={selectClass(!!treatmentFormik.touched.residualExposure && !!treatmentFormik.errors.residualExposure)}
+                  className={selectClass(
+                    !!treatmentFormik.touched.residualExposure &&
+                      !!treatmentFormik.errors.residualExposure
+                  )}
                 >
                   <option value="">{t('oscrat.ui.risk.select-level')}</option>
-                  {RISK_LEVELS.map(level => (
-                    <option key={level} value={level}>{riskLevelLabel(level)}</option>
+                  {RISK_LEVELS.map((level) => (
+                    <option key={level} value={level}>
+                      {riskLevelLabel(level)}
+                    </option>
                   ))}
                 </select>
-                {treatmentFormik.touched.residualExposure && treatmentFormik.errors.residualExposure && (
-                  <p className="mt-1 text-sm text-red-600">{t(treatmentFormik.errors.residualExposure)}</p>
-                )}
+                {treatmentFormik.touched.residualExposure &&
+                  treatmentFormik.errors.residualExposure && (
+                    <p className="text-danger mt-1 text-sm">
+                      {t(treatmentFormik.errors.residualExposure)}
+                    </p>
+                  )}
               </div>
 
               {/* Responsible */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('oscrat.ui.risk.responsible')}{requiredMark}
+                <label className="text-content-secondary block text-sm font-medium">
+                  {t('oscrat.ui.risk.responsible')}
+                  {requiredMark}
                 </label>
                 <select
                   name="responsibleId"
                   value={treatmentFormik.values.responsibleId}
                   onChange={treatmentFormik.handleChange}
                   onBlur={treatmentFormik.handleBlur}
-                  className={selectClass(!!treatmentFormik.touched.responsibleId && !!treatmentFormik.errors.responsibleId)}
+                  className={selectClass(
+                    !!treatmentFormik.touched.responsibleId &&
+                      !!treatmentFormik.errors.responsibleId
+                  )}
                 >
-                  <option value="">{t('oscrat.ui.risk.select-responsible')}</option>
-                  {members?.map(member => (
+                  <option value="">
+                    {t('oscrat.ui.risk.select-responsible')}
+                  </option>
+                  {members?.map((member) => (
                     <option key={member.userId} value={member.userId}>
                       {member.user.name}
                     </option>
                   ))}
                 </select>
-                {treatmentFormik.touched.responsibleId && treatmentFormik.errors.responsibleId && (
-                  <p className="mt-1 text-sm text-red-600">{t(treatmentFormik.errors.responsibleId)}</p>
-                )}
+                {treatmentFormik.touched.responsibleId &&
+                  treatmentFormik.errors.responsibleId && (
+                    <p className="text-danger mt-1 text-sm">
+                      {t(treatmentFormik.errors.responsibleId)}
+                    </p>
+                  )}
               </div>
 
               {/* Measures */}
               <div className="space-y-2 lg:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="text-content-secondary block text-sm font-medium">
                   {t('oscrat.ui.risk.measures')}
                 </label>
                 <textarea
@@ -415,23 +521,36 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ task, tea
                   onChange={treatmentFormik.handleChange}
                   onBlur={treatmentFormik.handleBlur}
                   rows={4}
-                  className={textareaClass(!!treatmentFormik.touched.measures && !!treatmentFormik.errors.measures)}
+                  className={textareaClass(
+                    !!treatmentFormik.touched.measures &&
+                      !!treatmentFormik.errors.measures
+                  )}
                   placeholder={t('oscrat.ui.risk.measures-placeholder')}
                 />
-                {treatmentFormik.touched.measures && treatmentFormik.errors.measures && (
-                  <p className="mt-1 text-sm text-red-600">{t(treatmentFormik.errors.measures)}</p>
-                )}
+                {treatmentFormik.touched.measures &&
+                  treatmentFormik.errors.measures && (
+                    <p className="text-danger mt-1 text-sm">
+                      {t(treatmentFormik.errors.measures)}
+                    </p>
+                  )}
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end border-t border-gray-200 pt-4">
-              <button
+            <div className="border-line-subtle mt-6 flex justify-end border-t pt-4">
+              <Button
                 type="submit"
-                disabled={!isSection1Complete || treatmentFormik.isSubmitting || !treatmentFormik.dirty}
-                className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                variant="primary"
+                loading={treatmentFormik.isSubmitting}
+                disabled={
+                  !isSection1Complete ||
+                  treatmentFormik.isSubmitting ||
+                  !treatmentFormik.dirty
+                }
               >
-                {treatmentFormik.isSubmitting ? t('oscrat.ui.saving') : t('oscrat.ui.risk.save-risk-treatment')}
-              </button>
+                {treatmentFormik.isSubmitting
+                  ? t('oscrat.ui.saving')
+                  : t('oscrat.ui.risk.save-risk-treatment')}
+              </Button>
             </div>
           </fieldset>
         </div>

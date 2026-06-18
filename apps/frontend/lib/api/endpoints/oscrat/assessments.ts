@@ -15,14 +15,8 @@ export const oscratAssessmentEndpoints = {
       filters || {}
     ),
 
-  createAssessment: (
-    teamSlug: string,
-    data: OscratAssessmentCreateRequest
-  ) =>
-    api.post<OscratAssessmentDetail>(
-      `/teams/${teamSlug}/assessments`,
-      data
-    ),
+  createAssessment: (teamSlug: string, data: OscratAssessmentCreateRequest) =>
+    api.post<OscratAssessmentDetail>(`/teams/${teamSlug}/assessments`, data),
 
   getAssessmentDetail: (teamSlug: string, assessmentId: string) =>
     api.get<OscratAssessmentDetail>(

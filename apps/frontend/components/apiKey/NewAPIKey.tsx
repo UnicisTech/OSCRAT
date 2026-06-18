@@ -4,8 +4,8 @@ import { extractErrorMessage } from '@/lib/utils';
 import type { Team } from '@oscrat/model';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
-import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
+import Button from '@/components/button';
 import Modal from '../shared/Modal';
 
 const NewAPIKey = ({
@@ -85,15 +85,14 @@ const CreateAPIKeyForm = ({
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" variant="outline" onClick={closeModal} size="md">
+        <Button type="button" variant="secondary" onClick={closeModal}>
           {t('close')}
         </Button>
         <Button
-          color="primary"
+          variant="primary"
           type="submit"
           loading={submitting}
           disabled={!name}
-          size="md"
         >
           {t('create-api-key')}
         </Button>
@@ -117,7 +116,7 @@ const DisplayAPIKey = ({ apiKey, closeModal }: DisplayAPIKeyProps) => {
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" variant="outline" onClick={closeModal} size="md">
+        <Button type="button" variant="secondary" onClick={closeModal}>
           {t('close')}
         </Button>
       </Modal.Footer>

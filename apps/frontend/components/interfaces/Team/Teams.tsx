@@ -1,12 +1,13 @@
 import Link from 'next/link';
-import { Button } from 'react-daisyui';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { Card, Error, LetterAvatar, Loading } from '@/components/shared';
+import Button from '@/components/button';
 import { useTeams } from 'hooks/useTeams';
 import { TeamSummary } from '@oscrat/model';
 import { ApiResponse } from 'types';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const Teams = () => {
   const { isLoading, isError, teams } = useTeams();
@@ -39,19 +40,19 @@ const Teams = () => {
   return (
     <Card heading="Your Teams">
       <Card.Body>
-        <table className="w-full table-fixed text-left text-sm text-gray-500 dark:text-gray-400">
-          <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+        <table className="text-content-muted w-full table-fixed text-left text-sm">
+          <thead className="bg-surface-muted text-content border-line-header border-b">
             <tr>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="text-b2 p-4 font-medium">
                 {t('name')}
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="text-b2 p-4 font-medium">
                 {t('members')}
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="text-b2 p-4 font-medium">
                 {t('created-at')}
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="text-b2 p-4 font-medium">
                 {t('actions')}
               </th>
             </tr>
@@ -62,9 +63,9 @@ const Teams = () => {
                 return (
                   <tr
                     key={team.id}
-                    className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
+                    className="bg-surface hover:bg-surface-muted border-b"
                   >
-                    <td className="px-6 py-3">
+                    <td className="px-4 py-3">
                       <Link href={`/organization/${team.slug}/tasks`}>
                         <div className="flex items-center justify-start space-x-2">
                           <LetterAvatar name={team.name} />
@@ -72,14 +73,14 @@ const Teams = () => {
                         </div>
                       </Link>
                     </td>
-                    <td className="px-6 py-3">{team.membersCount}</td>
-                    <td className="px-6 py-3">
-                      {new Date(team.createdAt).toDateString()}
+                    <td className="px-4 py-3">{team.membersCount}</td>
+                    <td className="px-4 py-3">
+                      {formatDateShort(team.createdAt)}
                     </td>
-                    <td className="px-6 py-3">
+                    <td className="px-4 py-3">
                       <Button
-                        size="sm"
-                        variant="outline"
+                        size="m"
+                        variant="secondary"
                         onClick={() => {
                           leaveTeam(team);
                         }}

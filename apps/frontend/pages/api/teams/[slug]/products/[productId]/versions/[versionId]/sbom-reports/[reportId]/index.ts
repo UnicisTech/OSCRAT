@@ -1,4 +1,7 @@
-import { deleteSbomReport, getSbomReportDetailsById } from '@oscrat/model/operations';
+import {
+  deleteSbomReport,
+  getSbomReportDetailsById,
+} from '@oscrat/model/operations';
 import { prisma } from '@/lib/prisma';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
@@ -61,7 +64,12 @@ const handleDELETE = async (
     throw new ApiError(400, 'Report ID is required');
   }
 
-  await deleteSbomReport(prisma, teamMember.teamId, reportId as string, req.auditInfo);
+  await deleteSbomReport(
+    prisma,
+    teamMember.teamId,
+    reportId as string,
+    req.auditInfo
+  );
 
   console.log(
     `[SBOM Reports API] Deleted report: reportId: ${reportId}, teamId: ${teamMember.teamId}`

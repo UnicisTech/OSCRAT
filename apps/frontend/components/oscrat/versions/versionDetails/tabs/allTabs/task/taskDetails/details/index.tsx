@@ -29,21 +29,21 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
   }, [task]);
 
   return (
-    <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
+    <div className="border-line bg-surface rounded-card w-full border p-4">
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <FormField label="Name">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-md border border-gray-400 px-3 py-2 text-sm"
+            className="border-line rounded-input w-full border px-3 py-2 text-sm"
           />
         </FormField>
         <FormField label="Section">
           <select
             value={section}
             onChange={(e) => setSection(e.target.value)}
-            className="w-full rounded-md border border-gray-400 px-3 py-2 text-sm"
+            className="border-line rounded-input w-full border px-3 py-2 text-sm"
           >
             {task.availableSections.map((opt) => (
               <option key={opt} value={opt}>
@@ -56,7 +56,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
           <select
             value={assignee}
             onChange={(e) => setAssignee(e.target.value)}
-            className="w-full rounded-md border border-gray-400 px-3 py-2 text-sm"
+            className="border-line rounded-input w-full border px-3 py-2 text-sm"
           >
             {task.availableAssignees.map((opt) => (
               <option key={opt} value={opt}>
@@ -70,7 +70,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
             type="text"
             value={task.dateAdded}
             readOnly
-            className="w-full cursor-not-allowed rounded-md border border-gray-400 bg-gray-100 px-3 py-2 text-sm"
+            className="border-line bg-surface-muted rounded-input w-full cursor-not-allowed border px-3 py-2 text-sm"
           />
         </FormField>
       </div>
@@ -80,7 +80,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task }) => {
           value={details}
           onChange={(e) => setDetails(e.target.value)}
           rows={4}
-          className="w-full whitespace-pre-wrap rounded-md border border-gray-400 px-3 py-2 text-sm"
+          className="border-line rounded-input w-full whitespace-pre-wrap border px-3 py-2 text-sm"
         />
       </FormField>
     </div>

@@ -49,7 +49,7 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
             <label
               htmlFor={inputId}
               className={
-                labelStyle || 'block text-sm font-medium text-gray-700'
+                labelStyle || 'text-content-secondary block text-sm font-medium'
               }
             >
               {label}
@@ -60,7 +60,7 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
         </div>
       )}
       {descriptionText && (
-        <p className="mb-2 text-sm text-gray-600">{descriptionText}</p>
+        <p className="text-content-secondary mb-2 text-sm">{descriptionText}</p>
       )}
       <input
         id={inputId}
@@ -76,12 +76,12 @@ const InputWithLabel: React.FC<InputWithLabelProps> = ({
         minLength={minLength}
         pattern={pattern}
         autoComplete={autoComplete}
-        className={`w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 placeholder-gray-400 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''} ${className} `
+        className={`border-line text-content-secondary placeholder-content-placeholder shadow-2 focus:border-primary focus:ring-primary disabled:bg-surface-muted disabled:text-content-muted w-full rounded-md border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed ${error ? 'border-danger-border focus:border-danger focus:ring-danger' : ''} ${className} `
           .trim()
           .replace(/\s+/g, ' ')}
       />
       {error && (
-        <p className="mt-1 text-sm text-red-600" role="alert">
+        <p className="text-danger mt-1 text-sm" role="alert">
           {error}
         </p>
       )}

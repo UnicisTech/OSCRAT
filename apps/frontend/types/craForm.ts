@@ -1,7 +1,4 @@
-import { 
-  ApplicabilityAnswer, 
-  RiskAnswer, 
-} from '@oscrat/model';
+import { ApplicabilityAnswer, RiskAnswer } from '@oscrat/model';
 
 // Form state types
 export interface FormAnswers {
@@ -39,7 +36,7 @@ export enum RiskLevel {
   OTHER = 'OTHER',
   IMPORTANT_CLASS_II = 'IMPORTANT_CLASS_II',
   IMPORTANT_CLASS_I = 'IMPORTANT_CLASS_I',
-  CRITICAL = 'CRITICAL'
+  CRITICAL = 'CRITICAL',
 }
 
 export const RISK_LEVEL_PRIORITY: Record<string, number> = {
@@ -47,14 +44,18 @@ export const RISK_LEVEL_PRIORITY: Record<string, number> = {
   [RiskLevel.OTHER]: 1,
   [RiskLevel.IMPORTANT_CLASS_II]: 2,
   [RiskLevel.IMPORTANT_CLASS_I]: 3,
-  [RiskLevel.CRITICAL]: 4
+  [RiskLevel.CRITICAL]: 4,
 };
 
 // Utility type guards
-export const isRiskAnswer = (answer: ApplicabilityAnswer | RiskAnswer): answer is RiskAnswer => {
+export const isRiskAnswer = (
+  answer: ApplicabilityAnswer | RiskAnswer
+): answer is RiskAnswer => {
   return 'riskLevel' in answer;
 };
 
-export const isApplicabilityAnswer = (answer: ApplicabilityAnswer | RiskAnswer): answer is ApplicabilityAnswer => {
+export const isApplicabilityAnswer = (
+  answer: ApplicabilityAnswer | RiskAnswer
+): answer is ApplicabilityAnswer => {
   return 'isEliminatory' in answer;
 };

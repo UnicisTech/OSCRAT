@@ -3,6 +3,7 @@ import TeamDropdown from '../TeamDropdown';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Brand from './Brand';
 import Navigation from './Navigation';
+import Button from '@/components/button';
 
 interface DrawerProps {
   sidebarOpen: boolean;
@@ -14,23 +15,20 @@ const Drawer = ({ sidebarOpen, setSidebarOpen }: DrawerProps) => {
     <>
       {sidebarOpen && (
         <div className="relative z-50 lg:hidden">
-          <div className="fixed inset-0 bg-white dark:bg-gray-900/80" />
+          <div className="bg-surface fixed inset-0" />
           <div className="fixed inset-0 flex">
             <div className="relative mr-16 flex w-full max-w-xs flex-1">
               <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                <button
+                <Button
                   type="button"
-                  className="-m-2.5 p-2.5"
+                  variant="tertiary"
+                  className="-m-2.5"
                   onClick={() => setSidebarOpen(false)}
-                >
-                  <span className="sr-only">Close sidebar</span>
-                  <XMarkIcon
-                    className="h-6 w-6 text-white"
-                    aria-hidden="true"
-                  />
-                </button>
+                  aria-label="Close sidebar"
+                  icon={<XMarkIcon className="h-6 w-6" aria-hidden="true" />}
+                />
               </div>
-              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 dark:bg-gray-800">
+              <div className="bg-surface flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
                 <Brand />
                 <TeamDropdown />
                 <Navigation />
@@ -40,8 +38,8 @@ const Drawer = ({ sidebarOpen, setSidebarOpen }: DrawerProps) => {
         </div>
       )}
 
-      <div className="hidden bg-white text-black lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col dark:bg-gray-900/80 dark:text-white">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 px-6 dark:border-gray-600 dark:bg-gray-800">
+      <div className="bg-surface text-content hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+        <div className="border-line-subtle flex grow flex-col gap-y-5 overflow-y-auto border-r px-6">
           <Brand />
           <TeamDropdown />
           <Navigation />

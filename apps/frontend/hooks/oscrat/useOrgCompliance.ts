@@ -1,9 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ComplianceState } from '@/types/compliance';
-import { OscratOrganizationRole, OscratAssessmentType, OscratAssessmentCreateRequest } from '@oscrat/model';
+import {
+  OscratOrganizationRole,
+  OscratAssessmentType,
+  OscratAssessmentCreateRequest,
+} from '@oscrat/model';
 import { useAssessments, useOscratAssessment } from './useOscratAssessment';
 import { useLatestAssessment } from './useLatestAssessment';
-import { transformComplianceStateToAssessmentData, transformOrgAssessmentToComplianceState } from '@/utils/compliance';
+import {
+  transformComplianceStateToAssessmentData,
+  transformOrgAssessmentToComplianceState,
+} from '@/utils/compliance';
 import { ASSESSMENT_SCHEMA_VERSION } from '@/lib/compliance/constants';
 
 interface UseOrgComplianceOptions {
@@ -19,21 +26,34 @@ export function useOrgCompliance({
   teamRole,
   userId,
 }: UseOrgComplianceOptions) {
-  const { assessments, createAssessment, isCreating } = useAssessments(teamSlug, {}, { enabled: true });
-
-  const latestAssessmentId = useLatestAssessment(assessments, OscratAssessmentType.ORG);
-
-  const { assessment: assessmentDetail, updateAssessment, deleteAssessment } = useOscratAssessment(
+  const { assessments, createAssessment, isCreating } = useAssessments(
     teamSlug,
-    latestAssessmentId || '',
-    { enabled: !!latestAssessmentId }
+    {},
+    { enabled: true }
   );
 
-  const [complianceState, setComplianceState] = useState<ComplianceState | null>(null);
+  const latestAssessmentId = useLatestAssessment(
+    assessments,
+    OscratAssessmentType.ORG
+  );
+
+  const {
+    assessment: assessmentDetail,
+    updateAssessment,
+    deleteAssessment,
+  } = useOscratAssessment(teamSlug, latestAssessmentId || '', {
+    enabled: !!latestAssessmentId,
+  });
+
+  const [complianceState, setComplianceState] =
+    useState<ComplianceState | null>(null);
 
   useEffect(() => {
     if (assessmentDetail?.rawData) {
-      const state = transformOrgAssessmentToComplianceState(assessmentDetail.rawData, teamRole);
+      const state = transformOrgAssessmentToComplianceState(
+        assessmentDetail.rawData,
+        teamRole
+      );
       if (state) {
         setComplianceState(state);
       }

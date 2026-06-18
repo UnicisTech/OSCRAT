@@ -1,4 +1,5 @@
 import app from '@/lib/app';
+import Button from '@/components/button';
 import { useTranslation } from 'next-i18next';
 
 interface HeaderProps {
@@ -12,23 +13,18 @@ export default function Header({ title, onClose }: HeaderProps) {
   if (!ready) return null;
 
   return (
-    <div className="flex items-center justify-between py-3 px-6 bg-white shadow-md">
-
+    <div className="bg-surface shadow-4 flex items-center justify-between px-6 py-3">
       <div className="flex items-center">
         <img src={app.logoUrl} alt={app.name} className="h-10 w-auto" />
       </div>
-
-      <h1 className="text-lg font-semibold text-gray-900 ">{title}</h1>
-      
+      <h1 className="text-content text-lg font-semibold">{title}</h1>
       {onClose ? (
-              <button
-          onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 "
-        >
+        <Button variant="secondary" onClick={onClose}>
           {t('close')}
-        </button>
+        </Button>
       ) : (
         <div></div>
-      )}   </div>
-  )
+      )}{' '}
+    </div>
+  );
 }

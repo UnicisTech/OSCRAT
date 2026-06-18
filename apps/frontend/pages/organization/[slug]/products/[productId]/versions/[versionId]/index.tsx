@@ -4,6 +4,7 @@ import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/tabs';
 import Version from '@/components/oscrat/versions/versionDetails/version';
 import DocSection from '@/components/oscrat/versions/versionDetails/docSection';
 import { Breadcrumb } from '@/components/shared';
+import Header from '@/components/oscrat/shared/header';
 import { useTranslation } from 'next-i18next';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useVersionContext } from '@/context/VersionContext';
@@ -43,6 +44,7 @@ export default function Index() {
   return (
     <>
       <Breadcrumb items={breadcrumbItems} />
+      <Header title={versionData.version} subtitle={project.name} />
       <Version />
       <DocSection />
       <TabsManager tabs={TABS_CONFIG} />
@@ -52,9 +54,13 @@ export default function Index() {
 
 Index.getLayout = withProductDetailLayout;
 
-export async function getServerSideProps(context: import('next').GetServerSidePropsContext) {
+export async function getServerSideProps(
+  context: import('next').GetServerSidePropsContext
+) {
   const { getCommonServerSideProps } = await import('@/lib/server-helpers');
-  const { getAllComplianceNamespaces } = await import('@/lib/compliance/translations');
+  const { getAllComplianceNamespaces } = await import(
+    '@/lib/compliance/translations'
+  );
 
   return getCommonServerSideProps(context, getAllComplianceNamespaces());
 }

@@ -1,7 +1,11 @@
 import { useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import { TaskStatus, TaskOriginType } from '@oscrat/model';
-import { ComplianceRequirement, RequirementAssessment, ComplianceStatus } from '@/types/compliance';
+import {
+  ComplianceRequirement,
+  RequirementAssessment,
+  ComplianceStatus,
+} from '@/types/compliance';
 import { CreateTaskData } from '@/lib/api/endpoints/tasks';
 import useTasks from '@/hooks/useTasks';
 
@@ -31,17 +35,22 @@ export function useComplianceTaskGeneration({
   const { t } = useTranslation(['common', complianceNamespace]);
   const [pendingTask, setPendingTask] = useState<PendingTask | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   // Use ref to avoid stale closure issues when acceptTask is called from toast
   const pendingTaskRef = useRef<PendingTask | null>(null);
 
-  const shouldGenerateTask = useCallback((status: ComplianceStatus): boolean => {
-    return status === 'Not Compliant';
-  }, []);
+  const shouldGenerateTask = useCallback(
+    (status: ComplianceStatus): boolean => {
+      return status === 'Not Compliant';
+    },
+    []
+  );
 
   const generateTaskData = useCallback(
     (requirement: ComplianceRequirement): CreateTaskData => {
-      const translatedRequirement = t(requirement.requirement, { ns: complianceNamespace });
+      const translatedRequirement = t(requirement.requirement, {
+        ns: complianceNamespace,
+      });
       // Include the product/version context (productName already encodes
       // "Project (version)" for version assessments) so auto-generated
       // remediation tasks stay distinguishable across products and versions.
@@ -50,7 +59,9 @@ export function useComplianceTaskGeneration({
         requirement: translatedRequirement,
         product: productName,
       });
-      const description = requirement.genericTask || t('oscrat.ui.remediate-compliance-requirement');
+      const description =
+        requirement.genericTask ||
+        t('oscrat.ui.remediate-compliance-requirement');
 
       const taskData: CreateTaskData = {
         title,
@@ -68,7 +79,6 @@ export function useComplianceTaskGeneration({
 
   const proposeTask = useCallback(
     (requirement: ComplianceRequirement, assessment: RequirementAssessment) => {
-
       if (!shouldGenerateTask(assessment.complianceStatus!)) {
         return false;
       }
@@ -114,4 +124,3 @@ export function useComplianceTaskGeneration({
     shouldGenerateTask,
   };
 }
-

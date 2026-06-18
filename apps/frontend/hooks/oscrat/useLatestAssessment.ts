@@ -29,11 +29,10 @@ export function useLatestAssessment(
     if (filtered.length === 0) return null;
 
     const latest = filtered.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )[0];
 
     return latest.id;
   }, [assessments, type, filters]);
 }
-
-

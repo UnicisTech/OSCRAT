@@ -16,11 +16,16 @@ import { useGetProducts } from '@/lib/api/hooks/oscrat/projects';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 
 // Models & Types
-import { OscratProductType, OscratProductCategory, OscratProductVersionStatus } from '@oscrat/model';
+import {
+  OscratProductType,
+  OscratProductCategory,
+  OscratProductVersionStatus,
+} from '@oscrat/model';
 import type { OscratProductCreate } from '@oscrat/model';
 import type { ApiError } from '@/types';
 
 // Components
+import Button from '@/components/button';
 import { SelectWithLabel } from '@/components/shared';
 import ProductCreationForm from '@/components/oscrat/ProductCreationForm';
 
@@ -36,7 +41,11 @@ export default function Existing() {
   const router = useRouter();
 
   const { data: existingProducts } = useGetProducts(teamId);
-  const { createProject, isLoading: isCreatingProject } = useOscratProject(teamId, '', { enabled: false });
+  const { createProject, isLoading: isCreatingProject } = useOscratProject(
+    teamId,
+    '',
+    { enabled: false }
+  );
 
   // Create validation schema with uniqueness check
   const validationSchema = useMemo(
@@ -74,7 +83,8 @@ export default function Existing() {
           name: values.name.trim(),
           acronym: values.acronym.trim(),
           type: selectedProduct.type as OscratProductType,
-          productCategory: selectedProduct.productCategory as OscratProductCategory,
+          productCategory:
+            selectedProduct.productCategory as OscratProductCategory,
           createdBy: userId,
           description: values.description?.trim(),
           initialVersion: {
@@ -88,7 +98,7 @@ export default function Existing() {
         toast.success(t('oscrat.ui.validation.product-copied-successfully'));
 
         // 1 second delay before replacing the page
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         router.replace(`/organization/${teamId}/products/${createdProduct.id}`);
       } catch (err) {
         const apiError = err as ApiError;
@@ -97,21 +107,23 @@ export default function Existing() {
     },
   });
 
-  const selectedProduct = existingProducts?.find(
-    (p) => p.id === formik.values.sourceProductId
-  ) ?? null;
+  const selectedProduct =
+    existingProducts?.find((p) => p.id === formik.values.sourceProductId) ??
+    null;
 
   const isLoading = isCreatingProject;
 
   const productOptions = [
     { value: '', label: t('choose') },
-    ...(existingProducts || []).map(product => ({
+    ...(existingProducts || []).map((product) => ({
       value: product.id,
-      label: product.name
-    }))
+      label: product.name,
+    })),
   ];
 
-  const handleSourceProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSourceProductChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const productId = e.target.value;
     formik.setFieldValue('sourceProductId', productId);
   };
@@ -121,29 +133,31 @@ export default function Existing() {
   if (!existingProducts || existingProducts.length === 0) {
     return (
       <div className="flex w-full justify-center">
-        <div className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white shadow-md">
+        <div className="border-line bg-surface rounded-card w-full max-w-2xl border">
           <div className="p-10">
-            <h1 className="text-[20px] font-semibold text-gray-800 mb-4">
+            <h1 className="text-content mb-4 text-[20px] font-semibold">
               {t('oscrat.ui.no-existing-products')}
             </h1>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-content-secondary mb-6 text-sm">
               {t('oscrat.ui.no-existing-products-description')}
             </p>
             <div className="flex space-x-3">
-              <button
+              <Button
                 type="button"
-                onClick={() => router.push(`/organization/${teamId}/products/add-product`)}
-                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                variant="secondary"
+                onClick={() =>
+                  router.push(`/organization/${teamId}/products/add-product`)
+                }
               >
                 {t('back')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="primary"
                 onClick={() => router.push(`/organization/${teamId}/form`)}
-                className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 {t('oscrat.ui.take-survey')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -159,7 +173,7 @@ export default function Existing() {
         value={formik.values.sourceProductId}
         label={`${t('oscrat.ui.source-product')} *`}
         error={
-          formik.touched.sourceProductId && formik.errors.sourceProductId 
+          formik.touched.sourceProductId && formik.errors.sourceProductId
             ? t(formik.errors.sourceProductId)
             : undefined
         }
@@ -172,14 +186,13 @@ export default function Existing() {
 
       {/* Category */}
       <div className="w-full">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="text-content-secondary mb-2 block text-sm font-medium">
           {t('oscrat.ui.category')}
         </label>
-        <div className="w-full rounded-md px-1 py-2 text-gray-700">
-          {selectedProduct 
+        <div className="text-content-secondary w-full rounded-md px-1 py-2">
+          {selectedProduct
             ? t(getProductCategoryKey(selectedProduct.productCategory))
-            : '-'
-          }
+            : '-'}
         </div>
       </div>
     </>
@@ -190,7 +203,9 @@ export default function Existing() {
       formik={formik}
       isLoading={isLoading || formik.isSubmitting}
       additionalFields={additionalFields}
-      submitDisabled={isLoading || formik.isSubmitting || !formik.isValid || !formik.dirty}
+      submitDisabled={
+        isLoading || formik.isSubmitting || !formik.isValid || !formik.dirty
+      }
       headerTitle={t('oscrat.ui.validation.provide-initial-information')}
     />
   );

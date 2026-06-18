@@ -22,7 +22,7 @@ const InputField: React.FC<InputFieldProps> = ({
   <div>
     <label
       htmlFor={id}
-      className="mb-1 block text-sm font-medium text-gray-700"
+      className="text-content-secondary mb-1 block text-sm font-medium"
     >
       {label}
     </label>
@@ -34,7 +34,7 @@ const InputField: React.FC<InputFieldProps> = ({
       onChange={onChange}
       placeholder={placeholder}
       required={required}
-      className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+      className="border-line bg-surface placeholder-content-placeholder shadow-2 focus:border-primary focus:ring-primary rounded-input block w-full border px-3 py-2 focus:outline-none sm:text-sm"
     />
   </div>
 );

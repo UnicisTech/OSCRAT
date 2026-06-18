@@ -3,12 +3,15 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import { useTeamContext } from '@/context/TeamContext';
 import { formatRiskLevel } from '@/utils/craForm';
+import Button from '@/components/button';
 
 interface CompletedAppCheckProps {
   riskLevel: string;
 }
 
-export default function CompletedAppCheck({ riskLevel }: CompletedAppCheckProps) {
+export default function CompletedAppCheck({
+  riskLevel,
+}: CompletedAppCheckProps) {
   const { t, ready } = useTranslation('common');
   const { slug: teamId } = useTeamContext();
   const router = useRouter();
@@ -23,13 +26,13 @@ export default function CompletedAppCheck({ riskLevel }: CompletedAppCheckProps)
 
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-full justify-between rounded-lg border border-gray-200 bg-white shadow-md">
+      <div className="border-line bg-surface rounded-card flex w-full justify-between border">
         {/* Header Section */}
         <div className="p-4">
-          <h1 className="text-lg font-semibold text-gray-800">
+          <h1 className="text-content text-h6 font-bold">
             {t('oscrat.ui.completed-applicability-check')}
           </h1>
-          <p className="mt-1 text-[13px] text-gray-500">
+          <p className="text-content-secondary text-c1 mt-1">
             {t('oscrat.ui.use-the-result')}{' '}
             <span className="font-bold text-black"> {classification} </span>{' '}
             {t('product')}
@@ -37,12 +40,12 @@ export default function CompletedAppCheck({ riskLevel }: CompletedAppCheckProps)
         </div>
 
         <div className="flex justify-end px-4 py-6">
-          <button
+          <Button
+            variant="primary"
+            size="m"
             onClick={handleAddProduct}
-            className="rounded border border-gray-400 px-2 py-1 text-[14px] font-semibold text-gray-600"
-          >
-            {t('add-product')}
-          </button>
+            text={t('add-product')}
+          />
         </div>
       </div>
     </div>

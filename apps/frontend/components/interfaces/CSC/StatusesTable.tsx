@@ -12,6 +12,7 @@ import { ControlOption, ISO } from 'types';
 import { TailwindTableWrapper } from 'sharedStyles';
 import TasksList from './TasksList';
 import { useRouter } from 'next/router';
+import { Button } from '@/components/shared';
 
 const StatusesTable = ({
   iso,
@@ -89,27 +90,27 @@ const StatusesTable = ({
     <>
       <TailwindTableWrapper>
         <div className="overflow-x- mt-2">
-          {/* <table className="w-full table-fixed text-left text-sm text-gray-500 dark:text-gray-400">
-            <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400"> */}
-          <table className="dark:border-base-200 table w-full border-b text-sm">
-            <thead className="bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+          {/* <table className="w-full table-fixed text-left text-sm text-content-muted ">
+ <thead className="bg-surface-muted text-xs uppercase text-content-secondary "> */}
+          <table className="table w-full border-b text-sm">
+            <thead className="text-content bg-surface-muted border-b border-line-header">
               <tr>
-                <th scope="col" className="px-6 py-3">
+                <th scope="col" className="p-4 text-b2 font-medium">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-3">
+                <th scope="col" className="p-4 text-b2 font-medium">
                   Section
                 </th>
-                <th scope="col" className="px-6 py-3">
+                <th scope="col" className="p-4 text-b2 font-medium">
                   Control
                 </th>
-                <th scope="col" className="px-6 py-3">
+                <th scope="col" className="p-4 text-b2 font-medium">
                   Requirements
                 </th>
-                <th scope="col" className="px-6 py-3">
+                <th scope="col" className="p-4 text-b2 font-medium">
                   <StatusHeader />
                 </th>
-                <th scope="col" className="px-6 py-3">
+                <th scope="col" className="p-4 text-b2 font-medium">
                   Tasks
                 </th>
               </tr>
@@ -118,19 +119,19 @@ const StatusesTable = ({
               {pageData.map((option) => (
                 <tr
                   key={option.value.control}
-                  className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
+                  className="bg-surface hover:bg-surface-muted border-b"
                 >
-                  <td className="px-6 py-3">{option.value.code}</td>
-                  <td className="px-6 py-3">{option.value.section}</td>
-                  <td className="px-6 py-3">
+                  <td className="px-4 py-3">{option.value.code}</td>
+                  <td className="px-4 py-3">{option.value.section}</td>
+                  <td className="px-4 py-3">
                     {option.value.controlLabel || option.value.control}
                   </td>
-                  <td className="px-6 py-3">
+                  <td className="px-4 py-3">
                     <span style={{ whiteSpace: 'pre-line' }}>
                       {option.value.requirements}
                     </span>
                   </td>
-                  <td className="px-6 py-3">
+                  <td className="px-4 py-3">
                     {canAccess('task', ['update']) ? (
                       <div className="w-40">
                         <StatusSelector
@@ -152,7 +153,7 @@ const StatusesTable = ({
                       </span>
                     )}
                   </td>
-                  <td className="w-40 px-6 py-3">
+                  <td className="w-40 px-4 py-3">
                     {canAccess('task', ['update']) ? (
                       <TaskSelector
                         tasks={tasks}
@@ -171,24 +172,22 @@ const StatusesTable = ({
         </div>
         {pageData.length ? (
           <div className="mt-3 w-full">
-            <div className="w-30 flex justify-center">
-              <div className="btn-group join grid grid-cols-10">
-                <button
-                  className="btn btn-outline join-item col-span-4"
-                  onClick={goToPreviousPage}
-                  disabled={prevButtonDisabled}
-                >
-                  Previous page
-                </button>
-                <button className="btn btn-outline join-item col-span-2">{`${currentPage}/${totalPages}`}</button>
-                <button
-                  className="btn btn-outline join-item col-span-4"
-                  onClick={goToNextPage}
-                  disabled={nextButtonDisabled}
-                >
-                  Next
-                </button>
-              </div>
+            <div className="w-30 flex items-center justify-center gap-2">
+              <Button
+                variant="secondary"
+                onClick={goToPreviousPage}
+                disabled={prevButtonDisabled}
+              >
+                Previous page
+              </Button>
+              <span className="text-content-secondary text-b2 px-2">{`${currentPage}/${totalPages}`}</span>
+              <Button
+                variant="secondary"
+                onClick={goToNextPage}
+                disabled={nextButtonDisabled}
+              >
+                Next
+              </Button>
             </div>
           </div>
         ) : null}

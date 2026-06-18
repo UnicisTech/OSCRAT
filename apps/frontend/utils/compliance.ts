@@ -1,5 +1,12 @@
-import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
-import { ComplianceAssessmentRawData, validateComplianceAssessmentRawData } from '@/types/assessmentRawData';
+import {
+  ComplianceArea,
+  ComplianceState,
+  RequirementAssessment,
+} from '@/types/compliance';
+import {
+  ComplianceAssessmentRawData,
+  validateComplianceAssessmentRawData,
+} from '@/types/assessmentRawData';
 import { OscratOrganizationRole } from '@oscrat/model';
 import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 import type { ComplianceNamespace } from '@/lib/compliance/translations';
@@ -26,9 +33,7 @@ export const computeRequirementsStatus = (
 
   complianceData.forEach((area) => {
     area.content.forEach((req) => {
-      const assessment = assessments.find(
-        (a) => a.requirementId === req.reqId
-      );
+      const assessment = assessments.find((a) => a.requirementId === req.reqId);
       const totalQuestions = req.questions.length;
       const answeredQuestions = assessment?.answers.length || 0;
       const completionPercentage =
@@ -68,12 +73,18 @@ export const computeRequirementsStatus = (
 };
 
 export const getStatusBadgeColor = (status: string): string => {
-  if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) return 'bg-green-100 text-green-800';
-  if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT) return 'bg-yellow-100 text-yellow-800';
-  if (status === CONFORMITY_STATUS.NOT_COMPLIANT) return 'bg-red-100 text-red-800';
-  if (status === CONFORMITY_STATUS.NOT_APPLICABLE) return 'bg-gray-100 text-gray-800';
-  if (status === CONFORMITY_STATUS.NOT_EVALUATED) return 'bg-gray-100 text-gray-600';
-  if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) return 'bg-blue-100 text-blue-800';
+  if (status === CONFORMITY_STATUS.FULLY_COMPLIANT)
+    return 'bg-green-100 text-green-800';
+  if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT)
+    return 'bg-yellow-100 text-yellow-800';
+  if (status === CONFORMITY_STATUS.NOT_COMPLIANT)
+    return 'bg-red-100 text-red-800';
+  if (status === CONFORMITY_STATUS.NOT_APPLICABLE)
+    return 'bg-gray-100 text-gray-800';
+  if (status === CONFORMITY_STATUS.NOT_EVALUATED)
+    return 'bg-gray-100 text-gray-600';
+  if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION))
+    return 'bg-blue-100 text-blue-800';
   return 'bg-gray-100 text-gray-600';
 };
 
@@ -108,8 +119,8 @@ export const transformOrgAssessmentToComplianceState = (
   teamRole: OscratOrganizationRole
 ): ComplianceState | null => {
   if (!validateComplianceAssessmentRawData(rawData)) {
-   return null;
- }
+    return null;
+  }
 
   const results = rawData.compliance_results;
 
@@ -139,8 +150,8 @@ export const transformVersionAssessmentToComplianceState = (
   teamRole: OscratOrganizationRole
 ): ComplianceState | null => {
   if (!validateComplianceAssessmentRawData(rawData)) {
-   return null;
- }
+    return null;
+  }
 
   const results = rawData.compliance_results;
 

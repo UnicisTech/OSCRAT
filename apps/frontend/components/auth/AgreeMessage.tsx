@@ -9,13 +9,13 @@ const AgreeMessage = ({ text }: Props) => {
   const { t } = useTranslation('common');
 
   return (
-    <p className="text-center text-sm font-semibold text-[#212121]">
+    <p className="text-b2 text-content text-center font-medium">
       {t('agree-message-part', { button: t(text) })}
       <Link
         rel="noopener noreferrer"
         target="_blank"
         href={'https://www.unicis.tech/terms'}
-        className="hover:text-primary-focus font-medium text-blue-600 underline"
+        className="hover:text-primary-focus text-primary font-medium underline"
       >
         {t('terms')}
       </Link>{' '}
@@ -23,7 +23,7 @@ const AgreeMessage = ({ text }: Props) => {
         rel="noopener noreferrer"
         target="_blank"
         href={'https://www.unicis.tech/privacy'}
-        className="hover:text-primary-focus font-medium text-blue-600 underline"
+        className="hover:text-primary-focus text-primary font-medium underline"
       >
         {t('privacy')}
       </Link>{' '}
@@ -32,7 +32,7 @@ const AgreeMessage = ({ text }: Props) => {
         rel="noopener noreferrer"
         target="_blank"
         href={'https://www.unicis.tech/security'}
-        className="hover:text-primary-focus font-medium text-blue-600 underline"
+        className="hover:text-primary-focus text-primary font-medium underline"
       >
         {t('security')}
       </Link>

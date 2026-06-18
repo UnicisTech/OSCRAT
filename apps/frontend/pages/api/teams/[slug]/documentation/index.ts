@@ -3,7 +3,10 @@ import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 import { createDocumentation, listDocumentation } from 'models/documentation';
 import { DocumentationStatus, DocumentationVisibility } from '@oscrat/model';
-import { documentationCreateSchema, documentationFilterSchema } from '@/lib/validation/documentation';
+import {
+  documentationCreateSchema,
+  documentationFilterSchema,
+} from '@/lib/validation/documentation';
 import { validateRequest } from '@/lib/validation/validateRequest';
 
 export default function handler(

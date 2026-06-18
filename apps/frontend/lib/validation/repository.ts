@@ -68,17 +68,17 @@ export const createRepositoryCreateSchema = (t: (key: string) => string) =>
 
     targetBranch: Yup.string()
       .trim()
-      .transform((value) => value === '' ? null : value)
+      .transform((value) => (value === '' ? null : value))
       .max(100, t('oscrat.ui.repository.validation.branch-too-long'))
       .nullable(),
     targetTag: Yup.string()
       .trim()
-      .transform((value) => value === '' ? null : value)
+      .transform((value) => (value === '' ? null : value))
       .max(100, t('oscrat.ui.repository.validation.tag-too-long'))
       .nullable(),
     targetCommit: Yup.string()
       .trim()
-      .transform((value) => value === '' ? null : value)
+      .transform((value) => (value === '' ? null : value))
       .matches(
         /^[a-f0-9]{40}$/i,
         t('oscrat.ui.repository.validation.commit-invalid-format')
@@ -89,11 +89,17 @@ export const createRepositoryCreateSchema = (t: (key: string) => string) =>
       .trim()
       .when('authType', {
         is: OscratRepositoryAuthType.PERSONAL_ACCESS_TOKEN,
-        then: (schema) => schema
-          .required(t('oscrat.ui.repository.validation.access-token-required'))
-          .min(1, t('oscrat.ui.repository.validation.access-token-required'))
-          .max(500, t('oscrat.ui.repository.validation.access-token-too-long')),
-        otherwise: (schema) => schema.nullable()
+        then: (schema) =>
+          schema
+            .required(
+              t('oscrat.ui.repository.validation.access-token-required')
+            )
+            .min(1, t('oscrat.ui.repository.validation.access-token-required'))
+            .max(
+              500,
+              t('oscrat.ui.repository.validation.access-token-too-long')
+            ),
+        otherwise: (schema) => schema.nullable(),
       }),
   });
 
@@ -157,17 +163,17 @@ export const repositoryCreateSchema = Yup.object().shape({
 
   targetBranch: Yup.string()
     .trim()
-    .transform((value) => value === '' ? null : value)
+    .transform((value) => (value === '' ? null : value))
     .max(100, 'oscrat.ui.repository.validation.branch-too-long')
     .nullable(),
   targetTag: Yup.string()
     .trim()
-    .transform((value) => value === '' ? null : value)
+    .transform((value) => (value === '' ? null : value))
     .max(100, 'oscrat.ui.repository.validation.tag-too-long')
     .nullable(),
   targetCommit: Yup.string()
     .trim()
-    .transform((value) => value === '' ? null : value)
+    .transform((value) => (value === '' ? null : value))
     .matches(
       /^[a-f0-9]{40}$/i,
       'oscrat.ui.repository.validation.commit-invalid-format'
@@ -178,11 +184,12 @@ export const repositoryCreateSchema = Yup.object().shape({
     .trim()
     .when('authType', {
       is: OscratRepositoryAuthType.PERSONAL_ACCESS_TOKEN,
-      then: (schema) => schema
-        .required('oscrat.ui.repository.validation.access-token-required')
-        .min(1, 'oscrat.ui.repository.validation.access-token-required')
-        .max(500, 'oscrat.ui.repository.validation.access-token-too-long'),
-      otherwise: (schema) => schema.nullable()
+      then: (schema) =>
+        schema
+          .required('oscrat.ui.repository.validation.access-token-required')
+          .min(1, 'oscrat.ui.repository.validation.access-token-required')
+          .max(500, 'oscrat.ui.repository.validation.access-token-too-long'),
+      otherwise: (schema) => schema.nullable(),
     }),
 });
 

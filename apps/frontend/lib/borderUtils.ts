@@ -8,5 +8,5 @@
  * @returns Tailwind border class string
  */
 export const getBorderClass = (count: number): string => {
-  return count > 0 ? 'border-red-600' : 'border-gray-300';
+  return count > 0 ? 'border-danger' : 'border-line';
 };

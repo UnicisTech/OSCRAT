@@ -36,7 +36,11 @@ export function useAuditLogFilterOptions(
   options?: { enabled?: boolean }
 ) {
   return useQuery({
-    queryKey: [...queryKeys.teams.detail(teamSlug), 'audit-logs', 'filter-options'],
+    queryKey: [
+      ...queryKeys.teams.detail(teamSlug),
+      'audit-logs',
+      'filter-options',
+    ],
     queryFn: () => auditLogEndpoints.getFilterOptions(teamSlug),
     enabled: options?.enabled !== false,
     staleTime: 5 * 60 * 1000, // 5 min cache

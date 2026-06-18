@@ -6,7 +6,7 @@ export { default as EmptyState } from './EmptyState';
 export { default as InputWithLabel } from './InputWithLabel';
 export { default as SelectWithLabel } from './SelectWithLabel';
 export { default as WithLabel } from './WithLabel';
-export { default as Button } from './Button';
+export { default as Button } from '@/components/button';
 export { default as Loading } from './Loading';
 export { default as Error } from './Error';
 export { default as WithLoadingAndError } from './WithLoadingAndError';

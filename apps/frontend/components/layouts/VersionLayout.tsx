@@ -1,6 +1,9 @@
 import React from 'react';
 import { TeamContextProvider } from '@/context/TeamContext';
-import { ProductContextProvider, useProductContext } from '@/context/ProductContext';
+import {
+  ProductContextProvider,
+  useProductContext,
+} from '@/context/ProductContext';
 import { VersionContextProvider } from '@/context/VersionContext';
 import { useTeamContext } from '@/context/TeamContext';
 import { SidePanel } from '@/components/shared';
@@ -14,8 +17,10 @@ const VersionLayoutInner = ({ children }) => {
   return (
     <div className="flex h-screen">
       <SidePanel />
-      <main className="flex-1 bg-white py-10 text-black dark:bg-black dark:text-white overflow-y-auto">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
+      <main className="bg-surface-sunken flex-1 overflow-y-auto py-10 text-black">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          {children}
+        </div>
       </main>
     </div>
   );

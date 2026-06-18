@@ -15,7 +15,10 @@ export const userSignupSchema = Yup.object({
   password: passwordSchema.required('oscrat.ui.validation.password-required'),
   retypePassword: Yup.string()
     .required('oscrat.ui.validation.password-confirm-required')
-    .oneOf([Yup.ref('password')], 'oscrat.ui.validation.password-confirm-match'),
+    .oneOf(
+      [Yup.ref('password')],
+      'oscrat.ui.validation.password-confirm-match'
+    ),
   recaptchaToken: Yup.string().notRequired(),
 });
 

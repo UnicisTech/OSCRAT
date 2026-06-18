@@ -1,6 +1,7 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
+import Button from '@/components/button';
 
 export type TabConfig = {
   id: string;
@@ -24,12 +25,13 @@ export default function TabsManager({
   const { t, ready } = useTranslation('common');
   const router = useRouter();
 
-  const initialTab = (router.query.tab as string) || defaultActiveTab || tabs[0]?.id;
+  const initialTab =
+    (router.query.tab as string) || defaultActiveTab || tabs[0]?.id;
   const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {
     const tabFromQuery = router.query.tab as string;
-    if (tabFromQuery && tabs.find(tab => tab.id === tabFromQuery)) {
+    if (tabFromQuery && tabs.find((tab) => tab.id === tabFromQuery)) {
       setActiveTab(tabFromQuery);
     }
   }, [router.query.tab, tabs]);
@@ -39,7 +41,7 @@ export default function TabsManager({
     router.push(
       {
         pathname: router.pathname,
-        query: { ...router.query, tab: tabId }
+        query: { ...router.query, tab: tabId },
       },
       undefined,
       { shallow: true }
@@ -51,7 +53,7 @@ export default function TabsManager({
   return (
     <div className="mt-6">
       <div
-        className={`flex ${buttonText ? 'justify-between' : 'justify-start'} `}
+        className={`border-line-subtle flex border-b ${buttonText ? 'justify-between' : 'justify-start'} `}
         role="tablist"
         aria-label="Information sections"
       >
@@ -66,22 +68,24 @@ export default function TabsManager({
             onClick={() => handleTabChange(tab.id)}
             className={`${
               activeTab === tab.id
-                ? 'active-tab-button border-b-2 border-blue-500 font-medium text-blue-500'
-                : 'inactive-tab-button'
-            } mr-1 cursor-pointer px-4 py-2`}
+                ? 'active-tab-button border-info text-info border-b-2 font-medium'
+                : 'inactive-tab-button text-content-secondary hover:text-content font-medium'
+            } text-b2 mr-1 cursor-pointer px-3 py-3`}
           >
             {t(tab.label)}
           </button>
         ))}
 
         {buttonText && (
-          <button
+          <Button
             type="button"
-            className="ml-auto rounded border border-gray-300 bg-transparent px-4 py-2 text-sm font-medium text-black hover:bg-gray-100"
+            variant="secondary"
+            size="m"
+            className="ml-auto"
             onClick={() => (onButtonClick ? onButtonClick() : undefined)}
           >
             {buttonText}
-          </button>
+          </Button>
         )}
       </div>
 

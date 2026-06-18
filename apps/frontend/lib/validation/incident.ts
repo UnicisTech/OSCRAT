@@ -1,5 +1,9 @@
 import * as Yup from 'yup';
-import { productDescriptionSchema, incidentScopeSchema, incidentActionsSchema } from './inputs';
+import {
+  productDescriptionSchema,
+  incidentScopeSchema,
+  incidentActionsSchema,
+} from './inputs';
 import {
   IncidentStatus,
   IncidentClassification,
@@ -16,69 +20,90 @@ export const incidentCreateSchema = Yup.object({
   status: Yup.string()
     .oneOf(INCIDENT_STATUSES, 'oscrat.ui.validation.incident-status-invalid')
     .required('oscrat.ui.validation.incident-status-required'),
-  
+
   classification: Yup.string()
-    .oneOf(INCIDENT_CLASSIFICATIONS, 'oscrat.ui.validation.incident-classification-invalid')
+    .oneOf(
+      INCIDENT_CLASSIFICATIONS,
+      'oscrat.ui.validation.incident-classification-invalid'
+    )
     .required('oscrat.ui.validation.incident-classification-required'),
-  
+
   attackType: Yup.string()
-    .oneOf(INCIDENT_ATTACK_TYPES, 'oscrat.ui.validation.incident-attack-type-invalid')
+    .oneOf(
+      INCIDENT_ATTACK_TYPES,
+      'oscrat.ui.validation.incident-attack-type-invalid'
+    )
     .required('oscrat.ui.validation.incident-attack-type-required'),
-  
+
   severity: Yup.string()
-    .oneOf(INCIDENT_SEVERITIES, 'oscrat.ui.validation.incident-severity-invalid')
+    .oneOf(
+      INCIDENT_SEVERITIES,
+      'oscrat.ui.validation.incident-severity-invalid'
+    )
     .required('oscrat.ui.validation.incident-severity-required'),
-  
+
   reporterId: Yup.string()
     .trim()
     .required('oscrat.ui.validation.incident-reporter-required'),
-  
+
   dateOfDetection: Yup.date()
     .required('oscrat.ui.validation.incident-date-of-detection-required')
     .max(new Date(), 'oscrat.ui.validation.date-cannot-be-future'),
-  
-  description: productDescriptionSchema
-    .required('oscrat.ui.validation.description-required'),
-  
-  scope: incidentScopeSchema
-    .required('oscrat.ui.validation.incident-scope-required'),
-  
+
+  description: productDescriptionSchema.required(
+    'oscrat.ui.validation.description-required'
+  ),
+
+  scope: incidentScopeSchema.required(
+    'oscrat.ui.validation.incident-scope-required'
+  ),
+
   assetDetails: productDescriptionSchema.optional(),
-  
+
   handlingDate: Yup.date()
     .optional()
     .nullable()
-    .test('handling-after-detection', 'oscrat.ui.validation.incident-handling-date-invalid', function(value) {
-      if (!value) return true;
-      const { dateOfDetection } = this.parent;
-      if (!dateOfDetection) return true;
-      return value >= dateOfDetection;
-    }),
-  
+    .test(
+      'handling-after-detection',
+      'oscrat.ui.validation.incident-handling-date-invalid',
+      function (value) {
+        if (!value) return true;
+        const { dateOfDetection } = this.parent;
+        if (!dateOfDetection) return true;
+        return value >= dateOfDetection;
+      }
+    ),
+
   correctiveActions: incidentActionsSchema.optional(),
   rootCause: incidentActionsSchema.optional(),
   preventiveActions: incidentActionsSchema.optional(),
-  
+
   suspectedUnlawfulAct: Yup.boolean().optional().default(false),
-  
+
   unlawfulActDescription: incidentActionsSchema
     .optional()
     .when('suspectedUnlawfulAct', {
       is: true,
-      then: (schema) => schema.required('oscrat.ui.validation.incident-unlawful-act-description-required'),
-      otherwise: (schema) => schema.nullable()
+      then: (schema) =>
+        schema.required(
+          'oscrat.ui.validation.incident-unlawful-act-description-required'
+        ),
+      otherwise: (schema) => schema.nullable(),
     }),
-  
+
   crossBorderImpact: Yup.boolean().optional().default(false),
-  
+
   crossBorderImpactDetails: incidentActionsSchema
     .optional()
     .when('crossBorderImpact', {
       is: true,
-      then: (schema) => schema.required('oscrat.ui.validation.incident-cross-border-details-required'),
-      otherwise: (schema) => schema.nullable()
+      then: (schema) =>
+        schema.required(
+          'oscrat.ui.validation.incident-cross-border-details-required'
+        ),
+      otherwise: (schema) => schema.nullable(),
     }),
-  
+
   attachmentIds: Yup.array().of(Yup.string()).optional(),
 });
 
@@ -86,62 +111,81 @@ export const incidentUpdateSchema = Yup.object({
   status: Yup.string()
     .oneOf(INCIDENT_STATUSES, 'oscrat.ui.validation.incident-status-invalid')
     .optional(),
-  
+
   classification: Yup.string()
-    .oneOf(INCIDENT_CLASSIFICATIONS, 'oscrat.ui.validation.incident-classification-invalid')
+    .oneOf(
+      INCIDENT_CLASSIFICATIONS,
+      'oscrat.ui.validation.incident-classification-invalid'
+    )
     .optional(),
-  
+
   attackType: Yup.string()
-    .oneOf(INCIDENT_ATTACK_TYPES, 'oscrat.ui.validation.incident-attack-type-invalid')
+    .oneOf(
+      INCIDENT_ATTACK_TYPES,
+      'oscrat.ui.validation.incident-attack-type-invalid'
+    )
     .optional(),
-  
+
   severity: Yup.string()
-    .oneOf(INCIDENT_SEVERITIES, 'oscrat.ui.validation.incident-severity-invalid')
+    .oneOf(
+      INCIDENT_SEVERITIES,
+      'oscrat.ui.validation.incident-severity-invalid'
+    )
     .optional(),
-  
+
   reporterId: Yup.string().trim().optional(),
-  
+
   dateOfDetection: Yup.date()
     .optional()
     .max(new Date(), 'oscrat.ui.validation.date-cannot-be-future'),
-  
+
   description: productDescriptionSchema.optional(),
   scope: incidentScopeSchema.optional(),
   assetDetails: productDescriptionSchema.optional(),
-  
+
   handlingDate: Yup.date()
     .optional()
     .nullable()
-    .test('handling-after-detection', 'oscrat.ui.validation.incident-handling-date-invalid', function(value) {
-      if (!value) return true;
-      const { dateOfDetection } = this.parent;
-      if (!dateOfDetection) return true;
-      return value >= dateOfDetection;
-    }),
-  
+    .test(
+      'handling-after-detection',
+      'oscrat.ui.validation.incident-handling-date-invalid',
+      function (value) {
+        if (!value) return true;
+        const { dateOfDetection } = this.parent;
+        if (!dateOfDetection) return true;
+        return value >= dateOfDetection;
+      }
+    ),
+
   correctiveActions: incidentActionsSchema.optional(),
   rootCause: incidentActionsSchema.optional(),
   preventiveActions: incidentActionsSchema.optional(),
-  
+
   suspectedUnlawfulAct: Yup.boolean().optional(),
-  
+
   unlawfulActDescription: incidentActionsSchema
     .optional()
     .when('suspectedUnlawfulAct', {
       is: true,
-      then: (schema) => schema.required('oscrat.ui.validation.incident-unlawful-act-description-required'),
-      otherwise: (schema) => schema.nullable()
+      then: (schema) =>
+        schema.required(
+          'oscrat.ui.validation.incident-unlawful-act-description-required'
+        ),
+      otherwise: (schema) => schema.nullable(),
     }),
-  
+
   crossBorderImpact: Yup.boolean().optional(),
-  
+
   crossBorderImpactDetails: incidentActionsSchema
     .optional()
     .when('crossBorderImpact', {
       is: true,
-      then: (schema) => schema.required('oscrat.ui.validation.incident-cross-border-details-required'),
-      otherwise: (schema) => schema.nullable()
+      then: (schema) =>
+        schema.required(
+          'oscrat.ui.validation.incident-cross-border-details-required'
+        ),
+      otherwise: (schema) => schema.nullable(),
     }),
-  
+
   attachmentIds: Yup.array().of(Yup.string()).optional(),
 });

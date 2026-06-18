@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import { FormikProps } from 'formik';
 import { InputWithLabel } from '@/components/shared';
+import Button from '@/components/button';
 import { useTeamContext } from '@/context/TeamContext';
 
 interface ProductFormValues {
@@ -14,7 +15,9 @@ interface ProductFormValues {
   description?: string;
 }
 
-interface ProductCreationFormProps<T extends ProductFormValues = ProductFormValues> {
+interface ProductCreationFormProps<
+  T extends ProductFormValues = ProductFormValues,
+> {
   formik: FormikProps<T>;
   isLoading: boolean;
   additionalFields?: ReactNode;
@@ -22,7 +25,9 @@ interface ProductCreationFormProps<T extends ProductFormValues = ProductFormValu
   headerTitle?: string;
 }
 
-export default function ProductCreationForm<T extends ProductFormValues = ProductFormValues>({
+export default function ProductCreationForm<
+  T extends ProductFormValues = ProductFormValues,
+>({
   formik,
   isLoading,
   additionalFields,
@@ -41,11 +46,12 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
 
   return (
     <div className="flex w-full justify-center">
-      <div className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white shadow-md">
+      <div className="border-line bg-surface rounded-card w-full max-w-2xl border">
         {/* Header Section */}
-        <div className="border-b border-gray-200 p-6">
-          <h1 className="text-[20px] font-semibold text-gray-800">
-            {headerTitle || t('oscrat.ui.validation.provide-initial-information')}
+        <div className="border-line-subtle border-b p-6">
+          <h1 className="text-content text-[20px] font-semibold">
+            {headerTitle ||
+              t('oscrat.ui.validation.provide-initial-information')}
           </h1>
         </div>
 
@@ -60,11 +66,13 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
               <InputWithLabel
                 type="text"
                 name="acronym"
-                placeholder={t('oscrat.ui.validation.product-acronym-placeholder')}
+                placeholder={t(
+                  'oscrat.ui.validation.product-acronym-placeholder'
+                )}
                 value={formik.values.acronym}
                 label={`${t('oscrat.ui.product-acronym')} *`}
                 error={
-                  formik.touched.acronym && formik.errors.acronym 
+                  formik.touched.acronym && formik.errors.acronym
                     ? t(String(formik.errors.acronym))
                     : undefined
                 }
@@ -79,11 +87,13 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
               <InputWithLabel
                 type="text"
                 name="name"
-                placeholder={t('oscrat.ui.validation.enter-product-name-placeholder')}
+                placeholder={t(
+                  'oscrat.ui.validation.enter-product-name-placeholder'
+                )}
                 value={formik.values.name}
                 label={`${t('oscrat.ui.product-name')} *`}
                 error={
-                  formik.touched.name && formik.errors.name 
+                  formik.touched.name && formik.errors.name
                     ? t(String(formik.errors.name))
                     : undefined
                 }
@@ -98,11 +108,13 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
               <InputWithLabel
                 type="text"
                 name="version"
-                placeholder={t('oscrat.ui.validation.product-version-placeholder')}
+                placeholder={t(
+                  'oscrat.ui.validation.product-version-placeholder'
+                )}
                 value={formik.values.version}
                 label={`${t('oscrat.ui.product-version')} *`}
                 error={
-                  formik.touched.version && formik.errors.version 
+                  formik.touched.version && formik.errors.version
                     ? t(String(formik.errors.version))
                     : undefined
                 }
@@ -115,22 +127,24 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
 
               {/* Product Short Description */}
               <div className="w-full">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="text-content-secondary mb-2 block text-sm font-medium">
                   {t('oscrat.ui.product-short-description')}
                 </label>
                 <textarea
                   name="description"
-                  placeholder={t('oscrat.ui.validation.brief-description-placeholder')}
+                  placeholder={t(
+                    'oscrat.ui.validation.brief-description-placeholder'
+                  )}
                   value={formik.values.description || ''}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   disabled={isLoading}
                   maxLength={500}
                   rows={3}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 placeholder-gray-400 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+                  className="border-line text-content-secondary placeholder-content-placeholder shadow-2 focus:border-primary focus:ring-primary disabled:bg-surface-muted disabled:text-content-muted rounded-input w-full border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed"
                 />
                 {formik.touched.description && formik.errors.description && (
-                  <p className="mt-1 text-sm text-red-600" role="alert">
+                  <p className="text-danger mt-1 text-sm" role="alert">
                     {t(String(formik.errors.description))}
                   </p>
                 )}
@@ -139,26 +153,28 @@ export default function ProductCreationForm<T extends ProductFormValues = Produc
           </div>
 
           {/* Footer Section */}
-          <div className="flex pl-6 items-center justify-start space-x-3 rounded-b-lg border-t border-gray-200 p-4">
-            <button
+          <div className="border-line-subtle flex items-center justify-start space-x-3 rounded-b-lg border-t p-4 pl-6">
+            <Button
               type="button"
+              variant="secondary"
               onClick={handleBack}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               disabled={isLoading}
             >
               {t('back')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={submitDisabled ?? (isLoading || !formik.isValid || !formik.dirty)}
-              className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
+              variant="primary"
+              disabled={
+                submitDisabled ??
+                (isLoading || !formik.isValid || !formik.dirty)
+              }
             >
               {isLoading ? t('oscrat.ui.loading') : t('create')}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
     </div>
   );
 }
-

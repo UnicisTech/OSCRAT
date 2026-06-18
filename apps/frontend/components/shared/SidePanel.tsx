@@ -28,12 +28,12 @@ const AccountSettings = () => {
   return (
     <Link
       href="/settings/account"
-      className="flex items-center gap-3 border-t border-gray-200 px-3 py-2 pt-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+      className="border-line-subtle text-content-secondary hover:bg-surface-muted hover:text-content flex items-center gap-3 border-t px-3 py-2 pt-4 text-sm font-medium transition-colors"
     >
-      <UserCircleIcon className="h-8 w-8 shrink-0 text-gray-400" />
+      <UserCircleIcon className="text-content-placeholder h-8 w-8 shrink-0" />
       <div className="flex min-w-0 flex-col">
         <span className="truncate text-sm font-medium">{data.user.name}</span>
-        <span className="truncate text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-content-muted truncate text-xs">
           {data.user.email}
         </span>
       </div>
@@ -84,8 +84,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
       href: `/organization/${slug}/compliance`,
       icon: ClipboardDocumentCheckIcon,
       className: 'stroke-blue-600',
-      active:
-        activePathname?.startsWith(`/organization/${slug}/compliance`)
+      active: activePathname?.startsWith(`/organization/${slug}/compliance`),
     },
   ];
 
@@ -97,17 +96,17 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
 
     const content = (
       <div
-        className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+        className={`text-b2 rounded-input group flex items-center gap-3 px-3 py-2 transition-colors ${
           isActive
-            ? 'bg-gray-100 font-medium text-gray-900 dark:bg-gray-800 dark:text-white'
-            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
+            ? 'bg-info-subtle text-content font-bold'
+            : 'text-content hover:bg-surface-muted'
         }`}
       >
         <IconComponent
           className={`h-5 w-5 shrink-0 ${
             isActive
-              ? 'text-gray-900 dark:text-white'
-              : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-400 dark:group-hover:text-gray-300'
+              ? 'text-content'
+              : 'text-content-placeholder group-hover:text-content-secondary'
           }`}
         />
         <span className="truncate">{item.name}</span>
@@ -136,9 +135,9 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
   };
 
   const sidebarContent = (
-    <div className="flex h-full w-64 flex-col bg-white dark:bg-gray-900">
+    <div className="bg-surface flex h-full w-64 flex-col">
       {/* Logo */}
-      <div className="mt-6 flex h-16 shrink-0 items-center justify-center px-6 dark:border-gray-800">
+      <div className="mt-6 flex h-16 shrink-0 items-center justify-center px-6">
         <Link href={logoHref} className="w-full">
           <img src={app.logoUrl} alt={app.name} className="w-full" />
         </Link>
@@ -154,7 +153,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
 
             {/* Primary Navigation */}
             <nav className="flex flex-1 flex-col">
-              <div role="list" className="space-y-1">
+              <div role="list" className="space-y-3">
                 {navigationItems.map((item) => renderNavItem(item))}
               </div>
             </nav>
@@ -171,9 +170,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ className = '' }) => {
   );
 
   return (
-    <div
-      className={`relative z-10 flex flex-col shadow-lg shadow-gray-400/50 ${className}`}
-    >
+    <div className={`shadow-6 relative z-10 flex flex-col ${className}`}>
       {sidebarContent}
     </div>
   );

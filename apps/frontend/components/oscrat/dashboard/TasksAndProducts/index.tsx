@@ -12,15 +12,15 @@ const CategoryPill = ({ category }: { category: { count: number } }) => {
 
   if (category.count > 0) {
     return (
-      <div className="flex items-center rounded-full border border-red-500 px-3 py-1 text-sm">
-        <FaExclamationCircle className="mr-1.5 text-red-600" />
+      <div className="border-danger flex items-center rounded-full border px-3 py-1 text-sm">
+        <FaExclamationCircle className="text-danger mr-1.5" />
         {category.count} {t('oscrat.ui.open')}
       </div>
     );
   }
 
   return (
-    <div className="flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700">
+    <div className="border-line bg-surface-muted text-content-secondary flex items-center rounded-full border px-3 py-1 text-sm font-semibold">
       {t('oscrat.ui.none')}
     </div>
   );
@@ -31,14 +31,16 @@ const TasksSummaryCard = ({ data }) => {
 
   if (!ready) return null;
   return (
-    <div className="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md md:w-[70%]">
-      <h2 className="mb-6 text-lg font-bold text-gray-800">
+    <div className="border-line bg-surface rounded-card w-full border p-6 md:w-[70%]">
+      <h2 className="text-content mb-6 text-lg font-bold">
         {t('tasks-open')} ({data.totalOpen})
       </h2>
       <div className="grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
         {data.categories.map((category) => (
           <div key={category.label} className="flex flex-col">
-            <h3 className="mb-2 text-sm text-gray-600">{category.label}</h3>
+            <h3 className="text-content-secondary mb-2 text-sm">
+              {category.label}
+            </h3>
             <div className="self-start">
               <CategoryPill category={category} />
             </div>
@@ -55,12 +57,16 @@ const ProductsSummaryCard = ({ data }) => {
   if (!ready) return null;
 
   return (
-    <div className="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md md:w-[30%]">
-      <h2 className="mb-6 text-lg font-bold text-gray-800">
+    <div className="border-line bg-surface rounded-card w-full border p-6 md:w-[30%]">
+      <h2 className="text-content mb-6 text-lg font-bold">
         {t('products')} ({data.total})
       </h2>
       <div className="flex items-center justify-between space-x-6">
-        <DetailItem label="Assessment" value={data.assessment} variant="large" />
+        <DetailItem
+          label="Assessment"
+          value={data.assessment}
+          variant="large"
+        />
         <DetailItem label="Active" value={data.active} variant="large" />
         <DetailItem label="Withdrawn" value={data.withdrawn} variant="large" />
       </div>
@@ -72,7 +78,7 @@ export default function App() {
   const { teamContext } = useTeamContext();
   const team = teamContext.team!;
   const { t } = useTranslation('common');
-  
+
   const { summary, isLoading } = useDashboard(team.slug);
 
   const openVulnerabilities = summary?.vulnerabilities.open || 0;
@@ -85,7 +91,10 @@ export default function App() {
       { label: t('oscrat.ui.vulnerabilities'), count: openVulnerabilities },
       { label: t('oscrat.ui.incidents'), count: openIncidents },
       { label: 'SBOM', count: summary?.sbomReports.total || 0 },
-      { label: t('oscrat.ui.tech-documentation'), count: summary?.techDocumentation.total || 0 },
+      {
+        label: t('oscrat.ui.tech-documentation'),
+        count: summary?.techDocumentation.total || 0,
+      },
     ],
   };
 
@@ -99,7 +108,7 @@ export default function App() {
   if (isLoading) {
     return (
       <div className="flex w-full justify-center">
-        <div className="text-gray-600">{t('loading')}</div>
+        <div className="text-content-secondary">{t('loading')}</div>
       </div>
     );
   }

@@ -27,15 +27,18 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
   const allTeamOrganizations = team?.reportingOrganizations || [];
   const productTypes = Object.values(OscratProductType);
-  const externalReportingOptions = allTeamOrganizations.map((org) => org.acronym);
+  const externalReportingOptions = allTeamOrganizations.map(
+    (org) => org.acronym
+  );
 
   const formik = useFormik({
     initialValues: {
-      name: initialData.name as string || '',
+      name: (initialData.name as string) || '',
       acronym: initialData.acronym || '',
       description: initialData.description || '',
       type: initialData.type || OscratProductType.APPLICATION_SOFTWARE,
-      externalReporting: initialData.reportingOrganizations?.map((org) => org.acronym) || [],
+      externalReporting:
+        initialData.reportingOrganizations?.map((org) => org.acronym) || [],
     },
     validationSchema: productUpdateSchema,
     validateOnBlur: true,
@@ -62,23 +65,27 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
     if (isOpen) {
       formik.resetForm({
         values: {
-          name: initialData.name as string || '',
+          name: (initialData.name as string) || '',
           acronym: initialData.acronym || '',
           description: initialData.description || '',
           type: initialData.type || OscratProductType.APPLICATION_SOFTWARE,
-          externalReporting: initialData.reportingOrganizations?.map((org) => org.acronym) || [],
-        }
+          externalReporting:
+            initialData.reportingOrganizations?.map((org) => org.acronym) || [],
+        },
       });
     }
   }, [isOpen, initialData]);
 
-  const handleExternalReportingToggle = useCallback((option: string) => {
-    const current = formik.values.externalReporting;
-    const updated = current.includes(option)
-      ? current.filter((item) => item !== option)
-      : [...current, option];
-    formik.setFieldValue('externalReporting', updated);
-  }, [formik]);
+  const handleExternalReportingToggle = useCallback(
+    (option: string) => {
+      const current = formik.values.externalReporting;
+      const updated = current.includes(option)
+        ? current.filter((item) => item !== option)
+        : [...current, option];
+      formik.setFieldValue('externalReporting', updated);
+    },
+    [formik]
+  );
 
   if (!ready) return null;
 
@@ -94,7 +101,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
     >
       <div className="space-y-6">
         <div>
-          <label className="mb-2 block text-sm font-medium dark:text-gray-300">
+          <label className="mb-2 block text-sm font-medium">
             {t('oscrat.ui.product-name')} *
           </label>
           <input
@@ -103,19 +110,17 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
             value={formik.values.name}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="bg-surface-muted w-full rounded border p-2"
             placeholder={t('oscrat.ui.product-name')}
             maxLength={60}
           />
           {formik.touched.name && formik.errors.name && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {t(formik.errors.name)}
-            </p>
+            <p className="text-danger mt-1 text-sm">{t(formik.errors.name)}</p>
           )}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium dark:text-gray-300">
+          <label className="mb-2 block text-sm font-medium">
             {t('oscrat.ui.product-acronym')} *
           </label>
           <input
@@ -125,18 +130,18 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             maxLength={10}
-            className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="bg-surface-muted w-full rounded border p-2"
             placeholder={t('oscrat.ui.validation.product-acronym-placeholder')}
           />
           {formik.touched.acronym && formik.errors.acronym && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            <p className="text-danger mt-1 text-sm">
               {t(formik.errors.acronym)}
             </p>
           )}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium dark:text-gray-300">
+          <label className="mb-2 block text-sm font-medium">
             {t('oscrat.ui.product-description')}
           </label>
           <textarea
@@ -146,18 +151,18 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
             onBlur={formik.handleBlur}
             rows={3}
             maxLength={500}
-            className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="bg-surface-muted w-full rounded border p-2"
             placeholder={t('description')}
           />
           {formik.touched.description && formik.errors.description && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            <p className="text-danger mt-1 text-sm">
               {t(formik.errors.description)}
             </p>
           )}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium dark:text-gray-300">
+          <label className="mb-2 block text-sm font-medium">
             {t('oscrat.ui.product-type')}
           </label>
           <select
@@ -165,7 +170,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
             value={formik.values.type}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+            className="bg-surface-muted w-full rounded border p-2"
           >
             {productTypes.map((productType) => (
               <option key={productType} value={productType}>
@@ -176,7 +181,7 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium dark:text-gray-300">
+          <label className="mb-2 block text-sm font-medium">
             {t('oscrat.ui.external-reporting')}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -187,18 +192,18 @@ const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   id={`reporting-${option}`}
                   checked={formik.values.externalReporting.includes(option)}
                   onChange={() => handleExternalReportingToggle(option)}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                  className="border-line text-primary focus:ring-primary h-4 w-4 rounded"
                 />
                 <label
                   htmlFor={`reporting-${option}`}
-                  className="ml-2 cursor-pointer text-sm dark:text-gray-300"
+                  className="ml-2 cursor-pointer text-sm"
                 >
                   {option}
                 </label>
               </div>
             ))}
             {externalReportingOptions.length === 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-content-muted text-sm">
                 {t('oscrat.ui.no-external-reporting-options')}
               </p>
             )}

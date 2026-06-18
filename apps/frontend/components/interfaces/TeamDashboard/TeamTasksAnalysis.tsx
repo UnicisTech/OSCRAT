@@ -54,7 +54,7 @@ const TasksAnalysis = () => {
         >
           <div
             style={{ width: '49%' }}
-            className="stats stat-value dark:bg-base-100 bg-white py-2 shadow"
+            className="stats stat-value bg-surface py-2 shadow"
           >
             <PieChart
               page_name={`task`}

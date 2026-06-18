@@ -2,7 +2,10 @@ import { createTask, getTeamTasks } from 'models/task';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
-import { DEFAULT_TASK_STATUS, DEFAULT_TASK_ORIGIN_TYPE } from '@/constants/taskStatuses';
+import {
+  DEFAULT_TASK_STATUS,
+  DEFAULT_TASK_ORIGIN_TYPE,
+} from '@/constants/taskStatuses';
 import { taskPropertiesSchema } from '@/lib/validation/task';
 
 export default function handler(
@@ -41,7 +44,16 @@ const handlePOST = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  const { title, status, duedate, description, productId, versionId, originType, properties } = req.body;
+  const {
+    title,
+    status,
+    duedate,
+    description,
+    productId,
+    versionId,
+    originType,
+    properties,
+  } = req.body;
   const { teamId } = teamMember;
 
   let validatedProperties;
@@ -56,18 +68,21 @@ const handlePOST = async (
     }
   }
 
-  const task = await createTask({
-    authorId: user.id,
-    teamId,
-    title,
-    status: status || DEFAULT_TASK_STATUS,
-    duedate,
-    description: description || '',
-    productId,
-    versionId,
-    originType: originType || DEFAULT_TASK_ORIGIN_TYPE,
-    properties: validatedProperties,
-  }, req.auditInfo);
+  const task = await createTask(
+    {
+      authorId: user.id,
+      teamId,
+      title,
+      status: status || DEFAULT_TASK_STATUS,
+      duedate,
+      description: description || '',
+      productId,
+      versionId,
+      originType: originType || DEFAULT_TASK_ORIGIN_TYPE,
+      properties: validatedProperties,
+    },
+    req.auditInfo
+  );
 
   return res.status(200).json({ data: task, error: null });
 };

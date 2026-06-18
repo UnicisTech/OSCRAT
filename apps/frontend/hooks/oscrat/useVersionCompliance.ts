@@ -1,9 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ComplianceState } from '@/types/compliance';
-import { OscratOrganizationRole, OscratAssessmentType, OscratAssessmentCreateRequest } from '@oscrat/model';
+import {
+  OscratOrganizationRole,
+  OscratAssessmentType,
+  OscratAssessmentCreateRequest,
+} from '@oscrat/model';
 import { useAssessments, useOscratAssessment } from './useOscratAssessment';
 import { useLatestAssessment } from './useLatestAssessment';
-import { transformComplianceStateToAssessmentData, transformVersionAssessmentToComplianceState } from '@/utils/compliance';
+import {
+  transformComplianceStateToAssessmentData,
+  transformVersionAssessmentToComplianceState,
+} from '@/utils/compliance';
 import { ASSESSMENT_SCHEMA_VERSION } from '@/lib/compliance/constants';
 
 interface UseVersionComplianceOptions {
@@ -33,13 +40,16 @@ export function useVersionCompliance({
     { productId, versionId }
   );
 
-  const { assessment: assessmentDetail, updateAssessment, deleteAssessment } = useOscratAssessment(
-    teamSlug,
-    latestAssessmentId || '',
-    { enabled: !!latestAssessmentId }
-  );
+  const {
+    assessment: assessmentDetail,
+    updateAssessment,
+    deleteAssessment,
+  } = useOscratAssessment(teamSlug, latestAssessmentId || '', {
+    enabled: !!latestAssessmentId,
+  });
 
-  const [complianceState, setComplianceState] = useState<ComplianceState | null>(null);
+  const [complianceState, setComplianceState] =
+    useState<ComplianceState | null>(null);
 
   useEffect(() => {
     if (assessmentDetail?.rawData) {
@@ -79,7 +89,14 @@ export function useVersionCompliance({
       const created = await createAssessment(assessmentData);
       return created?.id;
     },
-    [userId, latestAssessmentId, updateAssessment, createAssessment, productId, versionId]
+    [
+      userId,
+      latestAssessmentId,
+      updateAssessment,
+      createAssessment,
+      productId,
+      versionId,
+    ]
   );
 
   const resetAssessment = useCallback(async () => {
@@ -98,6 +115,3 @@ export function useVersionCompliance({
     isCreating,
   };
 }
-
-
-

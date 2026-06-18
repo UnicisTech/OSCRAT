@@ -14,4 +14,3 @@ export function useGetComplianceData(
     enabled: options?.enabled !== false && !!params.role,
   });
 }
-

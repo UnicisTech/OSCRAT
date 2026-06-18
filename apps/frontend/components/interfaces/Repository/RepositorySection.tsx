@@ -6,7 +6,9 @@ import { Edit, GitBranch, ExternalLink, Trash2 } from 'lucide-react';
 import { useTeamContext } from '@/context/TeamContext';
 import { useOscratRepository } from '@/hooks/oscrat/useOscratRepository';
 import EditRepository from './EditRepository';
+import Button from '@/components/button';
 import type { OscratRepositoryDetail } from '@oscrat/model';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const RepositorySection = () => {
   const { t } = useTranslation('common');
@@ -50,7 +52,7 @@ const RepositorySection = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center p-8">
-        <div className="text-sm text-gray-500">Loading repository...</div>
+        <div className="text-content-muted text-sm">Loading repository...</div>
       </div>
     );
   }
@@ -58,7 +60,7 @@ const RepositorySection = () => {
   if (isError) {
     return (
       <div className="flex justify-center p-8">
-        <div className="text-sm text-red-500">
+        <div className="text-danger text-sm">
           Error loading repository: {error?.message}
         </div>
       </div>
@@ -70,16 +72,16 @@ const RepositorySection = () => {
       <>
         <div className="flex justify-center p-8">
           <div className="text-center">
-            <div className="mb-4 text-sm text-gray-500">
+            <div className="text-content-muted mb-4 text-sm">
               No repository configured for this project.
             </div>
-            <button
+            <Button
               type="button"
+              variant="primary"
               onClick={handleAddRepository}
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Add Repository
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -101,69 +103,70 @@ const RepositorySection = () => {
   return (
     <div className="w-full p-4 pl-0 font-sans">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="text-content text-lg font-semibold">
           Repository Configuration
         </h3>
         <div className="flex space-x-2">
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="m"
             onClick={handleEditRepository}
-            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            startIcon={<Edit size={16} />}
           >
-            <Edit size={16} className="mr-2" />
             Edit Repository
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="secondary"
+            tone="danger"
+            size="m"
             onClick={handleDeleteRepository}
-            className="inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-600 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-900/20"
+            startIcon={<Trash2 size={16} />}
           >
-            <Trash2 size={16} className="mr-2" />
             Delete Repository
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg bg-white shadow-md dark:bg-gray-800">
+      <div className="bg-surface border-line rounded-card overflow-hidden border">
         <div className="p-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div>
-              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <dt className="text-content-muted text-sm font-medium">
                 {t('oscrat.ui.repository.labels.repository-name')}
               </dt>
-              <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+              <dd className="text-content mt-1 text-sm font-semibold">
                 {repository.name}
               </dd>
             </div>
 
             <div>
-              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <dt className="text-content-muted text-sm font-medium">
                 Provider
               </dt>
-              <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+              <dd className="text-content mt-1 text-sm font-semibold">
                 {repository.provider}
               </dd>
             </div>
 
             <div>
-              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                User
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+              <dt className="text-content-muted text-sm font-medium">User</dt>
+              <dd className="text-content mt-1 text-sm font-semibold">
                 {repository.user}
               </dd>
             </div>
 
             <div>
-              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <dt className="text-content-muted text-sm font-medium">
                 Repository URL
               </dt>
-              <dd className="mt-1 flex items-center text-sm font-semibold text-gray-900 dark:text-gray-100">
+              <dd className="text-content mt-1 flex items-center text-sm font-semibold">
                 <a
                   href={repository.repositoryUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                  className="text-primary hover:text-primary-dark inline-flex items-center"
                 >
                   {repository.repositoryUrl}
                   <ExternalLink size={14} className="ml-1" />
@@ -173,10 +176,10 @@ const RepositorySection = () => {
 
             {repository.targetBranch && (
               <div>
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <dt className="text-content-muted text-sm font-medium">
                   Target Branch
                 </dt>
-                <dd className="mt-1 flex items-center text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <dd className="text-content mt-1 flex items-center text-sm font-semibold">
                   <GitBranch size={14} className="mr-1" />
                   {repository.targetBranch}
                 </dd>
@@ -185,10 +188,10 @@ const RepositorySection = () => {
 
             {repository.targetTag && (
               <div>
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <dt className="text-content-muted text-sm font-medium">
                   Target Tag
                 </dt>
-                <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <dd className="text-content mt-1 text-sm font-semibold">
                   {repository.targetTag}
                 </dd>
               </div>
@@ -196,30 +199,30 @@ const RepositorySection = () => {
 
             {repository.targetCommit && (
               <div>
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <dt className="text-content-muted text-sm font-medium">
                   Target Commit
                 </dt>
-                <dd className="mt-1 truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <dd className="text-content mt-1 truncate text-sm font-semibold">
                   {repository.targetCommit}
                 </dd>
               </div>
             )}
 
             <div>
-              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <dt className="text-content-muted text-sm font-medium">
                 Created
               </dt>
-              <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {new Date(repository.createdAt).toLocaleDateString()}
+              <dd className="text-content mt-1 text-sm font-semibold">
+                {formatDateShort(repository.createdAt)}
               </dd>
             </div>
 
             <div>
-              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <dt className="text-content-muted text-sm font-medium">
                 Last Updated
               </dt>
-              <dd className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {new Date(repository.updatedAt).toLocaleDateString()}
+              <dd className="text-content mt-1 text-sm font-semibold">
+                {formatDateShort(repository.updatedAt)}
               </dd>
             </div>
           </div>

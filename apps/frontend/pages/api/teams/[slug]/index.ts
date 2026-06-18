@@ -77,10 +77,13 @@ const handleDELETE = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  await deleteTeam({ id: teamMember.teamId }, {
-    user,
-    team: { id: teamMember.teamId, name: teamMember.teamName },
-  });
+  await deleteTeam(
+    { id: teamMember.teamId },
+    {
+      user,
+      team: { id: teamMember.teamId, name: teamMember.teamName },
+    }
+  );
 
   recordMetric('team.removed');
 

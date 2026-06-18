@@ -1,4 +1,5 @@
 import { EmptyState, WithLoadingAndError } from '@/components/shared';
+import Button from '@/components/button';
 import Badge from '@/components/shared/Badge';
 import ConfirmationDialog from '@/components/shared/ConfirmationDialog';
 import { useApiKeys } from '@/hooks/useApiKeys';
@@ -6,9 +7,9 @@ import { extractErrorMessage } from '@/lib/utils';
 import type { ApiKey, Team } from '@oscrat/model';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
-import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
 import NewAPIKey from './NewAPIKey';
+import { formatDateShort } from '@/utils/dateFormat';
 
 interface APIKeysProps {
   team: Team;
@@ -46,16 +47,11 @@ const APIKeys = ({ team }: APIKeysProps) => {
             <h2 className="text-xl font-medium leading-none tracking-tight">
               API Keys
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-content-muted text-sm">
               API keys allow you to authenticate with the API.
             </p>
           </div>
-          <Button
-            color="primary"
-            variant="outline"
-            size="md"
-            onClick={() => setCreateModalVisible(true)}
-          >
+          <Button variant="primary" onClick={() => setCreateModalVisible(true)}>
             {t('create-api-key')}
           </Button>
         </div>
@@ -66,13 +62,21 @@ const APIKeys = ({ team }: APIKeysProps) => {
           />
         ) : (
           <>
-            <table className="dark:border-base-200 table w-full border-b text-sm">
-              <thead className="bg-base-200">
+            <table className="table w-full border-b text-sm">
+              <thead className="bg-surface-muted border-line-header border-b">
                 <tr>
-                  <th>{t('name')}</th>
-                  <th>{t('status')}</th>
-                  <th>{t('created')}</th>
-                  <th>{t('actions')}</th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('name')}
+                  </th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('status')}
+                  </th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('created')}
+                  </th>
+                  <th className="text-content text-b2 p-4 font-medium">
+                    {t('actions')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -83,12 +87,12 @@ const APIKeys = ({ team }: APIKeysProps) => {
                       <td>
                         <Badge color="success">{t('active')}</Badge>
                       </td>
-                      <td>{new Date(apiKey.createdAt).toLocaleDateString()}</td>
+                      <td>{formatDateShort(apiKey.createdAt)}</td>
                       <td>
                         <Button
-                          size="xs"
-                          color="error"
-                          variant="outline"
+                          size="s"
+                          tone="danger"
+                          variant="secondary"
                           onClick={() => {
                             setSelectedApiKey(apiKey);
                             setConfirmationDialogVisible(true);

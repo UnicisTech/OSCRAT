@@ -1,3 +1,4 @@
+import Button from '@/components/button';
 import { AuthLayout } from '@/components/layouts';
 import { InputWithLabel, Loading } from '@/components/shared';
 import env from '@/lib/env';
@@ -9,7 +10,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { type ReactElement } from 'react';
-import { Button } from 'react-daisyui';
 import { toast } from 'react-hot-toast';
 import type { NextPageWithLayout } from 'types';
 import * as Yup from 'yup';
@@ -71,19 +71,17 @@ const SSO: NextPageWithLayout = () => {
               value={formik.values.slug}
               descriptionText="Contact your administrator to get your team slug"
               error={
-                formik.touched.slug && formik.errors.slug 
-                  ? t(formik.errors.slug) 
+                formik.touched.slug && formik.errors.slug
+                  ? t(formik.errors.slug)
                   : undefined
               }
               onChange={formik.handleChange}
             />
             <Button
               type="submit"
-              color="primary"
+              variant="primary"
               loading={formik.isSubmitting}
-              active={formik.dirty}
               fullWidth
-              size="md"
             >
               {t('continue-with-saml-sso')}
             </Button>
@@ -91,10 +89,16 @@ const SSO: NextPageWithLayout = () => {
         </form>
         <div className="divider"></div>
         <div className="space-y-3">
-          <Link href="/auth/login" className="btn btn-outline w-full">
+          <Link
+            href="/auth/login"
+            className="border-line bg-surface text-content hover:bg-surface-muted rounded-input block w-full border px-2 py-3 text-center text-sm font-medium transition-colors duration-200"
+          >
             {t('sign-in-with-password')}
           </Link>
-          <Link href="/auth/magic-link" className="btn btn-outline w-full">
+          <Link
+            href="/auth/magic-link"
+            className="border-line bg-surface text-content hover:bg-surface-muted rounded-input block w-full border px-2 py-3 text-center text-sm font-medium transition-colors duration-200"
+          >
             {t('sign-in-with-email')}
           </Link>
         </div>

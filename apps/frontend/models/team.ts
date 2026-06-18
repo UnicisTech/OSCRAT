@@ -66,7 +66,13 @@ export const updateTeamMemberRole = async (
   role: Role,
   auditInfo: AuditInfo
 ) => {
-  return await TeamOps.updateTeamMemberRole(prisma, teamId, userId, role, auditInfo);
+  return await TeamOps.updateTeamMemberRole(
+    prisma,
+    teamId,
+    userId,
+    role,
+    auditInfo
+  );
 };
 
 export const getTeams = async (userId: string) => {

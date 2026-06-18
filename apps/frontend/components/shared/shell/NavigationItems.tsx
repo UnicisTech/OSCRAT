@@ -32,7 +32,7 @@ const NavigationItems = ({ menus }: NavigationItemsProps) => {
       {menus.map((menu) => (
         <li key={menu.name}>
           {menu.name === 'line-break' ? (
-            <hr className="my-1 border-t border-gray-300 dark:border-gray-600" />
+            <hr className="border-line my-1 border-t" />
           ) : (
             <NavigationItem menu={menu} className={menu.className || ''} />
           )}
@@ -57,8 +57,8 @@ const NavigationItem = ({
   const content = (
     <div
       onClick={menu.children ? toggleSubmenu : undefined}
-      className={`flex cursor-pointer items-center justify-between gap-2 rounded p-2 px-2 text-sm text-gray-900 hover:bg-gray-100 dark:text-gray-500 hover:dark:text-black ${
-        menu.active ? 'bg-gray-100 font-semibold dark:text-black' : ''
+      className={`text-content hover:bg-surface-muted flex cursor-pointer items-center justify-between gap-2 rounded p-2 px-2 text-sm ${
+        menu.active ? 'bg-surface-muted font-semibold' : ''
       } ${className}`}
       style={{ paddingLeft: `${level * 1.5}rem` }}
     >

@@ -18,7 +18,10 @@ const dataKeySchema = Yup.string()
   .required('Data key is required')
   .max(100, 'Data key too long')
   .lowercase()
-  .matches(DATA_KEY_REGEX, 'Data key must be lowercase alphanumeric with hyphens, underscores, and colons');
+  .matches(
+    DATA_KEY_REGEX,
+    'Data key must be lowercase alphanumeric with hyphens, underscores, and colons'
+  );
 
 export const teamDataCreateSchema = Yup.object({
   dataKey: dataKeySchema,

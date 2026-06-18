@@ -54,11 +54,18 @@ export const queryKeys = {
       csc: (slug: string, taskNumber: string) =>
         [...queryKeys.teams.tasks.detail(slug, taskNumber), 'csc'] as const,
       documentation: (slug: string, taskNumber: string) =>
-        [...queryKeys.teams.tasks.detail(slug, taskNumber), 'documentation'] as const,
+        [
+          ...queryKeys.teams.tasks.detail(slug, taskNumber),
+          'documentation',
+        ] as const,
     },
     documentation: {
       all: (slug: string, filters?: Record<string, unknown>) =>
-        [...queryKeys.teams.detail(slug), 'documentation', ...(filters ? [filters] : [])] as const,
+        [
+          ...queryKeys.teams.detail(slug),
+          'documentation',
+          ...(filters ? [filters] : []),
+        ] as const,
       detail: (slug: string, docId: string) =>
         [...queryKeys.teams.detail(slug), 'documentation', docId] as const,
     },

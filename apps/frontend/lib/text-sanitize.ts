@@ -1,7 +1,8 @@
 // Source-of-truth character classes for task-style text fields.
 // Validators and auto-generation sanitizers both consume these so they cannot drift.
 export const TITLE_CHAR_REGEX = /^[a-zA-Z0-9\s\-_.,()'[\]À-ſ]*$/;
-export const DESCRIPTION_CHAR_REGEX = /^[a-zA-Z0-9\s\-_.,()':;@#&+/\\!?\n\rÀ-ſ]*$/;
+export const DESCRIPTION_CHAR_REGEX =
+  /^[a-zA-Z0-9\s\-_.,()':;@#&+/\\!?\n\rÀ-ſ]*$/;
 
 const TITLE_STRIP_REGEX = /[^a-zA-Z0-9\s\-_.,()'[\]À-ſ]/g;
 const DESCRIPTION_STRIP_REGEX = /[^a-zA-Z0-9\s\-_.,()':;@#&+/\\!?\n\rÀ-ſ]/g;
@@ -22,7 +23,9 @@ export function sanitizeForTitle(input: string | null | undefined): string {
   return collapseWhitespace(input.replace(TITLE_STRIP_REGEX, ' '), false);
 }
 
-export function sanitizeForDescription(input: string | null | undefined): string {
+export function sanitizeForDescription(
+  input: string | null | undefined
+): string {
   if (!input) return '';
   return collapseWhitespace(input.replace(DESCRIPTION_STRIP_REGEX, ' '), true);
 }

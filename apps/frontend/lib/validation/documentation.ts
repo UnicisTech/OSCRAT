@@ -4,11 +4,17 @@ import { titleSchema } from './inputs';
 
 // Reusable enum validators
 const statusValidator = Yup.mixed<DocumentationStatus>()
-  .oneOf(Object.values(DocumentationStatus), 'oscrat.ui.validation.documentation-status-invalid')
+  .oneOf(
+    Object.values(DocumentationStatus),
+    'oscrat.ui.validation.documentation-status-invalid'
+  )
   .optional();
 
 const visibilityValidator = Yup.mixed<DocumentationVisibility>()
-  .oneOf(Object.values(DocumentationVisibility), 'oscrat.ui.validation.documentation-visibility-invalid')
+  .oneOf(
+    Object.values(DocumentationVisibility),
+    'oscrat.ui.validation.documentation-visibility-invalid'
+  )
   .optional();
 
 export const documentationCreateSchema = Yup.object({
@@ -34,6 +40,12 @@ export const documentationFilterSchema = Yup.object({
   versionId: Yup.string().optional(),
 }).noUnknown(false);
 
-export type DocumentationCreateData = Yup.InferType<typeof documentationCreateSchema>;
-export type DocumentationUpdateData = Yup.InferType<typeof documentationUpdateSchema>;
-export type DocumentationFilterData = Yup.InferType<typeof documentationFilterSchema>;
+export type DocumentationCreateData = Yup.InferType<
+  typeof documentationCreateSchema
+>;
+export type DocumentationUpdateData = Yup.InferType<
+  typeof documentationUpdateSchema
+>;
+export type DocumentationFilterData = Yup.InferType<
+  typeof documentationFilterSchema
+>;

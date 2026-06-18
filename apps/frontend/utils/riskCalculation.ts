@@ -1,9 +1,9 @@
 import type { RiskLevel } from '@/types/risk';
 
 const EXPOSURE_MATRIX: Record<RiskLevel, Record<RiskLevel, RiskLevel>> = {
-  HIGH:   { HIGH: 'HIGH', MEDIUM: 'HIGH',   LOW: 'MEDIUM' },
+  HIGH: { HIGH: 'HIGH', MEDIUM: 'HIGH', LOW: 'MEDIUM' },
   MEDIUM: { HIGH: 'HIGH', MEDIUM: 'MEDIUM', LOW: 'LOW' },
-  LOW:    { HIGH: 'MEDIUM', MEDIUM: 'LOW',  LOW: 'LOW' },
+  LOW: { HIGH: 'MEDIUM', MEDIUM: 'LOW', LOW: 'LOW' },
 };
 
 export const calculateExposure = (

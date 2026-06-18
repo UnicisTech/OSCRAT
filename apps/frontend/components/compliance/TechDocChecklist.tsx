@@ -1,6 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
-import { FaArrowLeft, FaSave, FaCheckCircle, FaExternalLinkAlt } from 'react-icons/fa';
+import {
+  FaArrowLeft,
+  FaSave,
+  FaCheckCircle,
+  FaExternalLinkAlt,
+} from 'react-icons/fa';
 import {
   ComplianceArea,
   ComplianceRequirement,
@@ -8,10 +13,13 @@ import {
 } from '@/types/compliance';
 import { COMPLIANCE_STATUS } from '@/constants/conformityStatuses';
 import { TECH_DOC_CHECKLIST_NAMESPACE } from '@/lib/compliance/translations';
+import { Button } from '@/components/shared';
 
 const CRA_ANNEX_URLS: Record<string, string> = {
-  'Annex VII': 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202402847#anx_VII',
-  'Annex II': 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202402847#anx_II',
+  'Annex VII':
+    'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202402847#anx_VII',
+  'Annex II':
+    'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202402847#anx_II',
 };
 
 function getCraReferenceUrl(reference: string): string | null {
@@ -30,15 +38,15 @@ const CraReferenceLink: React.FC<{ reference: string }> = ({ reference }) => {
         target="_blank"
         rel="noopener noreferrer"
         onClick={(e) => e.stopPropagation()}
-        className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors"
+        className="text-c1 text-primary bg-info-subtle hover:bg-info-subtle inline-flex flex-shrink-0 items-center gap-1 rounded px-2 py-1 font-mono transition-colors"
       >
         {reference}
-        <FaExternalLinkAlt className="text-[10px]" />
+        <FaExternalLinkAlt className="text-c2" />
       </a>
     );
   }
   return (
-    <span className="flex-shrink-0 text-xs font-mono text-gray-400 bg-gray-100 px-2 py-1 rounded">
+    <span className="text-c1 text-content-placeholder bg-surface-muted flex-shrink-0 rounded px-2 py-1 font-mono">
       {reference}
     </span>
   );
@@ -128,18 +136,17 @@ const TechDocChecklist: React.FC<TechDocChecklistProps> = ({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button
+          <Button
+            variant="tertiary"
             onClick={onBack}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             aria-label={t('back')}
-          >
-            <FaArrowLeft className="text-gray-600" />
-          </button>
+            icon={<FaArrowLeft />}
+          />
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-h5 text-content font-bold">
               {tr(area.areaOfRequirements)}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-b2 text-content-muted mt-1">
               {t('oscrat.ui.checklist-progress', {
                 checked: checkedCount,
                 total: totalCount,
@@ -152,27 +159,27 @@ const TechDocChecklist: React.FC<TechDocChecklistProps> = ({
       {Array.from(sections.entries()).map(([sectionKey, requirements]) => (
         <div
           key={sectionKey}
-          className="border border-gray-200 rounded-lg overflow-hidden"
+          className="border-line bg-surface rounded-card overflow-hidden border"
         >
           {sectionKey && (
-            <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+            <div className="bg-surface-muted border-line-subtle border-b px-6 py-3">
+              <h3 className="text-b2 text-content-secondary font-bold uppercase tracking-wide">
                 {tr(sectionKey)}
               </h3>
             </div>
           )}
-          <div className="divide-y divide-gray-100">
+          <div className="divide-line-subtle divide-y">
             {requirements.map((req) => {
               const isChecked = checks[req.reqId] ?? false;
               return (
                 <label
                   key={req.reqId}
-                  className="flex items-start gap-4 px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="hover:bg-surface-muted flex cursor-pointer items-start gap-4 px-6 py-4 transition-colors"
                 >
-                  <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                  <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center">
                     {isChecked ? (
                       <FaCheckCircle
-                        className="text-green-500 w-5 h-5 cursor-pointer"
+                        className="text-success h-5 w-5 cursor-pointer"
                         onClick={(e) => {
                           e.preventDefault();
                           handleToggle(req.reqId);
@@ -183,16 +190,16 @@ const TechDocChecklist: React.FC<TechDocChecklistProps> = ({
                         type="checkbox"
                         checked={false}
                         onChange={() => handleToggle(req.reqId)}
-                        className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        className="border-line text-primary focus:ring-primary h-5 w-5 cursor-pointer rounded"
                       />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p
-                      className={`text-sm ${
+                      className={`text-b2 ${
                         isChecked
-                          ? 'text-gray-500 line-through'
-                          : 'text-gray-800'
+                          ? 'text-content-muted line-through'
+                          : 'text-content'
                       }`}
                     >
                       {tr(req.requirement)}
@@ -207,13 +214,9 @@ const TechDocChecklist: React.FC<TechDocChecklistProps> = ({
       ))}
 
       <div className="flex justify-end pt-4">
-        <button
-          onClick={handleSave}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <FaSave />
+        <Button variant="primary" onClick={handleSave} startIcon={<FaSave />}>
           {t('oscrat.ui.save-checklist')}
-        </button>
+        </Button>
       </div>
     </div>
   );

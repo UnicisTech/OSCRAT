@@ -6,6 +6,7 @@ import { useVersionContext } from '@/context/VersionContext';
 import { useTeamContext } from '@/context/TeamContext';
 import { useGetConfigurationScanReportDetail } from '@/lib/api/hooks/oscrat/jobs';
 import { Loading, Breadcrumb } from '@/components/shared';
+import Button from '@/components/button';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import usePagination from '@/hooks/usePagination';
@@ -40,6 +41,7 @@ import {
   sanitizeForDescription,
   truncateAtWordBoundary,
 } from '@/lib/text-sanitize';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const TASK_TITLE_MAX = 100;
 const TASK_DESCRIPTION_MAX = 500;
@@ -47,21 +49,21 @@ const TASK_DESCRIPTION_MAX = 500;
 const ITEMS_PER_PAGE = 15;
 
 const SEVERITY_BADGE: Record<ConfigurationSeverity, string> = {
-  [CONFIGURATION_SEVERITY.HIGH]: 'bg-red-100 text-red-800',
-  [CONFIGURATION_SEVERITY.MEDIUM]: 'bg-yellow-100 text-yellow-800',
-  [CONFIGURATION_SEVERITY.LOW]: 'bg-blue-100 text-blue-800',
-  [CONFIGURATION_SEVERITY.UNKNOWN]: 'bg-gray-100 text-gray-800',
+  [CONFIGURATION_SEVERITY.HIGH]: 'border border-danger text-content',
+  [CONFIGURATION_SEVERITY.MEDIUM]: 'border border-caution text-content',
+  [CONFIGURATION_SEVERITY.LOW]: 'border border-info text-content',
+  [CONFIGURATION_SEVERITY.UNKNOWN]: 'border border-content-muted text-content',
 };
 
 const RESULT_BADGE: Record<ConfigurationResult, string> = {
-  [CONFIGURATION_RESULT.PASS]: 'bg-green-100 text-green-800',
-  [CONFIGURATION_RESULT.FAIL]: 'bg-red-100 text-red-800',
-  [CONFIGURATION_RESULT.ERROR]: 'bg-red-100 text-red-800',
-  [CONFIGURATION_RESULT.NOT_APPLICABLE]: 'bg-gray-100 text-gray-800',
-  [CONFIGURATION_RESULT.NOT_CHECKED]: 'bg-gray-100 text-gray-800',
-  [CONFIGURATION_RESULT.NOT_SELECTED]: 'bg-gray-100 text-gray-800',
-  [CONFIGURATION_RESULT.INFORMATIONAL]: 'bg-blue-100 text-blue-800',
-  [CONFIGURATION_RESULT.FIXED]: 'bg-green-100 text-green-800',
+  [CONFIGURATION_RESULT.PASS]: 'bg-success-subtle text-success-emphasis',
+  [CONFIGURATION_RESULT.FAIL]: 'bg-danger-subtle text-danger-emphasis',
+  [CONFIGURATION_RESULT.ERROR]: 'bg-danger-subtle text-danger-emphasis',
+  [CONFIGURATION_RESULT.NOT_APPLICABLE]: 'bg-surface-muted text-content',
+  [CONFIGURATION_RESULT.NOT_CHECKED]: 'bg-surface-muted text-content',
+  [CONFIGURATION_RESULT.NOT_SELECTED]: 'bg-surface-muted text-content',
+  [CONFIGURATION_RESULT.INFORMATIONAL]: 'bg-info-subtle text-info-emphasis',
+  [CONFIGURATION_RESULT.FIXED]: 'bg-success-subtle text-success-emphasis',
 };
 
 function ReportHeader({
@@ -78,18 +80,15 @@ function ReportHeader({
   return (
     <div className="flex items-center justify-between">
       <h1 className={reportStyles.pageTitle}>{title}</h1>
-      <button
+      <Button
+        variant="secondary"
+        size="m"
         onClick={onDownload}
         disabled={!hasAttachment}
-        className={`${reportStyles.downloadButton.base} ${
-          hasAttachment
-            ? reportStyles.downloadButton.enabled
-            : reportStyles.downloadButton.disabled
-        }`}
+        startIcon={<FaDownload size={14} />}
       >
-        <FaDownload className="mr-2" size={14} />
         {downloadLabel}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -115,7 +114,9 @@ function OverviewStats({
           <p className={reportStyles.metadataLabel}>
             {t('oscrat.ui.versions.configuration.total-rules')}
           </p>
-          <p className={reportStyles.metadataValueLarge}>{summary.totalRules}</p>
+          <p className={reportStyles.metadataValueLarge}>
+            {summary.totalRules}
+          </p>
         </div>
         <div>
           <p className={reportStyles.metadataLabel}>
@@ -133,7 +134,9 @@ function OverviewStats({
           <p className={reportStyles.metadataLabel}>
             {t('oscrat.ui.versions.configuration.error-count')}
           </p>
-          <p className={reportStyles.metadataValueLarge}>{summary.errorCount}</p>
+          <p className={reportStyles.metadataValueLarge}>
+            {summary.errorCount}
+          </p>
         </div>
         <div>
           <p className={reportStyles.metadataLabel}>
@@ -148,7 +151,7 @@ function OverviewStats({
             {t('oscrat.ui.versions.configuration.scan-date')}
           </p>
           <p className={reportStyles.metadataValue}>
-            {new Date(summary.scanDate).toLocaleDateString()}
+            {formatDateShort(summary.scanDate)}
           </p>
         </div>
         <div>
@@ -178,9 +181,7 @@ function BenchmarkInfo({
   t: (key: string) => string;
 }) {
   const hasBenchmark =
-    summary.benchmarkId ||
-    summary.profileId ||
-    summary.targetHostname;
+    summary.benchmarkId || summary.profileId || summary.targetHostname;
 
   if (!hasBenchmark) {
     return null;
@@ -260,7 +261,7 @@ function RulesTable({
   return (
     <div className={reportStyles.tableCard}>
       <div className={reportStyles.tableHeader}>
-        <h2 className="text-lg font-medium text-gray-900">
+        <h2 className="text-content text-lg font-medium">
           {t('oscrat.ui.versions.configuration.rules-section')}
         </h2>
         <p className={reportStyles.sectionSubtitle}>
@@ -294,11 +295,11 @@ function RulesTable({
             {pageData.map((rule, index) => (
               <tr key={`${rule.ruleId}-${index}`} className={tableStyles.tr}>
                 <td
-                  className={`${tableStyles.td} font-mono text-xs text-gray-700`}
+                  className={`${tableStyles.td} text-content-secondary font-mono text-xs`}
                 >
                   {rule.ruleId}
                 </td>
-                <td className={`${tableStyles.td} font-medium text-gray-900`}>
+                <td className={`${tableStyles.td} text-content font-medium`}>
                   {rule.title}
                 </td>
                 <td className={tableStyles.td}>
@@ -362,7 +363,11 @@ export default function ConfigurationScanSummaryPage() {
   const { teamContext } = useTeamContext();
 
   const { project } = useOscratProject(teamId, productId);
-  const { version: versionData } = useOscratVersion(teamId, productId, versionId);
+  const { version: versionData } = useOscratVersion(
+    teamId,
+    productId,
+    versionId
+  );
 
   const { data: report, isLoading } = useGetConfigurationScanReportDetail(
     teamId,
@@ -443,7 +448,10 @@ export default function ConfigurationScanSummaryPage() {
   };
 
   const taskTitle = selectedRule
-    ? buildTaskTitle(selectedRule, t('oscrat.ui.versions.configuration.task-title-prefix'))
+    ? buildTaskTitle(
+        selectedRule,
+        t('oscrat.ui.versions.configuration.task-title-prefix')
+      )
     : '';
 
   const taskDescription = selectedRule
@@ -532,11 +540,7 @@ function buildTaskTitle(
   rule: ConfigurationScanRuleResult,
   prefix: string
 ): string {
-  const candidates = [
-    rule.title,
-    rule.cceId,
-    rule.ruleId?.split('_').pop(),
-  ];
+  const candidates = [rule.title, rule.cceId, rule.ruleId?.split('_').pop()];
   const sanitizedPrefix = sanitizeForTitle(prefix);
   // ' - ' (hyphen) instead of ': ' because ':' is not in the title char regex.
   const head = sanitizedPrefix ? `${sanitizedPrefix} - ` : '';
@@ -555,11 +559,17 @@ function buildTaskDescription(
   rule: ConfigurationScanRuleResult,
   t: (key: string, options?: any) => string
 ): string {
-  const headerLines: string[] = [t('oscrat.ui.versions.configuration.task-description-header')];
+  const headerLines: string[] = [
+    t('oscrat.ui.versions.configuration.task-description-header'),
+  ];
   if (rule.cceId) {
-    headerLines.push(`${t('oscrat.ui.versions.configuration.task-description-cce')}: ${rule.cceId}`);
+    headerLines.push(
+      `${t('oscrat.ui.versions.configuration.task-description-cce')}: ${rule.cceId}`
+    );
   }
-  headerLines.push(`${t('oscrat.ui.versions.configuration.task-description-rule-id')}: ${rule.ruleId}`);
+  headerLines.push(
+    `${t('oscrat.ui.versions.configuration.task-description-rule-id')}: ${rule.ruleId}`
+  );
   headerLines.push(
     `${t('oscrat.ui.versions.configuration.task-description-severity')}: ${formatSeverity(rule.severity)}`
   );

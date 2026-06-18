@@ -14,13 +14,13 @@ const HeroSection = () => {
           <div className="flex items-center justify-center gap-2">
             <Link
               href="/auth/join"
-              className="btn btn-primary px-8 no-underline"
+              className="bg-button-primary text-content-inverse hover:bg-button-primary-hover rounded-input inline-flex items-center justify-center px-8 py-2 font-medium no-underline transition-colors"
             >
               {t('get-started')}
             </Link>
             <Link
               href="https://github.com/boxyhq/saas-starter-kit"
-              className="btn btn-outline px-8"
+              className="border-line text-content hover:bg-button-overlay rounded-input inline-flex items-center justify-center border px-8 py-2 font-medium no-underline transition-colors"
             >
               GitHub
             </Link>

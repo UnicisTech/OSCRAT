@@ -1,14 +1,15 @@
 import React from 'react';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaEye } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import type { OscratIncidentSummary } from '@oscrat/model';
-import { IncidentStatus, IncidentSeverity } from '@oscrat/model';
+import { IncidentStatus } from '@oscrat/model';
 import usePagination from '@/hooks/usePagination';
 import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { formatDateShort } from '@/utils/dateFormat';
+import SeverityBadge from '@/components/oscrat/shared/SeverityBadge';
 import {
   TableWrapper,
   TableHeader,
@@ -59,32 +60,32 @@ const Table: React.FC<IncidentsTableProps> = ({
       { bgColor: string; textColor: string }
     > = {
       [IncidentStatus.PENDING]: {
-        bgColor: 'bg-gray-100',
-        textColor: 'text-gray-800',
+        bgColor: 'bg-surface-muted',
+        textColor: 'text-content',
       },
       [IncidentStatus.START]: {
-        bgColor: 'bg-blue-100',
-        textColor: 'text-blue-800',
+        bgColor: 'bg-info-subtle',
+        textColor: 'text-info-emphasis',
       },
       [IncidentStatus.DECLARED]: {
-        bgColor: 'bg-yellow-100',
-        textColor: 'text-yellow-800',
+        bgColor: 'bg-warning-subtle',
+        textColor: 'text-warning-emphasis',
       },
       [IncidentStatus.STABLE]: {
-        bgColor: 'bg-cyan-100',
-        textColor: 'text-cyan-800',
+        bgColor: 'bg-info-subtle',
+        textColor: 'text-info-emphasis',
       },
       [IncidentStatus.ACTIVE]: {
-        bgColor: 'bg-orange-100',
-        textColor: 'text-orange-800',
+        bgColor: 'bg-warning-subtle',
+        textColor: 'text-warning-emphasis',
       },
       [IncidentStatus.RESOLVED]: {
-        bgColor: 'bg-green-100',
-        textColor: 'text-green-800',
+        bgColor: 'bg-success-subtle',
+        textColor: 'text-success-emphasis',
       },
       [IncidentStatus.COMPLETED]: {
-        bgColor: 'bg-emerald-100',
-        textColor: 'text-emerald-800',
+        bgColor: 'bg-success-subtle',
+        textColor: 'text-success-emphasis',
       },
     };
 
@@ -99,28 +100,6 @@ const Table: React.FC<IncidentsTableProps> = ({
     );
   };
 
-  const getSeverityBadge = (severity: IncidentSeverity) => {
-    const severityConfig: Record<
-      IncidentSeverity,
-      { bgColor: string; textColor: string }
-    > = {
-      [IncidentSeverity.LOW]: { bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
-      [IncidentSeverity.MEDIUM]: { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
-      [IncidentSeverity.HIGH]: { bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
-      [IncidentSeverity.CRITICAL]: { bgColor: 'bg-red-100', textColor: 'text-red-800' },
-    };
-
-    const config = severityConfig[severity] || severityConfig[IncidentSeverity.LOW];
-
-    return (
-      <span
-        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${config.bgColor} ${config.textColor}`}
-      >
-        {t(INCIDENT_SEVERITY_MAP[severity])}
-      </span>
-    );
-  };
-
   const handleViewDetails = (incidentId: string) => {
     router.push(
       `/organization/${slug}/products/${productId}/versions/${versionId}/incidents/${incidentId}`
@@ -130,7 +109,7 @@ const Table: React.FC<IncidentsTableProps> = ({
   return (
     <div className="w-full">
       <TableWrapper>
-        <table className="w-full text-left text-sm text-gray-600">
+        <table className="text-content-secondary w-full text-left text-sm">
           <TableHeader
             columns={[
               { label: t('oscrat.ui.versions.incidents.table-status') },
@@ -140,15 +119,15 @@ const Table: React.FC<IncidentsTableProps> = ({
               { label: t('oscrat.ui.versions.incidents.table-date-detected') },
               { label: t('oscrat.ui.versions.incidents.table-reporter') },
               { label: t('oscrat.ui.versions.incidents.table-description') },
-              { label: t('actions') },
+              { label: t('actions'), srOnly: true },
             ]}
           />
           <tbody className={tableStyles.tbody}>
             {pageData.map((incident) => (
-              <TableRow 
+              <TableRow
                 key={incident.id}
                 onClick={() => handleViewDetails(incident.id)}
-                className="cursor-pointer hover:bg-gray-50"
+                className="hover:bg-surface-muted cursor-pointer"
               >
                 <td className={tableStyles.td}>
                   {getStatusBadge(incident.status)}
@@ -156,7 +135,9 @@ const Table: React.FC<IncidentsTableProps> = ({
                 <td className={tableStyles.td}>
                   <div
                     className="max-w-[150px] truncate"
-                    title={t(INCIDENT_CLASSIFICATION_MAP[incident.classification])}
+                    title={t(
+                      INCIDENT_CLASSIFICATION_MAP[incident.classification]
+                    )}
                   >
                     {t(INCIDENT_CLASSIFICATION_MAP[incident.classification])}
                   </div>
@@ -164,14 +145,16 @@ const Table: React.FC<IncidentsTableProps> = ({
                 <td className={tableStyles.td}>
                   <div
                     className="max-w-[150px] truncate"
-                    title={t(INCIDENT_CLASSIFICATION_MAP[incident.classification])}
+                    title={t(INCIDENT_ATTACK_TYPE_MAP[incident.attackType])}
                   >
                     {t(INCIDENT_ATTACK_TYPE_MAP[incident.attackType])}
-
                   </div>
                 </td>
                 <td className={tableStyles.td}>
-                  {getSeverityBadge(incident.severity)}
+                  <SeverityBadge
+                    severity={incident.severity}
+                    label={t(INCIDENT_SEVERITY_MAP[incident.severity])}
+                  />
                 </td>
                 <td className={tableStyles.td}>
                   {formatDateShort(incident.dateOfDetection)}
@@ -204,6 +187,16 @@ const Table: React.FC<IncidentsTableProps> = ({
                     >
                       {t('oscrat.ui.delete')}
                     </ActionButton>
+                    <ActionButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewDetails(incident.id);
+                      }}
+                      icon={<FaEye size={12} />}
+                      title={t('view')}
+                    >
+                      {t('view')}
+                    </ActionButton>
                   </div>
                 </td>
               </TableRow>
@@ -212,7 +205,7 @@ const Table: React.FC<IncidentsTableProps> = ({
               <tr>
                 <td
                   colSpan={8}
-                  className="px-6 py-8 text-center text-sm text-gray-500"
+                  className="text-content-muted px-6 py-8 text-center text-sm"
                 >
                   {t('oscrat.ui.versions.incidents.no-incidents-added')}
                 </td>

@@ -58,14 +58,18 @@ const handlePOST = async (
     throw new ApiError(400, 'Repository ID is required');
   }
 
-  const report = await createSbomReportWithJob(prisma, {
-    versionId: versionId as string,
-    productId: productId as string,
-    jobType: 'REPO_GENERATE_SBOM',
-    jobPayload: { repositoryId },
-    triggeredByUserId: teamMember.userId,
-    teamId: teamMember.teamId,
-  }, req.auditInfo);
+  const report = await createSbomReportWithJob(
+    prisma,
+    {
+      versionId: versionId as string,
+      productId: productId as string,
+      jobType: 'REPO_GENERATE_SBOM',
+      jobPayload: { repositoryId },
+      triggeredByUserId: teamMember.userId,
+      teamId: teamMember.teamId,
+    },
+    req.auditInfo
+  );
 
   console.log(
     `[SBOM Reports API] Created repo-based SBOM report, teamId: ${teamMember.teamId}, reportId: ${report.id}, repositoryId: ${repositoryId}`

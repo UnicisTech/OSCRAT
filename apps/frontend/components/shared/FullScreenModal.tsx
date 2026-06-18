@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
-import { IoClose } from 'react-icons/io5';
-import Button from './Button';
-import Divider from './Divider';
+import React from 'react';
+import Button from '@/components/button';
+import Modal from './Modal';
 
 interface FullScreenModalProps {
   isOpen: boolean;
@@ -15,6 +14,11 @@ interface FullScreenModalProps {
   children?: React.ReactNode;
 }
 
+/**
+ * Thin wrapper over the shared Modal that keeps the title/text/cancel/continue
+ * convenience API used across product & version actions. All chrome/styling
+ * comes from the shared Modal primitive.
+ */
 const FullScreenModal: React.FC<FullScreenModalProps> = ({
   isOpen,
   onClose,
@@ -26,99 +30,26 @@ const FullScreenModal: React.FC<FullScreenModalProps> = ({
   onContinue,
   children,
 }) => {
-  // Handle ESC key press
-  useEffect(() => {
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscKey);
-      // Prevent body scroll when modal is open
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
-  const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    } else {
-      onClose();
-    }
-  };
-
-  const handleContinue = () => {
-    if (onContinue) {
-      onContinue();
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex !mt-0 items-center justify-center bg-black bg-opacity-30"
-      onClick={handleBackdropClick}
-    >
-      {/* Modal Content */}
-      <div className="relative z-10 flex w-full max-w-md flex-col rounded-lg bg-white py-4 shadow-xl dark:bg-gray-800">
-        <div className="flex items-center justify-between pb-2">
-          {/* Title */}
-          <h2 className="pl-6 pr-8 text-sm font-bold text-gray-900 dark:text-gray-100">
-            {title}
-          </h2>
-
-          {/* Close button (X) in top right */}
-          <div
-            onClick={onClose}
-            className="cursor-pointer rounded-full p-1 px-6 text-gray-500"
-            aria-label="Close modal"
-          >
-            <IoClose size={26} />
-          </div>
-        </div>
-
-        {/* Modal Content - Flex Column */}
-        <div className="flex flex-col space-y-4">
-          <Divider />
-          {/* Text/Description */}
-          {text && (
-            <p className="px-6 text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {text}
-            </p>
-          )}
-          {children && <div className="px-6 py-2">{children}</div>}
-          <Divider />
-          {/* Buttons */}
-          <div className="ml-auto flex min-w-fit flex-col space-y-3 px-6 sm:min-w-[250px] sm:flex-row sm:justify-end sm:space-x-3 sm:space-y-0">
-            <Button
-              text={cancelButtonText}
-              onClick={handleCancel}
-              variant="ghost"
-            />
-
-            <Button
-              text={continueButtonText}
-              onClick={handleContinue}
-              variant="primary"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <Modal open={isOpen} close={onClose} size="sm">
+      <Modal.Header>{title}</Modal.Header>
+      <Modal.Body>
+        {text && <p className="text-content-secondary text-b2">{text}</p>}
+        {children}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          text={cancelButtonText}
+          onClick={onCancel || onClose}
+          variant="tertiary"
+        />
+        <Button
+          text={continueButtonText}
+          onClick={onContinue}
+          variant="primary"
+        />
+      </Modal.Footer>
+    </Modal>
   );
 };
 

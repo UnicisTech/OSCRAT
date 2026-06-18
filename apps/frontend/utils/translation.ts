@@ -7,7 +7,8 @@ export const oscratOrganizationRoleTranslationMap = {
   DISTRIBUTOR: 'oscrat.organization.roles.distributor',
   IMPORTER: 'oscrat.organization.roles.importer',
   DATA_STEWARD: 'oscrat.organization.roles.data-steward',
-  AUTHORIZED_REPRESENTATIVE: 'oscrat.organization.roles.authorized-representative',
+  AUTHORIZED_REPRESENTATIVE:
+    'oscrat.organization.roles.authorized-representative',
 } as const;
 
 // Organization Type mappings
@@ -227,4 +228,3 @@ export const oscratEntityTypeTranslationMap: Record<string, string> = {
   Attachment: 'oscrat.entity-types.attachment',
   Documentation: 'oscrat.entity-types.documentation',
 };
-

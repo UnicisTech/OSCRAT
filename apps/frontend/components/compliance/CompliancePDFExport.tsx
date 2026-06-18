@@ -1,10 +1,18 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  pdf,
+} from '@react-pdf/renderer';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
 import { saveAs } from 'file-saver';
 import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 import type { PDFTranslations } from '@/lib/compliance/pdfTranslations';
 import checklistTranslations from '@/locales/en/compliance-tech-doc-checklist.json';
+import { formatDateTime } from '@/utils/dateFormat';
 
 const styles = StyleSheet.create({
   page: {
@@ -189,7 +197,13 @@ interface ChartBarSegment {
   color: string;
 }
 
-const BarChart = ({ segments, total }: { segments: ChartBarSegment[]; total: number }) => {
+const BarChart = ({
+  segments,
+  total,
+}: {
+  segments: ChartBarSegment[];
+  total: number;
+}) => {
   if (total === 0) return null;
 
   return (
@@ -211,7 +225,9 @@ const BarChart = ({ segments, total }: { segments: ChartBarSegment[]; total: num
       <View style={styles.chartLegendRow}>
         {segments.map((seg, i) => (
           <View key={i} style={styles.chartLegendItem}>
-            <View style={[styles.chartLegendDot, { backgroundColor: seg.color }]} />
+            <View
+              style={[styles.chartLegendDot, { backgroundColor: seg.color }]}
+            />
             <Text style={styles.chartLegendText}>
               {seg.label}: {seg.value}
             </Text>
@@ -240,17 +256,22 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
   translations: t,
   translateComplianceFn: tc,
 }) => {
-  const allRequirements = complianceData.flatMap(area => {
-    const translate = area.areaType === 'checklist'
-      ? (key: string) => (checklistTranslations as Record<string, string>)[key] ?? key
-      : tc;
-    return area.content.map(req => {
-      const assessment = state.assessments.find(a => a.requirementId === req.reqId);
+  const allRequirements = complianceData.flatMap((area) => {
+    const translate =
+      area.areaType === 'checklist'
+        ? (key: string) =>
+            (checklistTranslations as Record<string, string>)[key] ?? key
+        : tc;
+    return area.content.map((req) => {
+      const assessment = state.assessments.find(
+        (a) => a.requirementId === req.reqId
+      );
       const totalQuestions = req.questions.length;
       const answeredQuestions = assessment?.answers.length || 0;
-      const completionPercentage = totalQuestions > 0
-        ? Math.round((answeredQuestions / totalQuestions) * 100)
-        : 0;
+      const completionPercentage =
+        totalQuestions > 0
+          ? Math.round((answeredQuestions / totalQuestions) * 100)
+          : 0;
       const isEvaluated = assessment?.complianceStatus !== undefined;
 
       let conformityStatus: string = CONFORMITY_STATUS.NOT_EVALUATED;
@@ -274,34 +295,46 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
     });
   });
 
-  const evaluatedCount = allRequirements.filter(r => r.isEvaluated).length;
+  const evaluatedCount = allRequirements.filter((r) => r.isEvaluated).length;
   const notEvaluatedCount = allRequirements.length - evaluatedCount;
   const totalProgress = allRequirements.reduce((sum, req) => {
     return sum + (req.isEvaluated ? 100 : req.completionPercentage);
   }, 0);
-  const overallProgress = allRequirements.length > 0 ? Math.round(totalProgress / allRequirements.length) : 0;
+  const overallProgress =
+    allRequirements.length > 0
+      ? Math.round(totalProgress / allRequirements.length)
+      : 0;
 
-  const compliantCount = allRequirements.filter(r => r.conformityStatus === CONFORMITY_STATUS.FULLY_COMPLIANT).length;
-  const partiallyCompliantCount = allRequirements.filter(r => r.conformityStatus === CONFORMITY_STATUS.PARTIALLY_COMPLIANT).length;
-  const notCompliantCount = allRequirements.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_COMPLIANT).length;
-  const notApplicableCount = allRequirements.filter(r => r.conformityStatus === CONFORMITY_STATUS.NOT_APPLICABLE).length;
-  const inEvaluationCount = allRequirements.filter(r => r.conformityStatus.startsWith(CONFORMITY_STATUS.IN_EVALUATION)).length;
+  const compliantCount = allRequirements.filter(
+    (r) => r.conformityStatus === CONFORMITY_STATUS.FULLY_COMPLIANT
+  ).length;
+  const partiallyCompliantCount = allRequirements.filter(
+    (r) => r.conformityStatus === CONFORMITY_STATUS.PARTIALLY_COMPLIANT
+  ).length;
+  const notCompliantCount = allRequirements.filter(
+    (r) => r.conformityStatus === CONFORMITY_STATUS.NOT_COMPLIANT
+  ).length;
+  const notApplicableCount = allRequirements.filter(
+    (r) => r.conformityStatus === CONFORMITY_STATUS.NOT_APPLICABLE
+  ).length;
+  const inEvaluationCount = allRequirements.filter((r) =>
+    r.conformityStatus.startsWith(CONFORMITY_STATUS.IN_EVALUATION)
+  ).length;
   const notEvaluatedConformityCount = allRequirements.filter(
     (r) => r.conformityStatus === CONFORMITY_STATUS.NOT_EVALUATED
   ).length;
 
-  const exportDate = new Date().toLocaleString('en-GB', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  });
+  const exportDate = formatDateTime(new Date());
 
   const getStatusStyle = (status: string) => {
     if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) return styles.badgeGreen;
-    if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT) return styles.badgeYellow;
+    if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT)
+      return styles.badgeYellow;
     if (status === CONFORMITY_STATUS.NOT_COMPLIANT) return styles.badgeRed;
     if (status === CONFORMITY_STATUS.NOT_APPLICABLE) return styles.badgeGray;
     if (status === CONFORMITY_STATUS.NOT_EVALUATED) return styles.badgeGray;
-    if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) return styles.badgeBlue;
+    if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION))
+      return styles.badgeBlue;
     return styles.badgeGray;
   };
 
@@ -309,12 +342,15 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
   // "Fully compliant" enum) and stays consistent with the breakdown legend.
   const getConformityLabel = (status: string): string => {
     if (status === CONFORMITY_STATUS.FULLY_COMPLIANT) return t.compliant;
-    if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT) return t.partiallyCompliant;
+    if (status === CONFORMITY_STATUS.PARTIALLY_COMPLIANT)
+      return t.partiallyCompliant;
     if (status === CONFORMITY_STATUS.NOT_COMPLIANT) return t.notCompliant;
     if (status === CONFORMITY_STATUS.NOT_APPLICABLE) return t.notApplicable;
     if (status === CONFORMITY_STATUS.NOT_EVALUATED) return t.notEvaluated;
     if (status.startsWith(CONFORMITY_STATUS.IN_EVALUATION)) {
-      const suffix = status.slice(CONFORMITY_STATUS.IN_EVALUATION.length).trim();
+      const suffix = status
+        .slice(CONFORMITY_STATUS.IN_EVALUATION.length)
+        .trim();
       return suffix ? `${t.inEvaluation} ${suffix}` : t.inEvaluation;
     }
     return status;
@@ -327,11 +363,19 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
 
   const conformitySegments: ChartBarSegment[] = [
     { label: t.compliant, value: compliantCount, color: '#10b981' },
-    { label: t.partiallyCompliant, value: partiallyCompliantCount, color: '#f59e0b' },
+    {
+      label: t.partiallyCompliant,
+      value: partiallyCompliantCount,
+      color: '#f59e0b',
+    },
     { label: t.notCompliant, value: notCompliantCount, color: '#ef4444' },
     { label: t.notApplicable, value: notApplicableCount, color: '#9ca3af' },
     { label: t.inEvaluation, value: inEvaluationCount, color: '#3b82f6' },
-    { label: t.notEvaluated, value: notEvaluatedConformityCount, color: '#d1d5db' },
+    {
+      label: t.notEvaluated,
+      value: notEvaluatedConformityCount,
+      color: '#d1d5db',
+    },
   ];
 
   return (
@@ -340,31 +384,50 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.title}>{t.reportTitle}</Text>
-          {productName && <Text style={styles.subtitle}>{t.product}: {productName}</Text>}
-          <Text style={styles.subtitle}>{t.organization}: {organizationName}</Text>
-          <Text style={styles.subtitle}>{t.generated}: {exportDate}</Text>
+          {productName && (
+            <Text style={styles.subtitle}>
+              {t.product}: {productName}
+            </Text>
+          )}
+          <Text style={styles.subtitle}>
+            {t.organization}: {organizationName}
+          </Text>
+          <Text style={styles.subtitle}>
+            {t.generated}: {exportDate}
+          </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.overallProgress}</Text>
-          <Text style={styles.progressText}>{overallProgress}% {t.complete}</Text>
+          <Text style={styles.progressText}>
+            {overallProgress}% {t.complete}
+          </Text>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${overallProgress}%` }]} />
+            <View
+              style={[styles.progressFill, { width: `${overallProgress}%` }]}
+            />
           </View>
           <Text style={styles.subtitle}>
-            {evaluatedCount} {t.of} {allRequirements.length} {t.requirementsEvaluated}
+            {evaluatedCount} {t.of} {allRequirements.length}{' '}
+            {t.requirementsEvaluated}
           </Text>
         </View>
 
         {/* Visual Charts */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.evaluationStatusChart}</Text>
-          <BarChart segments={evaluationSegments} total={allRequirements.length} />
+          <BarChart
+            segments={evaluationSegments}
+            total={allRequirements.length}
+          />
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.conformityBreakdownChart}</Text>
-          <BarChart segments={conformitySegments} total={allRequirements.length} />
+          <BarChart
+            segments={conformitySegments}
+            total={allRequirements.length}
+          />
         </View>
 
         <View style={styles.section}>
@@ -376,7 +439,9 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
             </View>
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>{t.notEvaluated}</Text>
-              <Text style={styles.statValue}>{allRequirements.length - evaluatedCount}</Text>
+              <Text style={styles.statValue}>
+                {allRequirements.length - evaluatedCount}
+              </Text>
             </View>
           </View>
           <View style={styles.statsRow}>
@@ -401,7 +466,9 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
           </View>
         </View>
 
-        <Text style={styles.footer}>{t.page} 1 - {t.reportTitle}</Text>
+        <Text style={styles.footer}>
+          {t.page} 1 - {t.reportTitle}
+        </Text>
       </Page>
 
       {/* Status Table Page */}
@@ -420,11 +487,18 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
               <View key={index} style={styles.tableRow} wrap={false}>
                 <Text style={styles.tableColSmall}>{req.id}</Text>
                 <Text style={styles.tableCol}>{req.name}</Text>
-                <Text style={{ width: '20%', fontSize: 9 }}>{req.areaName}</Text>
+                <Text style={{ width: '20%', fontSize: 9 }}>
+                  {req.areaName}
+                </Text>
                 <Text style={styles.tableColSmall}>
                   {req.isEvaluated ? t.evaluated : t.notEvaluated}
                 </Text>
-                <Text style={[styles.tableColSmall, getStatusStyle(req.conformityStatus)]}>
+                <Text
+                  style={[
+                    styles.tableColSmall,
+                    getStatusStyle(req.conformityStatus),
+                  ]}
+                >
                   {getConformityLabel(req.conformityStatus)}
                 </Text>
               </View>
@@ -432,18 +506,26 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
           </View>
         </View>
 
-        <Text style={styles.footer}>{t.page} 2 - {t.reportTitle}</Text>
+        <Text style={styles.footer}>
+          {t.page} 2 - {t.reportTitle}
+        </Text>
       </Page>
 
       {/* Detailed Assessment Pages */}
       {allRequirements
-        .filter(req => req.assessment && req.areaType !== 'checklist')
+        .filter((req) => req.assessment && req.areaType !== 'checklist')
         .map((req, reqIndex) => (
           <Page key={reqIndex} size="A4" style={styles.page}>
             <View style={styles.header}>
-              <Text style={styles.title}>{req.id}: {req.name}</Text>
-              <Text style={styles.subtitle}>{t.area}: {req.areaName}</Text>
-              <Text style={[styles.badge, getStatusStyle(req.conformityStatus)]}>
+              <Text style={styles.title}>
+                {req.id}: {req.name}
+              </Text>
+              <Text style={styles.subtitle}>
+                {t.area}: {req.areaName}
+              </Text>
+              <Text
+                style={[styles.badge, getStatusStyle(req.conformityStatus)]}
+              >
                 {getConformityLabel(req.conformityStatus)}
               </Text>
             </View>
@@ -463,7 +545,9 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>{t.questionsAndAnswers}</Text>
               {req.requirement.questions.map((question, qIndex) => {
-                const answer = req.assessment?.answers.find(a => a.questionId === question.questionId);
+                const answer = req.assessment?.answers.find(
+                  (a) => a.questionId === question.questionId
+                );
                 return (
                   <View key={qIndex} style={styles.questionSection}>
                     <Text style={styles.question}>
@@ -472,8 +556,11 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
                     {answer && (
                       <>
                         <Text style={styles.answer}>
-                          {t.answer}: {typeof answer.answer === 'boolean'
-                            ? (answer.answer ? t.yes : t.no)
+                          {t.answer}:{' '}
+                          {typeof answer.answer === 'boolean'
+                            ? answer.answer
+                              ? t.yes
+                              : t.no
                             : answer.answer}
                         </Text>
                         {answer.additionalInformation && (
@@ -482,7 +569,9 @@ const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({
                           </Text>
                         )}
                         {answer.evidence && (
-                          <Text style={styles.answer}>{t.evidence}: {t.evidenceAttached}</Text>
+                          <Text style={styles.answer}>
+                            {t.evidence}: {t.evidenceAttached}
+                          </Text>
                         )}
                       </>
                     )}

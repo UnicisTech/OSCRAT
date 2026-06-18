@@ -1,6 +1,15 @@
 import React from 'react';
-import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
-import { AreaList, RequirementQuestionnaire, TechDocChecklist, AssessmentFilesPanel } from '@/components/compliance';
+import {
+  ComplianceArea,
+  ComplianceState,
+  RequirementAssessment,
+} from '@/types/compliance';
+import {
+  AreaList,
+  RequirementQuestionnaire,
+  TechDocChecklist,
+  AssessmentFilesPanel,
+} from '@/components/compliance';
 import type { ComplianceNamespace } from '@/lib/compliance/translations';
 
 interface ComplianceFormViewProps {
@@ -17,7 +26,9 @@ interface ComplianceFormViewProps {
   onBack: () => void;
   onReset: () => Promise<void>;
   getAreaProgress: (areaId: number) => number;
-  getRequirementAssessment: (requirementId: string) => RequirementAssessment | undefined;
+  getRequirementAssessment: (
+    requirementId: string
+  ) => RequirementAssessment | undefined;
 }
 
 const ComplianceFormView: React.FC<ComplianceFormViewProps> = ({
@@ -36,10 +47,7 @@ const ComplianceFormView: React.FC<ComplianceFormViewProps> = ({
   getAreaProgress,
   getRequirementAssessment,
 }) => {
-  if (
-    showQuestionnaire &&
-    localState.currentAreaIndex !== null
-  ) {
+  if (showQuestionnaire && localState.currentAreaIndex !== null) {
     const currentArea = complianceData[localState.currentAreaIndex];
 
     if (currentArea.areaType === 'checklist') {
@@ -58,7 +66,8 @@ const ComplianceFormView: React.FC<ComplianceFormViewProps> = ({
     }
 
     if (localState.currentRequirementIndex !== null) {
-      const currentRequirement = currentArea.content[localState.currentRequirementIndex];
+      const currentRequirement =
+        currentArea.content[localState.currentRequirementIndex];
 
       if (!currentRequirement) {
         return null;
@@ -70,7 +79,9 @@ const ComplianceFormView: React.FC<ComplianceFormViewProps> = ({
           requirement={currentRequirement}
           requirementIndex={localState.currentRequirementIndex}
           totalRequirements={currentArea.content.length}
-          existingAssessment={getRequirementAssessment(currentRequirement.reqId)}
+          existingAssessment={getRequirementAssessment(
+            currentRequirement.reqId
+          )}
           onComplete={onRequirementComplete}
           onBack={onBack}
           complianceNamespace={complianceNamespace}

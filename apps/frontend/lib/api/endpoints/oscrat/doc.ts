@@ -13,7 +13,12 @@ export const docEndpoints = {
       `/teams/${teamId}/products/${productId}/versions/${versionId}/car`
     ),
 
-  uploadCAR: (teamId: string, productId: string, versionId: string, formData: FormData) =>
+  uploadCAR: (
+    teamId: string,
+    productId: string,
+    versionId: string,
+    formData: FormData
+  ) =>
     api.post<DocUploadResponse>(
       `/teams/${teamId}/products/${productId}/versions/${versionId}/car`,
       formData,
@@ -31,7 +36,12 @@ export const docEndpoints = {
       `/teams/${teamId}/products/${productId}/versions/${versionId}/doc`
     ),
 
-  uploadDoC: (teamId: string, productId: string, versionId: string, formData: FormData) =>
+  uploadDoC: (
+    teamId: string,
+    productId: string,
+    versionId: string,
+    formData: FormData
+  ) =>
     api.post<DocUploadResponse>(
       `/teams/${teamId}/products/${productId}/versions/${versionId}/doc`,
       formData,
@@ -47,4 +57,3 @@ export const docEndpoints = {
   downloadAttachment: (attachmentId: string) =>
     `/api/attachments/${attachmentId}/download`,
 };
-

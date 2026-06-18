@@ -60,7 +60,10 @@ export interface ExistingTranslation {
   updatedAt: Date;
 }
 
-export function buildTranslationDataKey(namespace: TranslationNamespaceKey, language: string): string {
+export function buildTranslationDataKey(
+  namespace: TranslationNamespaceKey,
+  language: string
+): string {
   return buildDataKey('compliance', 'translation', namespace, language);
 }
 
@@ -69,7 +72,8 @@ const ROLE_SUFFIX_MAP: Record<OscratOrganizationRole, string> = {
   [OscratOrganizationRole.DISTRIBUTOR]: 'distributor',
   [OscratOrganizationRole.IMPORTER]: 'importer',
   [OscratOrganizationRole.DATA_STEWARD]: 'sme-manufacturer',
-  [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]: 'authorized-representative',
+  [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]:
+    'authorized-representative',
 };
 
 export function getTranslationNamespaceKey(
@@ -77,10 +81,10 @@ export function getTranslationNamespaceKey(
   type: ComplianceType
 ): TranslationNamespaceKey {
   const key = `${type}-${ROLE_SUFFIX_MAP[role]}`;
-    if (!(key in TRANSLATION_NAMESPACES)) {
-      throw new Error(`Invalid namespace key: ${key}`);
-    }
-    return key as TranslationNamespaceKey;
+  if (!(key in TRANSLATION_NAMESPACES)) {
+    throw new Error(`Invalid namespace key: ${key}`);
+  }
+  return key as TranslationNamespaceKey;
 }
 
 /**
@@ -96,13 +100,13 @@ function parseTranslationDataKey(
 
   const remainder = dataKey.slice(prefix.length);
   const lastColonIndex = remainder.lastIndexOf(':');
-  
+
   // Must have at least one colon separating namespace from language
   if (lastColonIndex === -1 || lastColonIndex === 0) return null;
 
   const namespacePart = remainder.slice(0, lastColonIndex);
   const language = remainder.slice(lastColonIndex + 1);
-  
+
   if (!(namespacePart in TRANSLATION_NAMESPACES)) return null;
 
   if (!language) return null;
@@ -124,14 +128,17 @@ export function parseExistingTranslations(
     const parsed = parseTranslationDataKey(item.dataKey);
     if (!parsed) continue;
 
-    const langInfo = SUPPORTED_LANGUAGES.find((l) => l.code === parsed.language);
+    const langInfo = SUPPORTED_LANGUAGES.find(
+      (l) => l.code === parsed.language
+    );
 
     results.push({
       dataKey: item.dataKey,
       namespace: parsed.namespace,
       language: parsed.language,
       languageLabel: langInfo?.label || parsed.language.toUpperCase(),
-      namespaceLabel: TRANSLATION_NAMESPACES[parsed.namespace]?.label || parsed.namespace,
+      namespaceLabel:
+        TRANSLATION_NAMESPACES[parsed.namespace]?.label || parsed.namespace,
       updatedAt: item.updatedAt,
     });
   }

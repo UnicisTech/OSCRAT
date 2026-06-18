@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { BsExclamationCircleFill } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
-import { getBorderClass } from '@/lib/borderUtils';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useVulnerabilities } from '@/hooks/oscrat/useVulnerabilities';
 import { useIncidents } from '@/hooks/oscrat/useIncidents';
@@ -16,16 +14,13 @@ import type { OscratProductVersionUpdate } from '@oscrat/model';
 import { OscratProductVersionStatus } from '@oscrat/model';
 import { extractErrorMessage } from '@/lib/utils';
 import { getProductVersionStatusKey } from '@/utils/translation';
-
-const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'bg-green-100 dark:bg-green-900',
-  ARCHIVED: 'bg-red-100 dark:bg-red-900',
-  DEPRECATED: 'bg-gray-200 dark:bg-orange-900',
-  DEFAULT: 'bg-gray-100 dark:bg-gray-900',
-};
-
-const getStatusColorClass = (status: string): string => 
-  STATUS_COLORS[status] || STATUS_COLORS.DEFAULT;
+import Button from '@/components/button';
+import Card from '@/components/oscrat/shared/Card';
+import Divider from '@/components/oscrat/shared/Divider';
+import MetaField from '@/components/oscrat/shared/MetaField';
+import CountChip from '@/components/oscrat/shared/CountChip';
+import StatusPill from '@/components/oscrat/shared/StatusPill';
+import { formatDateShort } from '@/utils/dateFormat';
 
 const Index = () => {
   const { t, ready } = useTranslation('common');
@@ -37,8 +32,16 @@ const Index = () => {
     productId,
     versionId
   );
-  const { openCount: openVulnerabilitiesCount } = useVulnerabilities(teamId, productId, versionId);
-  const { openCount: openIncidentsCount } = useIncidents(teamId, productId, versionId);
+  const { openCount: openVulnerabilitiesCount } = useVulnerabilities(
+    teamId,
+    productId,
+    versionId
+  );
+  const { openCount: openIncidentsCount } = useIncidents(
+    teamId,
+    productId,
+    versionId
+  );
 
   const router = useRouter();
 
@@ -142,152 +145,78 @@ const Index = () => {
         versionName={version?.version || ''}
         onConfirm={modalAction === 'delete' ? handleDelete : handleWithdraw}
       />
-      <div
-        className={`flex flex-col gap-2 rounded-lg border border-gray-400 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800`}
-      >
+      <Card className="flex flex-col gap-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
+          <div className="text-content text-h6 font-bold">
             {version?.version}
           </div>
 
-          <div className="flex flex-wrap font-medium text-gray-600">
-            <div>
-              <button
-                onClick={() => handleActionClick('delete')}
-                className="rounded px-6 py-1 text-sm"
-              >
-                {t('delete')}
-              </button>
-            </div>
+          <div className="text-content-secondary flex flex-wrap items-center gap-3 font-medium">
+            <Button
+              tone="danger"
+              variant="tertiary"
+              size="m"
+              onClick={() => handleActionClick('delete')}
+            >
+              {t('delete')}
+            </Button>
 
-            <div>
-              <button
-                onClick={() => handleActionClick('withdraw')}
-                className="rounded px-6 py-1 text-sm"
-              >
-                {t('oscrat.ui.withdraw')}
-              </button>
-            </div>
+            <Button
+              variant="tertiary"
+              size="m"
+              onClick={() => handleActionClick('withdraw')}
+            >
+              {t('oscrat.ui.withdraw')}
+            </Button>
 
-            <div>
-              <button
-                onClick={handleEditClick}
-                className="rounded border border-gray-400 px-3 py-1 text-sm text-black hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
-              >
-                {t('edit')}
-              </button>
-            </div>
+            <Button variant="secondary" size="m" onClick={handleEditClick}>
+              {t('edit')}
+            </Button>
           </div>
         </div>
 
-        <div className="my-2 w-full border-b border-gray-200 dark:border-gray-600" />
+        <Divider />
 
-        <div className="grid grid-cols-2 items-start gap-4 text-sm text-gray-700 dark:text-gray-300 md:grid-cols-3 lg:grid-cols-6">
-          <div className="flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('status')}:
-            </span>
-            <div className="inline-flex font-semibold text-black dark:text-gray-100">
-              <p className={`rounded-full px-2 py-0.5 ${getStatusColorClass(version.status)}`}>
-                {t(getProductVersionStatusKey(version.status))}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.release-date')}:
-            </span>
-            <span className="font-semibold text-black dark:text-gray-100">
-              {new Date(version?.releaseDate || version?.createdAt).toLocaleDateString()}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.incidents')}:
-            </span>
-            <div
-              className={`inline-flex font-semibold text-black dark:text-gray-100`}
-            >
-              {openIncidentsCount > 0 ? (
-                <div
-                  className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                    openIncidentsCount
-                  )}`}
-                >
-                  <BsExclamationCircleFill className="text-red-600" />
-                  <p>{displayIncidents}</p>
-                </div>
-              ) : (
-                <p
-                  className={`${getBorderClass(
-                    0
-                  )} rounded-full border border-gray-400 px-2 py-0.5`}
-                >
-                  {displayIncidents}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.vulnerabilities')}:
-            </span>
-            <div
-              className={`inline-flex items-center gap-2 font-semibold text-black dark:text-gray-100`}
-            >
-              {openVulnerabilitiesCount > 0 ? (
-                <div
-                  className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(
-                    openVulnerabilitiesCount
-                  )}`}
-                >
-                  <BsExclamationCircleFill className="text-red-600" />
-                  <p>{displayVulnerabilities}</p>
-                </div>
-              ) : (
-                <p
-                  className={`rounded-full border border-gray-400 px-2 py-0.5 ${getBorderClass(
-                    0
-                  )}`}
-                >
-                  {displayVulnerabilities}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.tasks.title')}:
-            </span>
-            <div className="inline-flex font-semibold text-black dark:text-gray-100">
-              {openTasksCount > 0 ? (
-                <div
-                  className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(openTasksCount)}`}
-                >
-                  <BsExclamationCircleFill className="text-blue-600" />
-                  <p>{displayTasks}</p>
-                </div>
-              ) : (
-                <p className={`${getBorderClass(0)} rounded-full border border-gray-400 px-2 py-0.5`}>
-                  {displayTasks}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex flex-col">
-            <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.support-period')}:
-            </span>
-            <span className="font-semibold text-black dark:text-gray-100">
-              {version?.supportEndDate
-                ? new Date(version.supportEndDate).toLocaleDateString()
-                : t('not-set')}
-            </span>
-          </div>
+        <div className="text-content-secondary text-b2 grid grid-cols-2 items-start gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <MetaField label={t('status')}>
+            <StatusPill
+              status={version.status}
+              label={t(getProductVersionStatusKey(version.status))}
+            />
+          </MetaField>
+          <MetaField
+            label={t('oscrat.ui.release-date')}
+            value={formatDateShort(version?.releaseDate || version?.createdAt)}
+          />
+          <MetaField label={t('oscrat.ui.incidents')}>
+            <CountChip
+              count={openIncidentsCount}
+              displayText={displayIncidents}
+            />
+          </MetaField>
+          <MetaField label={t('oscrat.ui.vulnerabilities')}>
+            <CountChip
+              count={openVulnerabilitiesCount}
+              displayText={displayVulnerabilities}
+            />
+          </MetaField>
+          <MetaField label={t('oscrat.ui.tasks.title')}>
+            <CountChip
+              count={openTasksCount}
+              displayText={displayTasks}
+              iconClassName="text-primary"
+            />
+          </MetaField>
+          <MetaField
+            label={t('oscrat.ui.support-period')}
+            value={
+              version?.supportEndDate
+                ? formatDateShort(version.supportEndDate)
+                : t('not-set')
+            }
+          />
         </div>
-      </div>
+      </Card>
     </>
   );
 };

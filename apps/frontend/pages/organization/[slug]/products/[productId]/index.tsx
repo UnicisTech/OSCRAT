@@ -3,6 +3,7 @@
 import { withProductLayout } from '@/lib/layout-helpers';
 import { ProductDetails } from '@/components/oscrat/products/ProductDetails';
 import { Breadcrumb } from '@/components/shared';
+import Header from '@/components/oscrat/shared/header';
 import { useTranslation } from 'next-i18next';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useProductContext } from '@/context/ProductContext';
@@ -13,7 +14,7 @@ export default function ProductDashboard() {
 
   const { project } = useOscratProject(teamId, productId);
 
-  if (!ready) {
+  if (!ready || !project) {
     return null;
   }
 
@@ -23,7 +24,7 @@ export default function ProductDashboard() {
       href: `/organization/${slug}/products`,
     },
     {
-      label: project!.name,
+      label: project.name,
       href: `/organization/${slug}/products/${productId}`,
       current: true,
     },
@@ -32,6 +33,7 @@ export default function ProductDashboard() {
   return (
     <>
       <Breadcrumb items={breadcrumbItems} />
+      <Header title={project.name} />
       <ProductDetails productId={productId} />
     </>
   );

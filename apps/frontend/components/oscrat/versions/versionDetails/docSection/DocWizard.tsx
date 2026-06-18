@@ -5,8 +5,13 @@ import FullDocTemplate from './FullDocTemplate';
 import RadioOption from './RadioOption';
 import { DeclarationType } from '@/lib/doc/types';
 import type { DocPrefillData } from '@/lib/doc/types';
-import { DOC_GUIDE_URL, ASSESSMENT_OPTIONS, DECLARATION_OPTIONS } from '@/lib/doc/constants';
+import {
+  DOC_GUIDE_URL,
+  ASSESSMENT_OPTIONS,
+  DECLARATION_OPTIONS,
+} from '@/lib/doc/constants';
 import { useDocWizard } from './hooks/useDocWizard';
+import Button from '@/components/button';
 
 interface DocWizardProps {
   isOpen: boolean;
@@ -29,38 +34,40 @@ export default function DocWizard({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800">
-        <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-700">
+      <div className="bg-surface shadow-16 rounded-card flex max-h-[90vh] w-full max-w-2xl flex-col">
+        <div className="border-line-subtle flex items-center justify-between border-b p-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-content text-lg font-semibold">
               {t('oscrat.ui.doc.create-doc')}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t('oscrat.ui.doc.step-progress', { current: wizard.step, total: 4 })}
+            <p className="text-content-muted text-sm">
+              {t('oscrat.ui.doc.step-progress', {
+                current: wizard.step,
+                total: 4,
+              })}
             </p>
           </div>
-          <button
+          <Button
+            variant="tertiary"
             onClick={onClose}
-            className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-700"
-          >
-            <IoClose className="h-6 w-6" />
-          </button>
+            icon={<IoClose className="h-6 w-6" />}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
           {wizard.step === 1 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="text-content text-lg font-medium">
                 {t('oscrat.ui.doc.step1-title')}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-content-secondary text-sm">
                 {t('oscrat.ui.doc.step1-description')}
               </p>
               <a
                 href={DOC_GUIDE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                className="bg-primary hover:bg-primary-dark text-content-inverse rounded-input inline-flex items-center gap-2 px-4 py-2"
               >
                 <IoLink className="h-5 w-5" />
                 {t('oscrat.ui.doc.open-guide')}
@@ -70,7 +77,7 @@ export default function DocWizard({
 
           {wizard.step === 2 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="text-content text-lg font-medium">
                 {t('oscrat.ui.doc.step2-title')}
               </h3>
               <div className="space-y-3">
@@ -90,7 +97,7 @@ export default function DocWizard({
 
           {wizard.step === 3 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="text-content text-lg font-medium">
                 {t('oscrat.ui.doc.step3-title')}
               </h3>
               <div className="space-y-3">
@@ -111,44 +118,52 @@ export default function DocWizard({
 
           {wizard.step === 4 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h3 className="text-content text-lg font-medium">
                 {t('oscrat.ui.doc.step4-title')}
               </h3>
               {wizard.declarationType === DeclarationType.SIMPLE ? (
                 <SimpleDocTemplate data={wizard.simpleDocData} />
               ) : (
-                <FullDocTemplate data={wizard.fullDocData} onChange={wizard.setFullDocData} />
+                <FullDocTemplate
+                  data={wizard.fullDocData}
+                  onChange={wizard.setFullDocData}
+                />
               )}
             </div>
           )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-gray-200 p-4 dark:border-gray-700">
-          <button
+        <div className="border-line-subtle flex items-center justify-between border-t p-4">
+          <Button
+            variant="secondary"
+            size="m"
             onClick={wizard.handleBack}
             disabled={wizard.step === 1}
-            className="flex items-center gap-1 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
-            <IoArrowBack className="h-4 w-4" />
-            {t('back')}
-          </button>
+            startIcon={<IoArrowBack className="h-4 w-4" />}
+            text={t('back')}
+          />
 
           {wizard.step < 4 ? (
-            <button
+            <Button
+              variant="primary"
+              size="m"
               onClick={wizard.handleNext}
-              className="flex items-center gap-1 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              {t('next')}
-              <IoArrowForward className="h-4 w-4" />
-            </button>
+              endIcon={<IoArrowForward className="h-4 w-4" />}
+              text={t('next')}
+            />
           ) : (
-            <button
+            <Button
+              variant="primary"
+              size="m"
               onClick={wizard.handleGenerate}
               disabled={wizard.isGenerating}
-              className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-            >
-              {wizard.isGenerating ? t('oscrat.ui.doc.generating') : t('oscrat.ui.doc.generate-pdf')}
-            </button>
+              loading={wizard.isGenerating}
+              text={
+                wizard.isGenerating
+                  ? t('oscrat.ui.doc.generating')
+                  : t('oscrat.ui.doc.generate-pdf')
+              }
+            />
           )}
         </div>
       </div>

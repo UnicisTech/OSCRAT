@@ -11,18 +11,32 @@ import {
 
 const ComplianceTranslationSettings = ({ team }: { team: Team }) => {
   const { t } = useTranslation('common');
-  const { dataList, upsertData, fetchDataItem, fetchComplianceTemplate, isLoading, isUpserting } = useTeamData(team.slug);
+  const {
+    dataList,
+    upsertData,
+    fetchDataItem,
+    fetchComplianceTemplate,
+    isLoading,
+    isUpserting,
+  } = useTeamData(team.slug);
 
-  const existingTranslations = useMemo(() => parseExistingTranslations(dataList), [dataList]);
+  const existingTranslations = useMemo(
+    () => parseExistingTranslations(dataList),
+    [dataList]
+  );
 
   return (
-    <Card heading={t('oscrat.ui.compliance-translation.title')}>
-      <Card.Body className="px-3 py-3">
-        <div className="space-y-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+    <Card>
+      <Card.Body>
+        <Card.Header>
+          <Card.Title>
+            {t('oscrat.ui.compliance-translation.title')}
+          </Card.Title>
+          <Card.Description>
             {t('oscrat.ui.compliance-translation.description')}
-          </p>
-
+          </Card.Description>
+        </Card.Header>
+        <div className="space-y-6">
           <UploadTranslationForm
             upsertData={upsertData}
             fetchDataItem={fetchDataItem}
@@ -33,8 +47,14 @@ const ComplianceTranslationSettings = ({ team }: { team: Team }) => {
           />
 
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">{t('oscrat.ui.compliance-translation.existing-translations')}</h3>
-            <ExistingTranslationsTable translations={existingTranslations} teamSlug={team.slug} isLoading={isLoading} />
+            <h3 className="text-lg font-medium">
+              {t('oscrat.ui.compliance-translation.existing-translations')}
+            </h3>
+            <ExistingTranslationsTable
+              translations={existingTranslations}
+              teamSlug={team.slug}
+              isLoading={isLoading}
+            />
           </div>
         </div>
       </Card.Body>

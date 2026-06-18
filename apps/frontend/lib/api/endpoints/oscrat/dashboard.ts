@@ -5,4 +5,3 @@ export const oscratDashboardEndpoints = {
   getDashboardSummary: (teamId: string) =>
     api.get<TeamDashboardSummary>(`/teams/${teamId}/dashboard/summary`),
 };
-

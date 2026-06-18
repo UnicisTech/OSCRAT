@@ -3,9 +3,9 @@ import type { FormikConfig } from 'formik';
 import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import { Button } from 'react-daisyui';
 import type { WebookFormSchema } from 'types';
 import * as Yup from 'yup';
+import Button from '@/components/button';
 import Modal from '../shared/Modal';
 import EventTypes from './EventTypes';
 
@@ -72,14 +72,18 @@ const Form = ({
               <label className="label">
                 <span className="label-text">{t('events-to-send')}</span>
               </label>
-              <p className="mb-3 ml-1 text-sm font-normal text-gray-500">
+              <p className="text-content-muted mb-3 ml-1 text-sm font-normal">
                 {t('events-description')}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <EventTypes
                   onChange={formik.handleChange}
                   values={initialValues['eventTypes']}
-                  error={formik.errors.eventTypes ? t(formik.errors.eventTypes) : undefined}
+                  error={
+                    formik.errors.eventTypes
+                      ? t(formik.errors.eventTypes)
+                      : undefined
+                  }
                 />
               </div>
             </div>
@@ -88,21 +92,14 @@ const Form = ({
         <Modal.Footer>
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={() => {
               setVisible(!visible);
             }}
-            size="md"
           >
             {t('close')}
           </Button>
-          <Button
-            type="submit"
-            color="primary"
-            loading={formik.isSubmitting}
-            active={formik.dirty}
-            size="md"
-          >
+          <Button type="submit" variant="primary" loading={formik.isSubmitting}>
             {t('create-webhook')}
           </Button>
         </Modal.Footer>

@@ -2,8 +2,8 @@ import { Card } from '@/components/shared';
 import { Team } from '@oscrat/model';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
-import { Button } from 'react-daisyui';
 import toast from 'react-hot-toast';
+import Button from '@/components/button';
 import { useTeam } from '@/hooks/useTeam';
 import { extractErrorMessage } from '@/lib/utils';
 
@@ -37,11 +37,10 @@ const RemoveTeam = ({ team }: { team: Team }) => {
         </Card.Body>
         <Card.Footer>
           <Button
-            color="error"
+            tone="danger"
+            variant="secondary"
             onClick={() => setAskConfirmation(true)}
             loading={isLoading}
-            variant="outline"
-            size="md"
           >
             {t('remove-team')}
           </Button>

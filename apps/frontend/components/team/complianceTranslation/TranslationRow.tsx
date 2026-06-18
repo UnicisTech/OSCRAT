@@ -4,7 +4,9 @@ import toast from 'react-hot-toast';
 import { useTeamDataItem } from '@/hooks/useTeamData';
 import { AccessControl } from '@/components/shared/AccessControl';
 import { downloadJson } from '@/lib/utils/download';
+import Button from '@/components/button';
 import type { ExistingTranslation } from './constants';
+import { formatDateShort } from '@/utils/dateFormat';
 
 interface TranslationRowProps {
   translation: ExistingTranslation;
@@ -12,13 +14,23 @@ interface TranslationRowProps {
   t: (key: string) => string;
 }
 
-const TranslationRow: React.FC<TranslationRowProps> = ({ translation, teamSlug, t }) => {
-  const { data, deleteData, isDeleting } = useTeamDataItem(teamSlug, translation.dataKey);
+const TranslationRow: React.FC<TranslationRowProps> = ({
+  translation,
+  teamSlug,
+  t,
+}) => {
+  const { data, deleteData, isDeleting } = useTeamDataItem(
+    teamSlug,
+    translation.dataKey
+  );
 
   const handleDownload = () => {
     if (!data?.payload) return;
     try {
-      downloadJson(data.payload, `${translation.namespace}-${translation.language}.json`);
+      downloadJson(
+        data.payload,
+        `${translation.namespace}-${translation.language}.json`
+      );
     } catch {
       toast.error(t('oscrat.ui.compliance-translation.download-error'));
     }
@@ -37,21 +49,26 @@ const TranslationRow: React.FC<TranslationRowProps> = ({ translation, teamSlug, 
     <tr>
       <td>{translation.namespaceLabel}</td>
       <td>{translation.languageLabel}</td>
-      <td>{new Date(translation.updatedAt).toLocaleDateString()}</td>
+      <td>{formatDateShort(translation.updatedAt)}</td>
       <td>
         <div className="flex gap-2">
-          <button type="button" className="btn btn-ghost btn-sm" onClick={handleDownload}>
-            <FaDownload />
-          </button>
+          <Button
+            type="button"
+            variant="tertiary"
+            size="m"
+            icon={<FaDownload />}
+            onClick={handleDownload}
+          />
           <AccessControl resource="team" actions={['update']}>
-            <button
+            <Button
               type="button"
-              className="btn btn-ghost btn-sm text-error hover:bg-error/10"
+              variant="tertiary"
+              tone="danger"
+              size="m"
+              icon={<FaTrash />}
               onClick={handleDelete}
               disabled={isDeleting}
-            >
-              <FaTrash />
-            </button>
+            />
           </AccessControl>
         </div>
       </td>

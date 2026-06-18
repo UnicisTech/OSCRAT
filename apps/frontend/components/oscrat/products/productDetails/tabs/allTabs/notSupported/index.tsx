@@ -55,7 +55,7 @@ export default function NotSupportedTab({ data }: NotSupportedTabProps) {
 
       {list.length === 0 && (
         <div className="py-8 text-center">
-          <div className="text-gray-500 dark:text-gray-400">
+          <div className="text-content-muted">
             {t('oscrat.ui.no-unsupported-versions-available')}
           </div>
         </div>

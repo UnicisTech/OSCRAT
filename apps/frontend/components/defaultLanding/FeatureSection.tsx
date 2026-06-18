@@ -19,7 +19,7 @@ const FeatureSection = () => {
             {features.map((feature: any, index) => {
               return (
                 <div
-                  className="card card-compact border border-gray-300 dark:border-gray-200"
+                  className="card card-compact border-line border"
                   key={index}
                 >
                   <div className="card-body">

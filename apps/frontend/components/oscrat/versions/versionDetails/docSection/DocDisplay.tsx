@@ -4,8 +4,11 @@ import { IoDownload, IoTrash, IoPrint, IoCloudUpload } from 'react-icons/io5';
 import { FaFilePdf } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { OscratProductVersionStatus, type Attachment } from '@oscrat/model';
+import Button from '@/components/button';
+import SuccessBadge from '@/components/oscrat/shared/SuccessBadge';
 import { formatFileSize } from '@/lib/utils';
 import { validateBrowserFile } from '@/lib/utils/docFileValidation';
+import { formatDateShort } from '@/utils/dateFormat';
 
 interface DocDisplayProps {
   doc: Attachment;
@@ -32,15 +35,15 @@ export default function DocDisplay({
       const response = await fetch(downloadUrl);
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
-      
+
       const printWindow = window.open(blobUrl, '_blank');
-      
+
       if (printWindow) {
         printWindow.onload = () => {
           printWindow.focus();
           printWindow.print();
         };
-        
+
         setTimeout(() => {
           printWindow.focus();
           printWindow.print();
@@ -67,35 +70,37 @@ export default function DocDisplay({
   const isSupported = versionStatus === OscratProductVersionStatus.SUPPORTED;
 
   return (
-    <div className="rounded-lg border border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700">
+    <div className="border-line bg-surface-muted rounded-card border p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <FaFilePdf className="h-8 w-8 text-red-500" />
+          <FaFilePdf className="text-danger h-8 w-8" />
           <div>
-            <p className="font-medium text-gray-900 dark:text-white">{doc.name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {formatFileSize(doc.fileSize)} • {new Date(doc.createdAt).toLocaleDateString()}
+            <p className="text-content font-medium">{doc.name}</p>
+            <p className="text-content-muted text-sm">
+              {formatFileSize(doc.fileSize)} • {formatDateShort(doc.createdAt)}
             </p>
             {isSupported && (
-              <span className="mt-1 inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-100">
-                {t('oscrat.ui.doc.signed')}
-              </span>
+              <SuccessBadge
+                className="mt-1"
+                label={t('oscrat.ui.doc.signed')}
+              />
             )}
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="secondary"
+            size="m"
             onClick={handlePrint}
-            className="flex items-center gap-1 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+            startIcon={<IoPrint className="h-4 w-4" />}
           >
-            <IoPrint className="h-4 w-4" />
             {t('oscrat.ui.doc.print')}
-          </button>
+          </Button>
 
           <a
             href={downloadUrl}
-            className="flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="bg-primary hover:bg-primary-dark text-content-inverse rounded-input flex items-center gap-1 px-3 py-1.5 text-sm font-medium"
           >
             <IoDownload className="h-4 w-4" />
             {t('download')}
@@ -111,22 +116,25 @@ export default function DocDisplay({
           />
           <label
             htmlFor="signed-doc-upload"
-            className="flex cursor-pointer items-center gap-1 rounded-md border border-green-300 bg-white px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-50 dark:border-green-600 dark:bg-gray-600 dark:text-green-400 dark:hover:bg-gray-500"
+            className="border-success-border bg-surface text-success hover:bg-success-subtle rounded-input flex cursor-pointer items-center gap-1 border px-3 py-1.5 text-sm font-medium"
           >
             <IoCloudUpload className="h-4 w-4" />
-            {isUploading ? t('oscrat.ui.doc.uploading') : t('oscrat.ui.doc.upload-signed')}
+            {isUploading
+              ? t('oscrat.ui.doc.uploading')
+              : t('oscrat.ui.doc.upload-signed')}
           </label>
 
-          <button
+          <Button
+            variant="secondary"
+            tone="danger"
+            size="m"
             onClick={onDelete}
-            className="flex items-center gap-1 rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-600 dark:hover:bg-red-900/20"
+            startIcon={<IoTrash className="h-4 w-4" />}
           >
-            <IoTrash className="h-4 w-4" />
             {t('delete')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
-

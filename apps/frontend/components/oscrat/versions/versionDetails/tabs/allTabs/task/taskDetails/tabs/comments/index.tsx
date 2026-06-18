@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Divider from '@/components/shared/Divider';
+import Button from '@/components/button';
 import { useTranslation } from 'next-i18next';
+import { formatDateTime } from '@/utils/dateFormat';
 
 // --- TYPE DEFINITIONS ---
 
@@ -42,16 +44,7 @@ export default function Index() {
     const newCommentObject: CommentData = {
       id: `comment-${Date.now()}`,
       author: 'Current User',
-      timestamp:
-        new Date()
-          .toLocaleString('de-DE', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          })
-          .replace(',', ' -') + ' PM',
+      timestamp: formatDateTime(new Date()),
       text: newComment,
     };
 
@@ -63,10 +56,10 @@ export default function Index() {
 
   return (
     <div className="flex w-full justify-center">
-      <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
+      <div className="border-line bg-surface rounded-card w-full border p-4">
         {/* New Comment Form */}
         <div className="mb-6">
-          <h2 className="mb-2 text-sm font-semibold text-gray-900">
+          <h2 className="text-content mb-2 text-sm font-semibold">
             {t('oscrat.ui.new-comment')}
           </h2>
           <form onSubmit={handleAddComment}>
@@ -74,15 +67,12 @@ export default function Index() {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Placeholder"
-              className="mb-2 w-full rounded-md border border-gray-400 px-3 py-2 text-sm"
+              className="border-line rounded-input mb-2 w-full border px-3 py-2 text-sm"
               rows={4}
             />
-            <button
-              type="submit"
-              className="rounded-md bg-blue-900 px-2.5 py-1.5 text-sm font-medium text-white hover:bg-blue-800"
-            >
+            <Button type="submit" variant="primary" size="m">
               {t('oscrat.ui.add-comment')}
-            </button>
+            </Button>
           </form>
         </div>
 
@@ -91,12 +81,12 @@ export default function Index() {
             <div key={comment.id} className="pt-4">
               <Divider />
               <div className="mb-1 flex items-center pt-4">
-                <p className="mr-2 text-sm font-semibold text-gray-900">
+                <p className="text-content mr-2 text-sm font-semibold">
                   {comment.author}
                 </p>
-                <p className="text-xs text-gray-900">{comment.timestamp}</p>
+                <p className="text-content text-xs">{comment.timestamp}</p>
               </div>
-              <p className="text-sm text-gray-900">{comment.text}</p>
+              <p className="text-content text-sm">{comment.text}</p>
             </div>
           ))}
         </div>

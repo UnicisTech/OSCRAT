@@ -18,22 +18,24 @@ import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
 import { mapScanSeverityToVulnerabilitySeverity } from '@/lib/utils/severity';
 import { Breadcrumb } from '@/components/shared';
+import Button from '@/components/button';
 import {
   OscratProductVulnerabilityStatus,
   OscratProductVulnerabilitySeverity,
-  type OscratVulnerabilityCreate
+  type OscratVulnerabilityCreate,
 } from '@oscrat/model';
 import { vulnerabilityFormSchema } from '@/lib/validation/vulnerability';
 
 const PAGE_STYLES = {
-  sectionCard: 'rounded-lg border border-gray-300 bg-white p-6',
-  sectionCardGray: 'rounded-lg border border-gray-300 bg-gray-50 p-6',
-  sectionHeading: 'mb-4 text-lg font-semibold text-gray-900',
-  label: 'block text-sm font-medium text-gray-700',
-  disabledInput: 'mt-1 w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-gray-700',
-  buttonSecondary: 'rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50',
-  buttonPrimary: 'rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50',
-  textSmGray: 'text-sm text-gray-700',
+  sectionCard: 'rounded-lg border border-line bg-surface p-6',
+  sectionCardGray: 'rounded-lg border border-line bg-surface-muted p-6',
+  sectionHeading: 'mb-4 text-lg font-semibold text-content',
+  label: 'block text-sm font-medium text-content-secondary',
+  disabledInput:
+    'mt-1 w-full rounded-input border border-line bg-surface-muted px-3 py-2 text-content-secondary',
+  buttonSecondary:
+    'rounded-input border border-line bg-surface px-4 py-2 text-sm font-medium text-content-secondary hover:bg-surface-muted',
+  textSmGray: 'text-sm text-content-secondary',
 } as const;
 
 function NewVulnerabilityPage() {
@@ -46,13 +48,23 @@ function NewVulnerabilityPage() {
 
   const version = versionContext.version;
   const project = productContext.project;
-  const { attachments, uploadAttachment } = useVersionAttachments(teamId, productId, versionId);
-  const { createVulnerability, isCreating } = useVulnerabilities(teamId, productId, versionId);
+  const { attachments, uploadAttachment } = useVersionAttachments(
+    teamId,
+    productId,
+    versionId
+  );
+  const { createVulnerability, isCreating } = useVulnerabilities(
+    teamId,
+    productId,
+    versionId
+  );
   const { members } = useTeamMembers(slug);
 
   const currentUserId = session?.user?.id || '';
 
-  const [uploadedAttachmentIds, setUploadedAttachmentIds] = useState<string[]>([]);
+  const [uploadedAttachmentIds, setUploadedAttachmentIds] = useState<string[]>(
+    []
+  );
   const [uploadingFile, setUploadingFile] = useState(false);
   const [isFromScanReport, setIsFromScanReport] = useState(false);
 
@@ -76,15 +88,19 @@ function NewVulnerabilityPage() {
     validateOnChange: false,
     onSubmit: async (values) => {
       try {
-        const affectedMemberStatesArray = values.hasOtherMemberStates && values.affectedMemberStates
-          ? values.affectedMemberStates
-              .split(',')
-              .map(s => s.trim())
-              .filter(s => s.length > 0)
-          : [];
+        const affectedMemberStatesArray =
+          values.hasOtherMemberStates && values.affectedMemberStates
+            ? values.affectedMemberStates
+                .split(',')
+                .map((s) => s.trim())
+                .filter((s) => s.length > 0)
+            : [];
 
         const referencesArray = values.references
-          ? values.references.split(',').map(s => s.trim()).filter(s => s.length > 0)
+          ? values.references
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0)
           : [];
 
         const createData: OscratVulnerabilityCreate = {
@@ -98,22 +114,42 @@ function NewVulnerabilityPage() {
           advisoryId: values.advisoryId || undefined,
           dateOfDiscovery: new Date(values.dateOfDiscovery),
           affectedMemberStates: affectedMemberStatesArray,
-          attachmentIds: uploadedAttachmentIds.length > 0 ? uploadedAttachmentIds : undefined,
+          attachmentIds:
+            uploadedAttachmentIds.length > 0
+              ? uploadedAttachmentIds
+              : undefined,
           createdBy: '',
         };
 
         await createVulnerability(createData);
-        toast.success(t('oscrat.ui.versions.vulnerabilities.created-successfully'));
-        router.push(`/organization/${slug}/products/${productId}/versions/${versionId}?tab=vulnerabilities`);
+        toast.success(
+          t('oscrat.ui.versions.vulnerabilities.created-successfully')
+        );
+        router.push(
+          `/organization/${slug}/products/${productId}/versions/${versionId}?tab=vulnerabilities`
+        );
       } catch (error: unknown) {
-        toast.error(extractErrorMessage(error, t('oscrat.ui.versions.vulnerabilities.failed-to-create')));
+        toast.error(
+          extractErrorMessage(
+            error,
+            t('oscrat.ui.versions.vulnerabilities.failed-to-create')
+          )
+        );
       }
     },
   });
 
   // Handle query params for pre-filling from scan report
   useEffect(() => {
-    const { prefill, advisoryId, cve, severity, description, package: pkg, version: ver } = router.query;
+    const {
+      prefill,
+      advisoryId,
+      cve,
+      severity,
+      description,
+      package: pkg,
+      version: ver,
+    } = router.query;
 
     if (prefill === 'true' && (advisoryId || cve) && pkg) {
       setIsFromScanReport(true);
@@ -144,7 +180,9 @@ function NewVulnerabilityPage() {
   }, [router.query, currentUserId]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     formik.handleChange(e);
   };
@@ -163,10 +201,12 @@ function NewVulnerabilityPage() {
     setUploadingFile(true);
     try {
       const attachment = await uploadAttachment(file);
-      setUploadedAttachmentIds(prev => [...prev, attachment.id]);
+      setUploadedAttachmentIds((prev) => [...prev, attachment.id]);
       toast.success(t('oscrat.ui.file-uploaded-successfully'));
     } catch (error: unknown) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file'))
+      );
     } finally {
       setUploadingFile(false);
     }
@@ -201,7 +241,7 @@ function NewVulnerabilityPage() {
     <>
       <Breadcrumb items={breadcrumbItems} />
       <div className="mx-auto max-w-5xl p-6">
-        <h1 className="mb-6 text-2xl font-bold text-gray-900">
+        <h1 className="text-content mb-6 text-2xl font-bold">
           {t('oscrat.ui.versions.vulnerabilities.add-new')}
         </h1>
 
@@ -240,7 +280,9 @@ function NewVulnerabilityPage() {
           {/* Vulnerability Information */}
           <div className={PAGE_STYLES.sectionCard}>
             <h2 className={PAGE_STYLES.sectionHeading}>
-              {t('oscrat.ui.versions.vulnerabilities.vulnerability-information')}
+              {t(
+                'oscrat.ui.versions.vulnerabilities.vulnerability-information'
+              )}
             </h2>
             <VulnerabilityFormFields
               formData={formik.values}
@@ -262,25 +304,33 @@ function NewVulnerabilityPage() {
               {t('oscrat.ui.attachments')}
             </h2>
             <div className="mb-4">
-              <label className={`inline-flex cursor-pointer items-center ${PAGE_STYLES.buttonSecondary}`}>
+              <label
+                className={`inline-flex cursor-pointer items-center ${PAGE_STYLES.buttonSecondary}`}
+              >
                 <input
                   type="file"
                   onChange={handleFileUpload}
                   disabled={uploadingFile}
                   className="hidden"
                 />
-                {uploadingFile ? t('oscrat.ui.uploading') : t('oscrat.ui.add-attachment')}
+                {uploadingFile
+                  ? t('oscrat.ui.uploading')
+                  : t('oscrat.ui.add-attachment')}
               </label>
             </div>
             {uploadedAttachmentIds.length > 0 && attachments && (
               <div className="space-y-2">
                 <p className={PAGE_STYLES.label}>
-                  {t('oscrat.ui.uploaded-attachments')}: {uploadedAttachmentIds.length}
+                  {t('oscrat.ui.uploaded-attachments')}:{' '}
+                  {uploadedAttachmentIds.length}
                 </p>
                 {attachments
-                  .filter(att => uploadedAttachmentIds.includes(att.id))
+                  .filter((att) => uploadedAttachmentIds.includes(att.id))
                   .map((attachment) => (
-                    <div key={attachment.id} className={`flex items-center ${PAGE_STYLES.textSmGray}`}>
+                    <div
+                      key={attachment.id}
+                      className={`flex items-center ${PAGE_STYLES.textSmGray}`}
+                    >
                       <span>{attachment.name}</span>
                     </div>
                   ))}
@@ -290,20 +340,18 @@ function NewVulnerabilityPage() {
 
           {/* Actions */}
           <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className={PAGE_STYLES.buttonSecondary}
-            >
+            <Button variant="secondary" type="button" onClick={handleCancel}>
               {t('oscrat.ui.cancel')}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
               type="submit"
               disabled={isCreating || formik.isSubmitting}
-              className={PAGE_STYLES.buttonPrimary}
             >
-              {isCreating || formik.isSubmitting ? t('oscrat.ui.adding') : t('oscrat.ui.add')}
-            </button>
+              {isCreating || formik.isSubmitting
+                ? t('oscrat.ui.adding')
+                : t('oscrat.ui.add')}
+            </Button>
           </div>
         </form>
       </div>

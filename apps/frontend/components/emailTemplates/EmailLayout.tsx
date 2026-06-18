@@ -25,8 +25,8 @@ const EmailLayout = ({ children }: EmailLayoutProps) => {
 
   return (
     <Tailwind>
-      <Body className="mx-auto my-auto bg-white font-sans">
-        <Container className="mx-auto my-[40px] w-[465px] rounded border border-solid border-[#f0f0f0] bg-white p-[20px]">
+      <Body className="bg-surface mx-auto my-auto font-sans">
+        <Container className="bg-surface mx-auto my-[40px] w-[465px] rounded border border-solid border-[#f0f0f0] p-[20px]">
           <Img src={logoSrc} alt={app.name} className="mx-auto my-8" />
 
           <Section>

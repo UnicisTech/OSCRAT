@@ -3,7 +3,10 @@ import { OscratOrganizationRole } from '@oscrat/model';
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { useGetComplianceData } from '@/lib/api/hooks/compliance';
 import { useGetTeamComplianceData } from '@/lib/api/hooks/teamCompliance';
-import { COMPLIANCE_TYPES, type ComplianceType } from '@/lib/compliance/translations';
+import {
+  COMPLIANCE_TYPES,
+  type ComplianceType,
+} from '@/lib/compliance/translations';
 
 interface UseComplianceDataParams {
   teamSlug: string;
@@ -29,22 +32,24 @@ export function useComplianceData({
   enabled = true,
 }: UseComplianceDataParams): UseComplianceDataReturn {
   const role = getRoleForTeam(teamRole);
-  
+
   const isTeamCompliance = complianceType === COMPLIANCE_TYPES.TEAM;
-  
+
   const teamComplianceQuery = useGetTeamComplianceData(
     teamSlug,
     { role },
     { enabled: enabled && isTeamCompliance && !!teamRole }
   );
-  
+
   const versionComplianceQuery = useGetComplianceData(
     teamSlug,
     { role },
     { enabled: enabled && !isTeamCompliance && !!teamRole }
   );
 
-  const activeQuery = isTeamCompliance ? teamComplianceQuery : versionComplianceQuery;
+  const activeQuery = isTeamCompliance
+    ? teamComplianceQuery
+    : versionComplianceQuery;
 
   return {
     complianceData: activeQuery.data || null,

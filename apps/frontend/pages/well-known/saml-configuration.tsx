@@ -15,15 +15,15 @@ const SPConfig: NextPageWithLayout<
   return (
     <>
       <div className="mt-10 flex w-full justify-center px-5">
-        <div className="w-full rounded border border-gray-200 bg-white p-6 md:w-1/2 dark:border-gray-700 dark:bg-gray-800">
+        <div className="border-line-subtle bg-surface w-full rounded border p-6 md:w-1/2">
           <div className="flex flex-col space-y-3">
-            <h2 className="font-bold text-gray-700 md:text-xl">
+            <h2 className="text-content-secondary font-bold md:text-xl">
               {t('sp-saml-config-title')}
             </h2>
-            <p className="text-sm leading-6 text-gray-800">
+            <p className="text-content text-sm leading-6">
               {t('sp-saml-config-description')}
             </p>
-            <p className="text-sm leading-6 text-gray-600">
+            <p className="text-content-secondary text-sm leading-6">
               Refer to our&nbsp;
               <a
                 href="https://boxyhq.com/docs/jackson/sso-providers"
@@ -51,7 +51,7 @@ const SPConfig: NextPageWithLayout<
             </div>
             <div className="form-control w-full">
               <div className="flex flex-col">
-                <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300">
+                <label className="text-content mb-2 block text-sm font-medium">
                   {t('response')}
                 </label>
                 <p className="text-sm">{config.response}</p>
@@ -59,7 +59,7 @@ const SPConfig: NextPageWithLayout<
             </div>
             <div className="form-control w-full">
               <div className="flex flex-col">
-                <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300">
+                <label className="text-content mb-2 block text-sm font-medium">
                   {t('assertion-signature')}
                 </label>
                 <p className="text-sm">{config.assertionSignature}</p>
@@ -67,7 +67,7 @@ const SPConfig: NextPageWithLayout<
             </div>
             <div className="form-control w-full">
               <div className="flex flex-col">
-                <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300">
+                <label className="text-content mb-2 block text-sm font-medium">
                   {t('signature-algorithm')}
                 </label>
                 <p className="text-sm">{config.signatureAlgorithm}</p>
@@ -75,7 +75,7 @@ const SPConfig: NextPageWithLayout<
             </div>
             <div className="form-control w-full">
               <div className="flex flex-col">
-                <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300">
+                <label className="text-content mb-2 block text-sm font-medium">
                   {t('assertion-encryption')}
                 </label>
                 <p className="text-sm">

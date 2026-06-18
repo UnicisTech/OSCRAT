@@ -24,23 +24,23 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = '' }) => {
               {item.href && !isCurrent ? (
                 <Link
                   href={item.href}
-                  className="text-sm font-medium text-gray-500 transition-colors duration-200 hover:text-gray-700"
+                  className="text-content-muted hover:text-content-secondary text-c1 font-medium transition-colors duration-200"
                 >
                   {item.label}
                 </Link>
               ) : (
                 <span
-                  className={`text-sm font-medium ${
-                    isCurrent
-                      ? 'text-gray-900'
-                      : 'text-gray-500'
+                  className={`text-c1 font-medium ${
+                    isCurrent ? 'text-content' : 'text-content-muted'
                   }`}
                 >
                   {item.label}
                 </span>
               )}
 
-              {!isCurrent && <span className="ml-2 text-gray-400">/</span>}
+              {!isCurrent && (
+                <span className="text-content-placeholder ml-2">/</span>
+              )}
             </li>
           );
         })}

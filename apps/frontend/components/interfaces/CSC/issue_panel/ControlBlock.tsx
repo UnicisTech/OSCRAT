@@ -8,7 +8,7 @@ import React, {
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import Select from '@atlaskit/select';
-import { LoadingButton } from '@atlaskit/button';
+import Button from '@/components/button';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
 import TextArea from '@atlaskit/textarea';
 import Textfield from '@atlaskit/textfield';
@@ -106,17 +106,18 @@ const ControlBlock = ({
             />
           </WithoutRing>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <LoadingButton
-              appearance="danger"
-              iconBefore={<TrashIcon size="medium" label="Delete" />}
+            <Button
+              tone="danger"
+              variant="primary"
+              icon={<TrashIcon size="medium" label="Delete" />}
               onClick={async () => {
                 setIsButtonLoading(true);
                 await deleteControlHandler(control);
                 setIsButtonLoading(false);
               }}
-              isLoading={isButtonLoading}
-              isDisabled={isSaving}
-            ></LoadingButton>
+              loading={isButtonLoading}
+              disabled={isSaving}
+            />
           </div>
         </div>
       </div>

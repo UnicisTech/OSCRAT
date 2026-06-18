@@ -2,7 +2,7 @@ import React from 'react';
 import { OscratProductStatus } from '@oscrat/model';
 
 const CheckCircleIcon = ({
-  className = 'w-5 h-5 text-green-500',
+  className = 'w-5 h-5 text-success',
 }: {
   className?: string;
 }) => (
@@ -46,14 +46,14 @@ interface StatusBadgeProps {
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const statusConfig = {
     [OscratProductStatus.ACTIVE]: {
-      bgColor: 'bg-green-100',
-      textColor: 'text-gray-800',
+      bgColor: 'bg-success-subtle',
+      textColor: 'text-content',
       Icon: CheckCircleIcon,
       label: 'Active',
     },
     [OscratProductStatus.INACTIVE]: {
-      bgColor: 'bg-gray-100',
-      textColor: 'text-gray-800',
+      bgColor: 'bg-surface-muted',
+      textColor: 'text-content',
       Icon: BannedIcon,
       label: 'Inactive',
     },

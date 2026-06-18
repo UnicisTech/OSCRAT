@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaEye } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import type { OscratVulnerabilitySummary } from '@oscrat/model';
@@ -10,7 +10,12 @@ import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import normalizeText from '@/utils/normalizeText';
 import { formatDateShort } from '@/utils/dateFormat';
-import { TableWrapper, TableHeader, TableRow } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
+import SeverityBadge from '@/components/oscrat/shared/SeverityBadge';
+import {
+  TableWrapper,
+  TableHeader,
+  TableRow,
+} from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -38,7 +43,10 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination<OscratVulnerabilitySummary>(vulnerabilities || [], pageSize);
+  } = usePagination<OscratVulnerabilitySummary>(
+    vulnerabilities || [],
+    pageSize
+  );
 
   if (!ready) {
     return null;
@@ -49,44 +57,45 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
       OscratProductVulnerabilityStatus,
       { bgColor: string; textColor: string }
     > = {
-      [OscratProductVulnerabilityStatus.PENDING]: { bgColor: 'bg-gray-100', textColor: 'text-gray-800' },
-      [OscratProductVulnerabilityStatus.PREPARATION]: { bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
-      [OscratProductVulnerabilityStatus.RECEIPT]: { bgColor: 'bg-cyan-100', textColor: 'text-cyan-800' },
-      [OscratProductVulnerabilityStatus.VERIFICATION]: { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
-      [OscratProductVulnerabilityStatus.REMEDIATION_DEVELOPMENT]: { bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
-      [OscratProductVulnerabilityStatus.RELEASE]: { bgColor: 'bg-green-100', textColor: 'text-green-800' },
-      [OscratProductVulnerabilityStatus.POST_RELEASE]: { bgColor: 'bg-emerald-100', textColor: 'text-emerald-800' },
+      [OscratProductVulnerabilityStatus.PENDING]: {
+        bgColor: 'bg-surface-muted',
+        textColor: 'text-content',
+      },
+      [OscratProductVulnerabilityStatus.PREPARATION]: {
+        bgColor: 'bg-info-subtle',
+        textColor: 'text-info-emphasis',
+      },
+      [OscratProductVulnerabilityStatus.RECEIPT]: {
+        bgColor: 'bg-info-subtle',
+        textColor: 'text-info-emphasis',
+      },
+      [OscratProductVulnerabilityStatus.VERIFICATION]: {
+        bgColor: 'bg-warning-subtle',
+        textColor: 'text-warning-emphasis',
+      },
+      [OscratProductVulnerabilityStatus.REMEDIATION_DEVELOPMENT]: {
+        bgColor: 'bg-warning-subtle',
+        textColor: 'text-warning-emphasis',
+      },
+      [OscratProductVulnerabilityStatus.RELEASE]: {
+        bgColor: 'bg-success-subtle',
+        textColor: 'text-success-emphasis',
+      },
+      [OscratProductVulnerabilityStatus.POST_RELEASE]: {
+        bgColor: 'bg-success-subtle',
+        textColor: 'text-success-emphasis',
+      },
     };
 
-    const config = statusConfig[status] || statusConfig[OscratProductVulnerabilityStatus.PENDING];
+    const config =
+      statusConfig[status] ||
+      statusConfig[OscratProductVulnerabilityStatus.PENDING];
 
     return (
       <span
         className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${config.bgColor} ${config.textColor}`}
       >
         {normalizeText(status)}
-      </span>
-    );
-  };
-
-  const getSeverityBadge = (severity: string) => {
-    const severityConfig: Record<
-      string,
-      { bgColor: string; textColor: string }
-    > = {
-      LOW: { bgColor: 'bg-blue-100', textColor: 'text-blue-800' },
-      MEDIUM: { bgColor: 'bg-yellow-100', textColor: 'text-yellow-800' },
-      HIGH: { bgColor: 'bg-orange-100', textColor: 'text-orange-800' },
-      CRITICAL: { bgColor: 'bg-red-100', textColor: 'text-red-800' },
-    };
-
-    const config = severityConfig[severity] || severityConfig.LOW;
-
-    return (
-      <span
-        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${config.bgColor} ${config.textColor}`}
-      >
-        {normalizeText(severity)}
       </span>
     );
   };
@@ -100,15 +109,23 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
   return (
     <div className="w-full">
       <TableWrapper>
-        <table className="w-full text-left text-sm text-gray-600">
+        <table className="text-content-secondary w-full text-left text-sm">
           <TableHeader
             columns={[
               { label: t('oscrat.ui.versions.vulnerabilities.table-name') },
               { label: t('oscrat.ui.versions.vulnerabilities.table-status') },
               { label: t('oscrat.ui.versions.vulnerabilities.table-severity') },
-              { label: t('oscrat.ui.versions.vulnerabilities.table-date-of-discovery') },
-              { label: t('oscrat.ui.versions.vulnerabilities.table-description') },
-              { label: t('actions') },
+              {
+                label: t(
+                  'oscrat.ui.versions.vulnerabilities.table-date-of-discovery'
+                ),
+              },
+              {
+                label: t(
+                  'oscrat.ui.versions.vulnerabilities.table-description'
+                ),
+              },
+              { label: t('actions'), srOnly: true },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -119,7 +136,10 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                 onClick={() => handleViewDetails(vulnerability.id)}
               >
                 <td className={tableStyles.td}>
-                  <div className="max-w-[200px] truncate" title={vulnerability.name}>
+                  <div
+                    className="max-w-[200px] truncate"
+                    title={vulnerability.name}
+                  >
                     {vulnerability.name}
                   </div>
                 </td>
@@ -127,13 +147,19 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                   {getStatusBadge(vulnerability.status)}
                 </td>
                 <td className={tableStyles.td}>
-                  {getSeverityBadge(vulnerability.severity)}
+                  <SeverityBadge
+                    severity={vulnerability.severity}
+                    label={normalizeText(vulnerability.severity)}
+                  />
                 </td>
                 <td className={tableStyles.td}>
                   {formatDateShort(vulnerability.dateOfDiscovery)}
                 </td>
                 <td className={tableStyles.td}>
-                  <div className="max-w-[300px] truncate" title={vulnerability.description}>
+                  <div
+                    className="max-w-[300px] truncate"
+                    title={vulnerability.description}
+                  >
                     {vulnerability.description}
                   </div>
                 </td>
@@ -145,9 +171,18 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                     <ActionButton
                       onClick={() => onDelete(vulnerability.id)}
                       icon={<FaTrash size={12} />}
-                      title={t('oscrat.ui.versions.vulnerabilities.delete-vulnerability')}
+                      title={t(
+                        'oscrat.ui.versions.vulnerabilities.delete-vulnerability'
+                      )}
                     >
                       {t('oscrat.ui.delete')}
+                    </ActionButton>
+                    <ActionButton
+                      onClick={() => handleViewDetails(vulnerability.id)}
+                      icon={<FaEye size={12} />}
+                      title={t('view')}
+                    >
+                      {t('view')}
                     </ActionButton>
                   </div>
                 </td>
@@ -157,9 +192,11 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
               <tr>
                 <td
                   colSpan={6}
-                  className="px-6 py-8 text-center text-sm text-gray-500"
+                  className="text-content-muted px-6 py-8 text-center text-sm"
                 >
-                  {t('oscrat.ui.versions.vulnerabilities.no-vulnerabilities-added')}
+                  {t(
+                    'oscrat.ui.versions.vulnerabilities.no-vulnerabilities-added'
+                  )}
                 </td>
               </tr>
             )}

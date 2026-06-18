@@ -38,10 +38,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
     });
   }
 
-  if (
-    teamFeatures.auditLog &&
-    canAccess('team_audit_log', ['read'])
-  ) {
+  if (teamFeatures.auditLog && canAccess('team_audit_log', ['read'])) {
     navigations.push({
       name: 'Audit Logs',
       href: `/organization/${teamSlug}/audit-logs`,
@@ -55,10 +52,7 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
       <h2 className="mb-2 text-xl font-semibold">
         {heading ? heading : team.name}
       </h2>
-      <nav
-        className="flex space-x-5 border-b border-gray-300"
-        aria-label="Tabs"
-      >
+      <nav className="border-line flex space-x-5 border-b" aria-label="Tabs">
         {navigations.map((menu) => {
           return (
             <Link
@@ -67,8 +61,8 @@ const TeamTab = ({ activeTab, team, heading, teamFeatures }: TeamTabProps) => {
               className={classNames(
                 'inline-flex items-center border-b-2 py-4 text-sm font-medium',
                 menu.active
-                  ? 'border-gray-900 text-gray-700 dark:text-gray-100'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 hover:dark:text-gray-100'
+                  ? 'text-content-secondary border-content'
+                  : 'text-content-muted hover:border-line hover:text-content-secondary border-transparent'
               )}
             >
               {menu.name}

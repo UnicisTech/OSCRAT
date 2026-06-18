@@ -13,7 +13,7 @@ const CommentsTab = ({
   return (
     <div className="mb-5">
       <nav
-        className="-mb-px flex space-x-5 border-b border-gray-300"
+        className="border-line -mb-px flex space-x-5 border-b"
         aria-label="Tabs"
       >
         {navigations.map((menu, index) => {
@@ -23,8 +23,8 @@ const CommentsTab = ({
               className={classNames(
                 'inline-flex cursor-pointer items-center border-b-2 py-4 text-sm font-medium',
                 menu.active
-                  ? 'border-gray-900 text-gray-700 dark:text-gray-200'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  ? 'text-content-secondary border-content'
+                  : 'text-content-muted hover:border-line hover:text-content-secondary border-transparent'
               )}
               onClick={() => {
                 setActiveTab(menu.name);

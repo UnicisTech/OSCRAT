@@ -1,7 +1,7 @@
 import React from 'react';
-import { InputProps } from 'react-daisyui';
 
-interface InputWithLabelProps extends InputProps {
+interface InputWithLabelProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   children: React.ReactNode;
   label: string | React.ReactNode;
   error?: string;
@@ -30,7 +30,7 @@ const InputWithLabel = (props: InputWithLabelProps) => {
       {React.cloneElement(children as React.ReactElement<any>, { ...rest })}
       {(error || descriptionText) && (
         <label className="label">
-          <span className={`label-text-alt ${error ? 'text-red-500' : ''}`}>
+          <span className={`label-text-alt ${error ? 'text-danger' : ''}`}>
             {error || descriptionText}
           </span>
         </label>

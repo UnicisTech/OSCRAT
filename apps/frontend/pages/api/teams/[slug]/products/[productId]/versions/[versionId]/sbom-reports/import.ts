@@ -76,19 +76,23 @@ const handlePOST = async (
 
     // Create the file import report and job; bytes go to the File table
     // (gzipped) inside createSbomReportWithJob, not into the WorkerJob payload.
-    const report = await createSbomReportWithJob(prisma, {
-      versionId: versionId as string,
-      productId: productId as string,
-      jobType: 'FILE_IMPORT_SBOM',
-      jobPayload: {},
-      fileImport: {
-        fileData: fileUpload.fileData,
-        filename: fileUpload.filename,
-        mimeType: fileUpload.mimeType,
+    const report = await createSbomReportWithJob(
+      prisma,
+      {
+        versionId: versionId as string,
+        productId: productId as string,
+        jobType: 'FILE_IMPORT_SBOM',
+        jobPayload: {},
+        fileImport: {
+          fileData: fileUpload.fileData,
+          filename: fileUpload.filename,
+          mimeType: fileUpload.mimeType,
+        },
+        triggeredByUserId: teamMember.userId,
+        teamId: teamMember.teamId,
       },
-      triggeredByUserId: teamMember.userId,
-      teamId: teamMember.teamId,
-    }, req.auditInfo);
+      req.auditInfo
+    );
 
     console.log(
       `[SBOM Reports API] File-based report created: reportId: ${report.id}, filename: ${fileUpload.filename}`

@@ -29,4 +29,3 @@ const handleGET = async (
 
   res.status(200).json({ data: summary });
 };
-

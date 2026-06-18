@@ -7,11 +7,11 @@ import * as Yup from 'yup';
 import Link from 'next/link';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
-import Button from '@/components/shared/Button';
+import Button from '@/components/button';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import React, { type ReactElement, useEffect, useState, useRef } from 'react';
-import type { ComponentStatus } from 'react-daisyui/dist/types';
+import type { AlertStatus as ComponentStatus } from '@/components/shared/Alert';
 import { getCsrfToken, signIn, useSession } from 'next-auth/react';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -93,8 +93,7 @@ const Login: NextPageWithLayout<
     },
     validationSchema: Yup.object().shape({
       email: emailSchema.required('Email is required'),
-      password: Yup.string()
-        .required('Password is required')
+      password: Yup.string().required('Password is required'),
     }),
     onSubmit: async (values) => {
       const { email, password } = values;
@@ -115,7 +114,7 @@ const Login: NextPageWithLayout<
         toast.error(t(response?.error));
         return;
       }
-      
+
       // Redirect after successful login
       if (response?.ok) {
         router.push(redirectUrl);
@@ -126,7 +125,6 @@ const Login: NextPageWithLayout<
   if (status === 'loading') {
     return <Loading />;
   }
-
 
   const params = token ? `?token=${token}` : '';
 
@@ -139,20 +137,19 @@ const Login: NextPageWithLayout<
         <Alert status={message.status}>{t(message.text)}</Alert>
       )}
       <div className="rounded border p-6">
-
         {authProviders?.credentials && (
           <form onSubmit={formik.handleSubmit}>
             <div className="space-y-3">
               <InputWithLabel
                 type="email"
                 label="Email"
-                labelStyle="font-semibold text-[#212121]"
+                labelStyle="font-semibold text-content"
                 name="email"
                 placeholder="Email"
                 value={formik.values.email}
                 error={
-                  formik.touched.email && formik.errors.email 
-                    ? t(formik.errors.email) 
+                  formik.touched.email && formik.errors.email
+                    ? t(formik.errors.email)
                     : undefined
                 }
                 onChange={formik.handleChange}
@@ -165,7 +162,7 @@ const Login: NextPageWithLayout<
                   value={formik.values.password}
                   label={
                     <label className="label">
-                      <span className="label-text font-semibold text-[#212121]">
+                      <span className="label-text text-content font-semibold">
                         Password
                       </span>
                       <span className="label-text-alt">
@@ -179,8 +176,8 @@ const Login: NextPageWithLayout<
                     </label>
                   }
                   error={
-                    formik.touched.password && formik.errors.password 
-                      ? t(formik.errors.password) 
+                    formik.touched.password && formik.errors.password
+                      ? t(formik.errors.password)
                       : undefined
                   }
                   onChange={formik.handleChange}
@@ -198,7 +195,7 @@ const Login: NextPageWithLayout<
             </div>
             <div className="mt-3 space-y-3">
               <Button
-                className="bg-primary-light"
+                type="submit"
                 disabled={!formik.dirty}
                 variant="primary"
                 text={t('sign-in')}
@@ -227,24 +224,27 @@ const Login: NextPageWithLayout<
           {authProviders.email && (
             <Link
               href={`/auth/magic-link${params}`}
-              className="block w-full rounded-md border-[1px] border-[#BDBDBD] bg-white px-2 py-3 text-center text-sm font-medium text-[#212121] transition-colors duration-200 disabled:cursor-not-allowed"
+              className="border-line bg-surface text-content block w-full rounded-input border px-2 py-3 text-center text-sm font-medium transition-colors duration-200 disabled:cursor-not-allowed"
             >
               &nbsp;{t('sign-in-with-email')}
             </Link>
           )}
 
           {authProviders.saml && (
-            <Link href="/auth/sso" className="btn btn-outline w-full">
+            <Link
+              href="/auth/sso"
+              className="border-line bg-surface text-content hover:bg-surface-muted block w-full rounded-input border px-2 py-3 text-center text-sm font-medium transition-colors duration-200"
+            >
               &nbsp;{t('continue-with-saml-sso')}
             </Link>
           )}
         </div> */}
       </div>
-      <p className="mt-3 text-center text-sm font-semibold text-gray-600">
+      <p className="text-content-secondary mt-3 text-center text-sm font-semibold">
         {t('dont-have-an-account')}&nbsp;
         <Link
           href={`/auth/join${params}`}
-          className="hover:text-primary-focus font-medium text-blue-600 underline"
+          className="hover:text-primary-focus text-primary font-medium underline"
         >
           {t('create-a-free-account')}
         </Link>
@@ -269,7 +269,9 @@ export const getServerSideProps = async (
 
   if (session) {
     const token = query.token as string | undefined;
-    const destination = token ? `/invitations/${token}` : env.redirectIfAuthenticated;
+    const destination = token
+      ? `/invitations/${token}`
+      : env.redirectIfAuthenticated;
     return {
       redirect: {
         destination,

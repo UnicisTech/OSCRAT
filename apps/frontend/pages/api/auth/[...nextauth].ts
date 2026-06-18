@@ -193,7 +193,9 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
 
-      const existingUser = await getUser({ email: user.email.toLowerCase().trim() });
+      const existingUser = await getUser({
+        email: user.email.toLowerCase().trim(),
+      });
 
       // Login via email (Magic Link)
       if (account?.provider === 'email') {
@@ -269,7 +271,11 @@ export const authOptions: NextAuthOptions = {
 
 export default NextAuth(authOptions);
 
-const linkToTeam = async (profile: Profile, userId: string, userName?: string | null) => {
+const linkToTeam = async (
+  profile: Profile,
+  userId: string,
+  userName?: string | null
+) => {
   const team = await getTeamDetail({
     id: profile.requested.tenant,
   });
@@ -308,7 +314,11 @@ const linkToTeam = async (profile: Profile, userId: string, userName?: string | 
   await addTeamMember(team.id, userId, userRole, auditInfo);
 
   ensureAwarenessTrainingTask(team.id, userId, userName!, auditInfo).catch(
-    (err) => console.error('[Awareness] Failed to create training task on SAML link:', err)
+    (err) =>
+      console.error(
+        '[Awareness] Failed to create training task on SAML link:',
+        err
+      )
   );
 };
 

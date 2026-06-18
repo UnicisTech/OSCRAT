@@ -15,19 +15,33 @@ import { useGetProducts } from '@/lib/api/hooks/oscrat/projects';
 import { useCreateAssessment } from '@/lib/api/hooks/oscrat/assessments';
 
 // Models & Types
-import { OscratProductType, OscratProductVersionStatus, OscratAssessmentType } from '@oscrat/model';
+import {
+  OscratProductType,
+  OscratProductVersionStatus,
+  OscratAssessmentType,
+} from '@oscrat/model';
 import type { OscratProductCreate } from '@oscrat/model';
 import type { ApiError } from '@/types';
 
 // Utils
-import { createCacheProductSchema, type CacheProductData } from '@/lib/validation/product';
-import { getProductCategoryFromRisk, transformFormStateToAssessmentData, loadFormState, clearFormState } from '@/utils/craForm';
+import {
+  createCacheProductSchema,
+  type CacheProductData,
+} from '@/lib/validation/product';
+import {
+  getProductCategoryFromRisk,
+  transformFormStateToAssessmentData,
+  loadFormState,
+  clearFormState,
+} from '@/utils/craForm';
 import { oscratProductCategoryTranslationMap } from '@/utils/translation';
 import type { FormState } from '@/types/craForm';
 import { withTeamLayout } from '@/lib/layout-helpers';
 
 // Components
 import ProductCreationForm from '@/components/oscrat/ProductCreationForm';
+import Button from '@/components/button';
+import { formatDateShort } from '@/utils/dateFormat';
 
 export default function Cache() {
   const { t, ready } = useTranslation('common');
@@ -38,7 +52,11 @@ export default function Cache() {
   const [formState, setFormState] = useState<FormState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { createProject, isLoading: isCreatingProject } = useOscratProject(teamId, '', { enabled: false});
+  const { createProject, isLoading: isCreatingProject } = useOscratProject(
+    teamId,
+    '',
+    { enabled: false }
+  );
   const { data: existingProducts } = useGetProducts(teamId);
   const createAssessmentMutation = useCreateAssessment(teamId);
 
@@ -51,7 +69,11 @@ export default function Cache() {
   // Load form state from localStorage on mount
   useEffect(() => {
     const cachedState = loadFormState();
-    if (cachedState?.completed && cachedState?.highestRiskLevel && cachedState?.answers) {
+    if (
+      cachedState?.completed &&
+      cachedState?.highestRiskLevel &&
+      cachedState?.answers
+    ) {
       setFormState(cachedState as FormState);
     }
   }, []);
@@ -80,12 +102,14 @@ export default function Cache() {
         }
 
         setIsLoading(true);
-        
+
         const productData: OscratProductCreate = {
           name: values.name.trim(),
           acronym: values.acronym.trim(),
           type: OscratProductType.APPLICATION_SOFTWARE,
-          productCategory: getProductCategoryFromRisk(formState.highestRiskLevel),
+          productCategory: getProductCategoryFromRisk(
+            formState.highestRiskLevel
+          ),
           createdBy: session.user.id,
           description: values.description?.trim(),
           initialVersion: {
@@ -97,9 +121,16 @@ export default function Cache() {
         const createdProduct = await createProject(productData);
 
         // Save CRA assessment to DB if form state exists
-        if (formState && createdProduct.versions && createdProduct.versions.length > 0) {
+        if (
+          formState &&
+          createdProduct.versions &&
+          createdProduct.versions.length > 0
+        ) {
           // Verify formState has answers before saving
-          if (!formState.answers || Object.keys(formState.answers).length === 0) {
+          if (
+            !formState.answers ||
+            Object.keys(formState.answers).length === 0
+          ) {
             console.error('FormState missing answers!', formState);
             toast.error(t('oscrat.ui.validation.no-answers-to-save'));
             setIsLoading(false);
@@ -108,7 +139,7 @@ export default function Cache() {
 
           // Transform form state to assessment data - this includes ALL answers
           const rawData = transformFormStateToAssessmentData(formState);
-          
+
           try {
             // Create assessment synchronously before navigating
             await createAssessmentMutation.mutateAsync({
@@ -118,7 +149,7 @@ export default function Cache() {
               productId: createdProduct.id,
               createdBy: session.user.id,
             });
-            
+
             // Clear localStorage only after successful assessment creation
             clearFormState();
             toast.success(t('oscrat.ui.assessment-saved-successfully'));
@@ -131,7 +162,7 @@ export default function Cache() {
           // No assessment to save, clear localStorage
           clearFormState();
         }
-        
+
         toast.success(t('oscrat.ui.validation.product-created-successfully'));
         router.replace(`/organization/${teamId}/products/${createdProduct.id}`);
       } catch (err) {
@@ -149,7 +180,7 @@ export default function Cache() {
 
   const formatCompletedDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString();
+      return formatDateShort(dateString);
     } catch {
       return 'Invalid date';
     }
@@ -160,29 +191,33 @@ export default function Cache() {
   if (!formState || !formState.highestRiskLevel) {
     return (
       <div className="flex w-full justify-center">
-        <div className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white shadow-md">
+        <div className="border-line bg-surface rounded-card w-full max-w-2xl border">
           <div className="p-10">
-            <h1 className="text-[20px] font-semibold text-gray-800 mb-4">
+            <h1 className="text-content mb-4 text-[20px] font-semibold">
               {t('oscrat.ui.no-cached-survey')}
             </h1>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-content-secondary mb-6 text-sm">
               {t('oscrat.ui.no-cached-survey-description')}
             </p>
             <div className="flex space-x-3">
-              <button
+              <Button
+                variant="secondary"
+                size="m"
                 type="button"
-                onClick={() => router.push(`/organization/${teamId}/products/add-product`)}
-                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={() =>
+                  router.push(`/organization/${teamId}/products/add-product`)
+                }
               >
                 {t('back')}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
+                size="m"
                 type="button"
                 onClick={handleRetakeSurvey}
-                className="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 {t('oscrat.ui.take-survey')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -190,30 +225,38 @@ export default function Cache() {
     );
   }
 
-  const isFormLoading = isLoading || isCreatingProject || createAssessmentMutation.isPending;
+  const isFormLoading =
+    isLoading || isCreatingProject || createAssessmentMutation.isPending;
 
   const additionalFields = (
     <>
       {/* Two-column info row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Cached Applicability Check */}
         <div className="space-y-2">
-          <h3 className="text-xs font-medium text-gray-500">
+          <h3 className="text-content-muted text-xs font-medium">
             {t('oscrat.ui.cached-applicability-check')}
           </h3>
-          <p className="text-sm font-bold text-black">
-            {t('oscrat.ui.applicability-check')} - {formState?.completedAt ? formatCompletedDate(formState.completedAt) : t('oscrat.ui.not-available')}
+          <p className="text-content text-sm font-bold">
+            {t('oscrat.ui.applicability-check')} -{' '}
+            {formState?.completedAt
+              ? formatCompletedDate(formState.completedAt)
+              : t('oscrat.ui.not-available')}
           </p>
         </div>
 
         {/* Category */}
         <div className="space-y-2">
-          <h3 className="text-xs font-medium text-gray-500">
+          <h3 className="text-content-muted text-xs font-medium">
             {t('oscrat.ui.category')}
           </h3>
-          <p className="text-sm font-bold text-black">
+          <p className="text-content text-sm font-bold">
             {formState?.highestRiskLevel
-              ? t(oscratProductCategoryTranslationMap[getProductCategoryFromRisk(formState.highestRiskLevel)])
+              ? t(
+                  oscratProductCategoryTranslationMap[
+                    getProductCategoryFromRisk(formState.highestRiskLevel)
+                  ]
+                )
               : t('oscrat.ui.not-available')}
           </p>
         </div>
@@ -221,13 +264,14 @@ export default function Cache() {
 
       {/* Retake Survey Button */}
       <div className="mb-6">
-        <button
+        <Button
+          variant="secondary"
+          size="m"
           type="button"
           onClick={handleRetakeSurvey}
-          className="rounded-md border border-blue-600 bg-white px-4 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           {t('oscrat.ui.retake-survey')}
-        </button>
+        </Button>
       </div>
     </>
   );
@@ -237,7 +281,12 @@ export default function Cache() {
       formik={formik}
       isLoading={isFormLoading}
       additionalFields={additionalFields}
-      submitDisabled={isFormLoading || !formik.isValid || !formik.dirty || !formState?.highestRiskLevel}
+      submitDisabled={
+        isFormLoading ||
+        !formik.isValid ||
+        !formik.dirty ||
+        !formState?.highestRiskLevel
+      }
     />
   );
 }

@@ -89,7 +89,12 @@ const handleDELETE = async (
 
   const { versionId } = req.query;
 
-  await deleteVersion(prisma, teamMember.teamId, versionId as string, req.auditInfo);
+  await deleteVersion(
+    prisma,
+    teamMember.teamId,
+    versionId as string,
+    req.auditInfo
+  );
 
   res.status(200).json({ data: {} });
 };

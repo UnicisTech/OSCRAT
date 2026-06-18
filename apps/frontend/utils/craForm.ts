@@ -1,15 +1,15 @@
-import { 
-  ApplicabilityQuestion, 
+import {
+  ApplicabilityQuestion,
   RiskQuestion,
   CraQuestion,
-  OscratProductCategory
+  OscratProductCategory,
 } from '@oscrat/model';
-import { 
-  FormAnswers, 
-  FormState, 
+import {
+  FormAnswers,
+  FormState,
   RISK_LEVEL_PRIORITY,
   isRiskAnswer,
-  RiskLevel
+  RiskLevel,
 } from '@/types/craForm';
 
 const LOCALSTORAGE_KEY = 'craFormState';
@@ -25,10 +25,13 @@ export const getStepNumberById = (
   return index + 1;
 };
 
-/** 
+/**
  * Compare two risk levels and return the higher priority one
  */
-export const compareRiskLevels = (level1: RiskLevel | null, level2: RiskLevel): RiskLevel => {
+export const compareRiskLevels = (
+  level1: RiskLevel | null,
+  level2: RiskLevel
+): RiskLevel => {
   if (!level1) return level2;
   const priority1 = RISK_LEVEL_PRIORITY[level1];
   const priority2 = RISK_LEVEL_PRIORITY[level2];
@@ -38,15 +41,17 @@ export const compareRiskLevels = (level1: RiskLevel | null, level2: RiskLevel): 
 /**
  * Calculate the highest risk level from all answers
  */
-export const calculateHighestRiskFromAnswers = (answers: FormAnswers): RiskLevel | null => {
+export const calculateHighestRiskFromAnswers = (
+  answers: FormAnswers
+): RiskLevel | null => {
   let highest: RiskLevel | null = null;
-  
+
   Object.values(answers).forEach(({ answer }) => {
     if (isRiskAnswer(answer) && answer.riskLevel) {
       highest = compareRiskLevels(highest, answer.riskLevel as RiskLevel);
     }
   });
-  
+
   return highest;
 };
 
@@ -54,14 +59,14 @@ export const calculateHighestRiskFromAnswers = (answers: FormAnswers): RiskLevel
  * Check if an answer is eliminatory
  */
 export const checkIsEliminatory = (
-  question: ApplicabilityQuestion | RiskQuestion, 
+  question: ApplicabilityQuestion | RiskQuestion,
   answerText: string
 ): boolean => {
-
-  const answer = question.answerOptions.find(option => option.text === answerText);
-  return (answer && 'isEliminatory' in answer) ? answer.isEliminatory : false;
+  const answer = question.answerOptions.find(
+    (option) => option.text === answerText
+  );
+  return answer && 'isEliminatory' in answer ? answer.isEliminatory : false;
 };
-
 
 /**
  * Format risk level for display
@@ -77,8 +82,8 @@ export const formatRiskLevel = (level: string | null): string => {
  * Get skipped questions between two steps
  */
 export const getSkippedQuestions = (
-  fromStep: number, 
-  toStep: number, 
+  fromStep: number,
+  toStep: number,
   existingSkipped: Set<number>
 ): Set<number> => {
   const newSkippedQuestions = new Set(existingSkipped);
@@ -92,7 +97,7 @@ export const getSkippedQuestions = (
  * Find the previous non-skipped step
  */
 export const findPreviousNonSkippedStep = (
-  currentStep: number, 
+  currentStep: number,
   skippedQuestions: Set<number>
 ): number => {
   for (let i = currentStep - 1; i >= 1; i--) {
@@ -100,13 +105,15 @@ export const findPreviousNonSkippedStep = (
       return i;
     }
   }
-  return 1; 
+  return 1;
 };
 
 /**
  * Map CRA risk level to product category
  */
-export const getProductCategoryFromRisk = (riskLevel: RiskLevel): OscratProductCategory => {
+export const getProductCategoryFromRisk = (
+  riskLevel: RiskLevel
+): OscratProductCategory => {
   switch (riskLevel) {
     case RiskLevel.CRITICAL:
       return OscratProductCategory.CRITICAL;
@@ -137,7 +144,7 @@ export const loadFormState = (): Partial<FormState> | null => {
   try {
     const savedState = localStorage.getItem(LOCALSTORAGE_KEY);
     if (!savedState) return null;
-    
+
     const parsed = JSON.parse(savedState);
     return {
       answers: parsed.answers || {},
@@ -145,7 +152,7 @@ export const loadFormState = (): Partial<FormState> | null => {
       skippedQuestions: parsed.skippedQuestions || [],
       highestRiskLevel: parsed.highestRiskLevel || null,
       completed: parsed.completed || false,
-      completedAt: parsed.completedAt || null
+      completedAt: parsed.completedAt || null,
     };
   } catch (error) {
     console.error('Failed to load form state from localStorage:', error);
@@ -168,7 +175,9 @@ export const clearFormState = (): void => {
  * Transform CRA FormState to assessment rawData format for database storage
  * IMPORTANT: This saves all answers to the database
  */
-export const transformFormStateToAssessmentData = (formState: FormState): Record<string, any> => {
+export const transformFormStateToAssessmentData = (
+  formState: FormState
+): Record<string, any> => {
   // Validate that we have answers
   if (!formState.answers || Object.keys(formState.answers).length === 0) {
     console.error('FormState has no answers to save!', formState);
@@ -176,9 +185,10 @@ export const transformFormStateToAssessmentData = (formState: FormState): Record
   }
 
   // Ensure skippedQuestions is an array (handles runtime cases where it might be a Set)
-  const skippedQuestions: number[] | Set<number> | unknown = formState.skippedQuestions;
-  const skippedQuestionsArray = Array.isArray(skippedQuestions) 
-    ? skippedQuestions 
+  const skippedQuestions: number[] | Set<number> | unknown =
+    formState.skippedQuestions;
+  const skippedQuestionsArray = Array.isArray(skippedQuestions)
+    ? skippedQuestions
     : skippedQuestions instanceof Set
       ? Array.from(skippedQuestions as Set<number>)
       : [];

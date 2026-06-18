@@ -1,3 +1,4 @@
+import Button from '@/components/button';
 import { AuthLayout } from '@/components/layouts';
 import { LetterAvatar } from '@/components/shared';
 import jackson from '@/lib/jackson';
@@ -23,9 +24,10 @@ export default function IdPSelection({ connections }: IdPSelectionProps) {
         <div className="flex flex-col gap-4">
           {connections.map((connection) => {
             return (
-              <button
+              <Button
+                variant="secondary"
                 type="button"
-                className="btn btn-outline w-full justify-start"
+                className="w-full justify-start"
                 onClick={() => {
                   connectionSelected(connection.clientID);
                 }}
@@ -35,7 +37,7 @@ export default function IdPSelection({ connections }: IdPSelectionProps) {
                   {connection.name && <LetterAvatar name={connection.name} />}
                   <div>{connection.name}</div>
                 </div>
-              </button>
+              </Button>
             );
           })}
         </div>

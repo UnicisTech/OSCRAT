@@ -14,7 +14,11 @@ interface TeamInviteEmailProps {
   userFirstname?: string;
 }
 
-const TeamInviteEmail = ({ teamName, invitationLink, userFirstname }: TeamInviteEmailProps) => {
+const TeamInviteEmail = ({
+  teamName,
+  invitationLink,
+  userFirstname,
+}: TeamInviteEmailProps) => {
   return (
     <Html>
       <Head />

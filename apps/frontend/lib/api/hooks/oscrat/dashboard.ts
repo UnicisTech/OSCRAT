@@ -8,4 +8,3 @@ export function useGetDashboardSummary(teamId: string) {
     queryFn: () => oscratDashboardEndpoints.getDashboardSummary(teamId),
   });
 }
-

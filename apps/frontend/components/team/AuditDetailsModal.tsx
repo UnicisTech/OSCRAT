@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Modal } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
-import Button from '@atlaskit/button';
+import Button from '@/components/button';
+import Modal from '@/components/shared/Modal';
 import {
   ClipboardIcon,
   CheckIcon,
@@ -15,6 +15,7 @@ import {
 } from '@/utils/translation';
 import { getCrudConfig, formatTimestamp } from '@/lib/auditUtils';
 import { isUuid } from '@/lib/utils';
+import { formatDateTime } from '@/utils/dateFormat';
 
 interface AuditDetailsModalProps {
   log: OscratAuditLog | null;
@@ -36,7 +37,7 @@ const formatValue = (value: unknown): string => {
   if (value === null || value === undefined) return '—';
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
   if (typeof value === 'string' && isDateString(value)) {
-    return new Date(value).toLocaleString();
+    return formatDateTime(value);
   }
   return String(value);
 };
@@ -89,23 +90,28 @@ const pathToFieldName = (path: string): string => {
   return parts.length > 0 ? formatKey(parts[parts.length - 1]) : path;
 };
 
-const opIndicator: Record<PatchOpValue, { symbol: string; className: string }> = {
-  [PatchOp.Replace]: { symbol: '→', className: 'text-amber-600' },
-  [PatchOp.Add]:     { symbol: '+', className: 'text-emerald-600' },
-  [PatchOp.Remove]:  { symbol: '−', className: 'text-rose-600' },
-};
+const opIndicator: Record<PatchOpValue, { symbol: string; className: string }> =
+  {
+    [PatchOp.Replace]: { symbol: '→', className: 'text-warning' },
+    [PatchOp.Add]: { symbol: '+', className: 'text-success' },
+    [PatchOp.Remove]: { symbol: '−', className: 'text-danger' },
+  };
 
 const PatchDisplay: React.FC<{ patch: PatchOperation[] }> = ({ patch }) => (
-  <dl className="grid grid-cols-[max-content_max-content_1fr] gap-x-3 gap-y-1.5 items-baseline">
+  <dl className="grid grid-cols-[max-content_max-content_1fr] items-baseline gap-x-3 gap-y-1.5">
     {patch.map((op, index) => {
       const ind = opIndicator[op.op];
       return (
         <React.Fragment key={index}>
-          <dt className="text-xs text-gray-500">{pathToFieldName(op.path)}</dt>
-          <span className={`font-mono text-sm ${ind.className}`}>{ind.symbol}</span>
-          <dd className="text-sm text-gray-900 break-words">
+          <dt className="text-content-muted text-xs">
+            {pathToFieldName(op.path)}
+          </dt>
+          <span className={`font-mono text-sm ${ind.className}`}>
+            {ind.symbol}
+          </span>
+          <dd className="text-content break-words text-sm">
             {op.op === PatchOp.Remove ? (
-              <span className="text-rose-600 italic">removed</span>
+              <span className="text-danger italic">removed</span>
             ) : (
               formatValue(op.value)
             )}
@@ -121,16 +127,20 @@ const SimplePropertyList: React.FC<{
   depth?: number;
 }> = ({ data, depth = 0 }) => (
   <dl
-    className={`grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 items-baseline ${depth > 0 ? 'ml-4 mt-1 col-span-2' : ''}`}
+    className={`grid grid-cols-[max-content_1fr] items-baseline gap-x-3 gap-y-1 ${depth > 0 ? 'col-span-2 ml-4 mt-1' : ''}`}
   >
     {Object.entries(data).map(([key, value]) => (
       <React.Fragment key={key}>
-        <dt className="text-xs text-gray-500">{formatKey(key)}</dt>
-        <dd className="text-sm text-gray-900 break-words min-w-0">
+        <dt className="text-content-muted text-xs">{formatKey(key)}</dt>
+        <dd className="text-content min-w-0 break-words text-sm">
           {isObject(value) ? (
             <SimplePropertyList data={value} depth={depth + 1} />
           ) : Array.isArray(value) ? (
-            value.length === 0 ? '—' : value.map(formatValue).join(', ')
+            value.length === 0 ? (
+              '—'
+            ) : (
+              value.map(formatValue).join(', ')
+            )
           ) : (
             formatValue(value)
           )}
@@ -151,38 +161,55 @@ const CopyableValue: React.FC<{ value: string }> = ({ value }) => {
       // ignore
     }
   };
-  const display = isUuid(value) ? `${value.slice(0, 8)}…${value.slice(-4)}` : value;
+  const display = isUuid(value)
+    ? `${value.slice(0, 8)}…${value.slice(-4)}`
+    : value;
   return (
-    <button
-      type="button"
+    <Button
+      variant="tertiary"
+      size="s"
       onClick={handleCopy}
       title={value}
-      className="group inline-flex items-center gap-1.5 font-mono text-xs text-gray-700 hover:text-gray-900"
+      className="text-content-secondary hover:text-content group !px-0 font-mono text-xs"
+      endIcon={
+        copied ? (
+          <CheckIcon className="text-success h-3.5 w-3.5" />
+        ) : (
+          <ClipboardIcon className="group-hover:text-content-muted text-content-placeholder h-3.5 w-3.5 transition-colors" />
+        )
+      }
     >
-      <span>{display}</span>
-      {copied ? (
-        <CheckIcon className="h-3.5 w-3.5 text-emerald-500" />
-      ) : (
-        <ClipboardIcon className="h-3.5 w-3.5 text-gray-300 group-hover:text-gray-500 transition-colors" />
-      )}
-    </button>
+      {display}
+    </Button>
   );
 };
 
-const FileRow: React.FC<{ icon: React.ReactNode; label: string; filename: string }> = ({ icon, label, filename }) => (
-  <div className="flex items-center gap-3 text-sm min-w-0">
-    <div className="text-gray-400 flex-shrink-0">{icon}</div>
-    <span className="text-xs text-gray-500 w-[50px] flex-shrink-0">{label}</span>
-    <span className="font-mono text-xs text-gray-700 truncate min-w-0" title={filename}>
+const FileRow: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  filename: string;
+}> = ({ icon, label, filename }) => (
+  <div className="flex min-w-0 items-center gap-3 text-sm">
+    <div className="text-content-placeholder flex-shrink-0">{icon}</div>
+    <span className="text-content-muted w-[50px] flex-shrink-0 text-xs">
+      {label}
+    </span>
+    <span
+      className="text-content-secondary min-w-0 truncate font-mono text-xs"
+      title={filename}
+    >
       {filename}
     </span>
   </div>
 );
 
-const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+const Field: React.FC<{ label: string; children: React.ReactNode }> = ({
+  label,
+  children,
+}) => (
   <>
-    <dt className="text-xs text-gray-500 pt-0.5">{label}</dt>
-    <dd className="text-sm text-gray-900 min-w-0">{children}</dd>
+    <dt className="text-content-muted pt-0.5 text-xs">{label}</dt>
+    <dd className="text-content min-w-0 text-sm">{children}</dd>
   </>
 );
 
@@ -216,7 +243,9 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
   const hasFiles = !!(inputFilename || outputFilename);
   const hasChanges =
     metadataType === 'patch' ||
-    (metadataType === 'snapshot' && isObject(metadataData) && Object.keys(metadataData).length > 0) ||
+    (metadataType === 'snapshot' &&
+      isObject(metadataData) &&
+      Object.keys(metadataData).length > 0) ||
     (metadataType === 'raw' && !!extraMetadata);
 
   const targetTypeLabel = t(
@@ -230,28 +259,34 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
   const showSeparateTargetId = log.targetId && log.targetName !== log.targetId;
 
   return (
-    <Modal open={isOpen} className="bg-white text-gray-900 max-w-2xl">
-      <Modal.Header className="border-b border-gray-100 pb-3 mb-0">
-        <div
-          className="font-semibold text-base text-gray-900 leading-tight"
-          title={log.action}
-        >
-          {actionLabel}
-        </div>
-        <div className="mt-1 text-xs">
-          <span className={`px-1.5 py-0.5 rounded ${crud.bg} ${crud.text}`}>
-            {t(crud.labelKey, { defaultValue: log.crud.toUpperCase() })}
-          </span>
+    <Modal open={isOpen} close={onClose} size="lg">
+      <Modal.Header>
+        <div className="flex flex-col">
+          <div
+            className="text-content text-base font-semibold leading-tight"
+            title={log.action}
+          >
+            {actionLabel}
+          </div>
+          <div className="mt-1 text-xs">
+            <span className={`rounded px-1.5 py-0.5 ${crud.bg} ${crud.text}`}>
+              {t(crud.labelKey, { defaultValue: log.crud.toUpperCase() })}
+            </span>
+          </div>
         </div>
       </Modal.Header>
 
       <Modal.Body>
-        <div className="max-h-[60vh] overflow-y-auto py-2 space-y-5">
+        <div className="max-h-[60vh] space-y-5 overflow-y-auto py-2">
           <dl className="grid grid-cols-[max-content_1fr] gap-x-5 gap-y-3">
             <Field label={t('user')}>
-              <div className="font-medium">{log.userName || log.userId || '—'}</div>
+              <div className="font-medium">
+                {log.userName || log.userId || '—'}
+              </div>
               {log.userEmail && (
-                <div className="text-xs text-gray-500">{log.userEmail}</div>
+                <div className="text-content-muted text-xs">
+                  {log.userEmail}
+                </div>
               )}
             </Field>
 
@@ -260,10 +295,19 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
             </Field>
 
             {(log.productName || log.versionName) && (
-              <Field label={log.versionName ? `${t('product')} · ${t('version')}` : t('product')}>
+              <Field
+                label={
+                  log.versionName
+                    ? `${t('product')} · ${t('version')}`
+                    : t('product')
+                }
+              >
                 {log.productName ?? '—'}
                 {log.versionName && (
-                  <span className="text-gray-500"> · {log.versionName}</span>
+                  <span className="text-content-muted">
+                    {' '}
+                    · {log.versionName}
+                  </span>
                 )}
               </Field>
             )}
@@ -275,7 +319,10 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
                   {isUuid(log.targetName) ? (
                     <CopyableValue value={log.targetName} />
                   ) : (
-                    <span className="text-xs text-gray-500 break-all" title={log.targetName}>
+                    <span
+                      className="text-content-muted break-all text-xs"
+                      title={log.targetName}
+                    >
                       {log.targetName}
                     </span>
                   )}
@@ -291,7 +338,7 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
 
           {hasFiles && (
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
+              <h3 className="text-content-secondary mb-2 text-sm font-medium">
                 {t('files')}
               </h3>
               <div className="space-y-1 pl-1">
@@ -315,7 +362,7 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
 
           {hasChanges && (
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
+              <h3 className="text-content-secondary mb-2 text-sm font-medium">
                 {t('changes')}
               </h3>
               <div className="pl-1">
@@ -332,11 +379,11 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
         </div>
       </Modal.Body>
 
-      <Modal.Actions className="border-t border-gray-100 pt-3">
-        <Button appearance="default" onClick={onClose}>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onClose}>
           {t('close')}
         </Button>
-      </Modal.Actions>
+      </Modal.Footer>
     </Modal>
   );
 };

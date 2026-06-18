@@ -2,8 +2,15 @@ import { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
 import { AssessmentType, DeclarationType } from '@/lib/doc/types';
-import type { FullDocData, SimpleDocData, DocPrefillData } from '@/lib/doc/types';
-import { generateDocPDF, buildPDFDocTranslations } from '@/lib/doc/pdfGenerator';
+import type {
+  FullDocData,
+  SimpleDocData,
+  DocPrefillData,
+} from '@/lib/doc/types';
+import {
+  generateDocPDF,
+  buildPDFDocTranslations,
+} from '@/lib/doc/pdfGenerator';
 import { extractErrorMessage } from '@/lib/utils';
 
 interface UseDocWizardConfig {
@@ -12,11 +19,19 @@ interface UseDocWizardConfig {
   onClose: () => void;
 }
 
-export function useDocWizard({ prefillData, onGenerate, onClose }: UseDocWizardConfig) {
+export function useDocWizard({
+  prefillData,
+  onGenerate,
+  onClose,
+}: UseDocWizardConfig) {
   const { t } = useTranslation('common');
   const [step, setStep] = useState(1);
-  const [assessmentType, setAssessmentType] = useState<AssessmentType>(AssessmentType.SELF);
-  const [declarationType, setDeclarationType] = useState<DeclarationType>(DeclarationType.SIMPLE);
+  const [assessmentType, setAssessmentType] = useState<AssessmentType>(
+    AssessmentType.SELF
+  );
+  const [declarationType, setDeclarationType] = useState<DeclarationType>(
+    DeclarationType.SIMPLE
+  );
   const [isGenerating, setIsGenerating] = useState(false);
 
   const [fullDocData, setFullDocData] = useState<FullDocData>({
@@ -67,7 +82,9 @@ export function useDocWizard({ prefillData, onGenerate, onClose }: UseDocWizardC
       await onGenerate(pdfBlob, filename);
       onClose();
     } catch (error) {
-      toast.error(extractErrorMessage(error, t('oscrat.ui.doc.doc-generation-failed')));
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.doc.doc-generation-failed'))
+      );
     } finally {
       setIsGenerating(false);
     }

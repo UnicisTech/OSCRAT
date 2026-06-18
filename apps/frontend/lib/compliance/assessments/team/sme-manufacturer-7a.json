@@ -13,10 +13,7 @@
             "questionId": "ESO1-Q1",
             "questionText": "area-1.ESO1.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -26,10 +23,7 @@
             "questionId": "ESO1-Q2",
             "questionText": "area-1.ESO1.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -79,10 +73,7 @@
             "questionId": "ESO2-Q1",
             "questionText": "area-2.ESO2.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -101,10 +92,7 @@
             "questionId": "ESO2-Q3",
             "questionText": "area-2.ESO2.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -119,10 +107,7 @@
             "questionId": "ESO2-Q5",
             "questionText": "area-2.ESO2.questions.Q5.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -132,10 +117,7 @@
             "questionId": "ESO2-Q6",
             "questionText": "area-2.ESO2.questions.Q6.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -145,10 +127,7 @@
             "questionId": "ESO2-Q7",
             "questionText": "area-2.ESO2.questions.Q7.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -167,10 +146,7 @@
             "questionId": "ESO3-Q1",
             "questionText": "area-2.ESO3.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -180,10 +156,7 @@
             "questionId": "ESO3-Q2",
             "questionText": "area-2.ESO3.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -202,10 +175,7 @@
             "questionId": "ESO4-Q1",
             "questionText": "area-2.ESO4.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO4-Q2",
@@ -216,10 +186,7 @@
             "questionId": "ESO4-Q3",
             "questionText": "area-2.ESO4.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -234,10 +201,7 @@
             "questionId": "ESO4-Q5",
             "questionText": "area-2.ESO4.questions.Q5.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO4-Q6",
@@ -263,10 +227,7 @@
             "questionId": "ESO6-Q1",
             "questionText": "area-3.ESO6.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -276,10 +237,7 @@
             "questionId": "ESO6-Q2",
             "questionText": "area-3.ESO6.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -294,10 +252,7 @@
             "questionId": "ESO6-Q4",
             "questionText": "area-3.ESO6.questions.Q4.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -312,10 +267,7 @@
             "questionId": "ESO6-Q6",
             "questionText": "area-3.ESO6.questions.Q6.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -334,10 +286,7 @@
             "questionId": "ESO7-Q1",
             "questionText": "area-3.ESO7.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -347,10 +296,7 @@
             "questionId": "ESO7-Q2",
             "questionText": "area-3.ESO7.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -360,10 +306,7 @@
             "questionId": "ESO7-Q3",
             "questionText": "area-3.ESO7.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -373,10 +316,7 @@
             "questionId": "ESO7-Q4",
             "questionText": "area-3.ESO7.questions.Q4.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -415,10 +355,7 @@
             "questionId": "ESO8-Q4",
             "questionText": "area-3.ESO8.questions.Q4.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO8-Q5",
@@ -444,10 +381,7 @@
             "questionId": "ESO9-Q1",
             "questionText": "area-4.ESO9.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO9-Q2",
@@ -498,10 +432,7 @@
             "questionId": "ESO10-Q1",
             "questionText": "area-5.ESO10.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO10-Q2",
@@ -527,10 +458,7 @@
             "questionId": "ESO11-Q1",
             "questionText": "area-6.ESO11.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -540,19 +468,13 @@
             "questionId": "ESO11-Q2",
             "questionText": "area-6.ESO11.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO11-Q3",
             "questionText": "area-6.ESO11.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO11-Q4",
@@ -563,19 +485,13 @@
             "questionId": "ESO11-Q5",
             "questionText": "area-6.ESO11.questions.Q5.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO11-Q6",
             "questionText": "area-6.ESO11.questions.Q6.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           }
         ],
         "hint": "area-6.ESO11.hint"
@@ -590,10 +506,7 @@
             "questionId": "ESO12-Q1",
             "questionText": "area-6.ESO12.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -612,10 +525,7 @@
             "questionId": "ESO13-Q1",
             "questionText": "area-6.ESO13.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -625,19 +535,13 @@
             "questionId": "ESO13-Q2",
             "questionText": "area-6.ESO13.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO13-Q3",
             "questionText": "area-6.ESO13.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -652,10 +556,7 @@
             "questionId": "ESO13-Q5",
             "questionText": "area-6.ESO13.questions.Q5.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO13-Q6",
@@ -679,10 +580,7 @@
             "questionId": "ESO14-Q1",
             "questionText": "area-6.ESO14.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           },
           {
             "questionId": "ESO14-Q2",
@@ -693,10 +591,7 @@
             "questionId": "ESO14-Q3",
             "questionText": "area-6.ESO14.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ]
+            "options": ["common.yes", "common.no"]
           }
         ],
         "hint": "area-6.ESO14.hint"

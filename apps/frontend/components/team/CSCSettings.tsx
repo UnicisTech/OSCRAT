@@ -4,7 +4,7 @@ import { isoOptions } from '../defaultLanding/data/configs/csc';
 import { useFormik } from 'formik';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 import { useSetCscIso, useGetCscIso } from '@/lib/api/hooks/csc';
@@ -42,7 +42,7 @@ const CSCSettings = ({ team }: { team: Team }) => {
               <p>{t('csc-choose-iso')}</p>
               <div className="flex w-1/2 items-center justify-between space-x-3">
                 <select
-                  className="select select-bordered dark:bg-base-100 flex-grow bg-white"
+                  className="select select-bordered bg-surface flex-grow"
                   name="iso"
                   onChange={formik.handleChange}
                   value={formik.values.iso}
@@ -58,10 +58,9 @@ const CSCSettings = ({ team }: { team: Team }) => {
                 </select>
                 <Button
                   type="submit"
-                  color="primary"
+                  variant="primary"
                   loading={formik.isSubmitting || isLoading}
                   disabled={!formik.isValid || !formik.dirty}
-                  size="md"
                 >
                   {t('choose')}
                 </Button>

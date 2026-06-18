@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ComplianceQuestion, ComplianceAnswer } from '@/types/compliance';
-import { ComplianceNamespace, createComplianceTranslator } from '@/lib/compliance/translations';
+import {
+  ComplianceNamespace,
+  createComplianceTranslator,
+} from '@/lib/compliance/translations';
 import { FaUpload, FaFile, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import { Button } from '@/components/shared';
 
 interface QuestionStepProps {
   question: ComplianceQuestion;
@@ -38,9 +42,33 @@ const EVIDENCE_ALLOWED_EXTENSIONS = new Set([
   'gif',
 ]);
 const BLOCKED_EXTENSIONS = new Set([
-  'exe', 'bat', 'cmd', 'com', 'msi', 'scr', 'pif', 'vbs', 'vbe',
-  'js', 'jse', 'ws', 'wsf', 'wsc', 'wsh', 'ps1', 'ps2', 'psc1',
-  'psc2', 'reg', 'inf', 'lnk', 'dll', 'sys', 'sh', 'cpl', 'hta',
+  'exe',
+  'bat',
+  'cmd',
+  'com',
+  'msi',
+  'scr',
+  'pif',
+  'vbs',
+  'vbe',
+  'js',
+  'jse',
+  'ws',
+  'wsf',
+  'wsc',
+  'wsh',
+  'ps1',
+  'ps2',
+  'psc1',
+  'psc2',
+  'reg',
+  'inf',
+  'lnk',
+  'dll',
+  'sys',
+  'sh',
+  'cpl',
+  'hta',
 ]);
 const EVIDENCE_FILE_ACCEPT =
   '.pdf,.doc,.docx,.txt,.csv,.json,.xml,.yml,.yaml,.zip,.tar,.gz,.tgz,.png,.jpg,.jpeg,.gif';
@@ -66,7 +94,11 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
   customTranslations = null,
 }) => {
   const { t, ready } = useTranslation(['common', complianceNamespace]);
-  const tr = createComplianceTranslator(t, complianceNamespace, customTranslations);
+  const tr = createComplianceTranslator(
+    t,
+    complianceNamespace,
+    customTranslations
+  );
 
   const getInitialAnswer = () => {
     if (existingAnswer?.answer !== undefined) {
@@ -75,7 +107,9 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
     return question.answerType === 'boolean' ? null : '';
   };
 
-  const [answer, setAnswer] = useState<string | boolean | null>(getInitialAnswer());
+  const [answer, setAnswer] = useState<string | boolean | null>(
+    getInitialAnswer()
+  );
   const [additionalInformation, setAdditionalInformation] = useState<string>(
     existingAnswer?.additionalInformation || ''
   );
@@ -107,7 +141,8 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
       questionId: question.questionId,
       answer,
       additionalInformation: additionalInformation || undefined,
-      evidence: evidenceFile || (hasExistingEvidence ? existingAnswer?.evidence : null),
+      evidence:
+        evidenceFile || (hasExistingEvidence ? existingAnswer?.evidence : null),
       evidenceFileName: evidenceFile?.name || existingAnswer?.evidenceFileName,
     };
 
@@ -121,7 +156,11 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
     }
 
     const extension = getFileExtension(file.name);
-    if (!extension || BLOCKED_EXTENSIONS.has(extension) || !EVIDENCE_ALLOWED_EXTENSIONS.has(extension)) {
+    if (
+      !extension ||
+      BLOCKED_EXTENSIONS.has(extension) ||
+      !EVIDENCE_ALLOWED_EXTENSIONS.has(extension)
+    ) {
       setFileError(t('oscrat.ui.file-upload-allowed-types'));
       e.target.value = '';
       return;
@@ -167,7 +206,7 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
             return (
               <label
                 key={option}
-                className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                className="border-line hover:bg-surface-muted rounded-input flex cursor-pointer items-center border p-3 transition-colors"
               >
                 <input
                   type="radio"
@@ -175,9 +214,9 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
                   value={String(booleanValue)}
                   checked={answer === booleanValue}
                   onChange={() => setAnswer(booleanValue)}
-                  className="mr-3 text-blue-600 "
+                  className="text-primary mr-3"
                 />
-                <span className="text-gray-700">{tr(option)}</span>
+                <span className="text-content-secondary">{tr(option)}</span>
               </label>
             );
           })}
@@ -189,19 +228,21 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
       const textValue = typeof answer === 'string' ? answer : '';
       const charCount = textValue.length;
       const MAX_CHARS = 1000;
-      
+
       return (
         <div>
           <textarea
             value={textValue}
             onChange={(e) => setAnswer(e.target.value)}
             placeholder={t('oscrat.ui.enter-your-answer')}
-            className="w-full p-3 border border-gray-300 rounded-lg min-h-[120px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="border-line focus:ring-primary focus:border-primary rounded-input min-h-[120px] w-full resize-y border p-3 focus:outline-none focus:ring-2"
             rows={4}
             maxLength={MAX_CHARS}
           />
-          <div className="flex justify-end mt-1">
-            <span className={`text-xs ${charCount >= MAX_CHARS ? 'text-red-600' : 'text-gray-500'}`}>
+          <div className="mt-1 flex justify-end">
+            <span
+              className={`text-c1 ${charCount >= MAX_CHARS ? 'text-danger' : 'text-content-muted'}`}
+            >
               {charCount} / {MAX_CHARS}
             </span>
           </div>
@@ -214,12 +255,13 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
 
   const isAnswerValid = () => {
     // Check main answer
-    const hasValidAnswer = question.answerType === 'boolean'
-      ? answer === true || answer === false
-      : answer && typeof answer === 'string' && answer.trim().length > 0;
-    
+    const hasValidAnswer =
+      question.answerType === 'boolean'
+        ? answer === true || answer === false
+        : answer && typeof answer === 'string' && answer.trim().length > 0;
+
     if (!hasValidAnswer) return false;
-    
+
     // Check additional information if required
     if (
       question.additionalInformation?.required &&
@@ -227,54 +269,60 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
     ) {
       return false;
     }
-    
+
     // Check evidence upload if required
-    if (isEvidenceRequiredForCurrentAnswer() && !evidenceFile && !hasExistingEvidence) {
+    if (
+      isEvidenceRequiredForCurrentAnswer() &&
+      !evidenceFile &&
+      !hasExistingEvidence
+    ) {
       return false;
     }
-    
+
     return true;
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-surface border-line rounded-card border p-6">
       {/* Question header */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-500">
-            {t('oscrat.ui.question-n-of-m', { 
-              current: questionNumber, 
-              total: totalQuestions 
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-b2 text-content-muted">
+            {t('oscrat.ui.question-n-of-m', {
+              current: questionNumber,
+              total: totalQuestions,
             })}
           </span>
         </div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-h6 text-content font-medium">
           {tr(question.questionText)}
         </h3>
       </div>
 
       {/* Answer input */}
-      <div className="mb-6">
-        {renderAnswerInput()}
-      </div>
+      <div className="mb-6">{renderAnswerInput()}</div>
 
       {/* Additional Information */}
       {question.additionalInformation && (
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="text-b2 text-content-secondary mb-2 block font-medium">
             {t('oscrat.ui.additional-information')}
-            {question.additionalInformation.required && <span className="text-red-600 ml-1">*</span>}
+            {question.additionalInformation.required && (
+              <span className="text-danger ml-1">*</span>
+            )}
           </label>
           <textarea
             value={additionalInformation}
             onChange={(e) => setAdditionalInformation(e.target.value)}
             placeholder={t('oscrat.ui.enter-additional-information')}
-            className="w-full p-3 border border-gray-300 rounded-lg min-h-[100px] resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="border-line focus:ring-primary focus:border-primary rounded-input min-h-[100px] w-full resize-y border p-3 focus:outline-none focus:ring-2"
             rows={3}
             maxLength={1000}
           />
-          <div className="flex justify-end mt-1">
-            <span className={`text-xs ${additionalInformation.length >= 1000 ? 'text-red-600' : 'text-gray-500'}`}>
+          <div className="mt-1 flex justify-end">
+            <span
+              className={`text-c1 ${additionalInformation.length >= 1000 ? 'text-danger' : 'text-content-muted'}`}
+            >
               {additionalInformation.length} / 1000
             </span>
           </div>
@@ -283,13 +331,15 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
 
       {/* Evidence upload */}
       {question.evidence && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <label className="block text-sm font-medium text-gray-700">
+        <div className="bg-surface-muted rounded-card mb-6 p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <label className="text-b2 text-content-secondary block font-medium">
               {t('oscrat.ui.evidence-upload')}
-              {isEvidenceRequiredForCurrentAnswer() && <span className="text-red-600 ml-1">*</span>}
+              {isEvidenceRequiredForCurrentAnswer() && (
+                <span className="text-danger ml-1">*</span>
+              )}
               {question.evidence.hint && (
-                <span className="ml-2 text-xs text-gray-500 font-normal">
+                <span className="text-c1 text-content-muted ml-2 font-normal">
                   ({question.evidence.hint})
                 </span>
               )}
@@ -298,13 +348,13 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
               className="tooltip tooltip-right"
               data-tip={`${t('oscrat.ui.file-upload-max-size')} • ${t('oscrat.ui.file-upload-allowed-types')}`}
             >
-              <FaInfoCircle className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+              <FaInfoCircle className="text-content-placeholder hover:text-content-secondary h-4 w-4" />
             </div>
           </div>
-          
+
           {!evidenceFile && !hasExistingEvidence ? (
             <div className="mt-2">
-              <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+              <label className="border-line shadow-2 text-b2 text-content-secondary bg-surface hover:bg-surface-muted focus-within:ring-primary rounded-input inline-flex cursor-pointer items-center border px-4 py-2 font-medium focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2">
                 <FaUpload className="mr-2" />
                 {t('oscrat.ui.select-file')}
                 <input
@@ -315,24 +365,27 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
                 />
               </label>
               {fileError && (
-                <p className="mt-2 text-xs text-red-500">{fileError}</p>
+                <p className="text-c1 text-danger mt-2">{fileError}</p>
               )}
             </div>
           ) : (
-            <div className="mt-2 flex items-center justify-between p-3 bg-white rounded-md border border-gray-200">
+            <div className="bg-surface border-line-subtle rounded-input mt-2 flex items-center justify-between border p-3">
               <div className="flex items-center">
-                <FaFile className="text-gray-400 mr-2" />
-                <span className="text-sm text-gray-700">
-                  {evidenceFile?.name || existingAnswer?.evidenceFileName || t('oscrat.ui.existing-evidence')}
+                <FaFile className="text-content-placeholder mr-2" />
+                <span className="text-b2 text-content-secondary">
+                  {evidenceFile?.name ||
+                    existingAnswer?.evidenceFileName ||
+                    t('oscrat.ui.existing-evidence')}
                 </span>
               </div>
-              <button
+              <Button
+                variant="tertiary"
+                tone="danger"
+                size="s"
                 onClick={removeFile}
-                className="text-red-600 hover:text-red-700"
                 aria-label={t('remove')}
-              >
-                <FaTimes />
-              </button>
+                icon={<FaTimes />}
+              />
             </div>
           )}
         </div>
@@ -340,26 +393,18 @@ const QuestionStep: React.FC<QuestionStepProps> = ({
 
       {/* Navigation buttons */}
       <div className="flex justify-between">
-        <button
+        <Button
+          variant="secondary"
           onClick={onPrevious}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          {isFirst ? t('back') : t('previous')}
-        </button>
-        
-        <button
+          text={isFirst ? t('back') : t('previous')}
+        />
+
+        <Button
+          variant="primary"
           onClick={handleSubmit}
           disabled={!isAnswerValid()}
-          className={`
-            px-4 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-            ${isAnswerValid()
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }
-          `}
-        >
-          {isLast ? t('oscrat.ui.complete-requirement') : t('next')}
-        </button>
+          text={isLast ? t('oscrat.ui.complete-requirement') : t('next')}
+        />
       </div>
     </div>
   );

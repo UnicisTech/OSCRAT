@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import Button from '@/components/button';
 
 export interface FilterOption {
   value: string;
@@ -29,25 +30,31 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 }) => {
   const isActive = value !== defaultValue;
   const selectedOption = options.find((opt) => opt.value === value);
-  const displayLabel = isActive && selectedOption ? selectedOption.label : label;
+  const displayLabel =
+    isActive && selectedOption ? selectedOption.label : label;
 
   return (
     <div className="relative">
-      <button
+      <Button
+        variant="secondary"
+        size="m"
         onClick={onToggle}
-        className={`flex items-center justify-between gap-2 px-3 py-2 text-sm border rounded-md min-w-[120px] ${
-          isActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+        fullWidth
+        className={`min-w-[120px] justify-between ${
+          isActive ? 'border-info bg-info-subtle' : ''
         }`}
+        endIcon={
+          <ChevronDownIcon
+            className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          />
+        }
       >
         <span className="truncate">{displayLabel}</span>
-        <ChevronDownIcon
-          className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-        />
-      </button>
+      </Button>
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={onClose} />
-          <div className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+          <div className="bg-surface border-line shadow-8 rounded-input absolute z-20 mt-1 w-full border">
             {options.map((option) => (
               <button
                 key={option.value}
@@ -55,8 +62,10 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                   onChange(option.value);
                   onClose();
                 }}
-                className={`block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${
-                  value === option.value ? 'bg-blue-50 text-blue-700' : ''
+                className={`hover:bg-surface-muted block w-full px-3 py-2 text-left text-sm ${
+                  value === option.value
+                    ? 'bg-info-subtle text-info-emphasis'
+                    : ''
                 }`}
               >
                 {option.label}

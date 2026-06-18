@@ -1,585 +1,584 @@
 {
-    "applicabilityQuestions": [
+  "applicabilityQuestions": [
+    {
+      "id": "1.1",
+      "question": "Is the product commercially supplied?",
+      "remark": "Will the product be made available on the market as part of commercial activities?",
+      "hint": "This Regulation applies to economic operators only in relation to products with digital elements made available on the market, hence supplied for distribution or use on the Union market in the course of a commercial activity. Including through sales, monetization, paid support, or data processing beyond security purposes, and excluding cases where the product is solely cost-recovery based or developed/used exclusively by public administration without market availability.",
+      "references": [
         {
-            "id": "1.1",
-            "question": "Is the product commercially supplied?",
-            "remark": "Will the product be made available on the market as part of commercial activities?",
-            "hint": "This Regulation applies to economic operators only in relation to products with digital elements made available on the market, hence supplied for distribution or use on the Union market in the course of a commercial activity. Including through sales, monetization, paid support, or data processing beyond security purposes, and excluding cases where the product is solely cost-recovery based or developed/used exclusively by public administration without market availability.",
-            "references": [
-                {
-                    "text": "Section 1.1 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                },
-                {
-                    "text": "Section 1.2 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "isEliminatory": false,
-                    "skipToQuestion": "1.3"
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
+          "text": "Section 1.1 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
         },
         {
-            "id": "1.2",
-            "question": "Is the product made available only for a limited period required for testing purposes?",
-            "hint": "The unfinished software which does not comply with CRA can be made available on the market, provided that the software is made available only for a limited period required for testing purposes with a visible sign clearly indicating that it does not comply with this Regulation and that it will not be available on the market for purposes other than testing.",
-            "references": [
-                {
-                    "text": "Section 1.2 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "isEliminatory": true
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
-        },
-        {
-            "id": "1.3",
-            "question": "Was the product with digital elements developed as a spare part to replace identical components on the market?",
-            "hint": "This Regulation does not apply to spare parts that are made available on the market to replace identical components in products with digital elements and that are manufactured according to the same specifications as the components that they are intended to replace. In order to ensure that products with digital elements made available on the market can be repaired effectively and their durability extended, an exemption cover both spare parts that have the purpose of repairing legacy products made available before the date of application of CRA and spare parts that have already undergone a conformity assessment procedure pursuant to CRA.",
-            "references": [
-                {
-                    "text": "Section 1.3 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "isEliminatory": true
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
-        },
-        {
-            "id": "1.4",
-            "question": "Is this a new solution or a modification of an existing product?",
-            "hint": "Determining whether it is a 'significant modification' and requires reassessment – a significant modification, if the product is being assessed by a third party, must also be reported to that party.",
-            "references": [
-                {
-                    "text": "Section 1.4 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "New solution",
-                    "isEliminatory": false,
-                    "skipToQuestion": "1.6"
-                },
-                {
-                    "text": "Modification of an existing product",
-                    "isEliminatory": false
-                }
-            ]
-        },
-        {
-            "id": "1.5",
-            "question": "Is this a substantial modification?",
-            "hint": "Substantial modification means a change to the product with digital elements following its placing on the market, which affects the compliance of the product with digital elements with the essential cybersecurity requirements set out in Part I of Annex I or which results in a modification to the intended purpose for which the product with digital elements has been assessed.",
-            "references": [
-                {
-                    "text": "Section 1.5 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "isEliminatory": false
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": true
-                }
-            ]
-        },
-        {
-            "id": "1.6",
-            "question": "Does the product contain digital elements?",
-            "hint": "\"Product with digital elements\" means a software or hardware product, where:\n- \"software\" means the part of an electronic information system which consists of computer code;\n- \"hardware\" means a physical electronic information system, or parts capable of processing, storing or transmitting digital data;\n- \"electronic information system\" means a system, including electrical or electronic equipment, capable of processing, storing or transmitting digital data;\nand its remote data processing solutions, including software or hardware components being placed on the market separately, where:\n- \"component\" means software or hardware intended for integration into an electronic information system;\n- \"remote data processing\" means data processing at a distance for which the software is designed and developed by the manufacturer, or under the responsibility of the manufacturer, and the absence of which would prevent the product with digital elements from performing one of its functions;",
-            "references": [
-                {
-                    "text": "Section 1.6 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "The product is a software solution, which is part of an electronic information system, in form of computer code",
-                    "isEliminatory": false
-                },
-                {
-                    "text": "The product is a hardware solution in form of physical electronic information system, capable of processing, storing or transmitting digital data",
-                    "isEliminatory": false
-                },
-                {
-                    "text": "The product does not contain digital elements.",
-                    "isEliminatory": true
-                }
-            ]
-        },
-        {
-            "id": "1.7",
-            "question": "Does the product with digital elements have the nature of a medical device?",
-            "remark": "A product with the nature of a medical device for use in humans and accessories for such devices (Article 1, paragraph 1), including clinical trials on products (Article 1, paragraph 2) or separate groups of products with no intended medical purpose – Annex XVI (Article 1, paragraph 2).",
-            "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2017/745, it is a medical device.\n\"Medical device\" means any instrument, apparatus, appliance, software, implant, reagent, material or other article intended by the manufacturer to be used, alone or in combination, for human beings for one or more of the following specific medical purposes:\n- diagnosis, prevention, monitoring, prediction, prognosis, treatment or alleviation of disease,\n- diagnosis, monitoring, treatment, alleviation of, or compensation for, an injury or disability,\n- investigation, replacement or modification of the anatomy or of a physiological or pathological process or state,\n- providing information by means of in vitro examination of specimens derived from the human body, including organ, blood and tissue donations,\nand which does not achieve its principal intended action by pharmacological, immunological or metabolic means, in or on the human body, but which may be assisted in its function by such means.\nThe following products shall also be deemed to be medical devices:\n- devices for the control or support of conception;\n- products specifically intended for the cleaning, disinfection or sterilisation of devices as referred to in Article 1(4) and of those referred to in the first paragraph of this point.",
-            "references": [
-                {
-                    "text": "Section 1.7 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes, in accordance with EU Regulation 2017/745",
-                    "isEliminatory": true
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
-        },
-        {
-            "id": "1.8",
-            "question": "Does the product with digital elements have the nature of a medical device for in vitro diagnostics?",
-            "remark": "A product with the nature of a medical device for in vitro diagnostics used by humans and accessories for such products (Article 1, paragraph 1j).",
-            "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2017/746, it is a vitro diagnostic medical device.\n\"In vitro diagnostic medical device\" means any medical device which is a reagent, reagent product, calibrator, control material, kit, instrument, apparatus, piece of equipment, software or system, whether used alone or in combination, intended by the manufacturer to be used in vitro for the examination of specimens, including blood and tissue donations, derived from the human body, solely or principally for the purpose of providing information on one or more of the following:\n- concerning a physiological or pathological process or state;\n- concerning congenital physical or mental impairments;\n- concerning the predisposition to a medical condition or a disease;\n- to determine the safety and compatibility with potential recipients;\n- to predict treatment response or reactions;\n- to define or monitoring therapeutic measures.\nSpecimen receptacles shall also be deemed to be in vitro diagnostic medical devices;",
-            "references": [
-                {
-                    "text": "Section 1.7 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes, in accordance with EU Regulation 2017/746",
-                    "isEliminatory": true
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
-        },
-        {
-            "id": "1.9",
-            "question": "Is the product with digital elements built for vehicles, where a product is a component for:\n- protection and safety of vehicle occupants and vulnerable road users or,\n- pressure monitoring systems or,\n- fuel efficiency or,\n- CO2 emissions or,\n- tyres.",
-            "remark": "A product built for vehicles, with regard to their general characteristics, safety and the protection and safety of vehicle occupants and vulnerable road users; in the scope of type-approval (Article 1):\n• of vehicles and systems, components and separate technical units, and,\n• of tyre pressure monitoring systems, with regard to their safety, fuel efficiency and CO2 emissions; and,\n• of newly manufactured tyres, with regard to their safety and environmental performance.",
-            "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2019/2144, it is a product for protection and safety of vehicle occupants and vulnerable road users, pressure monitoring systems, fuel efficiency and CO2 emissions, tyres.",
-            "references": [
-                {
-                    "text": "Section 1.7 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes, in accordance with EU Regulation 2019/2144",
-                    "isEliminatory": true
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
-        },
-        {
-            "id": "1.10",
-            "question": "Is the product with digital elements:\n- products, parts and equipment for remote control of aircraft or,\n- products for aircraft maintenance and operation or,\n- products/equipment for operation of airports or,\n- products related to the protection of the airport environment or,\n- components used in ATM/ANS.",
-            "remark": "The product has been certified in accordance with Regulation (EU) 2018/1139, i.e. a product of the nature (Article 1):\n• products, parts and equipment for remote control of aircraft;\n• aircraft maintenance and operation;\n• equipment and operation of airports;\n• related to the protection of the airport environment;\n• components used in ATM/ANS.",
-            "hint": "A product certified and in the scope of Regulation (EU) 2018/1139 does not apply to CRA.",
-            "references": [
-                {
-                    "text": "Section 1.7 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes, it is certified in accordance with Regulation (EU) 2018/1139",
-                    "isEliminatory": true
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
-        },
-        {
-            "id": "1.11",
-            "question": "Does the product with digital elements have a nature of marine equipment intended to be placed on board EU ships?",
-            "remark": "A product of the nature of marine equipment intended to be placed on board EU ships (Article 1).",
-            "hint": "A product in the scope of Regulation 2014/90/UE does not apply to CRA.",
-            "references": [
-                {
-                    "text": "Section 1.7 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes, in accordance with EU Regulation 2014/90/UE",
-                    "isEliminatory": true
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
-        },
-        {
-            "id": "1.12",
-            "question": "Is the product with digital elements developed or modified exclusively for national security, defense, or specifically designed to process classified information?",
-            "hint": "Products with digital elements that are developed or modified exclusively for national security or defence purposes or products that are specifically designed to process classified information fall outside the scope of this Regulation.",
-            "references": [
-                {
-                    "text": "Section 1.7 of the CRA Form",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Yes",
-                    "isEliminatory": true
-                },
-                {
-                    "text": "No",
-                    "isEliminatory": false
-                }
-            ]
+          "text": "Section 1.2 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
         }
-    ],
-    "riskQuestions": [
+      ],
+      "answerOptions": [
         {
-            "id": "1.13",
-            "question": "Does your product fall into any of the following categories?",
-            "answerType": "DROPDOWN",
-            "references": [
-                {
-                    "text": "Annex III, Annex IV",
-                    "url": "https://www.cra.gov.uk/form"
-                }
-            ],
-            "answerOptions": [
-                {
-                    "text": "Hardware Devices with Security Boxes",
-                    "riskLevel": "CRITICAL",
-                    "hint": "This category of products includes: payment terminals, tachograph vehicle units, smart meters, access control terminals and Hardware Security Modules where significant portions of the required security functionality depend upon a hardware physical envelope (referred to as a 'Security Box') that is designed to resist direct attacks. [Ref. extras from COMMISSION IMPLEMENTING REGULATION (EU) 2024/482 of 31 January 2024 laying down rules for the application of Regulation (EU) 2019/881 of the European Parliament and of the Council as regards the adoption of the European Common Criteria-based cybersecurity certification scheme (EUCC)]",
-                    "references": [
-                        {
-                            "text": "Annex IV point (1)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Smart meter gateways within smart metering systems as defined in Article 2, point (23) of Directive (EU) 2019/944 of the European Parliament and of the Council (1) and other devices for advanced security purposes, including for secure cryptoprocessing",
-                    "riskLevel": "CRITICAL",
-                    "hint": "'Smart metering system' means an electronic system that is capable of measuring electricity fed into the grid or electricity consumed from the grid, providing more information than a conventional meter, and that is capable of transmitting and receiving data for information, monitoring and control purposes, using a form of electronic communication This category of products includes: - Smart Metering Gateway - Device or unit within smart metering systems responsible for collecting Meter Data, processing Meter Data, providing communication capabilities for devices in the Local Metering Network, protecting devices in the Local Area Network, and providing cryptographic primitives (in cooperation with a Security Module). [Ref. Protection Profile for the Gateway of a Smart Metering System (Smart Meter Gateway PP), BSI CC PP 0073] - Components which can be used in the environment of smart metering systems by various types of users to support their tasks and communication activities in a secure operating environment [Ref. BSI Technische Richtlinie BSI TR-03109-2.B]",
-                    "references": [
-                        {
-                            "text": "Annex IV point (2)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Smartcards or similar devices, including secure elements",
-                    "riskLevel": "CRITICAL",
-                    "hint": "This category of products includes: smart card hardware/ICs, smart card composite products, TPMs used in Trusted Computing, digital tachograph cards, etc. – are devices where significant portions of the required security functionality depending upon hardware features at a chip level. NOTE: Smart card holder and issuer generally execute operations through communication with Smart Card terminal. The Smart Card terminals that have a physical protected envelope shall be considered as hardware with Security Boxes.",
-                    "references": [
-                        {
-                            "text": "Annex IV point (3)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Hypervisors and container runtime systems that support virtualised execution of operating systems and similar environments",
-                    "riskLevel": "IMPORTANT_CLASS_II",
-                    "hint": "This category of products includes: - Hypervisor-based operating system virtualization: focuses on the virtualization of the entire operating system, which each virtualized environment instance being designated as virtual machine (VM). - Container-based operating system virtualization, includes two types of containers: application containers, which package a single process or application; and system containers, which simulate a full operating system and tend to execute multiple processes simultaneously. NOTE: The virtualisation environment includes: BIOS, firmware, Operating Systems (OS) and drivers.",
-                    "references": [
-                        {
-                            "text": "Annex III part II point (1)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Firewalls, intrusion detection and prevention systems",
-                    "riskLevel": "IMPORTANT_CLASS_II",
-                    "hint": "This products family includes: - Firewalls - An internetwork gateway that restricts data communication traffic to and from one of the connected networks (the one said to be \"inside\" the firewall) and thus protects that network's system resources against threats from the other network (the one that is said to be \"outside\" the firewall). Source: RFC 4949 Internet Security Glossary, Version 2 - Intrusion Detection system - information systems used to identify that an intrusion has been attempted, is occurring, or has occurred [Source: ISO 27039:2015], and - Intrusion Prevention System is variant on intrusion detection systems that are specifically designed to provide an active response capability [Source: ISO 27039:2015]",
-                    "references": [
-                        {
-                            "text": "Annex III part II point (2)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Tamper-resistant microprocessors",
-                    "riskLevel": "IMPORTANT_CLASS_II",
-                    "hint": "This category of products includes: Microprocessors that implement security mechanisms against tampering of the device. Such mechanisms deter unauthorized use, malicious modification of the module (including substitution of hardware and software), or exposure of security information, such as cryptographic keys and secrets. Depending on the level of protection, anti-tamper mechanisms may include: tamper resistance, tamper detection, tamper response, and tamper evidence (see table below). [Ref. FIPS 140-3: Security Areas, Chapter 5: Physical security]",
-                    "references": [
-                        {
-                            "text": "Annex III part II point (3)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Tamper-resistant microcontrollers",
-                    "riskLevel": "IMPORTANT_CLASS_II",
-                    "hint": "This category of products includes: - Microcontrollers, that is, a small computer on a single integrated circuit (System on Chip – SoC). In modern terminology, a microcontroller is similar to, but less sophisticated than, a system on a chip (SoC). A SoC may include a microcontroller as one of its components, but usually integrates it with advanced peripherals like a graphics processing unit (GPU), a Wi-Fi module, or one or more coprocessors. - Microcontrollers are used in most cases for embedded applications, in contrast to (general purpose) microprocessors consisting of a variety of chips and peripherals.",
-                    "references": [
-                        {
-                            "text": "Annex III part II point (4)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Identity management systems and privileged access management software and hardware, including authentication and access control readers, including biometric readers",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes a variety of products that implement Identity and Access Management functions (locally or remotely). Identity management systems typically include software platforms that manage user identities and credentials, such as usernames, passwords, digital certificates, and multi-factor authentication tokens. They often integrate with directory services like Active Directory or LDAP and provide features such as single sign-on (SSO), role-based access control (RBAC), identity federation, and lifecycle management for user accounts. These systems help ensure that employees, partners, or clients can access appropriate systems based on their roles while preventing unauthorized access. Privileged access management software specifically targets accounts that have elevated permissions, such as system administrators or database managers. These tools secure, monitor, and audit the use of privileged credentials to reduce the risk of misuse or credential theft. PAM solutions typically include secure credential vaults, session recording, just-in-time access provisioning, and alerting mechanisms for suspicious behavior.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (1)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Standalone and embedded browsers",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes: - Standalone web browsers and - Embedded browsers, Standalone and embedded browsers are software components used for web access, with standalone browsers functioning as independent applications and embedded browsers integrated into other software or hardware systems to provide web-based interfaces or display web content. Standalone browsers offer full-featured browsing capabilities, user interaction, and security controls, while embedded browsers are often used in applications, kiosks, or devices where web content needs to be displayed within a controlled environment. Both types play key roles in enabling web access, but they differ in functionality, user interaction, and integration with other systems.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (2)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Password managers",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "Password managers are software tools designed to securely store, generate, and manage passwords and other sensitive credentials for users. They help individuals and organizations maintain strong, unique passwords for each account or service, reducing the risk of security breaches caused by reused or weak passwords. These tools typically encrypt stored data and require a master password or biometric authentication to access the vault. Advanced password managers may also support features like autofill, secure sharing, multi-factor authentication integration, and monitoring for compromised credentials. They enhance both security and convenience by simplifying the management of complex credentials across multiple platforms and devices.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (3)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Software that searches for, removes, or quarantines malicious software",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes software that monitors a mobile device/ computer or network to identify malware, prevent it from infecting devices and clean infected devices. Antivirus and anti-malware software are security tools designed to detect, block, and remove malicious software such as viruses, ransomware, trojans, and spyware. They scan systems using signature databases and behavioral analysis to identify threats, then remove or quarantine infected files to prevent damage.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (4)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Products with digital elements with the function of virtual private network (VPN)",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes any mechanism for overlaying a cryptographically secured network over distributed wide-area networks. [Ref: PP-Module for Virtual Private Network (VPN) Gateways; PP-Module for VPN Client Version 2.1; NIST 800-113 - Guide to SSL VPNs] Products with digital elements that provide Virtual Private Network (VPN) functionality are software or hardware solutions designed to create secure, encrypted connections over public or untrusted networks. These products mask users' IP addresses, protect data in transit, and enable private access to internet resources or internal networks.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (5)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Network management systems",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes: - NMS/EMS consists of systems and applications for control and monitoring of network elements (NE) on the network (such as hosts, gateways and terminal servers) and offers Fault, Configuration, Accounting, Performance, Security [FCAPS functionality] for the whole network. - includes network management system (NMS)/ equipment management system (EMS) which is used for the management of network elements / devices. [Ref. The FCAPS management categories and TMN management functions are also specified in ITU-T: Recs M.3010, X.700 and X.701 and ISO/IEC 10040. Configuration management system ISO/IEC 7184:2024; Fault Management – ETSI-TR 32.111 – series]",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (6)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Security information and event management (SIEM) systems",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "SIEM solutions are a combination of the formerly disparate product categories of SIM (security information management) and SEM (security event management). SEM deals with real-time monitoring, correlation of events, notifications and console views. SIM provides long-term storage, analysis and reporting of log data. [Ref. ETSI GS ISI 002 V1.2.1 (2015-11) Information Security Indicators (ISI); Event Model A security event classification model and taxonomy]",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (7)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Boot managers",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "Boot managers are software tools that control the startup process of a computer, allowing users to choose which operating system or environment to load when the system powers on. They are essential in multi-boot setups where multiple operating systems. This category of products includes: Boot manager, boot loader, bootstrap loader (used synonymously), used during star-up process for data processing devices. They are responsible for (securely) loading the operating system of the device.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (8)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Public key infrastructure and digital certificate issuance software",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "Public Key Infrastructure (PKI) and digital certificate issuance software are security solutions used to manage the creation, distribution, validation, and revocation of digital certificates. These systems support secure communications, authentication, and data integrity by enabling encryption and digital signatures based on asymmetric cryptography. PKI solutions include components such as certificate authorities (CAs), registration authorities (RAs), and certificate management tools.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (9)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Physical and virtual network interfaces",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "The category refers to the components—either hardware or software-based—that allow a product with digital elements to connect to and communicate over a network. These interfaces serve as the points of entry and exit for data transmission, enabling interaction with external systems or services. This category of products includes: - Physical network interfaces that are based on network hardware platforms - Virtual network interfaces that created a software version (i.e., emulation) of physical network interfaces",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (10)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Operating systems",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes software that controls the execution of programs and that may provide services such as resource allocation, scheduling, input-output control, and data management. [Ref. ISO/IEC 2382:2015 Information technology — Vocabulary]",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (11)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Routers, modems intended for the connection to the internet, and switches",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "The category encompasses network infrastructure devices that manage and direct data traffic between local and external networks. These products typically perform core networking functions such as routing, signal modulation/demodulation, and switching of data packets. As they often serve as gateways to the internet or other network segments, their exposure to potential threats is high, making it essential that they are developed with robust cybersecurity features to ensure secure configuration, data integrity, access control, and resilience against malicious exploitation. This category of products includes: - Routers are devices that direct traffic between different networks. They operate at OSI Layer 3: Network Layer, as are designed to route packets between different networks based on logical addressing (IP addresses). - Network switches are networking devices that connect devices on a computer network by using packet switching to receive, process, and forward data to the destination device. Switches work primarily at Switches work at the OSI Layer 2 – data link – by using MAC addresses to forward data between devices on the same network. Some switches are designed to operate at both layer 2 and layer 3, being able to perform routing functions. - Modems function at the physical layer of the OSI model, converting digital data from a computer into analogue signals suitable for sending over various transmission media, and vice versa. Modems used to connect to internet usually provide integrate functionality of router/modem, and sometimes switching.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (12)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Microprocessors with security-related functionalities",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes microprocessors that implement security mechanisms against tampering of the device. Such mechanisms deter unauthorized use, malicious modification of the module (including substitution of hardware and software), or exposure of security information, such as cryptographic keys and secrets. Depending on the level of protection, anti-tamper mechanisms may include: tamper resistance, tamper detection, tamper response, and tamper evidence (see table below). [Ref. FIPS 140-3: Security Areas, Chapter 5: Physical security]",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (13)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Microcontrollers with security-related functionalities",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes microcontrollers that implement security mechanisms against tampering of the device. Such mechanisms deter unauthorized use, malicious modification of the module (including substitution of hardware and software), or exposure of security information, such as cryptographic keys and secrets. Depending on the required level of protection, anti-tamper mechanisms may include: tamper resistance, tamper detection, tamper response, and tamper evidence (see table below). [Ref. FIPS 140-3: Security Areas, Chapter 5: Physical security]",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (14)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Application specific integrated circuits (ASIC) and field-programmable gate arrays (FPGA) with security-related functionalities",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This products with security-related functionalities refers to specialized hardware components designed to perform dedicated security functions, such as cryptographic operations, secure boot, or hardware-based access control. These components are integral to the trustworthiness of a product's security architecture, as they often handle sensitive processes at the hardware level. Due to their low-level operation and influence on overall system integrity, ensuring their secure design, configuration, and update mechanisms is critical to mitigating vulnerabilities and supporting secure product lifecycles. This category of products includes application specific integrated circuits (ASIC) and field-programmable gate arrays (FPGA) are two forms of components used in consumer electronics.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (15)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Smart home general purpose virtual assistants",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category includes voice-activated or text-activated devices designed to perform a wide range of functions within a domestic environment, such as controlling connected appliances, managing user preferences, or providing information services. These assistants typically integrate microphones, speakers, network interfaces, and cloud connectivity, making them continuously exposed to user input and internet-based communication. Given their access to personal data and their central role in smart home ecosystems, strong cybersecurity measures are essential to protect privacy, authenticate users, prevent unauthorized access, and ensure secure data handling. This category of products includes: - Any software system designed to help users interact with and control smart home devices directly from their smartphones or tablets based on voice commands, text, gesture or other interfaces, acting as centralized hubs for smart home automation and personal assistance. - Any smart home device that has integrated virtual assistants such as Smart Voice-controlled Devices (SVD), consumer IoT device with integrated voice-controlled virtual assistant logic that responds to prompts and commands from users. - Smart devices embedding multi-modal virtual assistants (i.e., interacting with users via a variety of channels, such as sound, images, text, etc.).",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (16)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Smart home products with security functionalities, including smart door locks, security cameras, baby monitoring systems and alarm systems",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category covers connected devices specifically designed to safeguard residential environments. These products typically involve real-time monitoring, remote access, and automated responses to potential threats, often processing sensitive audio, video, or biometric data. Due to their role in protecting physical spaces and personal safety, they require stringent cybersecurity controls to ensure data confidentiality, prevent tampering or unauthorized access, and maintain the reliability and integrity of their security functions. This category of products includes consumer IoT devices includes that implement functions of physical security, including alarms, door locks, detectors (e.g., fire), surveillance, etc, such as: - connected smoke detectors, door locks and window sensors - smart cameras - baby monitors - connected home automation and alarm systems - IoT gateways, base stations and hubs to which multiple devices connect.",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (17)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Internet connected toys covered by Directive 2009/48/EC of the European Parliament and of the Council (1) that have social interactive features (e.g. speaking or filming) or that have location tracking features",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes toys that have all the three following characteristics: - being internet-connected (in other words have the ability to connect to the internet); AND - having social interactive features (e.g. speaking or filming) or location tracking features; AND - being covered by Directive 2009/48/EC. The Directive 2009/48/EC applies to \"to products designed or intended, whether or not exclusively, for use in play by children under 14 years of age (hereinafter referred to as toys)\" (see Art. 2 par. 1 Directive 2009/48/EC). The following toys, among others, are excluded from this category since they are not considered as toys within the meaning of Directive 2009/48/EC (see Art. 2 par. 1 and Annex I Directive 2009/48/EC): - \"Products intended for use for educational purposes in schools and other pedagogical contexts under the surveillance of an adult instructor, such as science equipment\"; - \"Functional educational products, such as electric ovens, irons or other functional products operated at a nominal voltage exceeding 24 volts which are sold exclusively for teaching purposes under adult supervision\"; - \"Electronic equipment, such as personal computers and game consoles, used to access interactive software and their associated peripherals, unless the electronic equipment or the associated peripherals are specifically designed for and targeted at children and have a play value on their own, such as specially designed personal computers, key boards, joy sticks or steering wheels\"; - \"Interactive software, intended for leisure and entertainment, such as computer games, and their storage media, such as CDs\"; - \"Child-appealing luminaires\"; and - \"Electrical transformers for toys\". Also, the following toys are excluded from this category since the Directive 2009/48/EC does not apply to them (see Art. 2 par 2 Directive 2009/48/EC): - \"playground equipment intended for public use\"; - \"automatic playing machines, whether coin operated or not, intended for public use\"; - \"toy vehicles equipped with combustion engines\"; - \"toy steam engines\"; and - \"slings and catapults\".",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (18)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Personal wearable products to be worn or placed on a human body that have a health monitoring (such as tracking) purpose and to which Regulation (EU) 2017/745 or (EU) No 2017/746 do not apply, or personal wearable products that are intended for the use by and for children",
-                    "riskLevel": "IMPORTANT_CLASS_I",
-                    "hint": "This category of products includes: Near-body wearable electronic device - wearable electronic device intended to be located near a human body but which does not make direct contact with its external surface; (see  ) excluded is equipment that is not wearable (e.g., that operates in close proximity to the human body) is not considered to be near-body wearable electronics. [Ref: IEC 63203-101-1:2021] On-body wearable electronic device - wearable electronic device intended to be located on the external surface of a human body and which makes direct contact with it [Ref: IEC 63203-101-1:2021]",
-                    "references": [
-                        {
-                            "text": "Annex III part I point (19)",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                },
-                {
-                    "text": "Other",
-                    "riskLevel": "OTHER",
-                    "hint": "This relates to products that include software or hardware performing data processing or computation, but other than the above on the list. The category may include e.g.:\n- products containing embedded software, firmware, or an operating system that can receive updates (e.g., security updates, firmware updates),\n- products that connect to the internet or any other device via wired or wireless communication (e.g., Wi-Fi, Bluetooth, USB, network cable, NFC, RFID, etc.),\n- products that require a cloud service or remote data processing to perform one of their functions (i.e., would the product fail to function without cloud/remote software support?) - if the product requires access to a database, an API, or another data processing service provided by the manufacturer, such processing falls under the CRA regulations.\nAt the same time, the regulation does not cover general security measures for the manufacturer's entire IT infrastructure.\n\nClassification: Applicable - PDE Other than IMPORTANT or CRITICAL (standard product with digital elements).",
-                    "references": [
-                        {
-                            "text": "Annex III, Annex IV",
-                            "url": "https://www.cra.gov.uk/form"
-                        }
-                    ]
-                }
-            ]
+          "text": "Yes",
+          "isEliminatory": false,
+          "skipToQuestion": "1.3"
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
         }
-        
-    ]
+      ]
+    },
+    {
+      "id": "1.2",
+      "question": "Is the product made available only for a limited period required for testing purposes?",
+      "hint": "The unfinished software which does not comply with CRA can be made available on the market, provided that the software is made available only for a limited period required for testing purposes with a visible sign clearly indicating that it does not comply with this Regulation and that it will not be available on the market for purposes other than testing.",
+      "references": [
+        {
+          "text": "Section 1.2 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes",
+          "isEliminatory": true
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
+        }
+      ]
+    },
+    {
+      "id": "1.3",
+      "question": "Was the product with digital elements developed as a spare part to replace identical components on the market?",
+      "hint": "This Regulation does not apply to spare parts that are made available on the market to replace identical components in products with digital elements and that are manufactured according to the same specifications as the components that they are intended to replace. In order to ensure that products with digital elements made available on the market can be repaired effectively and their durability extended, an exemption cover both spare parts that have the purpose of repairing legacy products made available before the date of application of CRA and spare parts that have already undergone a conformity assessment procedure pursuant to CRA.",
+      "references": [
+        {
+          "text": "Section 1.3 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes",
+          "isEliminatory": true
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
+        }
+      ]
+    },
+    {
+      "id": "1.4",
+      "question": "Is this a new solution or a modification of an existing product?",
+      "hint": "Determining whether it is a 'significant modification' and requires reassessment – a significant modification, if the product is being assessed by a third party, must also be reported to that party.",
+      "references": [
+        {
+          "text": "Section 1.4 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "New solution",
+          "isEliminatory": false,
+          "skipToQuestion": "1.6"
+        },
+        {
+          "text": "Modification of an existing product",
+          "isEliminatory": false
+        }
+      ]
+    },
+    {
+      "id": "1.5",
+      "question": "Is this a substantial modification?",
+      "hint": "Substantial modification means a change to the product with digital elements following its placing on the market, which affects the compliance of the product with digital elements with the essential cybersecurity requirements set out in Part I of Annex I or which results in a modification to the intended purpose for which the product with digital elements has been assessed.",
+      "references": [
+        {
+          "text": "Section 1.5 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes",
+          "isEliminatory": false
+        },
+        {
+          "text": "No",
+          "isEliminatory": true
+        }
+      ]
+    },
+    {
+      "id": "1.6",
+      "question": "Does the product contain digital elements?",
+      "hint": "\"Product with digital elements\" means a software or hardware product, where:\n- \"software\" means the part of an electronic information system which consists of computer code;\n- \"hardware\" means a physical electronic information system, or parts capable of processing, storing or transmitting digital data;\n- \"electronic information system\" means a system, including electrical or electronic equipment, capable of processing, storing or transmitting digital data;\nand its remote data processing solutions, including software or hardware components being placed on the market separately, where:\n- \"component\" means software or hardware intended for integration into an electronic information system;\n- \"remote data processing\" means data processing at a distance for which the software is designed and developed by the manufacturer, or under the responsibility of the manufacturer, and the absence of which would prevent the product with digital elements from performing one of its functions;",
+      "references": [
+        {
+          "text": "Section 1.6 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "The product is a software solution, which is part of an electronic information system, in form of computer code",
+          "isEliminatory": false
+        },
+        {
+          "text": "The product is a hardware solution in form of physical electronic information system, capable of processing, storing or transmitting digital data",
+          "isEliminatory": false
+        },
+        {
+          "text": "The product does not contain digital elements.",
+          "isEliminatory": true
+        }
+      ]
+    },
+    {
+      "id": "1.7",
+      "question": "Does the product with digital elements have the nature of a medical device?",
+      "remark": "A product with the nature of a medical device for use in humans and accessories for such devices (Article 1, paragraph 1), including clinical trials on products (Article 1, paragraph 2) or separate groups of products with no intended medical purpose – Annex XVI (Article 1, paragraph 2).",
+      "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2017/745, it is a medical device.\n\"Medical device\" means any instrument, apparatus, appliance, software, implant, reagent, material or other article intended by the manufacturer to be used, alone or in combination, for human beings for one or more of the following specific medical purposes:\n- diagnosis, prevention, monitoring, prediction, prognosis, treatment or alleviation of disease,\n- diagnosis, monitoring, treatment, alleviation of, or compensation for, an injury or disability,\n- investigation, replacement or modification of the anatomy or of a physiological or pathological process or state,\n- providing information by means of in vitro examination of specimens derived from the human body, including organ, blood and tissue donations,\nand which does not achieve its principal intended action by pharmacological, immunological or metabolic means, in or on the human body, but which may be assisted in its function by such means.\nThe following products shall also be deemed to be medical devices:\n- devices for the control or support of conception;\n- products specifically intended for the cleaning, disinfection or sterilisation of devices as referred to in Article 1(4) and of those referred to in the first paragraph of this point.",
+      "references": [
+        {
+          "text": "Section 1.7 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes, in accordance with EU Regulation 2017/745",
+          "isEliminatory": true
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
+        }
+      ]
+    },
+    {
+      "id": "1.8",
+      "question": "Does the product with digital elements have the nature of a medical device for in vitro diagnostics?",
+      "remark": "A product with the nature of a medical device for in vitro diagnostics used by humans and accessories for such products (Article 1, paragraph 1j).",
+      "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2017/746, it is a vitro diagnostic medical device.\n\"In vitro diagnostic medical device\" means any medical device which is a reagent, reagent product, calibrator, control material, kit, instrument, apparatus, piece of equipment, software or system, whether used alone or in combination, intended by the manufacturer to be used in vitro for the examination of specimens, including blood and tissue donations, derived from the human body, solely or principally for the purpose of providing information on one or more of the following:\n- concerning a physiological or pathological process or state;\n- concerning congenital physical or mental impairments;\n- concerning the predisposition to a medical condition or a disease;\n- to determine the safety and compatibility with potential recipients;\n- to predict treatment response or reactions;\n- to define or monitoring therapeutic measures.\nSpecimen receptacles shall also be deemed to be in vitro diagnostic medical devices;",
+      "references": [
+        {
+          "text": "Section 1.7 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes, in accordance with EU Regulation 2017/746",
+          "isEliminatory": true
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
+        }
+      ]
+    },
+    {
+      "id": "1.9",
+      "question": "Is the product with digital elements built for vehicles, where a product is a component for:\n- protection and safety of vehicle occupants and vulnerable road users or,\n- pressure monitoring systems or,\n- fuel efficiency or,\n- CO2 emissions or,\n- tyres.",
+      "remark": "A product built for vehicles, with regard to their general characteristics, safety and the protection and safety of vehicle occupants and vulnerable road users; in the scope of type-approval (Article 1):\n• of vehicles and systems, components and separate technical units, and,\n• of tyre pressure monitoring systems, with regard to their safety, fuel efficiency and CO2 emissions; and,\n• of newly manufactured tyres, with regard to their safety and environmental performance.",
+      "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2019/2144, it is a product for protection and safety of vehicle occupants and vulnerable road users, pressure monitoring systems, fuel efficiency and CO2 emissions, tyres.",
+      "references": [
+        {
+          "text": "Section 1.7 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes, in accordance with EU Regulation 2019/2144",
+          "isEliminatory": true
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
+        }
+      ]
+    },
+    {
+      "id": "1.10",
+      "question": "Is the product with digital elements:\n- products, parts and equipment for remote control of aircraft or,\n- products for aircraft maintenance and operation or,\n- products/equipment for operation of airports or,\n- products related to the protection of the airport environment or,\n- components used in ATM/ANS.",
+      "remark": "The product has been certified in accordance with Regulation (EU) 2018/1139, i.e. a product of the nature (Article 1):\n• products, parts and equipment for remote control of aircraft;\n• aircraft maintenance and operation;\n• equipment and operation of airports;\n• related to the protection of the airport environment;\n• components used in ATM/ANS.",
+      "hint": "A product certified and in the scope of Regulation (EU) 2018/1139 does not apply to CRA.",
+      "references": [
+        {
+          "text": "Section 1.7 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes, it is certified in accordance with Regulation (EU) 2018/1139",
+          "isEliminatory": true
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
+        }
+      ]
+    },
+    {
+      "id": "1.11",
+      "question": "Does the product with digital elements have a nature of marine equipment intended to be placed on board EU ships?",
+      "remark": "A product of the nature of marine equipment intended to be placed on board EU ships (Article 1).",
+      "hint": "A product in the scope of Regulation 2014/90/UE does not apply to CRA.",
+      "references": [
+        {
+          "text": "Section 1.7 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes, in accordance with EU Regulation 2014/90/UE",
+          "isEliminatory": true
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
+        }
+      ]
+    },
+    {
+      "id": "1.12",
+      "question": "Is the product with digital elements developed or modified exclusively for national security, defense, or specifically designed to process classified information?",
+      "hint": "Products with digital elements that are developed or modified exclusively for national security or defence purposes or products that are specifically designed to process classified information fall outside the scope of this Regulation.",
+      "references": [
+        {
+          "text": "Section 1.7 of the CRA Form",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Yes",
+          "isEliminatory": true
+        },
+        {
+          "text": "No",
+          "isEliminatory": false
+        }
+      ]
+    }
+  ],
+  "riskQuestions": [
+    {
+      "id": "1.13",
+      "question": "Does your product fall into any of the following categories?",
+      "answerType": "DROPDOWN",
+      "references": [
+        {
+          "text": "Annex III, Annex IV",
+          "url": "https://www.cra.gov.uk/form"
+        }
+      ],
+      "answerOptions": [
+        {
+          "text": "Hardware Devices with Security Boxes",
+          "riskLevel": "CRITICAL",
+          "hint": "This category of products includes: payment terminals, tachograph vehicle units, smart meters, access control terminals and Hardware Security Modules where significant portions of the required security functionality depend upon a hardware physical envelope (referred to as a 'Security Box') that is designed to resist direct attacks. [Ref. extras from COMMISSION IMPLEMENTING REGULATION (EU) 2024/482 of 31 January 2024 laying down rules for the application of Regulation (EU) 2019/881 of the European Parliament and of the Council as regards the adoption of the European Common Criteria-based cybersecurity certification scheme (EUCC)]",
+          "references": [
+            {
+              "text": "Annex IV point (1)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Smart meter gateways within smart metering systems as defined in Article 2, point (23) of Directive (EU) 2019/944 of the European Parliament and of the Council (1) and other devices for advanced security purposes, including for secure cryptoprocessing",
+          "riskLevel": "CRITICAL",
+          "hint": "'Smart metering system' means an electronic system that is capable of measuring electricity fed into the grid or electricity consumed from the grid, providing more information than a conventional meter, and that is capable of transmitting and receiving data for information, monitoring and control purposes, using a form of electronic communication This category of products includes: - Smart Metering Gateway - Device or unit within smart metering systems responsible for collecting Meter Data, processing Meter Data, providing communication capabilities for devices in the Local Metering Network, protecting devices in the Local Area Network, and providing cryptographic primitives (in cooperation with a Security Module). [Ref. Protection Profile for the Gateway of a Smart Metering System (Smart Meter Gateway PP), BSI CC PP 0073] - Components which can be used in the environment of smart metering systems by various types of users to support their tasks and communication activities in a secure operating environment [Ref. BSI Technische Richtlinie BSI TR-03109-2.B]",
+          "references": [
+            {
+              "text": "Annex IV point (2)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Smartcards or similar devices, including secure elements",
+          "riskLevel": "CRITICAL",
+          "hint": "This category of products includes: smart card hardware/ICs, smart card composite products, TPMs used in Trusted Computing, digital tachograph cards, etc. – are devices where significant portions of the required security functionality depending upon hardware features at a chip level. NOTE: Smart card holder and issuer generally execute operations through communication with Smart Card terminal. The Smart Card terminals that have a physical protected envelope shall be considered as hardware with Security Boxes.",
+          "references": [
+            {
+              "text": "Annex IV point (3)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Hypervisors and container runtime systems that support virtualised execution of operating systems and similar environments",
+          "riskLevel": "IMPORTANT_CLASS_II",
+          "hint": "This category of products includes: - Hypervisor-based operating system virtualization: focuses on the virtualization of the entire operating system, which each virtualized environment instance being designated as virtual machine (VM). - Container-based operating system virtualization, includes two types of containers: application containers, which package a single process or application; and system containers, which simulate a full operating system and tend to execute multiple processes simultaneously. NOTE: The virtualisation environment includes: BIOS, firmware, Operating Systems (OS) and drivers.",
+          "references": [
+            {
+              "text": "Annex III part II point (1)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Firewalls, intrusion detection and prevention systems",
+          "riskLevel": "IMPORTANT_CLASS_II",
+          "hint": "This products family includes: - Firewalls - An internetwork gateway that restricts data communication traffic to and from one of the connected networks (the one said to be \"inside\" the firewall) and thus protects that network's system resources against threats from the other network (the one that is said to be \"outside\" the firewall). Source: RFC 4949 Internet Security Glossary, Version 2 - Intrusion Detection system - information systems used to identify that an intrusion has been attempted, is occurring, or has occurred [Source: ISO 27039:2015], and - Intrusion Prevention System is variant on intrusion detection systems that are specifically designed to provide an active response capability [Source: ISO 27039:2015]",
+          "references": [
+            {
+              "text": "Annex III part II point (2)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Tamper-resistant microprocessors",
+          "riskLevel": "IMPORTANT_CLASS_II",
+          "hint": "This category of products includes: Microprocessors that implement security mechanisms against tampering of the device. Such mechanisms deter unauthorized use, malicious modification of the module (including substitution of hardware and software), or exposure of security information, such as cryptographic keys and secrets. Depending on the level of protection, anti-tamper mechanisms may include: tamper resistance, tamper detection, tamper response, and tamper evidence (see table below). [Ref. FIPS 140-3: Security Areas, Chapter 5: Physical security]",
+          "references": [
+            {
+              "text": "Annex III part II point (3)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Tamper-resistant microcontrollers",
+          "riskLevel": "IMPORTANT_CLASS_II",
+          "hint": "This category of products includes: - Microcontrollers, that is, a small computer on a single integrated circuit (System on Chip – SoC). In modern terminology, a microcontroller is similar to, but less sophisticated than, a system on a chip (SoC). A SoC may include a microcontroller as one of its components, but usually integrates it with advanced peripherals like a graphics processing unit (GPU), a Wi-Fi module, or one or more coprocessors. - Microcontrollers are used in most cases for embedded applications, in contrast to (general purpose) microprocessors consisting of a variety of chips and peripherals.",
+          "references": [
+            {
+              "text": "Annex III part II point (4)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Identity management systems and privileged access management software and hardware, including authentication and access control readers, including biometric readers",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes a variety of products that implement Identity and Access Management functions (locally or remotely). Identity management systems typically include software platforms that manage user identities and credentials, such as usernames, passwords, digital certificates, and multi-factor authentication tokens. They often integrate with directory services like Active Directory or LDAP and provide features such as single sign-on (SSO), role-based access control (RBAC), identity federation, and lifecycle management for user accounts. These systems help ensure that employees, partners, or clients can access appropriate systems based on their roles while preventing unauthorized access. Privileged access management software specifically targets accounts that have elevated permissions, such as system administrators or database managers. These tools secure, monitor, and audit the use of privileged credentials to reduce the risk of misuse or credential theft. PAM solutions typically include secure credential vaults, session recording, just-in-time access provisioning, and alerting mechanisms for suspicious behavior.",
+          "references": [
+            {
+              "text": "Annex III part I point (1)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Standalone and embedded browsers",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes: - Standalone web browsers and - Embedded browsers, Standalone and embedded browsers are software components used for web access, with standalone browsers functioning as independent applications and embedded browsers integrated into other software or hardware systems to provide web-based interfaces or display web content. Standalone browsers offer full-featured browsing capabilities, user interaction, and security controls, while embedded browsers are often used in applications, kiosks, or devices where web content needs to be displayed within a controlled environment. Both types play key roles in enabling web access, but they differ in functionality, user interaction, and integration with other systems.",
+          "references": [
+            {
+              "text": "Annex III part I point (2)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Password managers",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "Password managers are software tools designed to securely store, generate, and manage passwords and other sensitive credentials for users. They help individuals and organizations maintain strong, unique passwords for each account or service, reducing the risk of security breaches caused by reused or weak passwords. These tools typically encrypt stored data and require a master password or biometric authentication to access the vault. Advanced password managers may also support features like autofill, secure sharing, multi-factor authentication integration, and monitoring for compromised credentials. They enhance both security and convenience by simplifying the management of complex credentials across multiple platforms and devices.",
+          "references": [
+            {
+              "text": "Annex III part I point (3)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Software that searches for, removes, or quarantines malicious software",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes software that monitors a mobile device/ computer or network to identify malware, prevent it from infecting devices and clean infected devices. Antivirus and anti-malware software are security tools designed to detect, block, and remove malicious software such as viruses, ransomware, trojans, and spyware. They scan systems using signature databases and behavioral analysis to identify threats, then remove or quarantine infected files to prevent damage.",
+          "references": [
+            {
+              "text": "Annex III part I point (4)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Products with digital elements with the function of virtual private network (VPN)",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes any mechanism for overlaying a cryptographically secured network over distributed wide-area networks. [Ref: PP-Module for Virtual Private Network (VPN) Gateways; PP-Module for VPN Client Version 2.1; NIST 800-113 - Guide to SSL VPNs] Products with digital elements that provide Virtual Private Network (VPN) functionality are software or hardware solutions designed to create secure, encrypted connections over public or untrusted networks. These products mask users' IP addresses, protect data in transit, and enable private access to internet resources or internal networks.",
+          "references": [
+            {
+              "text": "Annex III part I point (5)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Network management systems",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes: - NMS/EMS consists of systems and applications for control and monitoring of network elements (NE) on the network (such as hosts, gateways and terminal servers) and offers Fault, Configuration, Accounting, Performance, Security [FCAPS functionality] for the whole network. - includes network management system (NMS)/ equipment management system (EMS) which is used for the management of network elements / devices. [Ref. The FCAPS management categories and TMN management functions are also specified in ITU-T: Recs M.3010, X.700 and X.701 and ISO/IEC 10040. Configuration management system ISO/IEC 7184:2024; Fault Management – ETSI-TR 32.111 – series]",
+          "references": [
+            {
+              "text": "Annex III part I point (6)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Security information and event management (SIEM) systems",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "SIEM solutions are a combination of the formerly disparate product categories of SIM (security information management) and SEM (security event management). SEM deals with real-time monitoring, correlation of events, notifications and console views. SIM provides long-term storage, analysis and reporting of log data. [Ref. ETSI GS ISI 002 V1.2.1 (2015-11) Information Security Indicators (ISI); Event Model A security event classification model and taxonomy]",
+          "references": [
+            {
+              "text": "Annex III part I point (7)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Boot managers",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "Boot managers are software tools that control the startup process of a computer, allowing users to choose which operating system or environment to load when the system powers on. They are essential in multi-boot setups where multiple operating systems. This category of products includes: Boot manager, boot loader, bootstrap loader (used synonymously), used during star-up process for data processing devices. They are responsible for (securely) loading the operating system of the device.",
+          "references": [
+            {
+              "text": "Annex III part I point (8)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Public key infrastructure and digital certificate issuance software",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "Public Key Infrastructure (PKI) and digital certificate issuance software are security solutions used to manage the creation, distribution, validation, and revocation of digital certificates. These systems support secure communications, authentication, and data integrity by enabling encryption and digital signatures based on asymmetric cryptography. PKI solutions include components such as certificate authorities (CAs), registration authorities (RAs), and certificate management tools.",
+          "references": [
+            {
+              "text": "Annex III part I point (9)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Physical and virtual network interfaces",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "The category refers to the components—either hardware or software-based—that allow a product with digital elements to connect to and communicate over a network. These interfaces serve as the points of entry and exit for data transmission, enabling interaction with external systems or services. This category of products includes: - Physical network interfaces that are based on network hardware platforms - Virtual network interfaces that created a software version (i.e., emulation) of physical network interfaces",
+          "references": [
+            {
+              "text": "Annex III part I point (10)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Operating systems",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes software that controls the execution of programs and that may provide services such as resource allocation, scheduling, input-output control, and data management. [Ref. ISO/IEC 2382:2015 Information technology — Vocabulary]",
+          "references": [
+            {
+              "text": "Annex III part I point (11)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Routers, modems intended for the connection to the internet, and switches",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "The category encompasses network infrastructure devices that manage and direct data traffic between local and external networks. These products typically perform core networking functions such as routing, signal modulation/demodulation, and switching of data packets. As they often serve as gateways to the internet or other network segments, their exposure to potential threats is high, making it essential that they are developed with robust cybersecurity features to ensure secure configuration, data integrity, access control, and resilience against malicious exploitation. This category of products includes: - Routers are devices that direct traffic between different networks. They operate at OSI Layer 3: Network Layer, as are designed to route packets between different networks based on logical addressing (IP addresses). - Network switches are networking devices that connect devices on a computer network by using packet switching to receive, process, and forward data to the destination device. Switches work primarily at Switches work at the OSI Layer 2 – data link – by using MAC addresses to forward data between devices on the same network. Some switches are designed to operate at both layer 2 and layer 3, being able to perform routing functions. - Modems function at the physical layer of the OSI model, converting digital data from a computer into analogue signals suitable for sending over various transmission media, and vice versa. Modems used to connect to internet usually provide integrate functionality of router/modem, and sometimes switching.",
+          "references": [
+            {
+              "text": "Annex III part I point (12)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Microprocessors with security-related functionalities",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes microprocessors that implement security mechanisms against tampering of the device. Such mechanisms deter unauthorized use, malicious modification of the module (including substitution of hardware and software), or exposure of security information, such as cryptographic keys and secrets. Depending on the level of protection, anti-tamper mechanisms may include: tamper resistance, tamper detection, tamper response, and tamper evidence (see table below). [Ref. FIPS 140-3: Security Areas, Chapter 5: Physical security]",
+          "references": [
+            {
+              "text": "Annex III part I point (13)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Microcontrollers with security-related functionalities",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes microcontrollers that implement security mechanisms against tampering of the device. Such mechanisms deter unauthorized use, malicious modification of the module (including substitution of hardware and software), or exposure of security information, such as cryptographic keys and secrets. Depending on the required level of protection, anti-tamper mechanisms may include: tamper resistance, tamper detection, tamper response, and tamper evidence (see table below). [Ref. FIPS 140-3: Security Areas, Chapter 5: Physical security]",
+          "references": [
+            {
+              "text": "Annex III part I point (14)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Application specific integrated circuits (ASIC) and field-programmable gate arrays (FPGA) with security-related functionalities",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This products with security-related functionalities refers to specialized hardware components designed to perform dedicated security functions, such as cryptographic operations, secure boot, or hardware-based access control. These components are integral to the trustworthiness of a product's security architecture, as they often handle sensitive processes at the hardware level. Due to their low-level operation and influence on overall system integrity, ensuring their secure design, configuration, and update mechanisms is critical to mitigating vulnerabilities and supporting secure product lifecycles. This category of products includes application specific integrated circuits (ASIC) and field-programmable gate arrays (FPGA) are two forms of components used in consumer electronics.",
+          "references": [
+            {
+              "text": "Annex III part I point (15)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Smart home general purpose virtual assistants",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category includes voice-activated or text-activated devices designed to perform a wide range of functions within a domestic environment, such as controlling connected appliances, managing user preferences, or providing information services. These assistants typically integrate microphones, speakers, network interfaces, and cloud connectivity, making them continuously exposed to user input and internet-based communication. Given their access to personal data and their central role in smart home ecosystems, strong cybersecurity measures are essential to protect privacy, authenticate users, prevent unauthorized access, and ensure secure data handling. This category of products includes: - Any software system designed to help users interact with and control smart home devices directly from their smartphones or tablets based on voice commands, text, gesture or other interfaces, acting as centralized hubs for smart home automation and personal assistance. - Any smart home device that has integrated virtual assistants such as Smart Voice-controlled Devices (SVD), consumer IoT device with integrated voice-controlled virtual assistant logic that responds to prompts and commands from users. - Smart devices embedding multi-modal virtual assistants (i.e., interacting with users via a variety of channels, such as sound, images, text, etc.).",
+          "references": [
+            {
+              "text": "Annex III part I point (16)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Smart home products with security functionalities, including smart door locks, security cameras, baby monitoring systems and alarm systems",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category covers connected devices specifically designed to safeguard residential environments. These products typically involve real-time monitoring, remote access, and automated responses to potential threats, often processing sensitive audio, video, or biometric data. Due to their role in protecting physical spaces and personal safety, they require stringent cybersecurity controls to ensure data confidentiality, prevent tampering or unauthorized access, and maintain the reliability and integrity of their security functions. This category of products includes consumer IoT devices includes that implement functions of physical security, including alarms, door locks, detectors (e.g., fire), surveillance, etc, such as: - connected smoke detectors, door locks and window sensors - smart cameras - baby monitors - connected home automation and alarm systems - IoT gateways, base stations and hubs to which multiple devices connect.",
+          "references": [
+            {
+              "text": "Annex III part I point (17)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Internet connected toys covered by Directive 2009/48/EC of the European Parliament and of the Council (1) that have social interactive features (e.g. speaking or filming) or that have location tracking features",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes toys that have all the three following characteristics: - being internet-connected (in other words have the ability to connect to the internet); AND - having social interactive features (e.g. speaking or filming) or location tracking features; AND - being covered by Directive 2009/48/EC. The Directive 2009/48/EC applies to \"to products designed or intended, whether or not exclusively, for use in play by children under 14 years of age (hereinafter referred to as toys)\" (see Art. 2 par. 1 Directive 2009/48/EC). The following toys, among others, are excluded from this category since they are not considered as toys within the meaning of Directive 2009/48/EC (see Art. 2 par. 1 and Annex I Directive 2009/48/EC): - \"Products intended for use for educational purposes in schools and other pedagogical contexts under the surveillance of an adult instructor, such as science equipment\"; - \"Functional educational products, such as electric ovens, irons or other functional products operated at a nominal voltage exceeding 24 volts which are sold exclusively for teaching purposes under adult supervision\"; - \"Electronic equipment, such as personal computers and game consoles, used to access interactive software and their associated peripherals, unless the electronic equipment or the associated peripherals are specifically designed for and targeted at children and have a play value on their own, such as specially designed personal computers, key boards, joy sticks or steering wheels\"; - \"Interactive software, intended for leisure and entertainment, such as computer games, and their storage media, such as CDs\"; - \"Child-appealing luminaires\"; and - \"Electrical transformers for toys\". Also, the following toys are excluded from this category since the Directive 2009/48/EC does not apply to them (see Art. 2 par 2 Directive 2009/48/EC): - \"playground equipment intended for public use\"; - \"automatic playing machines, whether coin operated or not, intended for public use\"; - \"toy vehicles equipped with combustion engines\"; - \"toy steam engines\"; and - \"slings and catapults\".",
+          "references": [
+            {
+              "text": "Annex III part I point (18)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Personal wearable products to be worn or placed on a human body that have a health monitoring (such as tracking) purpose and to which Regulation (EU) 2017/745 or (EU) No 2017/746 do not apply, or personal wearable products that are intended for the use by and for children",
+          "riskLevel": "IMPORTANT_CLASS_I",
+          "hint": "This category of products includes: Near-body wearable electronic device - wearable electronic device intended to be located near a human body but which does not make direct contact with its external surface; (see  ) excluded is equipment that is not wearable (e.g., that operates in close proximity to the human body) is not considered to be near-body wearable electronics. [Ref: IEC 63203-101-1:2021] On-body wearable electronic device - wearable electronic device intended to be located on the external surface of a human body and which makes direct contact with it [Ref: IEC 63203-101-1:2021]",
+          "references": [
+            {
+              "text": "Annex III part I point (19)",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        },
+        {
+          "text": "Other",
+          "riskLevel": "OTHER",
+          "hint": "This relates to products that include software or hardware performing data processing or computation, but other than the above on the list. The category may include e.g.:\n- products containing embedded software, firmware, or an operating system that can receive updates (e.g., security updates, firmware updates),\n- products that connect to the internet or any other device via wired or wireless communication (e.g., Wi-Fi, Bluetooth, USB, network cable, NFC, RFID, etc.),\n- products that require a cloud service or remote data processing to perform one of their functions (i.e., would the product fail to function without cloud/remote software support?) - if the product requires access to a database, an API, or another data processing service provided by the manufacturer, such processing falls under the CRA regulations.\nAt the same time, the regulation does not cover general security measures for the manufacturer's entire IT infrastructure.\n\nClassification: Applicable - PDE Other than IMPORTANT or CRITICAL (standard product with digital elements).",
+          "references": [
+            {
+              "text": "Annex III, Annex IV",
+              "url": "https://www.cra.gov.uk/form"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

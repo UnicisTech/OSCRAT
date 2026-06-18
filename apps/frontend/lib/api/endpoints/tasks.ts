@@ -1,7 +1,4 @@
-import {
-  ExtendedComment,
-  Attachment,
-} from '@/types';
+import { ExtendedComment, Attachment } from '@/types';
 import { api } from '@/lib/api/client';
 import {
   Task,
@@ -127,5 +124,7 @@ export const tasksEndpoints = {
 
   // Linked Documentation
   getLinkedDocumentation: (slug: string, taskNumber: number) =>
-    api.get<TaskLinkedDocumentation[]>(`/teams/${slug}/tasks/${taskNumber}/documentation`),
+    api.get<TaskLinkedDocumentation[]>(
+      `/teams/${slug}/tasks/${taskNumber}/documentation`
+    ),
 };

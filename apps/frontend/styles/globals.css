@@ -2,6 +2,116 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── OSCRAT design tokens (source of truth — pulled from Figma) ──────────
+   Primitives live here as CSS custom properties. Tailwind/daisyUI read the
+   same values via tailwind.config.js. Atlaskit components are themed
+   separately via @atlaskit/tokens and do NOT read these. */
+:root {
+  /* Brand */
+  --color-primary: #1976d2; /* Figma color/blue/700 */
+
+  /* Neutrals / greys */
+  --color-white: #ffffff; /* color/neutral/white */
+  --color-grey-200: #eeeeee; /* page bg, dividers */
+  --color-grey-400: #bdbdbd; /* default field/card borders */
+  --color-grey-500: #9e9e9e; /* disabled borders */
+  --color-grey-900: #212121; /* primary text */
+  --color-disabled-fill: rgba(0, 0, 0, 0.08); /* color/neutral/black 8% */
+
+  /* Radius */
+  --radius-input: 4px;
+  --radius-card: 8px;
+
+  /* Spacing (aligns with Tailwind's 2 / 3 / 4) */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+
+  /* Semantic feedback (DEFAULT / subtle / emphasis / border) */
+  --color-danger: #dc2626;
+  --color-danger-subtle: #fee2e2;
+  --color-danger-emphasis: #991b1b;
+  --color-danger-border: #fca5a5;
+  --color-success: #16a34a;
+  --color-success-subtle: #dcfce7;
+  --color-success-emphasis: #166534;
+  --color-success-border: #86efac;
+  --color-warning: #d97706;
+  --color-warning-subtle: #fef3c7;
+  --color-warning-emphasis: #92400e;
+  --color-warning-border: #fcd34d;
+  --color-info: #1976d2;
+  --color-info-subtle: #e3f2fd;
+  --color-info-emphasis: #0d47a1;
+  --color-info-border: #90caf9;
+
+  /* Surfaces / backgrounds */
+  --surface: #ffffff; /* cards, panels, raised */
+  --surface-sunken: #eeeeee; /* app/page background */
+  --surface-muted: #f5f5f5; /* subtle fills, hover */
+  --surface-inverse: #212121; /* dark surfaces */
+
+  /* Borders / dividers */
+  --line: #bdbdbd; /* card & field borders */
+  --line-subtle: #eeeeee; /* light dividers (table cells) */
+  --line-header: #e0e0e0; /* table-header bottom border */
+  --line-strong: #9e9e9e; /* emphasis */
+
+  /* Text (semantic) */
+  --content: #212121; /* primary text & headings */
+  --content-secondary: #616161; /* captions, descriptions */
+  --content-muted: #757575; /* menu descriptions, hints */
+  --content-placeholder: #9e9e9e; /* placeholders, disabled text & icons */
+  --content-inverse: #ffffff; /* text on dark/brand surfaces */
+
+  /* Input field states (border by state; fill/text reuse tokens above) */
+  --field-border: #bdbdbd; /* rest */
+  --field-border-hover: #9e9e9e; /* hover */
+  --field-border-focus: #1976d2; /* focus ring (4px, +2px offset) */
+  --field-border-error: #e53935; /* error */
+  --field-border-error-hover: #d32f2f; /* error + hover */
+  --field-fill-disabled: rgba(0, 0, 0, 0.08); /* disabled */
+
+  /* Elevation (Material levels — overlays only; flat cards have no shadow) */
+  --elevation-1: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);
+  --elevation-2: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.12);
+  --elevation-4: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0px 4px 5px rgba(0, 0, 0, 0.14), 0px 1px 10px rgba(0, 0, 0, 0.12);
+  --elevation-8: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+  --elevation-16: 0px 8px 10px -5px rgba(0, 0, 0, 0.2),
+    0px 16px 24px 5px rgba(0, 0, 0, 0.14), 0px 6px 30px 5px rgba(0, 0, 0, 0.12);
+  --elevation-24: 0px 11px 15px -7px rgba(0, 0, 0, 0.2),
+    0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 9px 46px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Atlaskit (@atlaskit/tokens) brand overrides ────────────────────────
+   Atlaskit emits its --ds-* tokens under html[data-color-mode="light|dark"]
+   (injected at runtime by setGlobalTheme in _app.tsx). We override only the
+   brand/selected tokens to the OSCRAT blue; !important guarantees we win
+   regardless of stylesheet inject order. Applies to both colour modes. */
+html[data-color-mode] {
+  --ds-background-brand-bold: #1976d2 !important; /* primary buttons */
+  --ds-background-brand-bold-hovered: #1565c0 !important;
+  --ds-background-brand-bold-pressed: #0d47a1 !important;
+  --ds-text-brand: #1976d2 !important;
+  --ds-border-focused: #1976d2 !important; /* focus rings on fields/selects */
+  --ds-background-selected: #e3f2fd !important; /* selected option bg */
+  --ds-background-selected-hovered: #bbdefb !important;
+  /* Input/textfield/select field states → OSCRAT input tokens */
+  --ds-border-input: #bdbdbd !important; /* field rest border (line) */
+  --ds-background-input: #ffffff !important; /* field fill (surface) */
+  --ds-background-input-hovered: #ffffff !important;
+  --ds-background-disabled: rgba(
+    0,
+    0,
+    0,
+    0.08
+  ) !important; /* disabled field fill */
+}
+
 :root {
   color-scheme: dark light;
 }
@@ -73,7 +183,6 @@ a {
   box-shadow: none !important;
 }
 
-
 .card {
   position: relative;
   display: flex;
@@ -86,12 +195,12 @@ a {
   position: relative;
 }
 
-.mdxeditor [role="textbox"] {
+.mdxeditor [role='textbox'] {
   outline: none;
 }
 
 /* Fix MDXEditor link dialog positioning - always center */
-[data-radix-popper-content-wrapper]:has([class*="_linkDialogPopoverContent_"]) {
+[data-radix-popper-content-wrapper]:has([class*='_linkDialogPopoverContent_']) {
   position: fixed !important;
   left: 50% !important;
   top: 50% !important;
@@ -99,6 +208,6 @@ a {
   z-index: 9999 !important;
 }
 
-[class*="_linkDialogPopoverContent_"] {
+[class*='_linkDialogPopoverContent_'] {
   max-width: 90vw;
 }

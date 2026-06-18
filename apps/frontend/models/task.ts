@@ -12,19 +12,22 @@ import {
 const normalizeTaskTitle = (title: string) => title.trim();
 type TaskUpdateInput = Record<string, unknown>;
 
-export const createTask = async (param: {
-  authorId: string;
-  teamId: string;
-  title: string;
-  status: TaskStatus;
-  duedate?: string;
-  description: string;
-  assigneeId?: string;
-  productId?: string;
-  versionId?: string;
-  originType?: TaskOriginType;
-  properties?: TaskProperties;
-}, audit: AuditInfo) => {
+export const createTask = async (
+  param: {
+    authorId: string;
+    teamId: string;
+    title: string;
+    status: TaskStatus;
+    duedate?: string;
+    description: string;
+    assigneeId?: string;
+    productId?: string;
+    versionId?: string;
+    originType?: TaskOriginType;
+    properties?: TaskProperties;
+  },
+  audit: AuditInfo
+) => {
   const { teamId } = param;
   const normalizedTitle = normalizeTaskTitle(param.title);
   const team = await TeamOps.getTeamDetail(prisma, { id: teamId });
@@ -33,12 +36,16 @@ export const createTask = async (param: {
   }
   const taskNumber = team.taskIndex;
 
-  const task = await TaskOps.createTask(prisma, {
-    ...param,
-    title: normalizedTitle,
-    duedate: param.duedate || new Date().toISOString(),
-    taskNumber,
-  }, audit);
+  const task = await TaskOps.createTask(
+    prisma,
+    {
+      ...param,
+      title: normalizedTitle,
+      duedate: param.duedate || new Date().toISOString(),
+      taskNumber,
+    },
+    audit
+  );
 
   await TeamOps.incrementTaskIndex(prisma, teamId);
 
@@ -62,7 +69,10 @@ export const updateTask = async (
       const props = task.properties as Record<string, unknown>;
       if (props?.task_type === TRAINING_TASK_TYPE_VALUE) {
         await TeamOps.updateLastAwarenessTrainingCompletion(
-          prisma, task.teamId, task.assigneeId, new Date()
+          prisma,
+          task.teamId,
+          task.assigneeId,
+          new Date()
         );
       }
     }
@@ -78,7 +88,11 @@ export const updateTask = async (
   return await TaskOps.updateTask(prisma, taskNumber, slug, updateData, audit);
 };
 
-export const deleteTask = async (taskNumber: number, slug: string, audit: AuditInfo) => {
+export const deleteTask = async (
+  taskNumber: number,
+  slug: string,
+  audit: AuditInfo
+) => {
   return await TaskOps.deleteTask(prisma, taskNumber, slug, audit);
 };
 
@@ -103,5 +117,11 @@ export const ensureAwarenessTrainingTask = async (
   userName: string,
   auditInfo: AuditInfo
 ) => {
-  return TaskOps.ensureAwarenessTrainingTask(prisma, teamId, userId, userName, auditInfo);
+  return TaskOps.ensureAwarenessTrainingTask(
+    prisma,
+    teamId,
+    userId,
+    userName,
+    auditInfo
+  );
 };

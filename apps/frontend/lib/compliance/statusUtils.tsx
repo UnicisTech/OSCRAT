@@ -1,6 +1,14 @@
 import React from 'react';
-import { FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaBan } from 'react-icons/fa';
-import { COMPLIANCE_STATUS, type ComplianceStatus } from '@/constants/conformityStatuses';
+import {
+  FaCheckCircle,
+  FaTimesCircle,
+  FaExclamationTriangle,
+  FaBan,
+} from 'react-icons/fa';
+import {
+  COMPLIANCE_STATUS,
+  type ComplianceStatus,
+} from '@/constants/conformityStatuses';
 
 interface StatusConfig {
   icon: React.ReactElement;
@@ -26,11 +34,14 @@ const STATUS_CONFIG: Record<ComplianceStatus, StatusConfig> = {
   },
 };
 
-export const getStatusIcon = (status?: ComplianceStatus): React.ReactElement | null => {
+export const getStatusIcon = (
+  status?: ComplianceStatus
+): React.ReactElement | null => {
   return status ? STATUS_CONFIG[status]?.icon || null : null;
 };
 
 export const getStatusColor = (status?: ComplianceStatus): string => {
-  return status ? STATUS_CONFIG[status]?.textColor || 'text-gray-600' : 'text-gray-600';
+  return status
+    ? STATUS_CONFIG[status]?.textColor || 'text-gray-600'
+    : 'text-gray-600';
 };
-

@@ -6,7 +6,10 @@ import * as Yup from 'yup';
 import { useDocumentationList } from '@/hooks/useDocumentation';
 import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
 import { DocumentationStatus } from '@oscrat/model';
-import { getTemplateContent, type TemplateType } from '@/constants/documentationTemplates';
+import {
+  getTemplateContent,
+  type TemplateType,
+} from '@/constants/documentationTemplates';
 import { extractErrorMessage } from '@/lib/utils';
 import { titleSchema } from '@/lib/validation/inputs';
 
@@ -30,7 +33,8 @@ export function useCreateDocumentationWizard({
   const { data: products } = useSearchProducts(slug, { includeVersions: true });
 
   const [step, setStep] = useState<Step>('select');
-  const [isProductLevel, setIsProductLevel] = useState<boolean>(!!defaultProductId);
+  const [isProductLevel, setIsProductLevel] =
+    useState<boolean>(!!defaultProductId);
   const [template, setTemplate] = useState<TemplateType>('empty');
   const [productId, setProductId] = useState<string>(defaultProductId || '');
   const [versionId, setVersionId] = useState<string>(defaultVersionId || '');
@@ -86,7 +90,8 @@ export function useCreateDocumentationWizard({
     }
 
     try {
-      const templateContent = template !== 'empty' ? getTemplateContent(template) : '';
+      const templateContent =
+        template !== 'empty' ? getTemplateContent(template) : '';
 
       const doc = await createDocumentation({
         title: title.trim(),

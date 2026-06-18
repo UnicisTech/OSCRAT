@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { useTranslation } from 'next-i18next';
+import Button from '@/components/button';
 
 // --- TYPE DEFINITIONS ---
 
@@ -103,22 +104,21 @@ export default function Index() {
 
   return (
     <div className="flex w-full justify-center">
-      <div className="w-full rounded-lg border border-gray-400 bg-white p-4">
+      <div className="border-line bg-surface rounded-card w-full border p-4">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-600">Attachment</h2>
-          <button
-            onClick={handleAddDocument}
-            className="rounded-md border border-gray-400 bg-white px-2 py-1 text-sm font-medium text-gray-900 hover:bg-gray-50"
-          >
+          <h2 className="text-content-secondary text-sm font-semibold">
+            Attachment
+          </h2>
+          <Button variant="secondary" size="m" onClick={handleAddDocument}>
             {t('oscrat.ui.add-document')}
-          </button>
+          </Button>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-900">
-            <thead className="bg-gray-200 text-xs text-gray-900">
+          <table className="text-content w-full text-left text-sm">
+            <thead className="bg-surface-muted text-content border-b border-line-header">
               <tr>
                 {tableHeaders.map((h) => (
-                  <th key={h} className="px-6 py-3">
+                  <th key={h} className="p-4 text-b2 font-medium">
                     {h}
                   </th>
                 ))}
@@ -128,24 +128,26 @@ export default function Index() {
               {attachments.map((file) => (
                 <tr
                   key={file.id}
-                  className="border-b bg-white hover:bg-gray-50"
+                  className="bg-surface hover:bg-surface-muted border-b"
                 >
-                  <td className="px-6 py-4 font-medium text-gray-900">
+                  <td className="text-content px-4 py-4 font-medium">
                     {file.name}
                   </td>
-                  <td className="px-6 py-4">{file.type}</td>
-                  <td className="px-6 py-4">{file.version}</td>
-                  <td className="px-6 py-4">{file.dateAdded}</td>
-                  <td className="px-6 py-4">{file.addedBy}</td>
-                  <td className="px-6 py-4">{file.lastEdited}</td>
-                  <td className="px-6 py-4">{file.editedBy}</td>
-                  <td className="px-6 py-4 text-center">
-                    <button
+                  <td className="px-4 py-4">{file.type}</td>
+                  <td className="px-4 py-4">{file.version}</td>
+                  <td className="px-4 py-4">{file.dateAdded}</td>
+                  <td className="px-4 py-4">{file.addedBy}</td>
+                  <td className="px-4 py-4">{file.lastEdited}</td>
+                  <td className="px-4 py-4">{file.editedBy}</td>
+                  <td className="px-4 py-4 text-center">
+                    <Button
+                      variant="tertiary"
+                      size="m"
                       onClick={() => handleMoreAction(file.id)}
-                      className="flex items-center gap-x-2 text-gray-500 hover:text-gray-900"
+                      startIcon={<BsThreeDotsVertical size={16} />}
                     >
-                      <BsThreeDotsVertical size={16} /> <p> {t('more')} </p>
-                    </button>
+                      {t('more')}
+                    </Button>
                   </td>
                 </tr>
               ))}

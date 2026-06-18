@@ -5,7 +5,10 @@ import { COMPLIANCE_TEMPLATE_FILES } from '@/constants/complianceTemplates';
 import fs from 'fs';
 import path from 'path';
 
-export default function handler(req: AuthenticatedTeamRequest, res: NextApiResponse) {
+export default function handler(
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) {
   const { method } = req;
   if (method !== 'GET') {
     res.setHeader('Allow', 'GET');
@@ -14,7 +17,10 @@ export default function handler(req: AuthenticatedTeamRequest, res: NextApiRespo
   return withTeamAuth(['team', 'read'])(handleGET)(req, res);
 }
 
-const handleGET = async (req: AuthenticatedTeamRequest, res: NextApiResponse) => {
+const handleGET = async (
+  req: AuthenticatedTeamRequest,
+  res: NextApiResponse
+) => {
   const { namespace } = req.query as { namespace: string };
 
   const templateFile = COMPLIANCE_TEMPLATE_FILES[namespace];

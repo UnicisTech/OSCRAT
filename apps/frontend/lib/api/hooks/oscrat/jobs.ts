@@ -19,7 +19,10 @@ export function useGetSbomReports(
   const enabled = options?.enabled !== false;
 
   return useQuery({
-    queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(teamId, versionId),
+    queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(
+      teamId,
+      versionId
+    ),
     queryFn: () =>
       oscratJobEndpoints.listSbomReports(teamId, productId, versionId),
     enabled,
@@ -60,7 +63,12 @@ export function useCreateRepoSbomReport(
 ) {
   return useMutation({
     mutationFn: (data: CreateSbomJobRequest) =>
-      oscratJobEndpoints.createRepoSbomReport(teamId, productId, versionId, data),
+      oscratJobEndpoints.createRepoSbomReport(
+        teamId,
+        productId,
+        versionId,
+        data
+      ),
     onSuccess: () => {
       // Invalidate SBOM-specific queries
       queryClient.invalidateQueries({
@@ -115,7 +123,12 @@ export function useDeleteSbomReport(
 ) {
   return useMutation({
     mutationFn: (reportId: string) =>
-      oscratJobEndpoints.deleteSbomReport(teamId, productId, versionId, reportId),
+      oscratJobEndpoints.deleteSbomReport(
+        teamId,
+        productId,
+        versionId,
+        reportId
+      ),
     onSuccess: () => {
       // Invalidate SBOM-specific queries
       queryClient.invalidateQueries({
@@ -138,7 +151,10 @@ export function useInvalidateSbomReports() {
 
   return (teamId: string, versionId: string) => {
     return queryClient.invalidateQueries({
-      queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(teamId, versionId),
+      queryKey: queryKeys.oscrat.projects.versions.jobs.sbom.all(
+        teamId,
+        versionId
+      ),
     });
   };
 }

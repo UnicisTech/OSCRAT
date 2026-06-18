@@ -60,11 +60,11 @@ const Signup: NextPageWithLayout<
           </>
         )}
       </div>
-      <p className="mt-3 text-center text-sm text-gray-600">
+      <p className="text-content-secondary mt-3 text-center text-sm">
         {t('already-have-an-account')}
         <Link
           href={`/auth/login/${params}`}
-          className="text-blue-600 hover:text-blue-800 font-medium"
+          className="text-primary hover:text-primary-dark font-medium"
         >
           &nbsp;{t('sign-in')}
         </Link>

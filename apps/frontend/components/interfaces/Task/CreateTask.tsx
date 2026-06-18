@@ -1,16 +1,27 @@
 import React, { useMemo } from 'react';
-import { Team, TaskStatus, TaskOriginType, type TaskProperties } from '@oscrat/model';
+import {
+  Team,
+  TaskStatus,
+  TaskOriginType,
+  type TaskProperties,
+} from '@oscrat/model';
 import toast from 'react-hot-toast';
 import Modal from '@/components/shared/Modal';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import { useTranslation } from 'next-i18next';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
-import { DEFAULT_TASK_STATUS, getTaskStatusTranslationKey } from '@/constants/taskStatuses';
+import {
+  DEFAULT_TASK_STATUS,
+  getTaskStatusTranslationKey,
+} from '@/constants/taskStatuses';
 import { getCurrentStringDate } from '@/utils/dateFormat';
 import useTasks from '@/hooks/useTasks';
 import { useFormik } from 'formik';
-import { createTaskCreateSchema, type TaskCreateData } from '@/lib/validation/task';
+import {
+  createTaskCreateSchema,
+  type TaskCreateData,
+} from '@/lib/validation/task';
 import type { ApiError } from '@/types';
 import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
 
@@ -41,11 +52,13 @@ const CreateTask = ({
 }: CreateTaskProps) => {
   const { t, ready } = useTranslation('common');
   const { createTask } = useTasks(team.slug);
-  const { data: products } = useSearchProducts(team.slug, { includeVersions: true });
-  const requiredAsterisk = <span className="ml-1 text-red-600">*</span>;
+  const { data: products } = useSearchProducts(team.slug, {
+    includeVersions: true,
+  });
+  const requiredAsterisk = <span className="text-danger ml-1">*</span>;
 
   const validationSchema = useMemo(() => createTaskCreateSchema(), []);
-  
+
   const [enableRiskAssessment, setEnableRiskAssessment] = React.useState(false);
 
   const initialValues: TaskCreateData = {
@@ -96,7 +109,9 @@ const CreateTask = ({
 
   const availableVersions = useMemo(() => {
     if (!formik.values.productId || !products) return [];
-    const selectedProduct = products.find(p => p.id === formik.values.productId);
+    const selectedProduct = products.find(
+      (p) => p.id === formik.values.productId
+    );
     return selectedProduct?.versions || [];
   }, [formik.values.productId, products]);
 
@@ -121,7 +136,7 @@ const CreateTask = ({
   return (
     <Modal open={visible} close={handleClose}>
       <Modal.Header>{t('create-task')}</Modal.Header>
-      
+
       <form onSubmit={formik.handleSubmit} method="POST">
         <Modal.Body>
           <div className="space-y-4">
@@ -139,7 +154,7 @@ const CreateTask = ({
               required
               placeholder={t('task-title-placeholder')}
             />
-            
+
             <SelectWithLabel
               name="status"
               label={
@@ -150,14 +165,14 @@ const CreateTask = ({
               }
               value={formik.values.status}
               onChange={formik.handleChange}
-              options={Object.values(TaskStatus).map(status => ({
+              options={Object.values(TaskStatus).map((status) => ({
                 value: status,
                 label: t(getTaskStatusTranslationKey(status)),
               }))}
               error={formik.errors.status ? t(formik.errors.status) : undefined}
               required
             />
-            
+
             <SelectWithLabel
               name="productId"
               label={t('product')}
@@ -166,13 +181,13 @@ const CreateTask = ({
               disabled={!!defaultProductId}
               options={[
                 { value: '', label: t('oscrat.ui.no-product') },
-                ...(products?.map(product => ({
+                ...(products?.map((product) => ({
                   value: product.id,
                   label: product.name,
-                })) || [])
+                })) || []),
               ]}
             />
-            
+
             {formik.values.productId && (
               <SelectWithLabel
                 name="versionId"
@@ -182,14 +197,14 @@ const CreateTask = ({
                 disabled={!!defaultVersionId}
                 options={[
                   { value: '', label: t('oscrat.ui.no-version') },
-                  ...availableVersions.map(version => ({
+                  ...availableVersions.map((version) => ({
                     value: version.id,
                     label: version.version,
-                  }))
+                  })),
                 ]}
               />
             )}
-            
+
             <InputWithLabel
               type="date"
               name="duedate"
@@ -199,23 +214,29 @@ const CreateTask = ({
                   {requiredAsterisk}
                 </>
               }
-              value={formik.values.duedate instanceof Date ? formik.values.duedate.toISOString().split('T')[0] : ''}
+              value={
+                formik.values.duedate instanceof Date
+                  ? formik.values.duedate.toISOString().split('T')[0]
+                  : ''
+              }
               onChange={handleDateChange}
-              error={formik.errors.duedate ? t(formik.errors.duedate) : undefined}
+              error={
+                formik.errors.duedate ? t(formik.errors.duedate) : undefined
+              }
               required
             />
-            
+
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id="enableRiskAssessment"
                 checked={enableRiskAssessment}
                 onChange={(e) => setEnableRiskAssessment(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="border-line text-primary focus:ring-primary h-4 w-4 rounded"
               />
               <label
                 htmlFor="enableRiskAssessment"
-                className="text-sm font-medium text-gray-700"
+                className="text-content-secondary text-sm font-medium"
               >
                 {t('oscrat.ui.enable-risk-assessment')}
               </label>
@@ -224,7 +245,7 @@ const CreateTask = ({
             <div className="w-full">
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="text-content-secondary mb-2 block text-sm font-medium"
               >
                 {t('description')}
               </label>
@@ -234,23 +255,24 @@ const CreateTask = ({
                 value={formik.values.description || ''}
                 onChange={formik.handleChange}
                 rows={4}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 placeholder-gray-400 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border-line text-content-secondary placeholder-content-placeholder shadow-2 focus:border-primary focus:ring-primary rounded-input w-full border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2"
                 placeholder={t('task-description-placeholder')}
               />
               {formik.errors.description && (
-                <p className="mt-1 text-sm text-red-600">{t(formik.errors.description)}</p>
+                <p className="text-danger mt-1 text-sm">
+                  {t(formik.errors.description)}
+                </p>
               )}
             </div>
           </div>
         </Modal.Body>
-        
+
         <Modal.Footer>
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={handleClose}
             disabled={formik.isSubmitting}
-            className="text-gray-800 border-gray-300 hover:bg-gray-50"
           >
             {t('close')}
           </Button>
@@ -258,7 +280,6 @@ const CreateTask = ({
             type="submit"
             loading={formik.isSubmitting}
             disabled={formik.isSubmitting}
-            className="bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 border-0"
           >
             {t('create')}
           </Button>

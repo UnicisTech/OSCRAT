@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { useFormik } from 'formik';
-import { IoClose, IoEye, IoEyeOff } from 'react-icons/io5';
+import { IoEye, IoEyeOff } from 'react-icons/io5';
 import { Button } from '@/components/shared';
+import SharedModal from '@/components/shared/Modal';
 import type {
   OscratRepositoryDetail,
   OscratRepositoryProvider,
@@ -33,9 +34,18 @@ interface Option {
 }
 
 const PROVIDER_OPTIONS: Option[] = [
-  { label: 'oscrat.ui.repository.providers.GITHUB', value: RepositoryProvider.GITHUB },
-  { label: 'oscrat.ui.repository.providers.GITLAB', value: RepositoryProvider.GITLAB },
-  { label: 'oscrat.ui.repository.providers.BITBUCKET', value: RepositoryProvider.BITBUCKET },
+  {
+    label: 'oscrat.ui.repository.providers.GITHUB',
+    value: RepositoryProvider.GITHUB,
+  },
+  {
+    label: 'oscrat.ui.repository.providers.GITLAB',
+    value: RepositoryProvider.GITLAB,
+  },
+  {
+    label: 'oscrat.ui.repository.providers.BITBUCKET',
+    value: RepositoryProvider.BITBUCKET,
+  },
 ];
 
 interface AuthOption {
@@ -45,7 +55,10 @@ interface AuthOption {
 
 const AUTH_TYPE_OPTIONS: AuthOption[] = [
   { label: 'oscrat.ui.repository.labels.auth-public', value: AuthType.PUBLIC },
-  { label: 'oscrat.ui.repository.labels.auth-token', value: AuthType.PERSONAL_ACCESS_TOKEN },
+  {
+    label: 'oscrat.ui.repository.labels.auth-token',
+    value: AuthType.PERSONAL_ACCESS_TOKEN,
+  },
 ];
 
 interface ModalProps {
@@ -61,18 +74,18 @@ interface ModalProps {
 // Form styling constants
 const formStyles = {
   input: {
-    base: 'w-full rounded-md border px-3 py-2 text-gray-700 shadow-sm transition-colors duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500',
-    error: 'border-red-300 focus:border-red-500 focus:ring-red-500',
-    normal: 'border-gray-300',
-    password: 'pr-10 placeholder-gray-400',
+    base: 'w-full rounded-input border px-3 py-2 text-content-secondary shadow-2 transition-colors duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary',
+    error: 'border-danger-border focus:border-danger focus:ring-danger',
+    normal: 'border-line',
+    password: 'pr-10 placeholder-content-placeholder',
   },
-  label: 'mb-2 block text-sm font-medium text-gray-700',
-  error: 'mt-1 text-sm text-red-600',
-  helper: 'mt-1 text-xs text-gray-500',
-  required: 'text-red-500',
+  label: 'mb-2 block text-sm font-medium text-content-secondary',
+  error: 'mt-1 text-sm text-danger',
+  helper: 'mt-1 text-xs text-content-muted',
+  required: 'text-danger',
   button: {
     toggle:
-      'absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600',
+      'absolute inset-y-0 right-0 flex items-center pr-3 text-content-placeholder hover:text-content-secondary',
   },
 };
 
@@ -169,13 +182,14 @@ const PasswordField = ({
         autoComplete="off"
         className={`${formStyles.input.base} ${formStyles.input.password} ${error ? formStyles.input.error : formStyles.input.normal}`}
       />
-      <button
+      <Button
         type="button"
+        variant="tertiary"
+        size="s"
         onClick={onToggleToken}
         className={formStyles.button.toggle}
-      >
-        {showToken ? <IoEyeOff size={16} /> : <IoEye size={16} />}
-      </button>
+        icon={showToken ? <IoEyeOff size={16} /> : <IoEye size={16} />}
+      />
     </div>
     {error && (
       <p className={formStyles.error} role="alert">
@@ -244,7 +258,10 @@ const Modal: React.FC<ModalProps> = ({
           repositoryUrl,
           user: values.user,
           authType: values.authType,
-          accessToken: values.authType === AuthType.PUBLIC ? undefined : values.accessToken,
+          accessToken:
+            values.authType === AuthType.PUBLIC
+              ? undefined
+              : values.accessToken,
           targetBranch: values.targetBranch,
           targetTag: values.targetTag,
           targetCommit: values.targetCommit,
@@ -267,7 +284,9 @@ const Modal: React.FC<ModalProps> = ({
     },
   });
 
-  const handleRepositoryUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRepositoryUrlChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const url = e.target.value;
     formik.handleChange(e);
 
@@ -300,282 +319,254 @@ const Modal: React.FC<ModalProps> = ({
         )
       : '';
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
-      <div className="animate-fade-in-up flex h-[90vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-2xl">
-        <form onSubmit={formik.handleSubmit} className="flex h-full flex-col">
-          {/* Fixed Header */}
-          <header className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-4">
-            <div>
-              <h2 className="text-sm font-bold text-gray-900">
-                {isCreateMode
-                  ? t('oscrat.ui.add-new-repo')
-                  : t('oscrat.ui.repository.labels.edit-repository')}
-              </h2>
-              {project?.name && version?.version && (
-                <p className="mt-1 text-xs text-gray-500">
-                  {project.name} • {version.version}
-                </p>
+    <SharedModal open={isOpen} close={onClose} size="lg">
+      <SharedModal.Header>
+        {isCreateMode
+          ? t('oscrat.ui.add-new-repo')
+          : t('oscrat.ui.repository.labels.edit-repository')}
+      </SharedModal.Header>
+      <form onSubmit={formik.handleSubmit} className="contents">
+        <SharedModal.Body>
+          {project?.name && version?.version && (
+            <p className="text-content-muted text-xs">
+              {project.name} • {version.version}
+            </p>
+          )}
+          {/* Repository Information Section */}
+          <div className="space-y-4">
+            <h3 className="text-content-secondary text-sm font-semibold">
+              {t('oscrat.ui.repository.sections.information')}
+            </h3>
+
+            {/* Provider dropdown - full width */}
+            <SelectField
+              label={t('oscrat.ui.repository.labels.provider')}
+              name="provider"
+              value={formik.values.provider}
+              onChange={handleProviderChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.provider && formik.errors.provider
+                  ? t(formik.errors.provider)
+                  : undefined
+              }
+              required
+            >
+              {PROVIDER_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {t(option.label)}
+                </option>
+              ))}
+            </SelectField>
+
+            {/* Repository URL input - full width */}
+            <FormField
+              label={t('oscrat.ui.repository.labels.repository-url')}
+              name="repositoryUrl"
+              value={formik.values.repositoryUrl}
+              onChange={handleRepositoryUrlChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.repositoryUrl && formik.errors.repositoryUrl
+                  ? t(formik.errors.repositoryUrl)
+                  : undefined
+              }
+              placeholder={t(
+                'oscrat.ui.repository.placeholders.repository-url'
               )}
+              required
+            />
+
+            {/* Two-column grid for parsed fields */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                label={t('oscrat.ui.repository.labels.user-organization')}
+                name="user"
+                value={formik.values.user}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.user && formik.errors.user
+                    ? t(formik.errors.user)
+                    : undefined
+                }
+                placeholder={
+                  formik.values.provider === RepositoryProvider.GITHUB
+                    ? t('oscrat.ui.repository.placeholders.github-user')
+                    : t('oscrat.ui.repository.placeholders.user')
+                }
+                required
+              />
+
+              <FormField
+                label={t('oscrat.ui.repository.labels.repository-name')}
+                name="name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.name && formik.errors.name
+                    ? t(formik.errors.name)
+                    : undefined
+                }
+                placeholder={t(
+                  'oscrat.ui.repository.placeholders.repository-name'
+                )}
+                required
+              />
             </div>
 
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-              type="button"
-            >
-              <IoClose size={24} />
-            </button>
-          </header>
-
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto">
-            <main className="space-y-6 p-6">
-              {/* Repository Information Section */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-700">
-                  {t('oscrat.ui.repository.sections.information')}
-                </h3>
-
-                {/* Provider dropdown - full width */}
-                <SelectField
-                  label={t('oscrat.ui.repository.labels.provider')}
-                  name="provider"
-                  value={formik.values.provider}
-                  onChange={handleProviderChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.provider && formik.errors.provider
-                      ? t(formik.errors.provider)
-                      : undefined
-                  }
-                  required
-                >
-                  {PROVIDER_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {t(option.label)}
-                    </option>
-                  ))}
-                </SelectField>
-
-                {/* Repository URL input - full width */}
-                <FormField
-                  label={t('oscrat.ui.repository.labels.repository-url')}
-                  name="repositoryUrl"
-                  value={formik.values.repositoryUrl}
-                  onChange={handleRepositoryUrlChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.repositoryUrl && formik.errors.repositoryUrl
-                      ? t(formik.errors.repositoryUrl)
-                      : undefined
-                  }
-                  placeholder={t('oscrat.ui.repository.placeholders.repository-url')}
-                  required
-                />
-
-                {/* Two-column grid for parsed fields */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <FormField
-                    label={t('oscrat.ui.repository.labels.user-organization')}
-                    name="user"
-                    value={formik.values.user}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.user && formik.errors.user
-                        ? t(formik.errors.user)
-                        : undefined
-                    }
-                    placeholder={
-                      formik.values.provider === RepositoryProvider.GITHUB
-                        ? t('oscrat.ui.repository.placeholders.github-user')
-                        : t('oscrat.ui.repository.placeholders.user')
-                    }
-                    required
-                  />
-
-                  <FormField
-                    label={t('oscrat.ui.repository.labels.repository-name')}
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.name && formik.errors.name
-                        ? t(formik.errors.name)
-                        : undefined
-                    }
-                    placeholder={t(
-                      'oscrat.ui.repository.placeholders.repository-name'
-                    )}
-                    required
-                  />
-                </div>
-
-                {/* URL Preview - Full width */}
-                {previewUrl && (
-                  <div className="rounded-md bg-gray-50 p-3">
-                    <p className="mb-1 text-xs text-gray-600">
-                      {t('oscrat.ui.repository.labels.repository-url-preview')}
-                    </p>
-                    <p className="break-all font-mono text-sm text-blue-600">
-                      {previewUrl}
-                    </p>
-                  </div>
-                )}
+            {/* URL Preview - Full width */}
+            {previewUrl && (
+              <div className="bg-surface-muted rounded-card p-3">
+                <p className="text-content-secondary mb-1 text-xs">
+                  {t('oscrat.ui.repository.labels.repository-url-preview')}
+                </p>
+                <p className="text-primary break-all font-mono text-sm">
+                  {previewUrl}
+                </p>
               </div>
+            )}
+          </div>
 
-              {/* Authentication Section */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-gray-700">
-                  {t('oscrat.ui.repository.sections.authentication')}
-                </h3>
+          {/* Authentication Section */}
+          <div className="space-y-4">
+            <h3 className="text-content-secondary text-sm font-semibold">
+              {t('oscrat.ui.repository.sections.authentication')}
+            </h3>
 
-                <SelectField
-                  label={t('oscrat.ui.repository.labels.auth-type')}
-                  name="authType"
-                  value={formik.values.authType}
+            <SelectField
+              label={t('oscrat.ui.repository.labels.auth-type')}
+              name="authType"
+              value={formik.values.authType}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.authType && formik.errors.authType
+                  ? t(formik.errors.authType)
+                  : undefined
+              }
+              required
+            >
+              {AUTH_TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {t(option.label)}
+                </option>
+              ))}
+            </SelectField>
+
+            {formik.values.authType === AuthType.PERSONAL_ACCESS_TOKEN && (
+              <PasswordField
+                label={t('oscrat.ui.repository.labels.personal-access-token')}
+                name="accessToken"
+                value={formik.values.accessToken}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.accessToken && formik.errors.accessToken
+                    ? t(formik.errors.accessToken)
+                    : undefined
+                }
+                placeholder={t(
+                  'oscrat.ui.repository.placeholders.access-token'
+                )}
+                helperText={t(
+                  'oscrat.ui.repository.sections.token-security-notice'
+                )}
+                showToken={showToken}
+                onToggleToken={() => setShowToken(!showToken)}
+                required
+              />
+            )}
+
+            {formik.values.authType === AuthType.PUBLIC && (
+              <div className="bg-info-subtle rounded-card p-3">
+                <p className="text-info-emphasis text-sm">
+                  {t('oscrat.ui.repository.sections.public-repo-notice')}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Target Configuration Section */}
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-content-secondary text-sm font-semibold">
+                {t('oscrat.ui.repository.sections.target-configuration')}
+              </h3>
+              <p className="text-content-muted mt-1 text-xs">
+                {t('oscrat.ui.repository.sections.target-configuration-help')}
+              </p>
+            </div>
+
+            {/* Two-column grid for target fields */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                label={t('oscrat.ui.repository.labels.target-branch')}
+                name="targetBranch"
+                value={formik.values.targetBranch || ''}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.targetBranch && formik.errors.targetBranch
+                    ? t(formik.errors.targetBranch)
+                    : undefined
+                }
+                placeholder={t('oscrat.ui.repository.placeholders.branch')}
+              />
+
+              <FormField
+                label={t('oscrat.ui.repository.labels.target-tag')}
+                name="targetTag"
+                value={formik.values.targetTag || ''}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.targetTag && formik.errors.targetTag
+                    ? t(formik.errors.targetTag)
+                    : undefined
+                }
+                placeholder={t('oscrat.ui.repository.placeholders.tag')}
+              />
+
+              {/* Target Commit spans full width */}
+              <div className="md:col-span-2">
+                <FormField
+                  label={t('oscrat.ui.repository.labels.target-commit')}
+                  name="targetCommit"
+                  value={formik.values.targetCommit || ''}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={
-                    formik.touched.authType && formik.errors.authType
-                      ? t(formik.errors.authType)
+                    formik.touched.targetCommit && formik.errors.targetCommit
+                      ? t(formik.errors.targetCommit)
                       : undefined
                   }
-                  required
-                >
-                  {AUTH_TYPE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {t(option.label)}
-                    </option>
-                  ))}
-                </SelectField>
-
-                {formik.values.authType === AuthType.PERSONAL_ACCESS_TOKEN && (
-                  <PasswordField
-                    label={t(
-                      'oscrat.ui.repository.labels.personal-access-token'
-                    )}
-                    name="accessToken"
-                    value={formik.values.accessToken}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.accessToken && formik.errors.accessToken
-                        ? t(formik.errors.accessToken)
-                        : undefined
-                    }
-                    placeholder={t(
-                      'oscrat.ui.repository.placeholders.access-token'
-                    )}
-                    helperText={t(
-                      'oscrat.ui.repository.sections.token-security-notice'
-                    )}
-                    showToken={showToken}
-                    onToggleToken={() => setShowToken(!showToken)}
-                    required
-                  />
-                )}
-
-                {formik.values.authType === AuthType.PUBLIC && (
-                  <div className="rounded-md bg-blue-50 p-3">
-                    <p className="text-sm text-blue-700">
-                      {t('oscrat.ui.repository.sections.public-repo-notice')}
-                    </p>
-                  </div>
-                )}
+                  placeholder={t('oscrat.ui.repository.placeholders.commit')}
+                />
               </div>
-
-              {/* Target Configuration Section */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700">
-                    {t('oscrat.ui.repository.sections.target-configuration')}
-                  </h3>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {t(
-                      'oscrat.ui.repository.sections.target-configuration-help'
-                    )}
-                  </p>
-                </div>
-
-                {/* Two-column grid for target fields */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <FormField
-                    label={t('oscrat.ui.repository.labels.target-branch')}
-                    name="targetBranch"
-                    value={formik.values.targetBranch || ''}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.targetBranch && formik.errors.targetBranch
-                        ? t(formik.errors.targetBranch)
-                        : undefined
-                    }
-                    placeholder={t('oscrat.ui.repository.placeholders.branch')}
-                  />
-
-                  <FormField
-                    label={t('oscrat.ui.repository.labels.target-tag')}
-                    name="targetTag"
-                    value={formik.values.targetTag || ''}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.targetTag && formik.errors.targetTag
-                        ? t(formik.errors.targetTag)
-                        : undefined
-                    }
-                    placeholder={t('oscrat.ui.repository.placeholders.tag')}
-                  />
-
-                  {/* Target Commit spans full width */}
-                  <div className="md:col-span-2">
-                    <FormField
-                      label={t('oscrat.ui.repository.labels.target-commit')}
-                      name="targetCommit"
-                      value={formik.values.targetCommit || ''}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      error={
-                        formik.touched.targetCommit &&
-                        formik.errors.targetCommit
-                          ? t(formik.errors.targetCommit)
-                          : undefined
-                      }
-                      placeholder={t(
-                        'oscrat.ui.repository.placeholders.commit'
-                      )}
-                    />
-                  </div>
-                </div>
-              </div>
-            </main>
+            </div>
           </div>
-
-          {/* Fixed Footer */}
-          <footer className="flex flex-shrink-0 items-center justify-end space-x-3 border-t border-gray-200 p-4">
-            <Button
-              onClick={onClose}
-              type="button"
-              variant="ghost"
-              className="w-auto"
-              text={t('cancel')}
-            />
-            <Button
-              type="submit"
-              text={isCreateMode ? t('add') : t('save')}
-              variant="primary"
-              className="w-auto px-[1rem] py-[0.4rem]"
-              disabled={formik.isSubmitting || !formik.isValid}
-            />
-          </footer>
-        </form>
-      </div>
-    </div>
+        </SharedModal.Body>
+        <SharedModal.Footer>
+          <Button
+            onClick={onClose}
+            type="button"
+            variant="tertiary"
+            className="w-auto"
+            text={t('cancel')}
+          />
+          <Button
+            type="submit"
+            text={isCreateMode ? t('add') : t('save')}
+            variant="primary"
+            className="w-auto px-[1rem] py-[0.4rem]"
+            disabled={formik.isSubmitting || !formik.isValid}
+          />
+        </SharedModal.Footer>
+      </form>
+    </SharedModal>
   );
 };
 

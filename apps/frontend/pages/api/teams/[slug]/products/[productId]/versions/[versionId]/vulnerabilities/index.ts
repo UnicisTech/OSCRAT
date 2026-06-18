@@ -1,5 +1,8 @@
 import { prisma } from '@/lib/prisma';
-import { getVulnerabilities, createVulnerability } from '@oscrat/model/operations';
+import {
+  getVulnerabilities,
+  createVulnerability,
+} from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratVulnerabilityCreate } from '@oscrat/model';

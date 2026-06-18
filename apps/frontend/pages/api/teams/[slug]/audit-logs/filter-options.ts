@@ -25,7 +25,10 @@ const handleGET = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const filterOptions = await getAuditLogFilterOptions(prisma, teamMember.teamId);
+  const filterOptions = await getAuditLogFilterOptions(
+    prisma,
+    teamMember.teamId
+  );
 
   res.status(200).json({ data: filterOptions });
 };

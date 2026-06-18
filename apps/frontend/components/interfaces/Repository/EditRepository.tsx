@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import toast from 'react-hot-toast';
-import { Modal } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import TextField from '@atlaskit/textfield';
 import Select, { ValueType } from '@atlaskit/select';
@@ -8,7 +7,8 @@ import type {
   OscratRepositoryDetail,
   OscratRepositoryUpdate,
 } from '@oscrat/model';
-import Button, { LoadingButton } from '@atlaskit/button';
+import { Button } from '@/components/shared';
+import Modal from '@/components/shared/Modal';
 import Form, { ErrorMessage, Field, FormFooter } from '@atlaskit/form';
 import { WithoutRing } from 'sharedStyles';
 import {
@@ -109,7 +109,7 @@ const EditRepository = ({
   };
 
   return (
-    <Modal open={visible}>
+    <Modal open={visible} close={() => setVisible(false)} size="lg">
       <Form<FormData>
         onSubmit={async (data) => {
           const {
@@ -164,7 +164,7 @@ const EditRepository = ({
       >
         {({ formProps, submitting }) => (
           <form {...formProps}>
-            <Modal.Header className="font-bold">
+            <Modal.Header>
               {isCreateMode ? 'Add Repository' : 'Edit Repository'}
             </Modal.Header>
             <Modal.Body>
@@ -306,23 +306,19 @@ const EditRepository = ({
                 <FormFooter></FormFooter>
               </div>
             </Modal.Body>
-            <Modal.Actions>
+            <Modal.Footer>
               <Button
-                appearance="default"
+                variant="secondary"
                 onClick={() => {
                   setVisible(!visible);
                 }}
               >
                 {t('close')}
               </Button>
-              <LoadingButton
-                type="submit"
-                appearance="primary"
-                isLoading={submitting}
-              >
+              <Button type="submit" variant="primary" loading={submitting}>
                 {isCreateMode ? 'Create Repository' : t('save-changes')}
-              </LoadingButton>
-            </Modal.Actions>
+              </Button>
+            </Modal.Footer>
           </form>
         )}
       </Form>

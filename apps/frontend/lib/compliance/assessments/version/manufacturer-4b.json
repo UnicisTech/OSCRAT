@@ -13,10 +13,7 @@
             "questionId": "IP1-Q1",
             "questionText": "area-1.IP1.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": true
@@ -30,10 +27,7 @@
             "questionId": "IP1-Q2",
             "questionText": "area-1.IP1.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "additionalInformation": {
               "type": "text",
               "required": false
@@ -47,10 +41,7 @@
             "questionId": "IP1-Q3",
             "questionText": "area-1.IP1.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -60,10 +51,7 @@
             "questionId": "IP1-Q4",
             "questionText": "area-1.IP1.questions.Q4.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -82,10 +70,7 @@
             "questionId": "IP2-Q1",
             "questionText": "area-1.IP2.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -95,10 +80,7 @@
             "questionId": "IP2-Q2",
             "questionText": "area-1.IP2.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -117,10 +99,7 @@
             "questionId": "IP3-Q1",
             "questionText": "area-1.IP3.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -139,10 +118,7 @@
             "questionId": "IP4-Q1",
             "questionText": "area-1.IP4.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -152,10 +128,7 @@
             "questionId": "IP4-Q2",
             "questionText": "area-1.IP4.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -174,10 +147,7 @@
             "questionId": "IP5-Q1",
             "questionText": "area-1.IP5.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -187,10 +157,7 @@
             "questionId": "IP5-Q2",
             "questionText": "area-1.IP5.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -200,10 +167,7 @@
             "questionId": "IP5-Q3",
             "questionText": "area-1.IP5.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -213,10 +177,7 @@
             "questionId": "IP5-Q4",
             "questionText": "area-1.IP5.questions.Q4.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -235,10 +196,7 @@
             "questionId": "IP6-Q1",
             "questionText": "area-1.IP6.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -263,10 +221,7 @@
             "questionId": "IO1-Q1",
             "questionText": "area-2.IO1.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -276,10 +231,7 @@
             "questionId": "IO1-Q2",
             "questionText": "area-2.IO1.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -298,10 +250,7 @@
             "questionId": "IO2-Q1",
             "questionText": "area-2.IO2.questions.Q1.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -311,10 +260,7 @@
             "questionId": "IO2-Q2",
             "questionText": "area-2.IO2.questions.Q2.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -324,10 +270,7 @@
             "questionId": "IO2-Q3",
             "questionText": "area-2.IO2.questions.Q3.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -337,10 +280,7 @@
             "questionId": "IO2-Q4",
             "questionText": "area-2.IO2.questions.Q4.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -350,10 +290,7 @@
             "questionId": "IO2-Q5",
             "questionText": "area-2.IO2.questions.Q5.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false
@@ -363,10 +300,7 @@
             "questionId": "IO2-Q6",
             "questionText": "area-2.IO2.questions.Q6.text",
             "answerType": "boolean",
-            "options": [
-              "common.yes",
-              "common.no"
-            ],
+            "options": ["common.yes", "common.no"],
             "evidence": {
               "type": "fileUpload",
               "required": false

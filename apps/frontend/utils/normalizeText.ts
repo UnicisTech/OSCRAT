@@ -7,7 +7,23 @@
  * normalizeText('IMPORTANT_CLASS_II')     // "Important Class II"
  **/
 
-const PRESERVE_UPPERCASE = new Set(['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'ID', 'CVE', 'CRA', 'SBOM', 'EU']);
+const PRESERVE_UPPERCASE = new Set([
+  'I',
+  'II',
+  'III',
+  'IV',
+  'V',
+  'VI',
+  'VII',
+  'VIII',
+  'IX',
+  'X',
+  'ID',
+  'CVE',
+  'CRA',
+  'SBOM',
+  'EU',
+]);
 
 const normalizeText = (text: string): string => {
   return text

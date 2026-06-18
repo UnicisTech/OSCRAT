@@ -3,8 +3,17 @@ export type RiskCategory = 'CONFIDENTIALITY' | 'INTEGRITY' | 'AVAILABILITY';
 export type RiskTreatmentOption = 'ACCEPT' | 'REDUCE' | 'AVOID' | 'TRANSFER';
 
 export const RISK_LEVELS: RiskLevel[] = ['LOW', 'MEDIUM', 'HIGH'];
-export const RISK_CATEGORIES: RiskCategory[] = ['CONFIDENTIALITY', 'INTEGRITY', 'AVAILABILITY'];
-export const RISK_TREATMENT_OPTIONS: RiskTreatmentOption[] = ['ACCEPT', 'REDUCE', 'AVOID', 'TRANSFER'];
+export const RISK_CATEGORIES: RiskCategory[] = [
+  'CONFIDENTIALITY',
+  'INTEGRITY',
+  'AVAILABILITY',
+];
+export const RISK_TREATMENT_OPTIONS: RiskTreatmentOption[] = [
+  'ACCEPT',
+  'REDUCE',
+  'AVOID',
+  'TRANSFER',
+];
 
 export interface RiskDetailsProperties {
   threat: string;

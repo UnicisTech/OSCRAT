@@ -4,7 +4,7 @@ import { useTranslation } from 'next-i18next';
 import { DatePicker } from '@atlaskit/datetime-picker';
 import TextField from '@atlaskit/textfield';
 import Select, { ValueType } from '@atlaskit/select';
-import { Button } from 'react-daisyui';
+import Button from '@/components/button';
 import type { Task, Team } from '@oscrat/model';
 import { TaskStatus } from '@oscrat/model';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
@@ -124,7 +124,7 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
                       <Select<StatusOption>
                         inputId={id}
                         {...rest}
-                        options={Object.values(TaskStatus).map(status => ({
+                        options={Object.values(TaskStatus).map((status) => ({
                           label: t(getTaskStatusTranslationKey(status)),
                           value: status,
                         }))}
@@ -186,11 +186,9 @@ const TaskDetails = ({ task, team }: { task: Task; team: Team }) => {
               <FormFooter>
                 {canAccess('task', ['update']) && (
                   <Button
-                    color="primary"
-                    variant="outline"
-                    size="sm"
+                    variant="secondary"
+                    size="m"
                     type="submit"
-                    active={!isFormChanged}
                     loading={submitting}
                   >
                     {t('save-changes')}

@@ -1,5 +1,9 @@
 import * as Yup from 'yup';
-import { OscratOrganizationType, OscratOrganizationRole, Role } from '@oscrat/model';
+import {
+  OscratOrganizationType,
+  OscratOrganizationRole,
+  Role,
+} from '@oscrat/model';
 import {
   emailSchema,
   phoneSchema,
@@ -15,28 +19,43 @@ import { availableRoles } from '@/lib/permissions';
  * Team creation schema
  */
 export const teamCreationSchema = Yup.object({
-  name: organizationNameSchema.required('oscrat.ui.validation.team-name-required'),
+  name: organizationNameSchema.required(
+    'oscrat.ui.validation.team-name-required'
+  ),
   type: Yup.mixed()
-    .oneOf([
-      OscratOrganizationType.NATURAL_PERSON,
-      OscratOrganizationType.LIMITED_LIABILITY_COMPANY
-    ], 'oscrat.ui.validation.organization-type-invalid')
+    .oneOf(
+      [
+        OscratOrganizationType.NATURAL_PERSON,
+        OscratOrganizationType.LIMITED_LIABILITY_COMPANY,
+      ],
+      'oscrat.ui.validation.organization-type-invalid'
+    )
     .required('oscrat.ui.validation.organization-type-required'),
   size: Yup.string().when('type', {
-    is: (val: OscratOrganizationType) => val === OscratOrganizationType.LIMITED_LIABILITY_COMPANY,
-    then: (schema) => schema.required('oscrat.ui.validation.organization-size-required'),
+    is: (val: OscratOrganizationType) =>
+      val === OscratOrganizationType.LIMITED_LIABILITY_COMPANY,
+    then: (schema) =>
+      schema.required('oscrat.ui.validation.organization-size-required'),
     otherwise: (schema) => schema.notRequired(),
   }),
   taxId: Yup.string().when('type', {
-    is: (val: OscratOrganizationType) => val === OscratOrganizationType.LIMITED_LIABILITY_COMPANY,
+    is: (val: OscratOrganizationType) =>
+      val === OscratOrganizationType.LIMITED_LIABILITY_COMPANY,
     then: (_schema) => taxIdSchema.notRequired(),
     otherwise: (_schema) => _schema.notRequired(),
   }),
   orgRole: Yup.mixed<OscratOrganizationRole>()
-    .oneOf(Object.values(OscratOrganizationRole), 'oscrat.ui.validation.organization-role-invalid')
+    .oneOf(
+      Object.values(OscratOrganizationRole),
+      'oscrat.ui.validation.organization-role-invalid'
+    )
     .required('oscrat.ui.validation.organization-role-required'),
-  postalAddress: postalAddressSchema.required('oscrat.ui.validation.postal-address-required'),
-  contactEmail: emailSchema.required('oscrat.ui.validation.contact-email-required'),
+  postalAddress: postalAddressSchema.required(
+    'oscrat.ui.validation.postal-address-required'
+  ),
+  contactEmail: emailSchema.required(
+    'oscrat.ui.validation.contact-email-required'
+  ),
   contactPhone: phoneSchema.notRequired(),
   countryCode: Yup.string().when('contactPhone', {
     is: (contactPhone: string | undefined) => !!contactPhone?.trim(),
@@ -58,7 +77,10 @@ export const teamSettingsSchema = Yup.object({
 });
 
 const roleSchema = Yup.mixed<Role>()
-  .oneOf(availableRoles.map((r) => r.id), 'oscrat.ui.validation.role-invalid')
+  .oneOf(
+    availableRoles.map((r) => r.id),
+    'oscrat.ui.validation.role-invalid'
+  )
   .required('oscrat.ui.validation.role-required');
 
 /**

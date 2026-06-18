@@ -10,7 +10,7 @@ export function LoadingState({ message }: LoadingStateProps) {
 
   return (
     <div className="flex w-full flex-col justify-center">
-      <p className="py-4 text-center dark:text-gray-300">
+      <p className="py-4 text-center">
         {message || t('loading-project-details')}
       </p>
     </div>
@@ -26,7 +26,7 @@ export function ErrorState({ message }: ErrorStateProps) {
 
   return (
     <div className="flex w-full flex-col justify-center">
-      <p className="py-4 text-center text-red-500 dark:text-red-400">
+      <p className="text-danger py-4 text-center">
         {message || t('unknown-error')}
       </p>
     </div>
@@ -41,8 +41,6 @@ export function EmptyState({ message }: EmptyStateProps) {
   const { t } = useTranslation('common');
 
   return (
-    <p className="py-4 text-center dark:text-gray-300">
-      {message || t('no-projects-found')}
-    </p>
+    <p className="py-4 text-center">{message || t('no-projects-found')}</p>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@atlaskit/button';
+import Button from '@/components/button';
 import EditorPanelIcon from '@atlaskit/icon/glyph/editor/panel';
 import Popup from '@atlaskit/popup';
 
@@ -102,10 +102,11 @@ const StatusHeader = () => {
           <span>Status</span>
           <Button
             onClick={() => setIsOpen(!isOpen)}
-            iconBefore={<EditorPanelIcon size="small" label="test" />}
-            appearance="subtle-link"
+            icon={<EditorPanelIcon size="small" label="test" />}
+            variant="tertiary"
+            size="s"
             {...triggerProps}
-          ></Button>
+          />
         </div>
       )}
     />

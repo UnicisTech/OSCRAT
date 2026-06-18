@@ -7,8 +7,8 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState, type ReactElement, useEffect } from 'react';
-import { Button } from 'react-daisyui';
-import type { ComponentStatus } from 'react-daisyui/dist/types';
+import Button from '@/components/button';
+import type { AlertStatus as ComponentStatus } from '@/components/shared/Alert';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import { ApiResponse, NextPageWithLayout } from 'types';
@@ -80,8 +80,8 @@ const VerifyAccount: NextPageWithLayout<
               placeholder="Email"
               value={formik.values.email}
               error={
-                formik.touched.email && formik.errors.email 
-                  ? t(formik.errors.email) 
+                formik.touched.email && formik.errors.email
+                  ? t(formik.errors.email)
                   : undefined
               }
               onChange={formik.handleChange}
@@ -90,11 +90,9 @@ const VerifyAccount: NextPageWithLayout<
           <div className="mt-4">
             <Button
               type="submit"
-              color="primary"
+              variant="primary"
               loading={formik.isSubmitting}
-              active={formik.dirty}
               fullWidth
-              size="md"
             >
               {t('resend-link')}
             </Button>

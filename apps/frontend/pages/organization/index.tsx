@@ -7,7 +7,7 @@ import AccountLayout from '@/components/layouts/AccountLayout';
 import env from '@/lib/env';
 
 const AllTeams: NextPageWithLayout = () => {
-  return <Teams/>;
+  return <Teams />;
 };
 
 AllTeams.getLayout = function getLayout(page: React.ReactNode) {

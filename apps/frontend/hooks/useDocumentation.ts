@@ -13,7 +13,10 @@ import type {
   DocumentationListFilter,
 } from '@/lib/api/endpoints/documentation';
 
-export function useDocumentationList(slug: string, filter?: DocumentationListFilter) {
+export function useDocumentationList(
+  slug: string,
+  filter?: DocumentationListFilter
+) {
   const {
     data: documentation,
     isLoading,
@@ -34,7 +37,8 @@ export function useDocumentationList(slug: string, filter?: DocumentationListFil
 
   return {
     documentation,
-    isLoading: isLoading || createMutation.isPending || deleteMutation.isPending,
+    isLoading:
+      isLoading || createMutation.isPending || deleteMutation.isPending,
     isError,
     error,
     createDocumentation,

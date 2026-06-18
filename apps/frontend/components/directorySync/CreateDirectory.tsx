@@ -4,7 +4,8 @@ import { useFormik } from 'formik';
 import { useDirectory } from 'hooks/useDirectory';
 import { useIdp } from 'hooks/useIdp';
 import { useTranslation } from 'next-i18next';
-import { Button, Modal } from 'react-daisyui';
+import Modal from '../shared/Modal';
+import Button from '@/components/button';
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 import { extractErrorMessage } from '@/lib/utils';
@@ -54,21 +55,9 @@ const CreateDirectory = ({
   }
 
   return (
-    <Modal open={visible}>
-      <Button
-        type="button"
-        size="sm"
-        shape="circle"
-        className="btn-outline absolute right-2 top-2 rounded-full"
-        onClick={toggleVisible}
-        aria-label={t('close')}
-      >
-        ✕
-      </Button>
+    <Modal open={visible} close={toggleVisible}>
       <form onSubmit={formik.handleSubmit} method="POST">
-        <Modal.Header className="font-bold">
-          {t('create-directory-connection')}
-        </Modal.Header>
+        <Modal.Header>{t('create-directory-connection')}</Modal.Header>
         <Modal.Body>
           <div className="mt-2 flex flex-col space-y-2">
             <p>{t('create-directory-message')}</p>
@@ -102,17 +91,11 @@ const CreateDirectory = ({
             </div>
           </div>
         </Modal.Body>
-        <Modal.Actions>
-          <Button
-            type="submit"
-            color="primary"
-            loading={formik.isSubmitting}
-            active={formik.dirty}
-            size="md"
-          >
+        <Modal.Footer>
+          <Button type="submit" variant="primary" loading={formik.isSubmitting}>
             {t('create-directory')}
           </Button>
-        </Modal.Actions>
+        </Modal.Footer>
       </form>
     </Modal>
   );

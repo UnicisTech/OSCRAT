@@ -16,7 +16,11 @@ export const riskDetailsSchema = Yup.object({
     .required('oscrat.ui.risk.validation.threat-required'),
 
   category: Yup.array()
-    .of(Yup.mixed<RiskCategory>().oneOf([...RISK_CATEGORIES]).required())
+    .of(
+      Yup.mixed<RiskCategory>()
+        .oneOf([...RISK_CATEGORIES])
+        .required()
+    )
     .min(1, 'oscrat.ui.risk.validation.category-required')
     .required('oscrat.ui.risk.validation.category-required'),
 
@@ -35,7 +39,10 @@ export const riskDetailsSchema = Yup.object({
 
 export const riskTreatmentSchema = Yup.object({
   treatment: Yup.mixed<RiskTreatmentOption>()
-    .oneOf([...RISK_TREATMENT_OPTIONS], 'oscrat.ui.risk.validation.treatment-required')
+    .oneOf(
+      [...RISK_TREATMENT_OPTIONS],
+      'oscrat.ui.risk.validation.treatment-required'
+    )
     .required('oscrat.ui.risk.validation.treatment-required'),
 
   measures: Yup.string()
@@ -44,7 +51,10 @@ export const riskTreatmentSchema = Yup.object({
     .optional(),
 
   residualExposure: Yup.mixed<RiskLevel>()
-    .oneOf([...RISK_LEVELS], 'oscrat.ui.risk.validation.residual-exposure-required')
+    .oneOf(
+      [...RISK_LEVELS],
+      'oscrat.ui.risk.validation.residual-exposure-required'
+    )
     .required('oscrat.ui.risk.validation.residual-exposure-required'),
 
   responsibleId: Yup.string()

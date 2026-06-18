@@ -17,5 +17,3 @@ export function handleAuthError(error: string): string {
       return 'Account created but login failed. Please try logging in manually.';
   }
 }
-
-

@@ -8,7 +8,10 @@ import {
 import { queryKeys } from '../queryKeys';
 import { queryClient } from '.';
 
-export function useListDocumentation(slug: string, filter?: DocumentationListFilter) {
+export function useListDocumentation(
+  slug: string,
+  filter?: DocumentationListFilter
+) {
   return useQuery({
     queryKey: queryKeys.teams.documentation.all(slug, filter),
     queryFn: () => documentationEndpoints.list(slug, filter),

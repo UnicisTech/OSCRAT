@@ -1,4 +1,4 @@
-import { Link } from 'react-daisyui';
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import TeamLayout from '@/components/layouts/TeamLayout';
 import AccountLayout from '@/components/layouts/AccountLayout';
@@ -22,7 +22,9 @@ const Breadcrumb = ({
       <ul>
         <li>{teamName || t('Home')}</li>
         <li>
-          <Link href={backTo || '/'}>{t('Tasks')}</Link>
+          <Link href={backTo || '/'} className="text-primary hover:underline">
+            {t('Tasks')}
+          </Link>
         </li>
         <li>{`${taskNumber} - ${taskTitle}`}</li>
       </ul>

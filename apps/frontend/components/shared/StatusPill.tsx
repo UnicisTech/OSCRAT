@@ -16,9 +16,9 @@ const StatusPill: React.FC<StatusPillProps> = ({ label, className = '' }) => {
 };
 
 export const VULNERABILITY_STATUS_CLASSES: Record<string, string> = {
-  Pending: 'bg-yellow-100 text-yellow-800',
-  Active: 'bg-blue-100 text-blue-800',
-  Closed: 'bg-gray-100 text-gray-800',
+  Pending: 'bg-warning-subtle text-warning-emphasis',
+  Active: 'bg-info-subtle text-info-emphasis',
+  Closed: 'bg-surface-muted text-content',
 };
 
 export default StatusPill;

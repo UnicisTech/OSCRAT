@@ -4,11 +4,15 @@ import { GetServerSidePropsContext } from 'next';
 import { withTeamLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
 import { Loading, Breadcrumb } from '@/components/shared';
+import Header from '@/components/oscrat/shared/header';
 import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { COMPLIANCE_TYPES } from '@/lib/compliance/translations';
-import { useAssessments, useOscratAssessment } from '@/hooks/oscrat/useOscratAssessment';
+import {
+  useAssessments,
+  useOscratAssessment,
+} from '@/hooks/oscrat/useOscratAssessment';
 import { useLatestAssessment } from '@/hooks/oscrat/useLatestAssessment';
 import { transformOrgAssessmentToComplianceState } from '@/utils/compliance';
 import { ComplianceState } from '@/types/compliance';
@@ -84,16 +88,12 @@ const TeamCompliancePage = () => {
   return (
     <div className="max-w-7xl p-6">
       <Breadcrumb items={breadcrumbItems} />
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-white">
-          {t('oscrat.ui.team-compliance-assessment')}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t('oscrat.ui.team-compliance-assessment-description', { 
-            teamName: team.name
-          })}
-        </p>
-      </div>
+      <Header
+        title={t('oscrat.ui.team-compliance-assessment')}
+        subtitle={t('oscrat.ui.team-compliance-assessment-description', {
+          teamName: team.name,
+        })}
+      />
 
       <ComplianceAssessmentWrapper
         complianceData={complianceData}
@@ -113,8 +113,10 @@ TeamCompliancePage.getLayout = withTeamLayout;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { getCommonServerSideProps } = await import('@/lib/server-helpers');
-  const { getAllComplianceNamespaces } = await import('@/lib/compliance/translations');
-  
+  const { getAllComplianceNamespaces } = await import(
+    '@/lib/compliance/translations'
+  );
+
   return getCommonServerSideProps(context, getAllComplianceNamespaces());
 }
 

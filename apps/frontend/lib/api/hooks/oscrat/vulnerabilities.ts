@@ -2,7 +2,10 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { oscratVulnerabilityEndpoints } from '@/lib/api/endpoints/oscrat/vulnerabilities';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
-import type { OscratVulnerabilityCreate, OscratVulnerabilityUpdate } from '@oscrat/model';
+import type {
+  OscratVulnerabilityCreate,
+  OscratVulnerabilityUpdate,
+} from '@oscrat/model';
 
 export function useGetVulnerabilities(
   teamId: string,
@@ -86,7 +89,13 @@ export function useUpdateVulnerability(
   versionId: string
 ) {
   return useMutation({
-    mutationFn: ({ vulnerabilityId, data }: { vulnerabilityId: string; data: OscratVulnerabilityUpdate }) =>
+    mutationFn: ({
+      vulnerabilityId,
+      data,
+    }: {
+      vulnerabilityId: string;
+      data: OscratVulnerabilityUpdate;
+    }) =>
       oscratVulnerabilityEndpoints.updateVulnerability(
         teamId,
         productId,

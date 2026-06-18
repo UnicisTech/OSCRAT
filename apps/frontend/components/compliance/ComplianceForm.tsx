@@ -5,11 +5,18 @@ import { useRouter } from 'next/router';
 import { assessmentAttachmentsEndpoints } from '@/lib/api/endpoints/oscrat/assessmentAttachments';
 import { queryClient } from '@/lib/api/hooks';
 import { queryKeys } from '@/lib/api/queryKeys';
-import { ComplianceArea, ComplianceState, RequirementAssessment } from '@/types/compliance';
+import {
+  ComplianceArea,
+  ComplianceState,
+  RequirementAssessment,
+} from '@/types/compliance';
 import { OscratOrganizationRole } from '@oscrat/model';
 import { exportComplianceToPDF } from '@/components/compliance';
 import toast from 'react-hot-toast';
-import { getComplianceNamespace, type ComplianceType } from '@/lib/compliance/translations';
+import {
+  getComplianceNamespace,
+  type ComplianceType,
+} from '@/lib/compliance/translations';
 import { buildPDFTranslations } from '@/lib/compliance/pdfTranslations';
 import { useOrgCompliance } from '@/hooks/oscrat/useOrgCompliance';
 import { useVersionCompliance } from '@/hooks/oscrat/useVersionCompliance';
@@ -19,6 +26,7 @@ import { COMPLIANCE_STATUS } from '@/constants/conformityStatuses';
 import { generateCARFilename } from '@/lib/utils/filename';
 import { extractErrorMessage } from '@/lib/utils';
 import ComplianceFormView from './ComplianceFormView';
+import { Button } from '@/components/shared';
 
 interface ComplianceFormProps {
   complianceData: ComplianceArea[];
@@ -43,7 +51,9 @@ function computeCompletionFlags(
     completedAreas.find((ca) => ca.id === a.id)
   );
 
-  const questionnaireAreas = complianceData.filter((a) => a.areaType !== 'checklist');
+  const questionnaireAreas = complianceData.filter(
+    (a) => a.areaType !== 'checklist'
+  );
   const questionnaireReqIds = new Set(
     questionnaireAreas.flatMap((a) => a.content.map((r) => r.reqId))
   );
@@ -51,7 +61,8 @@ function computeCompletionFlags(
     questionnaireReqIds.has(a.requirementId)
   );
   const totalRequired = questionnaireAreas.reduce(
-    (n, area) => n + area.content.length, 0
+    (n, area) => n + area.content.length,
+    0
   );
   const allEvaluated =
     questionnaireAssessments.length === totalRequired &&
@@ -107,7 +118,9 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
   const isOrgCompliance = !productId && !versionId;
 
   if (!isVersionCompliance && !isOrgCompliance) {
-    throw new Error('Invalid compliance configuration: both productId and versionId must be provided, or both must be null');
+    throw new Error(
+      'Invalid compliance configuration: both productId and versionId must be provided, or both must be null'
+    );
   }
 
   const orgComplianceHook = useOrgCompliance({
@@ -168,10 +181,7 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         try {
           const formData = new FormData();
           formData.append('file', answer.evidence);
-          formData.append(
-            'description',
-            t('oscrat.ui.evidence-upload')
-          );
+          formData.append('description', t('oscrat.ui.evidence-upload'));
           await assessmentAttachmentsEndpoints.uploadAssessmentAttachment(
             teamSlug,
             assessmentId,
@@ -184,7 +194,10 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       }
 
       queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.assessments.attachments(teamSlug, assessmentId),
+        queryKey: queryKeys.oscrat.assessments.attachments(
+          teamSlug,
+          assessmentId
+        ),
         exact: false,
       });
 
@@ -200,9 +213,9 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
   // Tracks the id returned by the most recent save so the files panel can show
   // evidence for a freshly-created assessment before the assessments list refetch
   // updates `latestAssessmentId`.
-  const [savedAssessmentId, setSavedAssessmentId] = useState<string | undefined>(
-    undefined
-  );
+  const [savedAssessmentId, setSavedAssessmentId] = useState<
+    string | undefined
+  >(undefined);
 
   const activeAssessmentId = savedAssessmentId ?? latestAssessmentId;
 
@@ -239,7 +252,19 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         toast.error(t('oscrat.ui.car-generation-failed'));
       }
     },
-    [complianceData, complianceNamespace, isVersionCompliance, productId, productName, router, t, teamName, teamSlug, uploadCAR, versionId]
+    [
+      complianceData,
+      complianceNamespace,
+      isVersionCompliance,
+      productId,
+      productName,
+      router,
+      t,
+      teamName,
+      teamSlug,
+      uploadCAR,
+      versionId,
+    ]
   );
 
   useEffect(() => {
@@ -324,7 +349,9 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         const currentArea = complianceData[prev.currentAreaIndex];
         const completedRequirements = [...prev.completedRequirements];
 
-        if (!completedRequirements.find((r) => r.id === assessment.requirementId)) {
+        if (
+          !completedRequirements.find((r) => r.id === assessment.requirementId)
+        ) {
           completedRequirements.push({
             id: assessment.requirementId,
             text: assessment.requirementText,
@@ -337,14 +364,21 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
         );
 
         const completedAreas = [...prev.completedAreas];
-        if (areaComplete && !completedAreas.find((a) => a.id === currentArea.id)) {
+        if (
+          areaComplete &&
+          !completedAreas.find((a) => a.id === currentArea.id)
+        ) {
           completedAreas.push({
             id: currentArea.id,
             text: currentArea.areaOfRequirements,
           });
         }
 
-        const flags = computeCompletionFlags(complianceData, newAssessments, completedAreas);
+        const flags = computeCompletionFlags(
+          complianceData,
+          newAssessments,
+          completedAreas
+        );
         allAreasComplete = flags.completed;
 
         const nextRequirementIndex = prev.currentRequirementIndex + 1;
@@ -375,7 +409,10 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       try {
         const newAssessmentId = await saveToDatabase(updatedState);
         if (newAssessmentId) setSavedAssessmentId(newAssessmentId);
-        evidenceFailures = await persistEvidenceFiles(newAssessmentId, assessment);
+        evidenceFailures = await persistEvidenceFiles(
+          newAssessmentId,
+          assessment
+        );
       } catch {
         toast.error(t('oscrat.ui.failed-to-save-assessment'));
       }
@@ -396,15 +433,17 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
             (toastInstance) => (
               <div className="flex flex-col gap-3">
                 <div>
-                  <p className="font-semibold">
+                  <p className="font-bold">
                     {t('oscrat.ui.auto-task-generated')}
                   </p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-b2 text-content-secondary mt-1">
                     {t('oscrat.ui.auto-task-prompt')}
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button
+                  <Button
+                    variant="primary"
+                    size="m"
                     onClick={async () => {
                       try {
                         await taskGeneration.acceptTask();
@@ -417,21 +456,21 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
                         toast.dismiss(toastInstance.id);
                       }
                     }}
-                    className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                     disabled={taskGeneration.isGenerating}
                   >
                     {t('oscrat.ui.accept-task')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="m"
                     onClick={() => {
                       taskGeneration.rejectTask();
                       toast.success(t('oscrat.ui.task-rejected'));
                       toast.dismiss(toastInstance.id);
                     }}
-                    className="px-3 py-1.5 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300"
                   >
                     {t('oscrat.ui.reject-task')}
-                  </button>
+                  </Button>
                 </div>
               </div>
             ),
@@ -487,8 +526,12 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       let updatedState: ComplianceState = localState;
 
       setLocalState((prev) => {
-        const checklistReqIds = new Set(currentArea.content.map((r) => r.reqId));
-        const checkedReqIds = new Set(checklistAssessments.map((a) => a.requirementId));
+        const checklistReqIds = new Set(
+          currentArea.content.map((r) => r.reqId)
+        );
+        const checkedReqIds = new Set(
+          checklistAssessments.map((a) => a.requirementId)
+        );
 
         const newAssessments = prev.assessments.filter(
           (a) => !checklistReqIds.has(a.requirementId)
@@ -518,7 +561,11 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
           });
         }
 
-        const flags = computeCompletionFlags(complianceData, newAssessments, completedAreas);
+        const flags = computeCompletionFlags(
+          complianceData,
+          newAssessments,
+          completedAreas
+        );
 
         updatedState = {
           ...prev,
@@ -561,7 +608,14 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
 
       setShowQuestionnaire(false);
     },
-    [complianceData, localState, saveToDatabase, t, generateAndUploadCAR, persistEvidenceFiles]
+    [
+      complianceData,
+      localState,
+      saveToDatabase,
+      t,
+      generateAndUploadCAR,
+      persistEvidenceFiles,
+    ]
   );
 
   const handleBack = useCallback(() => {
@@ -585,7 +639,11 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
     } else {
       setShowQuestionnaire(false);
     }
-  }, [complianceData, localState.currentAreaIndex, localState.currentRequirementIndex]);
+  }, [
+    complianceData,
+    localState.currentAreaIndex,
+    localState.currentRequirementIndex,
+  ]);
 
   const getAreaProgress = useCallback(
     (areaId: number): number => {

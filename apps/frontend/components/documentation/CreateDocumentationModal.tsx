@@ -1,10 +1,14 @@
 import React from 'react';
-import { Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
+import { Button } from '@/components/shared';
 import Modal from '@/components/shared/Modal';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
-import { getTemplateOptions, DOCUMENTATION_TEMPLATES, type TemplateType } from '@/constants/documentationTemplates';
+import {
+  getTemplateOptions,
+  DOCUMENTATION_TEMPLATES,
+  type TemplateType,
+} from '@/constants/documentationTemplates';
 import { useCreateDocumentationWizard } from './hooks/useCreateDocumentationWizard';
 
 interface Props {
@@ -22,9 +26,9 @@ const CreateDocumentationModal: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation('common');
   const requiredLabel = (labelText: string) => (
-    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+    <label className="text-content-secondary block text-sm font-medium">
       {labelText}
-      <span className="ml-1 text-red-600">*</span>
+      <span className="text-danger ml-1">*</span>
     </label>
   );
 
@@ -48,8 +52,14 @@ const CreateDocumentationModal: React.FC<Props> = ({
               onChange={wizard.handleLevelChange}
               disabled={!!defaultProductId}
               options={[
-                { value: 'ORGANIZATION', label: t('oscrat.ui.documentation.level.organization') },
-                { value: 'PRODUCT', label: t('oscrat.ui.documentation.level.product') },
+                {
+                  value: 'ORGANIZATION',
+                  label: t('oscrat.ui.documentation.level.organization'),
+                },
+                {
+                  value: 'PRODUCT',
+                  label: t('oscrat.ui.documentation.level.product'),
+                },
               ]}
               required
             />
@@ -96,11 +106,15 @@ const CreateDocumentationModal: React.FC<Props> = ({
               name="template"
               label={t('oscrat.ui.documentation.template.label')}
               value={wizard.template}
-              onChange={(e) => wizard.setTemplate(e.target.value as TemplateType)}
+              onChange={(e) =>
+                wizard.setTemplate(e.target.value as TemplateType)
+              }
               options={getTemplateOptions()}
             />
 
-            {wizard.error && <p className="text-sm text-red-600">{wizard.error}</p>}
+            {wizard.error && (
+              <p className="text-danger text-sm">{wizard.error}</p>
+            )}
           </div>
         )}
 
@@ -115,25 +129,38 @@ const CreateDocumentationModal: React.FC<Props> = ({
               required
             />
 
-            <div className="rounded-md bg-gray-50 p-3 text-sm">
-              <p className="font-medium">{t('oscrat.ui.documentation.summary')}:</p>
-              <ul className="mt-2 list-inside list-disc text-gray-600">
+            <div className="bg-surface-muted rounded-card p-3 text-sm">
+              <p className="font-medium">
+                {t('oscrat.ui.documentation.summary')}:
+              </p>
+              <ul className="text-content-secondary mt-2 list-inside list-disc">
                 <li>
-                  {t('oscrat.ui.documentation.level.label')}: {t(`oscrat.ui.documentation.level.${wizard.isProductLevel ? 'product' : 'organization'}`)}
+                  {t('oscrat.ui.documentation.level.label')}:{' '}
+                  {t(
+                    `oscrat.ui.documentation.level.${wizard.isProductLevel ? 'product' : 'organization'}`
+                  )}
                 </li>
                 {wizard.isProductLevel && wizard.productId && (
                   <li>
-                    {t('product')}: {wizard.products?.find((p) => p.id === wizard.productId)?.name}
-                    {wizard.versionId && ` (${wizard.availableVersions.find((v) => v.id === wizard.versionId)?.version})`}
+                    {t('product')}:{' '}
+                    {
+                      wizard.products?.find((p) => p.id === wizard.productId)
+                        ?.name
+                    }
+                    {wizard.versionId &&
+                      ` (${wizard.availableVersions.find((v) => v.id === wizard.versionId)?.version})`}
                   </li>
                 )}
                 <li>
-                  {t('oscrat.ui.documentation.template.label')}: {DOCUMENTATION_TEMPLATES[wizard.template].name}
+                  {t('oscrat.ui.documentation.template.label')}:{' '}
+                  {DOCUMENTATION_TEMPLATES[wizard.template].name}
                 </li>
               </ul>
             </div>
 
-            {wizard.error && <p className="text-sm text-red-600">{wizard.error}</p>}
+            {wizard.error && (
+              <p className="text-danger text-sm">{wizard.error}</p>
+            )}
           </div>
         )}
       </Modal.Body>
@@ -141,25 +168,29 @@ const CreateDocumentationModal: React.FC<Props> = ({
       <Modal.Footer>
         {wizard.step === 'select' ? (
           <>
-            <Button type="button" variant="outline" onClick={wizard.handleClose}>
-              {t('cancel')}
-            </Button>
             <Button
               type="button"
-              color="primary"
-              onClick={wizard.handleNext}
+              variant="secondary"
+              onClick={wizard.handleClose}
             >
+              {t('cancel')}
+            </Button>
+            <Button type="button" variant="primary" onClick={wizard.handleNext}>
               {t('next')}
             </Button>
           </>
         ) : (
           <>
-            <Button type="button" variant="outline" onClick={wizard.handleBack}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={wizard.handleBack}
+            >
               {t('back')}
             </Button>
             <Button
               type="button"
-              color="primary"
+              variant="primary"
               loading={wizard.isCreating}
               onClick={wizard.handleCreate}
             >

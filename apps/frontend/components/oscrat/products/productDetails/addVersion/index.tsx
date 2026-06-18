@@ -82,7 +82,7 @@ const Index: React.FC<CreateVersionModalProps> = ({
     >
       <div className="space-y-6">
         <div>
-          <label className="mb-2 block text-sm font-medium dark:text-gray-300">
+          <label className="mb-2 block text-sm font-medium">
             {t('oscrat.ui.version-name')} *
           </label>
           <input
@@ -91,20 +91,20 @@ const Index: React.FC<CreateVersionModalProps> = ({
             value={formik.values.version}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="bg-surface-muted w-full rounded border p-2"
             placeholder="e.g., 1.2.4"
             disabled={isLoading}
             maxLength={20}
           />
           {formik.touched.version && formik.errors.version && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            <p className="text-danger mt-1 text-sm">
               {t(formik.errors.version)}
             </p>
           )}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium dark:text-gray-300">
+          <label className="mb-2 block text-sm font-medium">
             {t('status')} *
           </label>
           <select
@@ -112,7 +112,7 @@ const Index: React.FC<CreateVersionModalProps> = ({
             value={formik.values.status}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className="w-full rounded border bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+            className="bg-surface-muted w-full rounded border p-2"
             disabled={isLoading}
           >
             {statusOptions.map((statusOption) => (
@@ -122,7 +122,7 @@ const Index: React.FC<CreateVersionModalProps> = ({
             ))}
           </select>
           {formik.touched.status && formik.errors.status && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            <p className="text-danger mt-1 text-sm">
               {t(formik.errors.status)}
             </p>
           )}

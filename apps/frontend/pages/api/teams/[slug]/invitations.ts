@@ -8,10 +8,7 @@ import {
   getInvitation,
   getInvitations,
 } from 'models/invitation';
-import {
-  withTeamAuth,
-  type AuthenticatedTeamRequest,
-} from '@/lib/middleware';
+import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import { withApiHandler } from '@/lib/middleware';
 import { inviteMemberSchema } from '@/lib/validation/team';
 import { validateRequest } from '@/lib/validation/validateRequest';

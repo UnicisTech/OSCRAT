@@ -2,7 +2,10 @@ import env from '@/lib/env';
 import { prisma } from '@/lib/prisma';
 import jackson from '@/lib/jackson';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
-import { logDirectorySyncCreated, logDirectorySyncDeleted } from '@oscrat/model/operations';
+import {
+  logDirectorySyncCreated,
+  logDirectorySyncDeleted,
+} from '@oscrat/model/operations';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 

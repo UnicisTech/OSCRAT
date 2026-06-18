@@ -3,6 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { FaLanguage, FaPlay } from 'react-icons/fa';
 import { OscratOrganizationRole } from '@oscrat/model';
 import { useTeamData } from '@/hooks/useTeamData';
+import { Button } from '@/components/shared';
 import {
   SUPPORTED_LANGUAGES,
   getTranslationNamespaceKey,
@@ -22,7 +23,10 @@ interface Props {
   teamRole: OscratOrganizationRole;
   complianceType: ComplianceType;
   isAssessmentStarted?: boolean;
-  onLanguageSelect: (languageCode: string, translations: Record<string, string> | null) => void;
+  onLanguageSelect: (
+    languageCode: string,
+    translations: Record<string, string> | null
+  ) => void;
 }
 
 /**
@@ -54,14 +58,14 @@ function buildLanguageOptions(
   };
 
   // Other languages are only available if uploaded
-  const otherLanguages: LanguageOption[] = SUPPORTED_LANGUAGES
-    .filter((lang) => lang.code !== 'en')
-    .map((lang) => ({
-      code: lang.code,
-      label: lang.label,
-      available: uploadedLanguages.has(lang.code),
-      hasCustomTranslation: uploadedLanguages.has(lang.code),
-    }));
+  const otherLanguages: LanguageOption[] = SUPPORTED_LANGUAGES.filter(
+    (lang) => lang.code !== 'en'
+  ).map((lang) => ({
+    code: lang.code,
+    label: lang.label,
+    available: uploadedLanguages.has(lang.code),
+    hasCustomTranslation: uploadedLanguages.has(lang.code),
+  }));
 
   return [englishOption, ...otherLanguages];
 }
@@ -85,7 +89,9 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
   );
 
   const handleStart = async () => {
-    const langInfo = availableLanguages.find((l) => l.code === selectedLanguage);
+    const langInfo = availableLanguages.find(
+      (l) => l.code === selectedLanguage
+    );
 
     // Use default translations (null) if no custom translation uploaded
     if (!langInfo?.hasCustomTranslation) {
@@ -110,25 +116,27 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
     setIsStarting(false);
   };
 
-  const selectedLang = availableLanguages.find((l) => l.code === selectedLanguage);
+  const selectedLang = availableLanguages.find(
+    (l) => l.code === selectedLanguage
+  );
 
   return (
-    <div className="bg-white dark:bg-base-200 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
-      <div className="flex items-center gap-3 mb-4">
-        <FaLanguage className="text-2xl text-blue-600" />
-        <h3 className="text-lg font-semibold">
+    <div className="bg-surface border-line rounded-card mb-6 border p-6">
+      <div className="mb-4 flex items-center gap-3">
+        <FaLanguage className="text-primary text-2xl" />
+        <h3 className="text-h6 font-bold">
           {t('oscrat.ui.compliance-translation.assessment-language')}
         </h3>
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+      <p className="text-b2 text-content-secondary mb-4">
         {t('oscrat.ui.compliance-translation.select-language')}
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <div className="flex-1">
           <select
-            className="select select-bordered w-full bg-white dark:bg-base-100"
+            className="select select-bordered bg-surface w-full"
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
             disabled={isListLoading || isStarting || isAssessmentStarted}
@@ -141,30 +149,30 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
             ))}
           </select>
           {selectedLang && !selectedLang.available && !isAssessmentStarted && (
-            <p className="text-xs text-amber-600 mt-1">
+            <p className="text-c1 text-warning mt-1">
               {t('oscrat.ui.compliance-translation.default-english')}
             </p>
           )}
           {isAssessmentStarted && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-content-muted mt-1 text-xs">
               {t('oscrat.ui.compliance-translation.language-locked')}
             </p>
           )}
         </div>
 
-        <button
+        <Button
           type="button"
-          className="btn btn-primary flex items-center gap-2"
+          variant="primary"
+          startIcon={<FaPlay />}
           onClick={handleStart}
           disabled={isStarting || isListLoading}
         >
-          <FaPlay />
           {t(
             isAssessmentStarted
               ? 'oscrat.ui.dashboard.continue-assessment'
               : 'oscrat.ui.dashboard.start-assessment'
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

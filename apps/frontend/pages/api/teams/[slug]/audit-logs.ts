@@ -33,7 +33,11 @@ const handlePOST = async (
       stripUnknown: true,
     });
 
-    const result = await getAuditLogs(prisma, teamMember.teamId, validatedParams);
+    const result = await getAuditLogs(
+      prisma,
+      teamMember.teamId,
+      validatedParams
+    );
     res.status(200).json({ data: result });
   } catch (error) {
     if (error instanceof Yup.ValidationError) {

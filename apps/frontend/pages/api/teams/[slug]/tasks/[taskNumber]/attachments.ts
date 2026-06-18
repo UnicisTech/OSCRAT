@@ -96,7 +96,9 @@ const handlePOST = async (
 
     if (isAllowed) {
       try {
-        const resolvedVersionId = Array.isArray(versionId) ? versionId[0] : versionId;
+        const resolvedVersionId = Array.isArray(versionId)
+          ? versionId[0]
+          : versionId;
 
         const uploadParams = {
           taskId: Number(taskId),

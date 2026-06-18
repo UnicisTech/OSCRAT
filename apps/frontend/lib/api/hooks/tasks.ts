@@ -9,7 +9,10 @@ import {
 } from '@/lib/api/endpoints/tasks';
 import { queryKeys } from '../queryKeys';
 import { queryClient } from '.';
-import { TASK_CONFIGURATION_PROPERTY_KEYS, type TaskProperties } from '@oscrat/model';
+import {
+  TASK_CONFIGURATION_PROPERTY_KEYS,
+  type TaskProperties,
+} from '@oscrat/model';
 
 // Team tasks
 export function useGetTeamTasks(slug: string) {
@@ -19,10 +22,16 @@ export function useGetTeamTasks(slug: string) {
   });
 }
 
-function invalidateVersionOpenTasksCache(task: { teamId: string; versionId?: string | null }) {
+function invalidateVersionOpenTasksCache(task: {
+  teamId: string;
+  versionId?: string | null;
+}) {
   if (task.versionId) {
     queryClient.invalidateQueries({
-      queryKey: queryKeys.oscrat.projects.versions.detail(task.teamId, task.versionId),
+      queryKey: queryKeys.oscrat.projects.versions.detail(
+        task.teamId,
+        task.versionId
+      ),
     });
   }
 }
@@ -190,10 +199,14 @@ export function useDeleteTaskAttachment(slug: string, taskNumber: string) {
 }
 
 // Linked Documentation
-export function useGetTaskLinkedDocumentation(slug: string, taskNumber: string) {
+export function useGetTaskLinkedDocumentation(
+  slug: string,
+  taskNumber: string
+) {
   return useQuery({
     queryKey: queryKeys.teams.tasks.documentation(slug, taskNumber),
-    queryFn: () => tasksEndpoints.getLinkedDocumentation(slug, Number(taskNumber)),
+    queryFn: () =>
+      tasksEndpoints.getLinkedDocumentation(slug, Number(taskNumber)),
     enabled: !!slug && !!taskNumber,
   });
 }

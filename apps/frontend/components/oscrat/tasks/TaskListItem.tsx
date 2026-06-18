@@ -6,6 +6,7 @@ import type { Task, Team } from '@oscrat/model';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { formatTaskLabel } from '@/lib/tasks';
+import { formatDateShort } from '@/utils/dateFormat';
 
 interface TaskListItemProps {
   task: Task;
@@ -23,26 +24,26 @@ const TaskListItem: React.FC<TaskListItemProps> = ({
 }) => {
   const { t, ready } = useTranslation('common');
   const router = useRouter();
-  
+
   // Fetch product and version data if available
   const { project: product } = useOscratProject(
     team.slug,
     task.productId || '',
     { enabled: !!task.productId }
   );
-  
+
   const { version } = useOscratVersion(
     team.slug,
     task.productId || '',
     task.versionId || '',
     { enabled: !!task.productId && !!task.versionId }
   );
-  
+
   if (!ready) return null;
 
   const isAutomatic = task.originType === 'AUTOMATIC';
   const displayTitle = formatTaskLabel(task, t);
-  
+
   const handleRowClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on the status dropdown
     const target = e.target as HTMLElement;
@@ -53,46 +54,53 @@ const TaskListItem: React.FC<TaskListItemProps> = ({
   };
 
   return (
-    <tr 
+    <tr
       onClick={handleRowClick}
-      className="hover:bg-gray-50 cursor-pointer transition-colors"
+      className="hover:bg-surface-muted cursor-pointer transition-colors"
     >
       <td className="px-4 py-4 align-middle">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
           {isAutomatic ? (
-            <span 
-              className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700"
+            <span
+              className="bg-info-subtle text-info-emphasis inline-flex flex-shrink-0 items-center gap-1 rounded px-2 py-0.5 text-xs"
               title={t('oscrat.ui.task-origin-automatic')}
             >
               <CogIcon className="h-3 w-3" />
-              <span className="hidden sm:inline">{t('oscrat.ui.task-origin-automatic-short')}</span>
+              <span className="hidden sm:inline">
+                {t('oscrat.ui.task-origin-automatic-short')}
+              </span>
             </span>
           ) : (
-            <span 
-              className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-700"
+            <span
+              className="bg-warning-subtle text-warning inline-flex flex-shrink-0 items-center gap-1 rounded px-2 py-0.5 text-xs"
               title={t('oscrat.ui.task-origin-manual')}
             >
               <HandRaisedIcon className="h-3 w-3" />
-              <span className="hidden sm:inline">{t('oscrat.ui.task-origin-manual-short')}</span>
+              <span className="hidden sm:inline">
+                {t('oscrat.ui.task-origin-manual-short')}
+              </span>
             </span>
           )}
-          <div className="font-medium text-gray-900 truncate" title={displayTitle}>
+          <div
+            className="text-content truncate font-medium"
+            title={displayTitle}
+          >
             {displayTitle}
           </div>
         </div>
       </td>
-      <td className="hidden md:table-cell px-4 py-4 align-middle text-gray-700">
+      <td className="text-content-secondary hidden px-4 py-4 align-middle md:table-cell">
         <div className="truncate" title={product?.name}>
-          {product?.name || "-"}
+          {product?.name || '-'}
         </div>
       </td>
-      <td className="hidden lg:table-cell px-4 py-4 align-middle text-gray-700">
+      <td className="text-content-secondary hidden px-4 py-4 align-middle lg:table-cell">
         <div className="truncate" title={version?.version}>
-          {version?.version || "-"}
+          {version?.version || '-'}
         </div>
       </td>
-      <td className="hidden sm:table-cell px-4 py-4 align-middle text-gray-700 whitespace-nowrap">
-        {new Date(task.duedate).toLocaleDateString()}
+      <td className="text-content-secondary hidden whitespace-nowrap px-4 py-4 align-middle sm:table-cell">
+        {formatDateShort(task.duedate)}
       </td>
       <td className="px-4 py-4 align-middle">
         {React.createElement(statusDropdown, {

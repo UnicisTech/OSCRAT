@@ -4,6 +4,7 @@ import { useTranslation } from 'next-i18next';
 import { useVersionContext } from '@/context/VersionContext';
 import { useGetVulnerabilityScanReportDetail } from '@/lib/api/hooks/oscrat/jobs';
 import { Loading, Breadcrumb } from '@/components/shared';
+import Button from '@/components/button';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import usePagination from '@/hooks/usePagination';
@@ -17,42 +18,46 @@ import { reportStyles } from '@/components/oscrat/reportStyles';
 import { WorkerJobStatus, type ScanVulnerability } from '@oscrat/model';
 import ReportStatusMessage from '@/components/oscrat/ReportStatusMessage';
 import ActionButton from '@/components/oscrat/ActionButton';
+import { formatDateShort } from '@/utils/dateFormat';
 import { useTeamContext } from '@/context/TeamContext';
 
 const ITEMS_PER_PAGE = 15;
 
-function getSeverityBadge(severity: string, t: (key: string) => string): JSX.Element {
+function getSeverityBadge(
+  severity: string,
+  t: (key: string) => string
+): JSX.Element {
   const severityConfig: Record<string, { color: string; label: string }> = {
     Critical: {
-      color: 'bg-red-100 text-red-800',
+      color: 'border-danger text-content',
       label: t('oscrat.ui.versions.vulnerability-scan.critical'),
     },
     High: {
-      color: 'bg-orange-100 text-orange-800',
+      color: 'border-warning text-content',
       label: t('oscrat.ui.versions.vulnerability-scan.high'),
     },
     Medium: {
-      color: 'bg-yellow-100 text-yellow-800',
+      color: 'border-caution text-content',
       label: t('oscrat.ui.versions.vulnerability-scan.medium'),
     },
     Low: {
-      color: 'bg-blue-100 text-blue-800',
+      color: 'border-info text-content',
       label: t('oscrat.ui.versions.vulnerability-scan.low'),
     },
     Negligible: {
-      color: 'bg-gray-100 text-gray-800',
+      color: 'border-content-muted text-content',
       label: t('oscrat.ui.versions.vulnerability-scan.negligible'),
     },
   };
 
   const config = severityConfig[severity] || {
-    color: 'bg-gray-100 text-gray-800',
+    color: 'border-content-muted text-content',
     label: severity,
   };
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}
+      className={`inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold ${config.color}`}
     >
       {config.label}
     </span>
@@ -73,18 +78,13 @@ function ReportHeader({
   return (
     <div className="flex items-center justify-between">
       <h1 className={reportStyles.pageTitle}>{title}</h1>
-      <button
+      <Button
+        variant="secondary"
         onClick={onDownload}
         disabled={!hasAttachment}
-        className={`${reportStyles.downloadButton.base} ${
-          hasAttachment
-            ? reportStyles.downloadButton.enabled
-            : reportStyles.downloadButton.disabled
-        }`}
-      >
-        <FaDownload className="mr-2" size={14} />
-        {downloadLabel}
-      </button>
+        startIcon={<FaDownload size={14} />}
+        text={downloadLabel}
+      />
     </div>
   );
 }
@@ -159,9 +159,11 @@ function SeverityOverview({
       </div>
       <div className={`mt-6 ${reportStyles.metadataGrid}`}>
         <div>
-          <p className={reportStyles.metadataLabel}>{t('oscrat.ui.scan-date')}</p>
+          <p className={reportStyles.metadataLabel}>
+            {t('oscrat.ui.scan-date')}
+          </p>
           <p className={reportStyles.metadataValue}>
-            {new Date(scanData.scanDate).toLocaleString()}
+            {formatDateShort(scanData.scanDate)}
           </p>
         </div>
         <div>
@@ -171,7 +173,9 @@ function SeverityOverview({
           <p className={reportStyles.metadataValue}>{scanData.grypeVersion}</p>
         </div>
         <div>
-          <p className={reportStyles.metadataLabel}>{t('oscrat.ui.triggered-by-label')}</p>
+          <p className={reportStyles.metadataLabel}>
+            {t('oscrat.ui.triggered-by-label')}
+          </p>
           <p className={reportStyles.metadataValue}>{triggeredBy}</p>
         </div>
       </div>
@@ -219,7 +223,7 @@ function VulnerabilitiesTable({
   return (
     <div className={reportStyles.tableCard}>
       <div className={reportStyles.tableHeader}>
-        <h2 className="text-lg font-medium text-gray-900">
+        <h2 className="text-content text-lg font-medium">
           {t('oscrat.ui.versions.vulnerability-scan.vulnerabilities-section')}
         </h2>
         <p className={reportStyles.sectionSubtitle}>
@@ -253,29 +257,33 @@ function VulnerabilitiesTable({
               <th className={tableStyles.th}>
                 {t('oscrat.ui.versions.vulnerability-scan.table-description')}
               </th>
-              <th className={tableStyles.th}>
-                {t('oscrat.ui.actions')}
-              </th>
+              <th className={tableStyles.th}>{t('oscrat.ui.actions')}</th>
             </tr>
           </thead>
           <tbody className={tableStyles.tbody}>
             {pageData.map((vuln, index) => (
               <tr key={index} className={tableStyles.tr}>
-                <td className={`${tableStyles.td} font-medium text-gray-900`}>
+                <td className={`${tableStyles.td} text-content font-medium`}>
                   <div className="flex items-center gap-2">
                     {vuln.advisoryId}
                     {vuln.existingVulnerability && (
                       <FaCheckCircle
-                        className="text-green-600"
+                        className="text-success"
                         size={14}
-                        title={t('oscrat.ui.versions.vulnerability-scan.already-tracked')}
+                        title={t(
+                          'oscrat.ui.versions.vulnerability-scan.already-tracked'
+                        )}
                       />
                     )}
                   </div>
                 </td>
                 <td className={tableStyles.td}>{vuln.cve || '-'}</td>
-                <td className={tableStyles.td}>{getSeverityBadge(vuln.severity)}</td>
-                <td className={`${tableStyles.td} text-gray-900`}>{vuln.package}</td>
+                <td className={tableStyles.td}>
+                  {getSeverityBadge(vuln.severity)}
+                </td>
+                <td className={`${tableStyles.td} text-content`}>
+                  {vuln.package}
+                </td>
                 <td className={tableStyles.td}>{vuln.version}</td>
                 <td className={tableStyles.td}>{vuln.fixedIn || '-'}</td>
                 <td className={tableStyles.td}>
@@ -286,7 +294,9 @@ function VulnerabilitiesTable({
                 <td className={tableStyles.td}>
                   {vuln.existingVulnerability ? (
                     <ActionButton
-                      onClick={() => onViewVulnerability(vuln.existingVulnerability!.id)}
+                      onClick={() =>
+                        onViewVulnerability(vuln.existingVulnerability!.id)
+                      }
                       icon={<FaEye size={12} />}
                       title={t('oscrat.ui.view')}
                     >
@@ -330,7 +340,11 @@ export default function VulnerabilityScanSummary() {
   const { slug } = useTeamContext();
 
   const { project } = useOscratProject(teamId, productId);
-  const { version: versionData } = useOscratVersion(teamId, productId, versionId);
+  const { version: versionData } = useOscratVersion(
+    teamId,
+    productId,
+    versionId
+  );
 
   const { data: report, isLoading } = useGetVulnerabilityScanReportDetail(
     teamId,
@@ -398,7 +412,6 @@ export default function VulnerabilityScanSummary() {
       );
     }
   };
-
 
   return (
     <>

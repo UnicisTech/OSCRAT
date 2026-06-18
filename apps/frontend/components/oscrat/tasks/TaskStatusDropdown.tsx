@@ -17,11 +17,16 @@ const TaskStatusDropdown: React.FC<TaskStatusDropdownProps> = ({
   team,
 }) => {
   const { t, ready } = useTranslation('common');
-  const { updateTask, isLoading } = useTask(team.slug, task.taskNumber.toString());
+  const { updateTask, isLoading } = useTask(
+    team.slug,
+    task.taskNumber.toString()
+  );
 
-  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStatusChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const newStatus = e.target.value as TaskStatus;
-    
+
     try {
       await updateTask({ status: newStatus });
       toast.success(t('task-status-updated'));
@@ -39,7 +44,7 @@ const TaskStatusDropdown: React.FC<TaskStatusDropdownProps> = ({
       value={task.status}
       onChange={handleStatusChange}
       disabled={isLoading}
-      className="w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50"
+      className="border-line bg-surface text-content-secondary shadow-2 focus:border-primary focus:ring-primary disabled:bg-surface-muted rounded-input w-full border px-2 py-1 text-xs focus:outline-none focus:ring-1 disabled:cursor-not-allowed"
     >
       {Object.values(TaskStatus).map((status) => (
         <option key={status} value={status}>

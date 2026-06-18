@@ -67,7 +67,9 @@ export function buildPDFTranslations(t: TFunction): PDFTranslations {
     notCompliant: t('oscrat.ui.dashboard.not-compliant'),
     notApplicable: t('oscrat.ui.dashboard.not-applicable'),
     inEvaluation: t('oscrat.ui.dashboard.in-evaluation'),
-    requirementsStatusSummary: t('oscrat.ui.dashboard.pdf.requirements-status-summary'),
+    requirementsStatusSummary: t(
+      'oscrat.ui.dashboard.pdf.requirements-status-summary'
+    ),
     id: t('oscrat.ui.dashboard.pdf.id'),
     requirement: t('oscrat.ui.dashboard.pdf.requirement'),
     status: t('oscrat.ui.dashboard.pdf.status'),

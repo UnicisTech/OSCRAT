@@ -77,7 +77,7 @@ export default function Files() {
   }
 
   return (
-    <div className="flex w-full flex-col items-center rounded-lg border border-gray-400 bg-white p-4">
+    <div className="border-line bg-surface rounded-card flex w-full flex-col items-center border p-4">
       <div className="w-full">
         <FileTable
           attachments={attachments}

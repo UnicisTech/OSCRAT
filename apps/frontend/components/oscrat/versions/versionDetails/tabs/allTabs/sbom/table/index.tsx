@@ -10,6 +10,7 @@ import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { ShortUuidButton } from '@/components/shared';
+import { formatDateShort } from '@/utils/dateFormat';
 import {
   TableWrapper,
   TableHeader,
@@ -62,29 +63,29 @@ const Table: React.FC<SsmTableProps> = ({
   const getStatusBadge = (report: SbomReportDetails) => {
     const statusConfig = {
       [WorkerJobStatus.COMPLETED]: {
-        color: 'text-green-600',
+        color: 'text-success',
         label: t('oscrat.ui.versions.sbom.completed'),
       },
       [WorkerJobStatus.IN_PROGRESS]: {
-        color: 'text-blue-600',
+        color: 'text-primary',
         label: t('oscrat.ui.versions.sbom.in-progress'),
       },
       [WorkerJobStatus.FAILED]: {
-        color: 'text-red-600',
+        color: 'text-danger',
         label: t('oscrat.ui.versions.sbom.failed'),
       },
       [WorkerJobStatus.PENDING]: {
-        color: 'text-gray-600',
+        color: 'text-content-secondary',
         label: t('oscrat.ui.versions.sbom.pending'),
       },
       [WorkerJobStatus.CANCELLED]: {
-        color: 'text-gray-600',
+        color: 'text-content-secondary',
         label: t('oscrat.ui.versions.sbom.cancelled'),
       },
     };
 
     const config = statusConfig[report.status] || {
-      color: 'text-gray-600',
+      color: 'text-content-secondary',
       label: t('oscrat.ui.unknown'),
     };
 
@@ -106,29 +107,29 @@ const Table: React.FC<SsmTableProps> = ({
   const getVulnStatusBadge = (status: WorkerJobStatus) => {
     const statusConfig = {
       [WorkerJobStatus.COMPLETED]: {
-        color: 'bg-green-100 text-green-800',
+        color: 'bg-success-subtle text-success-emphasis',
         label: t('oscrat.ui.versions.sbom.completed'),
       },
       [WorkerJobStatus.IN_PROGRESS]: {
-        color: 'bg-blue-100 text-blue-800',
+        color: 'bg-info-subtle text-info-emphasis',
         label: t('oscrat.ui.versions.sbom.in-progress'),
       },
       [WorkerJobStatus.FAILED]: {
-        color: 'bg-red-100 text-red-800',
+        color: 'bg-danger-subtle text-danger-emphasis',
         label: t('oscrat.ui.versions.sbom.failed'),
       },
       [WorkerJobStatus.PENDING]: {
-        color: 'bg-gray-100 text-gray-800',
+        color: 'bg-surface-muted text-content',
         label: t('oscrat.ui.versions.sbom.pending'),
       },
       [WorkerJobStatus.CANCELLED]: {
-        color: 'bg-gray-100 text-gray-800',
+        color: 'bg-surface-muted text-content',
         label: t('oscrat.ui.versions.sbom.cancelled'),
       },
     };
 
     const config = statusConfig[status] || {
-      color: 'bg-gray-100 text-gray-800',
+      color: 'bg-surface-muted text-content',
       label: t('oscrat.ui.unknown'),
     };
 
@@ -143,38 +144,38 @@ const Table: React.FC<SsmTableProps> = ({
 
   if (!reports || reports.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+      <div className="text-content-muted flex flex-col items-center justify-center py-12">
         <p className="text-sm">{t('oscrat.ui.no-sbom-added')}</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full rounded-lg">
+    <div className="rounded-card w-full">
       <TableWrapper>
-        <table className={tableStyles.table}>
+        <table className={tableStyles.tableAuto}>
           <TableHeader
             columns={[
-              { label: t('status'), className: 'w-28' },
-              { label: t('oscrat.ui.source'), className: 'w-20 text-center' },
+              { label: t('status') },
+              { label: t('oscrat.ui.source'), className: 'text-center' },
               {
                 label: t('oscrat.ui.versions.sbom.started'),
-                className: 'w-28 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.sbom.triggered-by'),
-                className: 'w-24 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.sbom.duration'),
-                className: 'w-16 text-center',
+                className: 'text-center',
               },
               {
                 label: t('oscrat.ui.versions.sbom.packages'),
-                className: 'w-16 text-center',
+                className: 'text-center',
               },
-              { label: t('oscrat.ui.scan'), className: 'w-28 text-center' },
-              { label: t('actions'), className: 'w-48 text-center' },
+              { label: t('oscrat.ui.scan'), className: 'text-center' },
+              { label: t('actions'), className: 'text-center' },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -193,8 +194,8 @@ const Table: React.FC<SsmTableProps> = ({
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       report.job.source === 'REPO'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800'
+                        ? 'bg-info-subtle text-info-emphasis'
+                        : 'bg-success-subtle text-success-emphasis'
                     }`}
                   >
                     {report.job.source === 'REPO'
@@ -203,12 +204,7 @@ const Table: React.FC<SsmTableProps> = ({
                   </span>
                 </td>
                 <td className={tableStyles.tdCenter}>
-                  {new Date(report.job.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatDateShort(report.job.createdAt)}
                 </td>
                 <td
                   className={tableStyles.tdCenter}
@@ -247,10 +243,12 @@ const Table: React.FC<SsmTableProps> = ({
                       getVulnStatusBadge(report.latestVulnerabilityScan.status)
                     )
                   ) : (
-                    <span className="text-gray-400">{t('oscrat.ui.none')}</span>
+                    <span className="text-content-placeholder">
+                      {t('oscrat.ui.none')}
+                    </span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-center align-middle">
+                <td className="px-4 py-4 text-center align-middle">
                   <div
                     className="flex items-center justify-center space-x-1"
                     onClick={(e) => e.stopPropagation()}

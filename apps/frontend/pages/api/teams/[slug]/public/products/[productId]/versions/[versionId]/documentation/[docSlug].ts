@@ -29,11 +29,11 @@ export default async function handler(
     querySchema,
     req.query
   );
-  const doc = await getPublicDocumentation(slug, docSlug, {
+  const doc = (await getPublicDocumentation(slug, docSlug, {
     productId,
     versionId,
     includeContent: true,
-  }) as DocumentationDetails | null;
+  })) as DocumentationDetails | null;
 
   if (!doc) {
     throw new ApiError(404, 'Documentation not found');

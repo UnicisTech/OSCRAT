@@ -8,4 +8,3 @@ export const COMPLIANCE_TEMPLATE_FILES: Record<string, string> = {
   'version-importer': 'compliance-version-importer-3b.json',
   'version-sme-manufacturer': 'compliance-version-sme-manufacturer-7b.json',
 };
-

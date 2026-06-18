@@ -35,4 +35,3 @@ const handlePOST = async (
 
   res.status(200).json({ data: products });
 };
-

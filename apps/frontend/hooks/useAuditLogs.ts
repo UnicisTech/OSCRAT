@@ -7,11 +7,16 @@ const DEFAULT_PAGE_SIZE = 25;
 export function useAuditLogs(teamSlug: string) {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [filters, setFilters] = useState<Partial<OscratAuditLogQueryParams>>({});
+  const [filters, setFilters] = useState<Partial<OscratAuditLogQueryParams>>(
+    {}
+  );
 
   const params: OscratAuditLogQueryParams = { page, pageSize, ...filters };
 
-  const { data, isLoading, isError, error } = useSearchAuditLogs(teamSlug, params);
+  const { data, isLoading, isError, error } = useSearchAuditLogs(
+    teamSlug,
+    params
+  );
 
   const goToNextPage = useCallback(() => {
     if (data && page < data.totalPages) setPage(page + 1);

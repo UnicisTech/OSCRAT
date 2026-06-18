@@ -1,22 +1,27 @@
-import { Button } from 'react-daisyui';
 import { useTranslation } from 'next-i18next';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ArrowUpCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { User } from '@oscrat/model';
 
+import Button from '@/components/button';
 import { Card } from '@/components/shared';
 import { useAccount } from '@/hooks/useAccount';
 import { extractErrorMessage } from '@/lib/utils';
 
 const UploadAvatar = ({ user }: { user: Partial<User> }) => {
   const { t } = useTranslation('common');
-  const { updateAvatar, deleteAvatar, isUpdateAvatarLoading, isDeleteAvatarLoading } = useAccount();
+  const {
+    updateAvatar,
+    deleteAvatar,
+    isUpdateAvatarLoading,
+    isDeleteAvatarLoading,
+  } = useAccount();
   const [dragActive, setDragActive] = useState(false);
   const [image, setImage] = useState<string | null>();
 
-  const defaultImage = useMemo(() => 
-    `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`,
+  const defaultImage = useMemo(
+    () => `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`,
     [user.name]
   );
 
@@ -77,9 +82,15 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
     if (result.success) {
       toast.success(t('successfully-updated'));
     } else {
-      const errorMessage = extractErrorMessage(result.error, t('error.avatar-update-failed'));
-      
-      if (errorMessage.includes('413') || errorMessage.toLowerCase().includes('body exceeded')) {
+      const errorMessage = extractErrorMessage(
+        result.error,
+        t('error.avatar-update-failed')
+      );
+
+      if (
+        errorMessage.includes('413') ||
+        errorMessage.toLowerCase().includes('body exceeded')
+      ) {
         toast.error('File size too big. Maximum file size is 2MB.');
       } else {
         toast.error(errorMessage);
@@ -117,7 +128,7 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
           <div>
             <label
               htmlFor="image"
-              className="group relative mt-1 flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-full border border-gray-300 bg-white transition-all hover:bg-gray-50"
+              className="border-line bg-surface hover:bg-surface-muted group relative mt-1 flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-full border transition-all"
             >
               <div
                 className="absolute z-[5] h-full w-full rounded-full"
@@ -141,18 +152,18 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
               <div
                 className={`${
                   dragActive
-                    ? 'cursor-copy border-2 border-black bg-gray-50 opacity-100'
+                    ? 'bg-surface-muted border-content cursor-copy border-2 opacity-100'
                     : ''
-                } absolute z-[3] flex h-full w-full flex-col items-center justify-center rounded-full bg-white transition-all ${
+                } bg-surface absolute z-[3] flex h-full w-full flex-col items-center justify-center rounded-full transition-all ${
                   image
                     ? 'opacity-0 group-hover:opacity-100'
-                    : 'group-hover:bg-gray-50'
+                    : 'group-hover:bg-surface-muted'
                 }`}
               >
                 <ArrowUpCircleIcon
                   className={`${
                     dragActive ? 'scale-110' : 'scale-100'
-                  } h-50 w-50 text-gray-500 transition-all duration-75 group-hover:scale-110 group-active:scale-95`}
+                  } h-50 w-50 text-content-muted transition-all duration-75 group-hover:scale-110 group-active:scale-95`}
                 />
               </div>
               {image && (
@@ -163,7 +174,7 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
                 />
               )}
             </label>
-            <div className="mt-1 flex rounded-full shadow-sm">
+            <div className="shadow-2 mt-1 flex rounded-full">
               <input
                 id="image"
                 name="image"
@@ -179,8 +190,7 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
           <div className="flex gap-2">
             <Button
               type="submit"
-              color="primary"
-              size="md"
+              variant="primary"
               disabled={!image || image === user.image}
               loading={isUpdateAvatarLoading}
             >
@@ -189,14 +199,13 @@ const UploadAvatar = ({ user }: { user: Partial<User> }) => {
             {hasCustomAvatar && (
               <Button
                 type="button"
-                color="error"
-                variant="outline"
-                size="md"
+                tone="danger"
+                variant="secondary"
                 onClick={handleDelete}
                 loading={isDeleteAvatarLoading}
                 disabled={isUpdateAvatarLoading}
+                startIcon={<TrashIcon className="h-5 w-5" />}
               >
-                <TrashIcon className="h-5 w-5" />
                 {t('delete')}
               </Button>
             )}

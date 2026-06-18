@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { AccessControl } from '@/components/shared/AccessControl';
 import { useTaskAttachments } from '@/hooks/useTaskAttachments';
 import { extractErrorMessage } from '@/lib/utils';
+import Button from '@/components/button';
 
 type Props = {
   attachment: Attachment;
@@ -47,7 +48,7 @@ export default function AttachmentsCard({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={`text-blue-700`}
+            className={`text-info-emphasis`}
           >
             <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" />
             <path d="M11 10a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0v-4z" />
@@ -56,11 +57,11 @@ export default function AttachmentsCard({
           <div className="flex flex-col">
             <p className="font-medium hover:underline">{attachment.name}</p>
             {attachment.description && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-content-muted text-xs">
                 {attachment.description}
               </p>
             )}
-            <p className="text-xs text-gray-400">
+            <p className="text-content-placeholder text-xs">
               {(attachment.fileSize / 1024).toFixed(1)} KB
               {attachment.mimeType && ` • ${attachment.mimeType}`}
             </p>
@@ -68,28 +69,31 @@ export default function AttachmentsCard({
         </div>
       </a>
       <AccessControl resource="task" actions={['update']}>
-        <button
-          className="flex items-center rounded p-1 text-red-500 hover:bg-gray-100"
+        <Button
+          variant="tertiary"
+          tone="danger"
+          size="m"
           onClick={handleDelete}
           title={t('delete')}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 6h18" />
-            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-            <line x1="10" y1="11" x2="10" y2="17" />
-            <line x1="14" y1="11" x2="14" y2="17" />
-          </svg>
-        </button>
+          icon={
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 6h18" />
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
+          }
+        />
       </AccessControl>
     </div>
   );

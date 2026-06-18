@@ -5,6 +5,8 @@ interface Column {
   label: string;
   className?: string;
   scope?: 'col' | 'row';
+  /** Visually hide the label (kept for screen readers) — e.g. an Actions column. */
+  srOnly?: boolean;
 }
 
 interface TableHeaderProps {
@@ -21,7 +23,11 @@ const TableHeader: React.FC<TableHeaderProps> = ({ columns }) => {
             scope={column.scope || 'col'}
             className={`${tableStyles.th} ${column.className || ''}`}
           >
-            {column.label}
+            {column.srOnly ? (
+              <span className="sr-only">{column.label}</span>
+            ) : (
+              column.label
+            )}
           </th>
         ))}
       </tr>
