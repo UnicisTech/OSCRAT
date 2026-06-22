@@ -107,12 +107,24 @@ module.exports = {
           overlay: 'rgba(0,0,0,0.04)', // hover state layer (secondary/tertiary)
           'overlay-active': 'rgba(0,0,0,0.08)', // active/pressed state layer
         },
-        // Categorical chart palette (literal — not part of the semantic system).
+        // Categorical chart palette (literal — not part of the semantic
+        // system). Paired hues let a multi-series chart encode two
+        // dimensions at once (hue = category, strong/light = sub-series).
+        // The unpaired `accent`/`muted` pair is reserved for binary
+        // "processed vs untouched" charts so they never share colours
+        // with a categorical chart sitting next to them.
         chart: {
           coral: '#FA938E',
+          'coral-strong': '#E63946',
           teal: '#51CCD0',
+          'teal-strong': '#0D9488',
           blue: '#5BA5FF',
+          'blue-strong': '#1E40AF',
+          green: '#86EFAC',
+          'green-strong': '#15803D',
           grey: '#DADADA',
+          accent: '#3952AD',
+          muted: '#E0E0E0',
         },
       },
       fontSize: {

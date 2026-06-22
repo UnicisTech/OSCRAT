@@ -46,22 +46,43 @@ const CONFORMITY_STATUS_COLORS: Record<ConformityStatus, string> = {
   [CONFORMITY_STATUS.NOT_EVALUATED]: '#E0E0E0', // grey/300 — not evaluated
 };
 
-// Evaluation Status palette — a binary "processed vs not processed" read.
-// Deliberately uses tokens that do NOT appear in the Task Distribution
-// palette below so the two charts are visually distinct at a glance.
-const EVALUATION_STATUS_COLORS = {
-  evaluated: '#1976D2', // primary blue — "actively processed"
-  notEvaluated: '#E0E0E0', // grey/300 — "untouched", matches conformity chart's "Not Evaluated"
+// Categorical chart palette — mirrors `theme.colors.chart` in
+// tailwind.config.js (Chart.js needs hex values, so the tokens are
+// referenced as literals here). Paired hues + a separate binary accent
+// pair let the two dashboard charts use disjoint subsets and stay
+// visually distinct.
+const CHART_PALETTE = {
+  coral: '#FA938E',
+  coralStrong: '#E63946',
+  teal: '#51CCD0',
+  tealStrong: '#0D9488',
+  blue: '#5BA5FF',
+  blueStrong: '#1E40AF',
+  green: '#86EFAC',
+  greenStrong: '#15803D',
+  grey: '#DADADA',
+  accent: '#3952AD',
+  muted: '#E0E0E0',
 };
 
-// Task Distribution palette — paired by status (auto = saturated, manual =
-// lighter shade of the same hue). 8 distinct values so no two pie segments
-// share a color, and none of them collide with EVALUATION_STATUS_COLORS.
+// Evaluation Status — binary "processed vs untouched" read. Uses the
+// `accent`/`muted` pair so it never collides with the task chart below.
+const EVALUATION_STATUS_COLORS = {
+  evaluated: CHART_PALETTE.accent,
+  notEvaluated: CHART_PALETTE.muted,
+};
+
+// Task Distribution — one hue per status, strong shade for AUTOMATIC
+// and the light shade of the same hue for MANUAL. 8 distinct values
+// total; status reads by hue, origin reads by saturation.
 const TASK_STATUS_HUES = {
-  TODO: { auto: '#E11D48', manual: '#FDA4AF' }, // rose 600 / 300
-  PLANNED: { auto: '#D97706', manual: '#FCD34D' }, // amber 600 / 300
-  IN_PROGRESS: { auto: '#0D9488', manual: '#5EEAD4' }, // teal 600 / 300
-  DONE: { auto: '#15803D', manual: '#86EFAC' }, // green 700 / 300
+  TODO: { auto: CHART_PALETTE.coralStrong, manual: CHART_PALETTE.coral },
+  PLANNED: { auto: CHART_PALETTE.blueStrong, manual: CHART_PALETTE.blue },
+  IN_PROGRESS: {
+    auto: CHART_PALETTE.tealStrong,
+    manual: CHART_PALETTE.teal,
+  },
+  DONE: { auto: CHART_PALETTE.greenStrong, manual: CHART_PALETTE.green },
 } as const;
 
 const TASK_PIE_OPTIONS = {
