@@ -101,5 +101,8 @@ export function filterProducts(
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .filter((product) => matchesFilters(product, filters))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 }

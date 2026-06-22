@@ -74,6 +74,12 @@ export const validateFile = (file: formidable.File): boolean => {
     return false;
   }
 
+  // Server-side defense against zero-byte uploads (browser may still slip
+  // one through if a future entry point forgets the client check).
+  if ((file.size ?? 0) <= 0) {
+    return false;
+  }
+
   const extension = getFileExtension(file.originalFilename);
   if (!extension) {
     return false;

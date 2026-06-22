@@ -171,6 +171,7 @@ export default function Compliance() {
             <TabActionButton
               onClick={handleNavigateToCompliance}
               icon={<FaPlayCircle />}
+              className="min-w-[190px] justify-center whitespace-nowrap"
             >
               {complianceState.started
                 ? t('oscrat.ui.dashboard.continue-assessment')

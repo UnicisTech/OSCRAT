@@ -77,7 +77,11 @@ const AuditLogsPage: NextPageWithLayout<AuditLogsPageProps> = ({
               isLoadingOptions={isLoadingOptions}
             />
           </div>
-          <AuditLogsTable logs={auditLogs} isLoading={isLoading} />
+          <AuditLogsTable
+            logs={auditLogs}
+            isLoading={isLoading}
+            teamSlug={slug as string}
+          />
           {total > pageSize && (
             <PaginationControls
               currentPage={currentPage}

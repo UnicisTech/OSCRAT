@@ -70,7 +70,7 @@ const Modal = ({
       <div
         role="dialog"
         aria-modal="true"
-        className={`bg-surface rounded-card shadow-24 text-content relative flex max-h-[90vh] w-full flex-col ${SIZE_MAP[size]} ${className}`}
+        className={`bg-surface rounded-card shadow-24 text-content relative flex max-h-[90vh] w-full flex-col overflow-hidden ${SIZE_MAP[size]} ${className}`}
       >
         {close && (
           <Button

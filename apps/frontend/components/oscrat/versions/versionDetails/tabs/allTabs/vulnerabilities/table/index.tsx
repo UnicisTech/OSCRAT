@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FaTrash, FaEye } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -10,14 +10,14 @@ import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import normalizeText from '@/utils/normalizeText';
 import { formatDateShort } from '@/utils/dateFormat';
+import { sortByCreatedAtDesc } from '@/utils/sortItems';
 import SeverityBadge from '@/components/oscrat/shared/SeverityBadge';
 import {
   TableWrapper,
   TableHeader,
   TableRow,
 } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
-
-const ITEMS_PER_PAGE = 15;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 interface VulnerabilitiesTableProps {
   vulnerabilities?: OscratVulnerabilitySummary[];
@@ -34,7 +34,11 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
   const router = useRouter();
   const { slug, productId, versionId } = router.query;
 
-  const pageSize = itemsPerPage || ITEMS_PER_PAGE;
+  const pageSize = itemsPerPage || LISTING_PAGE_SIZE;
+  const sortedVulnerabilities = useMemo(
+    () => sortByCreatedAtDesc(vulnerabilities),
+    [vulnerabilities]
+  );
   const {
     currentPage,
     totalPages,
@@ -44,7 +48,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
     prevButtonDisabled,
     nextButtonDisabled,
   } = usePagination<OscratVulnerabilitySummary>(
-    vulnerabilities || [],
+    sortedVulnerabilities,
     pageSize
   );
 
@@ -188,7 +192,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                 </td>
               </TableRow>
             ))}
-            {(!vulnerabilities || vulnerabilities.length === 0) && (
+            {!sortedVulnerabilities.length && (
               <tr>
                 <td
                   colSpan={6}
@@ -204,7 +208,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
         </table>
       </TableWrapper>
 
-      {vulnerabilities && vulnerabilities.length > pageSize && (
+      {sortedVulnerabilities.length > pageSize && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}

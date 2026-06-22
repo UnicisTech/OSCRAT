@@ -2,6 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { oscratVulnerabilityEndpoints } from '@/lib/api/endpoints/oscrat/vulnerabilities';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
+import { invalidateProductCountCaches } from './invalidations';
 import type {
   OscratVulnerabilityCreate,
   OscratVulnerabilityUpdate,
@@ -75,10 +76,10 @@ export function useCreateVulnerability(
           versionId
         ),
       });
-      // Also invalidate version detail since it might include vulnerability summaries
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
+      invalidateProductCountCaches(teamId, productId);
     },
   });
 }
@@ -120,6 +121,7 @@ export function useUpdateVulnerability(
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
+      invalidateProductCountCaches(teamId, productId);
     },
   });
 }
@@ -144,10 +146,10 @@ export function useDeleteVulnerability(
           versionId
         ),
       });
-      // Also invalidate version detail since it might include vulnerability summaries
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
+      invalidateProductCountCaches(teamId, productId);
     },
   });
 }

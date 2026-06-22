@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import type { OscratProductVersionSummary } from '@oscrat/model';
 import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
-
-const VERSIONS_PER_PAGE = 10;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
+import { sortByCreatedAtDesc } from '@/utils/sortItems';
 
 type NotSupportedTabProps = {
   data: OscratProductVersionSummary[];
@@ -13,7 +13,7 @@ type NotSupportedTabProps = {
 
 export default function NotSupportedTab({ data }: NotSupportedTabProps) {
   const { t, ready } = useTranslation('common');
-  const list = data ?? [];
+  const list = sortByCreatedAtDesc(data);
 
   const {
     currentPage,
@@ -23,7 +23,7 @@ export default function NotSupportedTab({ data }: NotSupportedTabProps) {
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination(list, VERSIONS_PER_PAGE);
+  } = usePagination(list, LISTING_PAGE_SIZE);
 
   if (!ready) return null;
 
@@ -49,7 +49,7 @@ export default function NotSupportedTab({ data }: NotSupportedTabProps) {
           goToNextPage={goToNextPage}
           showItemCount
           totalItems={list.length}
-          itemsPerPage={VERSIONS_PER_PAGE}
+          itemsPerPage={LISTING_PAGE_SIZE}
         />
       )}
 

@@ -22,6 +22,7 @@ import type {
   OscratAuditLogQueryParams,
   AuditLogFilterOptions,
 } from '@oscrat/model';
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 interface VersionLogTableProps {
   logs: OscratAuditLog[];
@@ -33,6 +34,7 @@ interface VersionLogTableProps {
   onFilterChange: (filters: Partial<OscratAuditLogQueryParams>) => void;
   filterOptions?: AuditLogFilterOptions;
   isLoadingOptions?: boolean;
+  teamSlug?: string;
 }
 
 const Table: React.FC<VersionLogTableProps> = ({
@@ -45,6 +47,7 @@ const Table: React.FC<VersionLogTableProps> = ({
   onFilterChange,
   filterOptions,
   isLoadingOptions,
+  teamSlug,
 }) => {
   const { t, ready } = useTranslation('common');
   const [selectedLog, setSelectedLog] = useState<OscratAuditLog | null>(null);
@@ -164,7 +167,7 @@ const Table: React.FC<VersionLogTableProps> = ({
           goToNextPage={() => onPageChange(currentPage + 1)}
           showItemCount
           totalItems={totalLogs}
-          itemsPerPage={15}
+          itemsPerPage={LISTING_PAGE_SIZE}
         />
       )}
 
@@ -172,6 +175,7 @@ const Table: React.FC<VersionLogTableProps> = ({
         log={selectedLog}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        teamSlug={teamSlug}
       />
     </div>
   );

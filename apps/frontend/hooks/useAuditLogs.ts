@@ -1,12 +1,11 @@
 import { useState, useCallback } from 'react';
 import { useSearchAuditLogs } from '@/lib/api/hooks/auditLogs';
 import type { OscratAuditLogQueryParams } from '@oscrat/model';
-
-const DEFAULT_PAGE_SIZE = 25;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 export function useAuditLogs(teamSlug: string) {
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [pageSize] = useState(LISTING_PAGE_SIZE);
   const [filters, setFilters] = useState<Partial<OscratAuditLogQueryParams>>(
     {}
   );
@@ -44,7 +43,7 @@ export function useAuditLogs(teamSlug: string) {
 
     currentPage: data?.page ?? 1,
     totalPages: data?.totalPages ?? 1,
-    pageSize: data?.pageSize ?? DEFAULT_PAGE_SIZE,
+    pageSize: data?.pageSize ?? LISTING_PAGE_SIZE,
 
     goToNextPage,
     goToPreviousPage,

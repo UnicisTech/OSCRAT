@@ -9,6 +9,7 @@ import {
 } from '@/lib/api/endpoints/tasks';
 import { queryKeys } from '../queryKeys';
 import { queryClient } from '.';
+import { invalidateProductCountCaches } from './oscrat/invalidations';
 import {
   TASK_CONFIGURATION_PROPERTY_KEYS,
   type TaskProperties,
@@ -22,14 +23,17 @@ export function useGetTeamTasks(slug: string) {
   });
 }
 
-function invalidateVersionOpenTasksCache(task: {
-  teamId: string;
-  versionId?: string | null;
-}) {
+// `task.teamId` from the API is a Prisma UUID, but the version-detail cache
+// is keyed by the team slug (see ProductContext). Always pass the slug
+// explicitly so the invalidation matches the cached query.
+function invalidateVersionOpenTasksCache(
+  slug: string,
+  task: { versionId?: string | null }
+) {
   if (task.versionId) {
     queryClient.invalidateQueries({
       queryKey: queryKeys.oscrat.projects.versions.detail(
-        task.teamId,
+        slug,
         task.versionId
       ),
     });
@@ -60,8 +64,9 @@ export function useCreateTeamTask(slug: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.all(slug),
       });
-      invalidateVersionOpenTasksCache(task);
+      invalidateVersionOpenTasksCache(slug, task);
       invalidateConfigurationReportCache(slug, task);
+      invalidateProductCountCaches(slug, task.productId);
     },
   });
 }
@@ -86,8 +91,9 @@ export function useUpdateTask(slug: string, taskNumber: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.all(slug),
       });
-      invalidateVersionOpenTasksCache(task);
+      invalidateVersionOpenTasksCache(slug, task);
       invalidateConfigurationReportCache(slug, task);
+      invalidateProductCountCaches(slug, task.productId);
     },
   });
 }
@@ -102,12 +108,15 @@ export function useDeleteTask(slug: string, taskNumber: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.teams.tasks.all(slug),
       });
+      // Refresh every cached version and the product list/detail summaries
+      // so the open-task counts stay in sync after a deletion.
       queryClient.invalidateQueries({
         predicate: (q) =>
           Array.isArray(q.queryKey) &&
           q.queryKey[2] === 'oscrat' &&
           q.queryKey[3] === 'versions',
       });
+      invalidateProductCountCaches(slug);
     },
   });
 }

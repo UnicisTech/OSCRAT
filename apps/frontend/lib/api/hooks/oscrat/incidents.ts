@@ -2,6 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { oscratIncidentEndpoints } from '@/lib/api/endpoints/oscrat/incidents';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
+import { invalidateProductCountCaches } from './invalidations';
 import type { OscratIncidentCreate, OscratIncidentUpdate } from '@oscrat/model';
 
 // List incidents
@@ -75,10 +76,10 @@ export function useCreateIncident(
           versionId
         ),
       });
-      // Also invalidate version detail since it might include incident summaries
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
+      invalidateProductCountCaches(teamId, productId);
     },
   });
 }
@@ -113,10 +114,10 @@ export function useUpdateIncident(
           incidentId
         ),
       });
-      // Also invalidate version detail since it might include incident summaries
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
+      invalidateProductCountCaches(teamId, productId);
     },
   });
 }
@@ -142,10 +143,10 @@ export function useDeleteIncident(
           versionId
         ),
       });
-      // Also invalidate version detail since it might include incident summaries
       queryClient.invalidateQueries({
         queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
       });
+      invalidateProductCountCaches(teamId, productId);
     },
   });
 }

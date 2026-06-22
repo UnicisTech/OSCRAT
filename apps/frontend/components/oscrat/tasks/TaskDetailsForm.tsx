@@ -39,10 +39,13 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
     { enabled: !!task.productId && !!task.versionId }
   );
 
-  const validationSchema = useMemo(() => createTaskUpdateSchema(), []);
-
   const hasLocalizedTitle = !!task.titleLocId;
   const hasLocalizedDescription = !!task.descriptionLocId;
+
+  const validationSchema = useMemo(
+    () => createTaskUpdateSchema({ allowEmptyTitle: hasLocalizedTitle }),
+    [hasLocalizedTitle]
+  );
 
   const resolvedTitle = resolveTaskTitle(task, t);
   const resolvedDescription = resolveTaskDescription(task, t);
@@ -66,13 +69,18 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
     validateOnBlur: true,
     onSubmit: async (values) => {
       try {
-        await updateTask({
-          title: values.title,
+        // Don't send title/description back when the task uses localized i18n
+        // keys; the saved value is intentionally "" and sending it would
+        // either fail validation or wipe the localized rendering.
+        const payload: UpdateTaskData = {
           status: values.status,
           duedate: values.duedate,
-          description: values.description,
           assigneeId: values.assigneeId,
-        });
+        };
+        if (!hasLocalizedTitle) payload.title = values.title;
+        if (!hasLocalizedDescription) payload.description = values.description;
+
+        await updateTask(payload);
         toast.success(t('task-updated-successfully'));
       } catch (error: unknown) {
         const apiError = error as ApiError;

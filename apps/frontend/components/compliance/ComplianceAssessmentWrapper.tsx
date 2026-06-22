@@ -18,6 +18,8 @@ interface Props {
   productName: string;
   complianceType: ComplianceType;
   isAssessmentStarted?: boolean;
+  isAssessmentCompleted?: boolean;
+  onReset?: () => Promise<void> | void;
 }
 
 const ComplianceAssessmentWrapper: React.FC<Props> = ({
@@ -31,6 +33,8 @@ const ComplianceAssessmentWrapper: React.FC<Props> = ({
   productName,
   complianceType,
   isAssessmentStarted = false,
+  isAssessmentCompleted = false,
+  onReset,
 }) => {
   const [translations, setTranslations] =
     useState<TranslationsState>(undefined);
@@ -42,6 +46,8 @@ const ComplianceAssessmentWrapper: React.FC<Props> = ({
         teamRole={teamRole}
         complianceType={complianceType}
         isAssessmentStarted={isAssessmentStarted}
+        isAssessmentCompleted={isAssessmentCompleted}
+        onReset={onReset}
         onLanguageSelect={(_, t) => setTranslations(t)}
       />
     );

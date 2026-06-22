@@ -94,20 +94,22 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
       <Divider />
 
       <section
-        className="text-content-secondary text-b2 grid grid-cols-6 gap-4"
+        className="text-content-secondary text-b2 flex flex-wrap items-start gap-x-8 gap-y-4"
         aria-label="Product details"
       >
         <MetaField
+          className="min-w-0"
           label={t('oscrat.ui.category')}
           value={t(getProductCategoryKey(project.productCategory))}
         />
 
         <MetaField
+          className="min-w-0"
           label={t('oscrat.ui.product-type')}
           value={t(getProductTypeKey(project.type))}
         />
 
-        <MetaField label={t('oscrat.ui.open-incidents')}>
+        <MetaField className="min-w-0" label={t('oscrat.ui.open-incidents')}>
           <CountChip
             count={openIncidents}
             displayText={displayIncidents}
@@ -115,7 +117,10 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
           />
         </MetaField>
 
-        <MetaField label={t('oscrat.ui.open-vulnerabilities')}>
+        <MetaField
+          className="min-w-0"
+          label={t('oscrat.ui.open-vulnerabilities')}
+        >
           <CountChip
             count={openVulnerabilities}
             displayText={displayVulnerabilities}
@@ -124,11 +129,12 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
         </MetaField>
 
         <MetaField
+          className="min-w-0"
           label={t('oscrat.ui.external-reporting')}
           value={reportingOrganizations}
         />
 
-        <MetaField label={t('status')}>
+        <MetaField className="min-w-0" label={t('status')}>
           <span className="text-b2 text-content font-medium capitalize">
             {t(complianceStatusKey)}
           </span>

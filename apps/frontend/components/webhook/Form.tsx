@@ -45,7 +45,11 @@ const Form = ({
 
   return (
     <Modal open={visible} close={toggleVisible}>
-      <form onSubmit={formik.handleSubmit} method="POST">
+      <form
+        onSubmit={formik.handleSubmit}
+        method="POST"
+        className="contents"
+      >
         <Modal.Header>{title}</Modal.Header>
         <Modal.Description>{t('webhook-create-desc')}</Modal.Description>
         <Modal.Body>

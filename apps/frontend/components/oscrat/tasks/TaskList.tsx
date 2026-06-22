@@ -5,6 +5,7 @@ import TaskListFilters from './TaskListFilters';
 import TaskListTable from './TaskListTable';
 import TaskStatusDropdown from './TaskStatusDropdown';
 import PaginationControls from '@/components/shared/PaginationControls';
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 interface TaskListProps {
   tasks: Task[];
@@ -18,8 +19,6 @@ interface FilterState {
   productId: string[];
   versionId: string[];
 }
-
-const ITEMS_PER_PAGE = 15;
 
 const TaskList: React.FC<TaskListProps> = ({
   tasks,
@@ -126,12 +125,12 @@ const TaskList: React.FC<TaskListProps> = ({
       .sort((a, b) => b.taskNumber - a.taskNumber);
   }, [tasks, filters]);
 
-  const totalPages = Math.ceil(filteredTasks.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredTasks.length / LISTING_PAGE_SIZE);
   const safeTotalPages = Math.max(totalPages, 1);
 
   const paginatedTasks = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredTasks.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * LISTING_PAGE_SIZE;
+    return filteredTasks.slice(startIndex, startIndex + LISTING_PAGE_SIZE);
   }, [filteredTasks, currentPage]);
 
   useEffect(() => {
@@ -184,7 +183,7 @@ const TaskList: React.FC<TaskListProps> = ({
         />
 
         {/* Pagination */}
-        {filteredTasks.length > ITEMS_PER_PAGE && (
+        {filteredTasks.length > LISTING_PAGE_SIZE && (
           <PaginationControls
             currentPage={currentPage}
             totalPages={safeTotalPages}
@@ -196,7 +195,7 @@ const TaskList: React.FC<TaskListProps> = ({
             }
             showItemCount
             totalItems={filteredTasks.length}
-            itemsPerPage={ITEMS_PER_PAGE}
+            itemsPerPage={LISTING_PAGE_SIZE}
           />
         )}
       </div>

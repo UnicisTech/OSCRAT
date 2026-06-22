@@ -126,6 +126,7 @@ const CreateDocumentationModal: React.FC<Props> = ({
               value={wizard.title}
               onChange={(e) => wizard.setTitle(e.target.value)}
               placeholder={t('oscrat.ui.documentation.title-placeholder')}
+              maxLength={100}
               required
             />
 

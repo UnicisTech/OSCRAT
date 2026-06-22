@@ -22,23 +22,23 @@ const TaskListTable: React.FC<TaskListTableProps> = ({
   if (!ready) return null;
 
   return (
-    <div className="bg-surface border-line rounded-card overflow-x-auto border">
-      <table className="text-content-secondary divide-line-subtle min-w-full divide-y text-left text-sm">
+    <div className="bg-surface border-line rounded-card border">
+      <table className="text-content-secondary divide-line-subtle w-full table-fixed divide-y text-left text-sm">
         <thead className="bg-surface-muted">
           <tr>
-            <th className="text-content w-auto min-w-[300px] p-4 text-b2 font-medium">
+            <th className="text-content w-[40%] p-4 text-b2 font-medium">
               {t('task')}
             </th>
-            <th className="text-content hidden whitespace-nowrap p-4 text-b2 font-medium md:table-cell">
+            <th className="text-content hidden w-[20%] whitespace-nowrap p-4 text-b2 font-medium md:table-cell">
               {t('product')}
             </th>
-            <th className="text-content hidden whitespace-nowrap p-4 text-b2 font-medium lg:table-cell">
+            <th className="text-content hidden w-[15%] whitespace-nowrap p-4 text-b2 font-medium lg:table-cell">
               {t('version')}
             </th>
-            <th className="text-content hidden whitespace-nowrap p-4 text-b2 font-medium sm:table-cell">
+            <th className="text-content hidden w-[12%] whitespace-nowrap p-4 text-b2 font-medium sm:table-cell">
               {t('due-date')}
             </th>
-            <th className="text-content whitespace-nowrap p-4 text-b2 font-medium">
+            <th className="text-content w-[13%] whitespace-nowrap p-4 text-b2 font-medium">
               {t('status')}
             </th>
           </tr>

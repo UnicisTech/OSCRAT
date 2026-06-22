@@ -163,7 +163,7 @@ const EditRepository = ({
         }}
       >
         {({ formProps, submitting }) => (
-          <form {...formProps}>
+          <form {...formProps} className="contents">
             <Modal.Header>
               {isCreateMode ? 'Add Repository' : 'Edit Repository'}
             </Modal.Header>

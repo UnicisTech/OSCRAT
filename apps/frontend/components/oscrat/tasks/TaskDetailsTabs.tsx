@@ -26,7 +26,7 @@ import Button from '@/components/button';
 import useCanAccess from '@/hooks/useCanAccess';
 import { useComments } from '@/hooks/useComments';
 import { extractErrorMessage } from '@/lib/utils';
-import { checkExtensionAndMIMEType } from '@/utils/fileValidation';
+import { checkExtensionAndMIMEType, isEmptyFile } from '@/utils/fileValidation';
 import { formatDateShort, formatDateTime } from '@/utils/dateFormat';
 import type { Attachment } from '@/types';
 
@@ -158,6 +158,10 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
   // --- Attachments (explicit button-triggered, no useEffect) ---
   const handleUploadFile = useCallback(
     async (file: File) => {
+      if (isEmptyFile(file)) {
+        toast.error(t('oscrat.ui.validation.file-empty'));
+        return;
+      }
       if (!checkExtensionAndMIMEType(file)) {
         toast.error(t('oscrat.ui.file-upload-allowed-types'));
         return;

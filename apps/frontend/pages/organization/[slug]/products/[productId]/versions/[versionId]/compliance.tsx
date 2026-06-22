@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { GetServerSidePropsContext } from 'next';
+import { useSession } from 'next-auth/react';
 import { withProductDetailLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
 import { useVersionContext } from '@/context/VersionContext';
@@ -9,6 +10,7 @@ import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { Loading, Breadcrumb } from '@/components/shared';
 import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
+import { useVersionCompliance } from '@/hooks/oscrat/useVersionCompliance';
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { COMPLIANCE_TYPES } from '@/lib/compliance/translations';
 import {
@@ -17,11 +19,12 @@ import {
 } from '@/hooks/oscrat/useOscratAssessment';
 import { useLatestAssessment } from '@/hooks/oscrat/useLatestAssessment';
 import { transformVersionAssessmentToComplianceState } from '@/utils/compliance';
-import { OscratAssessmentType } from '@oscrat/model';
+import { OscratAssessmentType, OscratOrganizationRole } from '@oscrat/model';
 
 const CompliancePage = () => {
   const { t, ready } = useTranslation('common');
   const { teamContext } = useTeamContext();
+  const { data: session } = useSession();
   const { teamId, productId, versionId } = useVersionContext();
   const { project } = useOscratProject(teamId, productId);
   const { version: versionData } = useOscratVersion(
@@ -58,15 +61,26 @@ const CompliancePage = () => {
     { enabled: !!latestVersionComplianceId }
   );
 
-  const hasStartedAssessment = useMemo(() => {
-    if (!versionComplianceAssessment?.rawData) return false;
-    const complianceState = transformVersionAssessmentToComplianceState(
+  const { resetAssessment } = useVersionCompliance({
+    teamSlug: team.slug,
+    productId,
+    versionId,
+    teamRole: team.orgRoles[0] as OscratOrganizationRole,
+    userId: session?.user?.id,
+  });
+
+  const versionComplianceState = useMemo(() => {
+    if (!versionComplianceAssessment?.rawData) return null;
+    return transformVersionAssessmentToComplianceState(
       versionComplianceAssessment.rawData,
       productId,
       team.orgRoles[0]
     );
-    return !!(complianceState?.started && !complianceState.completed);
   }, [versionComplianceAssessment?.rawData, productId, team.orgRoles]);
+
+  const hasStartedAssessment =
+    !!versionComplianceState?.started && !versionComplianceState.completed;
+  const isAssessmentCompleted = !!versionComplianceState?.completed;
 
   const { complianceData, isLoading } = useComplianceData({
     teamSlug: team.slug,
@@ -130,6 +144,8 @@ const CompliancePage = () => {
         productName={`${project.name} (${versionData.version})`}
         complianceType={COMPLIANCE_TYPES.VERSION}
         isAssessmentStarted={hasStartedAssessment}
+        isAssessmentCompleted={isAssessmentCompleted}
+        onReset={resetAssessment}
       />
     </div>
   );

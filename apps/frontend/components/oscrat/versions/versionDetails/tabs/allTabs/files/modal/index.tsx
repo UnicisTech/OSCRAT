@@ -3,7 +3,9 @@ import { IoCloudUpload } from 'react-icons/io5';
 import { useTranslation } from 'next-i18next';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import toast from 'react-hot-toast';
 import { fileDescriptionSchema } from '@/lib/validation/inputs';
+import { isEmptyFile } from '@/utils/fileValidation';
 import Button from '@/components/button';
 import Modal from '@/components/shared/Modal';
 
@@ -52,9 +54,13 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
+    if (!file) return;
+    if (isEmptyFile(file)) {
+      toast.error(t('oscrat.ui.validation.file-empty'));
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
     }
+    setSelectedFile(file);
   };
 
   const [isDragOver, setIsDragOver] = useState(false);
@@ -76,9 +82,12 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
     e.stopPropagation();
     setIsDragOver(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) {
-      setSelectedFile(file);
+    if (!file) return;
+    if (isEmptyFile(file)) {
+      toast.error(t('oscrat.ui.validation.file-empty'));
+      return;
     }
+    setSelectedFile(file);
   };
 
   if (!ready) return null;
@@ -86,7 +95,7 @@ const AddFileModal: React.FC<AddFileModalProps> = ({
   return (
     <Modal open={isOpen} close={handleClose} size="md">
       <Modal.Header>{t('oscrat.ui.add-new-file')}</Modal.Header>
-      <form onSubmit={formik.handleSubmit}>
+      <form onSubmit={formik.handleSubmit} className="contents">
         <Modal.Body>
           <div className="space-y-4">
             <div>

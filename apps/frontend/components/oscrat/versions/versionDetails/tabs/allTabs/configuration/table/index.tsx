@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FaDownload, FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -10,13 +10,13 @@ import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { formatDateShort } from '@/utils/dateFormat';
+import { sortByCreatedAtDesc } from '@/utils/sortItems';
 import {
   TableWrapper,
   TableHeader,
   TableRow,
 } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
-
-const ITEMS_PER_PAGE = 10;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 interface ConfigurationTableProps {
   reports?: ConfigurationScanReportDetails[];
@@ -44,7 +44,8 @@ const Table: React.FC<ConfigurationTableProps> = ({
   const router = useRouter();
   const { slug, productId, versionId } = router.query;
 
-  const pageSize = itemsPerPage || ITEMS_PER_PAGE;
+  const pageSize = itemsPerPage || LISTING_PAGE_SIZE;
+  const sortedReports = useMemo(() => sortByCreatedAtDesc(reports), [reports]);
   const {
     currentPage,
     totalPages,
@@ -53,7 +54,7 @@ const Table: React.FC<ConfigurationTableProps> = ({
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination<ConfigurationScanReportDetails>(reports || [], pageSize);
+  } = usePagination<ConfigurationScanReportDetails>(sortedReports, pageSize);
 
   if (!ready) {
     return null;
@@ -110,7 +111,7 @@ const Table: React.FC<ConfigurationTableProps> = ({
     );
   };
 
-  if (!reports || reports.length === 0) {
+  if (!sortedReports.length) {
     return (
       <div className="text-content-muted flex flex-col items-center justify-center py-12">
         <p className="text-sm">{t('oscrat.ui.no-config-scan-added')}</p>
@@ -262,7 +263,7 @@ const Table: React.FC<ConfigurationTableProps> = ({
         </table>
       </TableWrapper>
 
-      {reports && reports.length > pageSize && (
+      {sortedReports.length > pageSize && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}

@@ -8,6 +8,7 @@ import Button from '@/components/button';
 import SuccessBadge from '@/components/oscrat/shared/SuccessBadge';
 import { formatFileSize } from '@/lib/utils';
 import { validateBrowserFile } from '@/lib/utils/docFileValidation';
+import { isEmptyFile } from '@/utils/fileValidation';
 import { formatDateShort } from '@/utils/dateFormat';
 
 interface DocDisplayProps {
@@ -58,8 +59,15 @@ export default function DocDisplay({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (isEmptyFile(file)) {
+      toast.error(t('oscrat.ui.validation.file-empty'));
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
     if (!validateBrowserFile(file, 'doc')) {
       toast.error(t('oscrat.ui.doc.doc-invalid-file-type'));
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
@@ -71,11 +79,13 @@ export default function DocDisplay({
 
   return (
     <div className="border-line bg-surface-muted rounded-card border p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <FaFilePdf className="text-danger h-8 w-8" />
-          <div>
-            <p className="text-content font-medium">{doc.name}</p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <FaFilePdf className="text-danger h-8 w-8 flex-shrink-0" />
+          <div className="min-w-0">
+            <p className="text-content truncate font-medium" title={doc.name}>
+              {doc.name}
+            </p>
             <p className="text-content-muted text-sm">
               {formatFileSize(doc.fileSize)} • {formatDateShort(doc.createdAt)}
             </p>
@@ -88,7 +98,7 @@ export default function DocDisplay({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-2">
           <Button
             variant="secondary"
             size="m"

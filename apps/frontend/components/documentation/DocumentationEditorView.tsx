@@ -93,9 +93,14 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
         onConfirm={onDelete}
       />
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{documentation.title}</h1>
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <h1
+            className="truncate text-2xl font-bold"
+            title={documentation.title}
+          >
+            {documentation.title}
+          </h1>
           <div className="text-content-muted mt-1 flex items-center gap-4 text-sm">
             {documentation.productName && (
               <span>
@@ -160,6 +165,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
           value={title}
           onChange={onTitleChange}
           disabled={!canEdit}
+          maxLength={100}
           required
         />
 

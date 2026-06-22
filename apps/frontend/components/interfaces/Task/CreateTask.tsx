@@ -137,7 +137,11 @@ const CreateTask = ({
     <Modal open={visible} close={handleClose}>
       <Modal.Header>{t('create-task')}</Modal.Header>
 
-      <form onSubmit={formik.handleSubmit} method="POST">
+      <form
+        onSubmit={formik.handleSubmit}
+        method="POST"
+        className="contents"
+      >
         <Modal.Body>
           <div className="space-y-4">
             <InputWithLabel

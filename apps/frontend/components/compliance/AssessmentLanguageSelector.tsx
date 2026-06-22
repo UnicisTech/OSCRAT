@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
-import { FaLanguage, FaPlay } from 'react-icons/fa';
+import { FaLanguage, FaPlay, FaRedo } from 'react-icons/fa';
 import { OscratOrganizationRole } from '@oscrat/model';
 import { useTeamData } from '@/hooks/useTeamData';
 import { Button } from '@/components/shared';
+import ConfirmationModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/repository/confirmationModal';
 import {
   SUPPORTED_LANGUAGES,
   getTranslationNamespaceKey,
@@ -23,6 +24,15 @@ interface Props {
   teamRole: OscratOrganizationRole;
   complianceType: ComplianceType;
   isAssessmentStarted?: boolean;
+  /**
+   * When true the assessment has been completed and the selector switches
+   * its primary button to "Reset assessment" (with confirmation) and locks
+   * the language picker so the user can't pretend to start fresh without
+   * first resetting.
+   */
+  isAssessmentCompleted?: boolean;
+  /** Reset handler invoked after the user confirms the reset dialog. */
+  onReset?: () => Promise<void> | void;
   onLanguageSelect: (
     languageCode: string,
     translations: Record<string, string> | null
@@ -75,12 +85,30 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
   teamRole,
   complianceType,
   isAssessmentStarted = false,
+  isAssessmentCompleted = false,
+  onReset,
   onLanguageSelect,
 }) => {
   const { t } = useTranslation('common');
   const { dataList, isListLoading, fetchDataItem } = useTeamData(teamSlug);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [isStarting, setIsStarting] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleResetConfirm = async () => {
+    if (!onReset) {
+      setIsResetModalOpen(false);
+      return;
+    }
+    setIsResetting(true);
+    try {
+      await onReset();
+    } finally {
+      setIsResetting(false);
+      setIsResetModalOpen(false);
+    }
+  };
 
   const namespaceKey = getTranslationNamespaceKey(teamRole, complianceType);
   const availableLanguages = useMemo(
@@ -120,6 +148,8 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
     (l) => l.code === selectedLanguage
   );
 
+  const isLanguageLocked = isAssessmentStarted || isAssessmentCompleted;
+
   return (
     <div className="bg-surface border-line rounded-card mb-6 border p-6">
       <div className="mb-4 flex items-center gap-3">
@@ -139,7 +169,7 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
             className="select select-bordered bg-surface w-full"
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
-            disabled={isListLoading || isStarting || isAssessmentStarted}
+            disabled={isListLoading || isStarting || isLanguageLocked}
           >
             {availableLanguages.map((lang) => (
               <option key={lang.code} value={lang.code}>
@@ -148,32 +178,58 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
               </option>
             ))}
           </select>
-          {selectedLang && !selectedLang.available && !isAssessmentStarted && (
+          {selectedLang && !selectedLang.available && !isLanguageLocked && (
             <p className="text-c1 text-warning mt-1">
               {t('oscrat.ui.compliance-translation.default-english')}
             </p>
           )}
-          {isAssessmentStarted && (
+          {isLanguageLocked && (
             <p className="text-content-muted mt-1 text-xs">
               {t('oscrat.ui.compliance-translation.language-locked')}
             </p>
           )}
         </div>
 
-        <Button
-          type="button"
-          variant="primary"
-          startIcon={<FaPlay />}
-          onClick={handleStart}
-          disabled={isStarting || isListLoading}
-        >
-          {t(
-            isAssessmentStarted
-              ? 'oscrat.ui.dashboard.continue-assessment'
-              : 'oscrat.ui.dashboard.start-assessment'
-          )}
-        </Button>
+        {isAssessmentCompleted ? (
+          <Button
+            type="button"
+            variant="secondary"
+            startIcon={<FaRedo />}
+            onClick={() => setIsResetModalOpen(true)}
+            disabled={!onReset || isResetting}
+            className="min-w-[210px] justify-center whitespace-nowrap"
+          >
+            {t('oscrat.ui.dashboard.reset-assessment')}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            variant="primary"
+            startIcon={<FaPlay />}
+            onClick={handleStart}
+            disabled={isStarting || isListLoading}
+            className="min-w-[210px] justify-center whitespace-nowrap"
+          >
+            {t(
+              isAssessmentStarted
+                ? 'oscrat.ui.dashboard.continue-assessment'
+                : 'oscrat.ui.dashboard.start-assessment'
+            )}
+          </Button>
+        )}
       </div>
+
+      <ConfirmationModal
+        isOpen={isResetModalOpen}
+        onClose={() => !isResetting && setIsResetModalOpen(false)}
+        onConfirm={handleResetConfirm}
+        title={t('oscrat.ui.dashboard.reset-assessment-title')}
+        message={t('oscrat.ui.dashboard.confirm-reset-assessment')}
+        confirmText={t('oscrat.ui.dashboard.reset-assessment')}
+        cancelText={t('cancel')}
+        isLoading={isResetting}
+        variant="warning"
+      />
     </div>
   );
 };

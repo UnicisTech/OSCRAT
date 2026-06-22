@@ -26,7 +26,9 @@ const Index: React.FC<CreateVersionModalProps> = ({
   const { t, ready } = useTranslation('common');
   const { createVersion, isLoading } = useOscratVersions(teamId, productId);
 
-  const statusOptions = Object.values(OscratProductVersionStatus);
+  const statusOptions = Object.values(OscratProductVersionStatus).filter(
+    (status) => status !== OscratProductVersionStatus.SUPPORTED
+  );
 
   const formik = useFormik({
     initialValues: {

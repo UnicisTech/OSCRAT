@@ -16,8 +16,7 @@ import { useAcceptInvitation } from '@/lib/api/hooks/invitations';
 import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { formatDateShort } from '@/utils/dateFormat';
-
-const TEAMS_PER_PAGE = 10;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 const Teams = () => {
   const { t } = useTranslation('common');
@@ -91,7 +90,7 @@ const Teams = () => {
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination(teamsList, TEAMS_PER_PAGE);
+  } = usePagination(teamsList, LISTING_PAGE_SIZE);
 
   return (
     <>
@@ -164,7 +163,7 @@ const Teams = () => {
               goToNextPage={goToNextPage}
               showItemCount
               totalItems={teamsList.length}
-              itemsPerPage={TEAMS_PER_PAGE}
+              itemsPerPage={LISTING_PAGE_SIZE}
             />
           )}
 

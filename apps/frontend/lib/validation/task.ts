@@ -81,9 +81,17 @@ export const createTaskCreateSchema = () =>
     versionId: Yup.string().optional(),
   });
 
-export const createTaskUpdateSchema = () =>
+// Localized/automatic tasks (e.g. awareness training) store their title and
+// description as i18n keys instead of literal strings, so the form field is
+// read-only and the saved `title` is "". Skip the required-title validation
+// when the caller signals that case so the rest of the form can still save.
+export const createTaskUpdateSchema = (options?: {
+  allowEmptyTitle?: boolean;
+}) =>
   Yup.object({
-    title: taskTitleSchema,
+    title: options?.allowEmptyTitle
+      ? Yup.string().optional()
+      : taskTitleSchema.optional(),
     description: descriptionSchema.optional(),
     status: Yup.mixed<TaskStatus>()
       .oneOf(

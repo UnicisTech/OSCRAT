@@ -1,12 +1,14 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'next-i18next';
 import { GetServerSidePropsContext } from 'next';
+import { useSession } from 'next-auth/react';
 import { withTeamLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
 import { Loading, Breadcrumb } from '@/components/shared';
 import Header from '@/components/oscrat/shared/header';
 import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
+import { useOrgCompliance } from '@/hooks/oscrat/useOrgCompliance';
 import { getRoleForTeam } from '@/lib/compliance/utils';
 import { COMPLIANCE_TYPES } from '@/lib/compliance/translations';
 import {
@@ -21,6 +23,7 @@ import { OscratAssessmentType } from '@oscrat/model';
 const TeamCompliancePage = () => {
   const { t, ready } = useTranslation('common');
   const { teamContext } = useTeamContext();
+  const { data: session } = useSession();
 
   const team = teamContext.team;
   if (!team) return null;
@@ -43,32 +46,44 @@ const TeamCompliancePage = () => {
     { enabled: !!latestOrgAssessmentId }
   );
 
-  const hasStartedAssessment = useMemo(() => {
+  const { resetAssessment } = useOrgCompliance({
+    teamSlug: team.slug,
+    teamId: team.id,
+    teamRole: team.orgRoles[0],
+    userId: session?.user?.id,
+  });
+
+  const computedComplianceState = useMemo<ComplianceState | null>(() => {
     if (assessmentDetail?.rawData) {
-      const complianceState = transformOrgAssessmentToComplianceState(
+      return transformOrgAssessmentToComplianceState(
         assessmentDetail.rawData,
         team.orgRoles[0]
       );
-      return !!(complianceState?.started && !complianceState.completed);
     }
 
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
+    if (typeof window === 'undefined') return null;
     const storageKey = `team_compliance_${team.id}`;
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
-        const complianceState = JSON.parse(saved) as ComplianceState;
-        return !!(complianceState.started && !complianceState.completed);
+        return JSON.parse(saved) as ComplianceState;
       } catch {
         localStorage.removeItem(storageKey);
       }
     }
-
-    return false;
+    return null;
   }, [assessmentDetail, team.id, team.orgRoles]);
+
+  const hasStartedAssessment =
+    !!computedComplianceState?.started && !computedComplianceState.completed;
+  const isAssessmentCompleted = !!computedComplianceState?.completed;
+
+  const handleReset = async () => {
+    await resetAssessment();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(`team_compliance_${team.id}`);
+    }
+  };
 
   if (isLoading || !complianceData || !ready) {
     return <Loading />;
@@ -104,6 +119,8 @@ const TeamCompliancePage = () => {
         productName={team.name}
         complianceType={COMPLIANCE_TYPES.TEAM}
         isAssessmentStarted={hasStartedAssessment}
+        isAssessmentCompleted={isAssessmentCompleted}
+        onReset={handleReset}
       />
     </div>
   );

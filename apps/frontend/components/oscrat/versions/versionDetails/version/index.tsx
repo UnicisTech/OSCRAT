@@ -186,7 +186,11 @@ const Index = () => {
           </MetaField>
           <MetaField
             label={t('oscrat.ui.release-date')}
-            value={formatDateShort(version?.releaseDate || version?.createdAt)}
+            value={
+              version?.releaseDate
+                ? formatDateShort(version.releaseDate)
+                : t('not-set')
+            }
           />
           <MetaField label={t('oscrat.ui.incidents')}>
             <CountChip

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { IoAdd } from 'react-icons/io5';
 import { FaDownload, FaTrash } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
@@ -15,8 +15,8 @@ import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
 import ActionButton from '@/components/oscrat/ActionButton';
 import { formatDateShort } from '@/utils/dateFormat';
-
-const ITEMS_PER_PAGE = 10;
+import { sortByCreatedAtDesc } from '@/utils/sortItems';
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 interface FileTableProps {
   attachments: Attachment[];
@@ -34,8 +34,10 @@ const FileTable: React.FC<FileTableProps> = ({
   downloadingFiles = new Set(),
 }) => {
   const { t, ready } = useTranslation('common');
-  if (!ready) return null;
-
+  const sortedAttachments = useMemo(
+    () => sortByCreatedAtDesc(attachments),
+    [attachments]
+  );
   const {
     currentPage,
     totalPages,
@@ -44,7 +46,8 @@ const FileTable: React.FC<FileTableProps> = ({
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination<Attachment>(attachments, ITEMS_PER_PAGE);
+  } = usePagination<Attachment>(sortedAttachments, LISTING_PAGE_SIZE);
+  if (!ready) return null;
 
   const tableHeaders = [
     { label: t('oscrat.ui.file-name') },
@@ -66,7 +69,7 @@ const FileTable: React.FC<FileTableProps> = ({
         <table className={tableStyles.table}>
           <TableHeader columns={tableHeaders} />
           <tbody className={tableStyles.tbody}>
-            {(!attachments || attachments.length === 0) && (
+            {!sortedAttachments.length && (
               <tr>
                 <td
                   colSpan={5}
@@ -135,7 +138,7 @@ const FileTable: React.FC<FileTableProps> = ({
         </table>
       </TableWrapper>
 
-      {attachments.length > ITEMS_PER_PAGE && (
+      {sortedAttachments.length > LISTING_PAGE_SIZE && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}

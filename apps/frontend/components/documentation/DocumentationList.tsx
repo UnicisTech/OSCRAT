@@ -10,8 +10,7 @@ import {
 import { useDocumentationList } from '@/hooks/useDocumentation';
 import { Button } from '@/components/shared';
 import { formatDateShort } from '@/utils/dateFormat';
-
-const ITEMS_PER_PAGE = 15;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 const DocumentationList = () => {
   const router = useRouter();
@@ -67,10 +66,10 @@ const DocumentationList = () => {
     );
   }, [documentation, statusFilter, levelFilter]);
 
-  const totalPages = Math.ceil(filteredDocs.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredDocs.length / LISTING_PAGE_SIZE);
   const paginatedDocs = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredDocs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * LISTING_PAGE_SIZE;
+    return filteredDocs.slice(startIndex, startIndex + LISTING_PAGE_SIZE);
   }, [filteredDocs, currentPage]);
 
   const handleRowClick = (docId: string) => {
@@ -153,12 +152,15 @@ const DocumentationList = () => {
                       onClick={() => handleRowClick(doc.id)}
                     >
                       <td className="px-4 py-3">
-                        <div className="flex flex-col">
-                          <span className="text-content font-medium">
+                        <div className="flex min-w-0 flex-col">
+                          <span
+                            className="text-content truncate font-medium"
+                            title={doc.title}
+                          >
                             {doc.title}
                           </span>
                           {doc.productName && (
-                            <span className="text-content-muted text-xs">
+                            <span className="text-content-muted truncate text-xs">
                               {doc.productName}
                               {doc.versionName && ` ${doc.versionName}`}
                             </span>
@@ -222,7 +224,7 @@ const DocumentationList = () => {
             }
             showItemCount
             totalItems={filteredDocs.length}
-            itemsPerPage={ITEMS_PER_PAGE}
+            itemsPerPage={LISTING_PAGE_SIZE}
           />
         </div>
       </div>

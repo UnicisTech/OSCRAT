@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import type { Attachment } from '@oscrat/model';
 import { formatFileSize } from '@/lib/utils';
 import { validateBrowserFile } from '@/lib/utils/docFileValidation';
+import { isEmptyFile } from '@/utils/fileValidation';
 import { getFileIcon } from '@/lib/utils/fileIcons';
 import Button from '@/components/button';
 import { formatDateShort } from '@/utils/dateFormat';
@@ -44,6 +45,10 @@ export default function CarUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (file: File) => {
+    if (isEmptyFile(file)) {
+      toast.error(t('oscrat.ui.validation.file-empty'));
+      return;
+    }
     if (!validateBrowserFile(file, 'car')) {
       toast.error(t('oscrat.ui.doc.car-invalid-file-type'));
       return;
@@ -60,17 +65,21 @@ export default function CarUpload({
 
   if (car) {
     return (
-      <div className="border-line bg-surface-muted rounded-card flex items-center justify-between border p-4">
-        <div className="flex items-center gap-3">
-          {getFileIcon(car.mimeType ?? undefined)}
-          <div>
-            <p className="text-content font-medium">{car.name}</p>
+      <div className="border-line bg-surface-muted rounded-card flex items-center justify-between gap-4 border p-4">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex-shrink-0">
+            {getFileIcon(car.mimeType ?? undefined)}
+          </div>
+          <div className="min-w-0">
+            <p className="text-content truncate font-medium" title={car.name}>
+              {car.name}
+            </p>
             <p className="text-content-muted text-sm">
               {formatFileSize(car.fileSize)} • {formatDateShort(car.createdAt)}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-2">
           <a
             href={downloadUrl}
             className="bg-primary hover:bg-primary-dark text-content-inverse rounded-input flex items-center gap-1 px-3 py-1.5 text-sm font-medium"

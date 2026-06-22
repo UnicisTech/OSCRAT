@@ -18,8 +18,7 @@ import { reportStyles } from '@/components/oscrat/reportStyles';
 import { WorkerJobStatus } from '@oscrat/model';
 import ReportStatusMessage from '@/components/oscrat/ReportStatusMessage';
 import { formatDateShort } from '@/utils/dateFormat';
-
-const ITEMS_PER_PAGE = 15;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 function ReportHeader({
   title,
@@ -198,7 +197,7 @@ function PackagesTable({
         </table>
       </div>
 
-      {packages.length > ITEMS_PER_PAGE && (
+      {packages.length > LISTING_PAGE_SIZE && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
@@ -245,7 +244,7 @@ export default function SbomSummary() {
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination(sbomData?.packages || [], ITEMS_PER_PAGE);
+  } = usePagination(sbomData?.packages || [], LISTING_PAGE_SIZE);
 
   const breadcrumbItems = [
     {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import Button from '@/components/button';
 import Modal from '@/components/shared/Modal';
@@ -16,11 +16,20 @@ import {
 import { getCrudConfig, formatTimestamp } from '@/lib/auditUtils';
 import { isUuid } from '@/lib/utils';
 import { formatDateTime } from '@/utils/dateFormat';
+import { useQuery } from '@tanstack/react-query';
+import { teamsEndpoints } from '@/lib/api/endpoints/teams';
+import { queryKeys } from '@/lib/api/queryKeys';
 
 interface AuditDetailsModalProps {
   log: OscratAuditLog | null;
   isOpen: boolean;
   onClose: () => void;
+  /**
+   * Team slug. When provided, UUIDs in user-reference patch fields
+   * (`assigneeId`, `userId`) are resolved to the member name so audit
+   * entries read "Jane Doe" instead of "a1b2c3d4-…".
+   */
+  teamSlug?: string;
 }
 
 const formatKey = (key: string) =>
@@ -32,6 +41,13 @@ const formatKey = (key: string) =>
 const isDateString = (value: string) =>
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value) ||
   /^\d{4}-\d{2}-\d{2}$/.test(value);
+
+const USER_REFERENCE_FIELDS = new Set(['assigneeId', 'userId']);
+
+const isUserReferenceField = (path: string): boolean => {
+  const parts = path.split('/').filter(Boolean);
+  return parts.length > 0 && USER_REFERENCE_FIELDS.has(parts[parts.length - 1]);
+};
 
 const formatValue = (value: unknown): string => {
   if (value === null || value === undefined) return '—';
@@ -97,10 +113,20 @@ const opIndicator: Record<PatchOpValue, { symbol: string; className: string }> =
     [PatchOp.Remove]: { symbol: '−', className: 'text-danger' },
   };
 
-const PatchDisplay: React.FC<{ patch: PatchOperation[] }> = ({ patch }) => (
+const PatchDisplay: React.FC<{
+  patch: PatchOperation[];
+  resolveUserId?: (id: string) => string | undefined;
+}> = ({ patch, resolveUserId }) => (
   <dl className="grid grid-cols-[max-content_max-content_1fr] items-baseline gap-x-3 gap-y-1.5">
     {patch.map((op, index) => {
       const ind = opIndicator[op.op];
+      const userName =
+        resolveUserId &&
+        isUserReferenceField(op.path) &&
+        typeof op.value === 'string' &&
+        isUuid(op.value)
+          ? resolveUserId(op.value)
+          : undefined;
       return (
         <React.Fragment key={index}>
           <dt className="text-content-muted text-xs">
@@ -112,6 +138,8 @@ const PatchDisplay: React.FC<{ patch: PatchOperation[] }> = ({ patch }) => (
           <dd className="text-content break-words text-sm">
             {op.op === PatchOp.Remove ? (
               <span className="text-danger italic">removed</span>
+            ) : userName ? (
+              userName
             ) : (
               formatValue(op.value)
             )}
@@ -217,8 +245,32 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
   log,
   isOpen,
   onClose,
+  teamSlug,
 }) => {
   const { t } = useTranslation('common');
+
+  // Resolve user UUIDs in patch values to readable member names. The query
+  // is gated on `teamSlug` so call sites without team context don't issue
+  // an empty-slug request; absent that lookup the modal still renders
+  // (UUIDs simply fall through `formatValue`).
+  const { data: members } = useQuery({
+    queryKey: queryKeys.teams.members(teamSlug ?? ''),
+    queryFn: () => teamsEndpoints.getMembers(teamSlug!),
+    enabled: !!teamSlug && isOpen,
+  });
+  const userIdToName = useMemo(() => {
+    const map = new Map<string, string>();
+    members?.forEach((member: any) => {
+      const id = member?.userId ?? member?.user?.id;
+      const name = member?.user?.name ?? member?.user?.email;
+      if (id && name) map.set(id, name);
+    });
+    return map;
+  }, [members]);
+  const resolveUserId = useMemo(
+    () => (teamSlug ? (id: string) => userIdToName.get(id) : undefined),
+    [teamSlug, userIdToName]
+  );
 
   if (!log) return null;
 
@@ -367,7 +419,10 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
               </h3>
               <div className="pl-1">
                 {metadataType === 'patch' ? (
-                  <PatchDisplay patch={metadataData as PatchOperation[]} />
+                  <PatchDisplay
+                    patch={metadataData as PatchOperation[]}
+                    resolveUserId={resolveUserId}
+                  />
                 ) : metadataType === 'snapshot' && isObject(metadataData) ? (
                   <SimplePropertyList data={metadataData} />
                 ) : extraMetadata ? (

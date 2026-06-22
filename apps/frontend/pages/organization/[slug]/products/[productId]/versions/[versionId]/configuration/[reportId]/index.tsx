@@ -42,11 +42,10 @@ import {
   truncateAtWordBoundary,
 } from '@/lib/text-sanitize';
 import { formatDateShort } from '@/utils/dateFormat';
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 const TASK_TITLE_MAX = 100;
 const TASK_DESCRIPTION_MAX = 500;
-
-const ITEMS_PER_PAGE = 15;
 
 const SEVERITY_BADGE: Record<ConfigurationSeverity, string> = {
   [CONFIGURATION_SEVERITY.HIGH]: 'border border-danger text-content',
@@ -341,7 +340,7 @@ function RulesTable({
         </table>
       </div>
 
-      {rules.length > ITEMS_PER_PAGE && (
+      {rules.length > LISTING_PAGE_SIZE && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
@@ -397,7 +396,7 @@ export default function ConfigurationScanSummaryPage() {
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination(sortedRules, ITEMS_PER_PAGE);
+  } = usePagination(sortedRules, LISTING_PAGE_SIZE);
 
   const breadcrumbItems = [
     {

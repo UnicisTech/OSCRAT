@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FaTrash, FaEye } from 'react-icons/fa';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -9,6 +9,7 @@ import ActionButton from '@/components/oscrat/ActionButton';
 import { tableStyles } from '@/components/oscrat/tableStyles';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { formatDateShort } from '@/utils/dateFormat';
+import { sortByCreatedAtDesc } from '@/utils/sortItems';
 import SeverityBadge from '@/components/oscrat/shared/SeverityBadge';
 import {
   TableWrapper,
@@ -21,8 +22,7 @@ import {
   INCIDENT_ATTACK_TYPE_MAP,
   INCIDENT_SEVERITY_MAP,
 } from '@/utils/incidentEnumMaps';
-
-const ITEMS_PER_PAGE = 10;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 interface IncidentsTableProps {
   incidents?: OscratIncidentSummary[];
@@ -39,7 +39,11 @@ const Table: React.FC<IncidentsTableProps> = ({
   const router = useRouter();
   const { slug, productId, versionId } = router.query;
 
-  const pageSize = itemsPerPage || ITEMS_PER_PAGE;
+  const pageSize = itemsPerPage || LISTING_PAGE_SIZE;
+  const sortedIncidents = useMemo(
+    () => sortByCreatedAtDesc(incidents),
+    [incidents]
+  );
   const {
     currentPage,
     totalPages,
@@ -48,7 +52,7 @@ const Table: React.FC<IncidentsTableProps> = ({
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination<OscratIncidentSummary>(incidents || [], pageSize);
+  } = usePagination<OscratIncidentSummary>(sortedIncidents, pageSize);
 
   if (!ready) {
     return null;
@@ -201,7 +205,7 @@ const Table: React.FC<IncidentsTableProps> = ({
                 </td>
               </TableRow>
             ))}
-            {(!incidents || incidents.length === 0) && (
+            {!sortedIncidents.length && (
               <tr>
                 <td
                   colSpan={8}
@@ -216,7 +220,7 @@ const Table: React.FC<IncidentsTableProps> = ({
       </TableWrapper>
 
       {/* Pagination Controls */}
-      {incidents && incidents.length > pageSize && (
+      {sortedIncidents.length > pageSize && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}

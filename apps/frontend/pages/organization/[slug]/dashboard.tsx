@@ -166,6 +166,7 @@ const TeamDashboard = () => {
                     variant="primary"
                     onClick={handleGoToAssessment}
                     startIcon={<FaPlayCircle />}
+                    className="min-w-[210px] justify-center whitespace-nowrap"
                   >
                     {complianceState.started
                       ? t('oscrat.ui.dashboard.continue-assessment')

@@ -20,8 +20,7 @@ import ReportStatusMessage from '@/components/oscrat/ReportStatusMessage';
 import ActionButton from '@/components/oscrat/ActionButton';
 import { formatDateShort } from '@/utils/dateFormat';
 import { useTeamContext } from '@/context/TeamContext';
-
-const ITEMS_PER_PAGE = 15;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 function getSeverityBadge(
   severity: string,
@@ -318,7 +317,7 @@ function VulnerabilitiesTable({
         </table>
       </div>
 
-      {vulnerabilities.length > ITEMS_PER_PAGE && (
+      {vulnerabilities.length > LISTING_PAGE_SIZE && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
@@ -367,7 +366,7 @@ export default function VulnerabilityScanSummary() {
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination(vulnerabilities, ITEMS_PER_PAGE);
+  } = usePagination(vulnerabilities, LISTING_PAGE_SIZE);
 
   const breadcrumbItems = [
     {

@@ -14,8 +14,7 @@ import {
 } from '@/components/shared/StateComponents';
 import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
-
-const PRODUCTS_PER_PAGE = 12;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 export function ProductListContent() {
   const { t } = useTranslation('common');
@@ -51,7 +50,7 @@ export function ProductListContent() {
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination(filteredProducts, PRODUCTS_PER_PAGE);
+  } = usePagination(filteredProducts, LISTING_PAGE_SIZE);
 
   if (isLoading) {
     return <LoadingState />;
@@ -102,7 +101,7 @@ export function ProductListContent() {
                 goToNextPage={goToNextPage}
                 showItemCount
                 totalItems={filteredProducts.length}
-                itemsPerPage={PRODUCTS_PER_PAGE}
+                itemsPerPage={LISTING_PAGE_SIZE}
               />
             )}
           </>

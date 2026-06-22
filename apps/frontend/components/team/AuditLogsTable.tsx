@@ -14,9 +14,14 @@ import { formatNameWithUuidFallback } from '@/lib/utils';
 interface AuditLogsTableProps {
   logs: OscratAuditLog[];
   isLoading?: boolean;
+  teamSlug?: string;
 }
 
-const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
+const AuditLogsTable: React.FC<AuditLogsTableProps> = ({
+  logs,
+  isLoading,
+  teamSlug,
+}) => {
   const { t } = useTranslation('common');
   const [selectedLog, setSelectedLog] = useState<OscratAuditLog | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -131,6 +136,7 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
         log={selectedLog}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        teamSlug={teamSlug}
       />
     </>
   );

@@ -8,8 +8,7 @@ import { useTeamContext } from '@/context/TeamContext';
 import Table from './table';
 import { TabLoading } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import type { OscratAuditLogQueryParams } from '@oscrat/model';
-
-const PAGE_SIZE = 15;
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 export default function Index() {
   const { slug } = useTeamContext();
@@ -26,7 +25,7 @@ export default function Index() {
     {
       versionId,
       page,
-      pageSize: PAGE_SIZE,
+      pageSize: LISTING_PAGE_SIZE,
       ...filters,
     },
     { enabled: !!versionId }
@@ -57,6 +56,7 @@ export default function Index() {
           onFilterChange={handleFilterChange}
           filterOptions={filterOptions}
           isLoadingOptions={isLoadingOptions}
+          teamSlug={slug}
         />
       </div>
     </div>

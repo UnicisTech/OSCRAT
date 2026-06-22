@@ -8,6 +8,7 @@ interface TabActionButtonProps {
   children: React.ReactNode;
   title?: string;
   variant?: 'primary' | 'secondary' | 'icon-only';
+  className?: string;
 }
 
 /**
@@ -23,6 +24,7 @@ const TabActionButton: React.FC<TabActionButtonProps> = ({
   children,
   title,
   variant = 'primary',
+  className,
 }) => {
   const iconOnly = variant === 'icon-only';
 
@@ -35,6 +37,7 @@ const TabActionButton: React.FC<TabActionButtonProps> = ({
       title={title}
       icon={iconOnly ? icon : undefined}
       startIcon={iconOnly ? undefined : icon}
+      className={className}
     >
       {iconOnly ? undefined : children}
     </Button>

@@ -23,6 +23,7 @@ import usePagination from '@/hooks/usePagination';
 import PaginationControls from '@/components/shared/PaginationControls';
 import { formatTaskLabel } from '@/lib/tasks';
 import { formatDateShort } from '@/utils/dateFormat';
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -174,7 +175,6 @@ export default function Index() {
 
   const allStatusOptions = Object.values(TaskStatus);
 
-  const ITEMS_PER_PAGE = 10;
   const {
     currentPage,
     totalPages,
@@ -183,7 +183,7 @@ export default function Index() {
     goToNextPage,
     prevButtonDisabled,
     nextButtonDisabled,
-  } = usePagination(filteredTasks, ITEMS_PER_PAGE);
+  } = usePagination(filteredTasks, LISTING_PAGE_SIZE);
 
   // --- HANDLERS ---
   const handleAddTask = () => {
@@ -229,7 +229,7 @@ export default function Index() {
             goToNextPage={goToNextPage}
             showItemCount
             totalItems={filteredTasks.length}
-            itemsPerPage={ITEMS_PER_PAGE}
+            itemsPerPage={LISTING_PAGE_SIZE}
           />
         )}
       </div>

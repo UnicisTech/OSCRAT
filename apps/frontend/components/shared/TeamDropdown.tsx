@@ -86,6 +86,29 @@ const TeamDropdown = () => {
         className="dropdown-content bg-surface text-content shadow-4 rounded-input w-full border p-2 px-2"
       >
         {menus.map(({ id, name, items }) => {
+          // Cap any single group at ~10 visible rows. Each row is roughly 36px
+          // (px-2 py-2 + text-sm/leading-5), so 360px keeps the first ten in
+          // view and lets the rest scroll inside the dropdown.
+          const isScrollable = items.length > 10;
+
+          const renderedItems = items.map((item) => (
+            <li
+              key={`${id}-${item.id}`}
+              onClick={() => {
+                if (document.activeElement) {
+                  (document.activeElement as HTMLElement).blur();
+                }
+              }}
+            >
+              <Link href={item.href}>
+                <div className="hover:bg-surface-muted focus:bg-surface-muted flex items-center gap-2 rounded px-2 py-2 text-sm font-medium focus:outline-none">
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  <span className="truncate">{item.name}</span>
+                </div>
+              </Link>
+            </li>
+          ));
+
           return (
             <React.Fragment key={id}>
               {name && (
@@ -96,23 +119,15 @@ const TeamDropdown = () => {
                   {name}
                 </li>
               )}
-              {items.map((item) => (
-                <li
-                  key={`${id}-${item.id}`}
-                  onClick={() => {
-                    if (document.activeElement) {
-                      (document.activeElement as HTMLElement).blur();
-                    }
-                  }}
-                >
-                  <Link href={item.href}>
-                    <div className="hover:bg-surface-muted focus:bg-surface-muted flex items-center gap-2 rounded px-2 py-2 text-sm font-medium focus:outline-none">
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      <span className="truncate">{item.name}</span>
-                    </div>
-                  </Link>
+              {isScrollable ? (
+                <li key={`${id}-scroll`}>
+                  <ul className="max-h-[360px] overflow-y-auto">
+                    {renderedItems}
+                  </ul>
                 </li>
-              ))}
+              ) : (
+                renderedItems
+              )}
               {name && <li className="divider m-0" key={`${id}-divider`} />}
             </React.Fragment>
           );

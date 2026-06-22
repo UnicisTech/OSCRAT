@@ -27,27 +27,15 @@ const CountChip: React.FC<CountChipProps> = ({
 
   return (
     <div
-      className="text-content inline-flex items-center gap-2 font-medium"
+      className={`text-content inline-flex items-center gap-2 rounded-full border px-2 py-0.5 font-medium tabular-nums ${getBorderClass(count)}`}
       role="status"
       aria-label={ariaLabel}
     >
-      {hasIssues ? (
-        <div
-          className={`flex items-center gap-2 rounded-full border px-2 py-0.5 ${getBorderClass(count)}`}
-        >
-          <BsExclamationCircleFill
-            className={iconClassName}
-            aria-hidden="true"
-          />
-          <span>{displayText}</span>
-        </div>
-      ) : (
-        <span
-          className={`rounded-full border px-2 py-0.5 ${getBorderClass(count)}`}
-        >
-          {displayText}
-        </span>
-      )}
+      <BsExclamationCircleFill
+        className={`${iconClassName} ${hasIssues ? '' : 'invisible'}`}
+        aria-hidden="true"
+      />
+      <span>{displayText}</span>
     </div>
   );
 };

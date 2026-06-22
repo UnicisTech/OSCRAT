@@ -86,7 +86,11 @@ const EditTask = ({
         <span className="text-content-muted ml-2">#{task.taskNumber}</span>
       </Modal.Header>
 
-      <form onSubmit={formik.handleSubmit} method="POST">
+      <form
+        onSubmit={formik.handleSubmit}
+        method="POST"
+        className="contents"
+      >
         <Modal.Body>
           <div className="space-y-4">
             <InputWithLabel

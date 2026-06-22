@@ -46,6 +46,11 @@ export const validateDocFile = (
   file: formidable.File,
   type: FileType
 ): boolean => {
+  // Reject zero-byte uploads up-front. Without this the server happily
+  // persists an empty buffer while the client sits on a never-resolving
+  // loading state.
+  if ((file.size ?? 0) <= 0) return false;
+
   const config = FILE_CONFIGS[type];
   const ext = getFileExtension(file.originalFilename || '');
   const mimeType = file.mimetype || '';
@@ -61,6 +66,9 @@ export const validateDocFile = (
  * Client-side file validation for browser File objects
  */
 export const validateBrowserFile = (file: File, type: FileType): boolean => {
+  // Reject zero-byte uploads — see validateDocFile for rationale.
+  if (file.size <= 0) return false;
+
   const config = FILE_CONFIGS[type];
   const ext = getFileExtension(file.name);
 
