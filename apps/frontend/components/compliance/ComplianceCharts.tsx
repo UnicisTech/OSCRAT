@@ -19,6 +19,7 @@ import { FaCheckCircle, FaExclamationCircle, FaClock } from 'react-icons/fa';
 import type { Task } from '@oscrat/model';
 import { TaskOriginType, TaskStatus } from '@oscrat/model';
 import { TASK_STATUS_TRANSLATION_MAP } from '@/constants/taskStatuses';
+import { chartTokens, surfaceToken } from '@/lib/chartTokens';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -35,54 +36,49 @@ const PIE_OPTIONS = {
   plugins: { legend: { position: 'bottom' as const } },
 };
 
-// Semantic statuses keep meaning — values mirror the theme
-// success / warning / danger / grey / primary / line tokens.
+// Conformity pie palette — sourced from `chart.conformity-*` tokens so
+// every chart colour traces back to tailwind.config.js.
 const CONFORMITY_STATUS_COLORS: Record<ConformityStatus, string> = {
-  [CONFORMITY_STATUS.FULLY_COMPLIANT]: '#16A34A', // success — compliant
-  [CONFORMITY_STATUS.PARTIALLY_COMPLIANT]: '#D97706', // warning — partially compliant
-  [CONFORMITY_STATUS.NOT_COMPLIANT]: '#E53935', // danger — not compliant
-  [CONFORMITY_STATUS.NOT_APPLICABLE]: '#9E9E9E', // grey/500 — not applicable
-  [CONFORMITY_STATUS.IN_EVALUATION]: '#1976D2', // primary — in evaluation
-  [CONFORMITY_STATUS.NOT_EVALUATED]: '#E0E0E0', // grey/300 — not evaluated
+  [CONFORMITY_STATUS.FULLY_COMPLIANT]: chartTokens['conformity-compliant'],
+  [CONFORMITY_STATUS.PARTIALLY_COMPLIANT]: chartTokens['conformity-partial'],
+  [CONFORMITY_STATUS.NOT_COMPLIANT]: chartTokens['conformity-not-compliant'],
+  [CONFORMITY_STATUS.NOT_APPLICABLE]:
+    chartTokens['conformity-not-applicable'],
+  [CONFORMITY_STATUS.IN_EVALUATION]: chartTokens['conformity-in-evaluation'],
+  [CONFORMITY_STATUS.NOT_EVALUATED]: chartTokens['conformity-not-evaluated'],
 };
 
-// Categorical chart palette — mirrors `theme.colors.chart` in
-// tailwind.config.js (Chart.js needs hex values, so the tokens are
-// referenced as literals here). Paired hues + a separate binary accent
-// pair let the two dashboard charts use disjoint subsets and stay
-// visually distinct.
-const CHART_PALETTE = {
-  coral: '#FA938E',
-  coralStrong: '#E63946',
-  teal: '#51CCD0',
-  tealStrong: '#0D9488',
-  blue: '#5BA5FF',
-  blueStrong: '#1E40AF',
-  green: '#86EFAC',
-  greenStrong: '#15803D',
-  grey: '#DADADA',
-  accent: '#3952AD',
-  muted: '#E0E0E0',
-};
+// Chart colour assignments below are sourced exclusively from
+// `chartTokens` (resolved at module load from `theme.colors.chart` in
+// tailwind.config.js). Two disjoint subsets keep the dashboard pies
+// visually distinct: a binary `accent`/`muted` pair for Evaluation
+// Status and four hue pairs for Task Distribution.
 
-// Evaluation Status — binary "processed vs untouched" read. Uses the
-// `accent`/`muted` pair so it never collides with the task chart below.
 const EVALUATION_STATUS_COLORS = {
-  evaluated: CHART_PALETTE.accent,
-  notEvaluated: CHART_PALETTE.muted,
+  evaluated: chartTokens.accent,
+  notEvaluated: chartTokens.muted,
 };
 
-// Task Distribution — one hue per status, strong shade for AUTOMATIC
-// and the light shade of the same hue for MANUAL. 8 distinct values
-// total; status reads by hue, origin reads by saturation.
+// One hue per task status, strong shade for AUTOMATIC and the light
+// shade of the same hue for MANUAL — 8 distinct values, no segment
+// shares a colour and none collide with Evaluation Status.
 const TASK_STATUS_HUES = {
-  TODO: { auto: CHART_PALETTE.coralStrong, manual: CHART_PALETTE.coral },
-  PLANNED: { auto: CHART_PALETTE.blueStrong, manual: CHART_PALETTE.blue },
-  IN_PROGRESS: {
-    auto: CHART_PALETTE.tealStrong,
-    manual: CHART_PALETTE.teal,
+  TODO: {
+    auto: chartTokens['coral-strong'],
+    manual: chartTokens.coral,
   },
-  DONE: { auto: CHART_PALETTE.greenStrong, manual: CHART_PALETTE.green },
+  PLANNED: {
+    auto: chartTokens['blue-strong'],
+    manual: chartTokens.blue,
+  },
+  IN_PROGRESS: {
+    auto: chartTokens['teal-strong'],
+    manual: chartTokens.teal,
+  },
+  DONE: {
+    auto: chartTokens['green-strong'],
+    manual: chartTokens.green,
+  },
 } as const;
 
 const TASK_PIE_OPTIONS = {
@@ -259,7 +255,7 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
                     data: chartData.evaluation.data,
                     backgroundColor: chartData.evaluation.colors,
                     borderWidth: 2,
-                    borderColor: '#ffffff',
+                    borderColor: surfaceToken,
                   },
                 ],
               }}
@@ -282,7 +278,7 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
                     data: chartData.conformity.data,
                     backgroundColor: chartData.conformity.colors,
                     borderWidth: 2,
-                    borderColor: '#ffffff',
+                    borderColor: surfaceToken,
                   },
                 ],
               }}
@@ -308,7 +304,7 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
                       data: taskChartData.pie.data,
                       backgroundColor: taskChartData.pie.colors,
                       borderWidth: 2,
-                      borderColor: '#ffffff',
+                      borderColor: surfaceToken,
                     },
                   ],
                 }}

@@ -107,12 +107,21 @@ module.exports = {
           overlay: 'rgba(0,0,0,0.04)', // hover state layer (secondary/tertiary)
           'overlay-active': 'rgba(0,0,0,0.08)', // active/pressed state layer
         },
-        // Categorical chart palette (literal — not part of the semantic
-        // system). Paired hues let a multi-series chart encode two
-        // dimensions at once (hue = category, strong/light = sub-series).
-        // The unpaired `accent`/`muted` pair is reserved for binary
-        // "processed vs untouched" charts so they never share colours
-        // with a categorical chart sitting next to them.
+        // Chart palette — the single source of truth for every colour
+        // a JS charting library (Chart.js / Recharts / etc.) consumes.
+        // Components MUST read these via the `chartTokens` helper rather
+        // than re-declaring hex literals.
+        //
+        // Three groups live under one namespace:
+        //  1. Categorical hue pairs (light = secondary/manual series,
+        //     `-strong` = primary/auto series of the same hue).
+        //  2. `accent`/`muted` binary pair for "processed vs untouched"
+        //     charts; kept disjoint from the categorical hues so a
+        //     binary chart and a categorical chart never share colours
+        //     when shown together.
+        //  3. `conformity-*` palette for the compliance conformity pie
+        //     (semantic per status, but tuned for the pie context so
+        //     values differ slightly from the global semantic tokens).
         chart: {
           coral: '#FA938E',
           'coral-strong': '#E63946',
@@ -125,6 +134,12 @@ module.exports = {
           grey: '#DADADA',
           accent: '#3952AD',
           muted: '#E0E0E0',
+          'conformity-compliant': '#16A34A', // green-600
+          'conformity-partial': '#D97706', // amber-600
+          'conformity-not-compliant': '#E53935', // red-600
+          'conformity-not-applicable': '#9E9E9E', // grey-500
+          'conformity-in-evaluation': '#1976D2', // primary blue
+          'conformity-not-evaluated': '#E0E0E0', // grey-300
         },
       },
       fontSize: {
