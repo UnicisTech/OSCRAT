@@ -46,25 +46,23 @@ const CONFORMITY_STATUS_COLORS: Record<ConformityStatus, string> = {
   [CONFORMITY_STATUS.NOT_EVALUATED]: '#E0E0E0', // grey/300 — not evaluated
 };
 
-// Categorical chart palette — mirrors `theme.colors.chart` in tailwind.config.js
-// (Chart.js needs hex values, so the tokens are referenced as literals here).
-const CHART_PALETTE = {
-  coral: '#FA938E',
-  teal: '#51CCD0',
-  blue: '#5BA5FF',
-  grey: '#DADADA',
+// Evaluation Status palette — a binary "processed vs not processed" read.
+// Deliberately uses tokens that do NOT appear in the Task Distribution
+// palette below so the two charts are visually distinct at a glance.
+const EVALUATION_STATUS_COLORS = {
+  evaluated: '#1976D2', // primary blue — "actively processed"
+  notEvaluated: '#E0E0E0', // grey/300 — "untouched", matches conformity chart's "Not Evaluated"
 };
 
-const TASK_PIE_COLORS = [
-  CHART_PALETTE.coral,
-  CHART_PALETTE.teal,
-  CHART_PALETTE.blue,
-  CHART_PALETTE.grey,
-  CHART_PALETTE.coral,
-  CHART_PALETTE.teal,
-  CHART_PALETTE.blue,
-  CHART_PALETTE.grey,
-];
+// Task Distribution palette — paired by status (auto = saturated, manual =
+// lighter shade of the same hue). 8 distinct values so no two pie segments
+// share a color, and none of them collide with EVALUATION_STATUS_COLORS.
+const TASK_STATUS_HUES = {
+  TODO: { auto: '#E11D48', manual: '#FDA4AF' }, // rose 600 / 300
+  PLANNED: { auto: '#D97706', manual: '#FCD34D' }, // amber 600 / 300
+  IN_PROGRESS: { auto: '#0D9488', manual: '#5EEAD4' }, // teal 600 / 300
+  DONE: { auto: '#15803D', manual: '#86EFAC' }, // green 700 / 300
+} as const;
 
 const TASK_PIE_OPTIONS = {
   responsive: true,
@@ -118,7 +116,10 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
           t('oscrat.ui.dashboard.not-evaluated'),
         ],
         data: [evaluated, notEvaluated],
-        colors: [CHART_PALETTE.coral, CHART_PALETTE.teal],
+        colors: [
+          EVALUATION_STATUS_COLORS.evaluated,
+          EVALUATION_STATUS_COLORS.notEvaluated,
+        ],
       },
       conformity: {
         labels: CONFORMITY_STATUS_ORDER.map((status) =>
@@ -142,7 +143,7 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
       TaskStatus.DONE,
     ] as const;
 
-    const segments = statusOrder.flatMap((status, statusIdx) => {
+    const segments = statusOrder.flatMap((status) => {
       const autoCount = tasks.filter(
         (task) =>
           task.originType === TaskOriginType.AUTOMATIC && task.status === status
@@ -155,20 +156,20 @@ const ComplianceCharts: React.FC<ComplianceChartsProps> = ({
       const statusLabel = t(TASK_STATUS_TRANSLATION_MAP[status]);
       const autoLabel = `${t('oscrat.ui.dashboard.auto-generated')} — ${statusLabel}`;
       const manualLabel = `${t('oscrat.ui.dashboard.manual')} — ${statusLabel}`;
-      const base = statusIdx * 2;
+      const hues = TASK_STATUS_HUES[status];
 
       return [
         {
           key: `auto-${status}`,
           label: autoLabel,
           count: autoCount,
-          color: TASK_PIE_COLORS[base],
+          color: hues.auto,
         },
         {
           key: `manual-${status}`,
           label: manualLabel,
           count: manualCount,
-          color: TASK_PIE_COLORS[base + 1],
+          color: hues.manual,
         },
       ];
     });
