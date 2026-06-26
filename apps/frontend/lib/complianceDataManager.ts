@@ -70,6 +70,7 @@ const versionDataManager = createComplianceDataManager({
     [OscratOrganizationRole.DISTRIBUTOR]: 'distributor-5b.json',
     [OscratOrganizationRole.IMPORTER]: 'importer-3b.json',
     [OscratOrganizationRole.DATA_STEWARD]: 'sme-manufacturer-7b.json',
+    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]: 'manufacturer-4b.json',
   },
   errorPrefix: 'Compliance',
 });
@@ -81,6 +82,7 @@ const teamDataManager = createComplianceDataManager({
     [OscratOrganizationRole.DISTRIBUTOR]: 'distributor-5a.json',
     [OscratOrganizationRole.IMPORTER]: 'importer-3a.json',
     [OscratOrganizationRole.DATA_STEWARD]: 'sme-manufacturer-7a.json',
+    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]: 'manufacturer-4a.json',
   },
   errorPrefix: 'Team compliance',
 });

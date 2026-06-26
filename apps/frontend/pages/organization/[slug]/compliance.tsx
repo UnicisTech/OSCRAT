@@ -4,7 +4,7 @@ import { GetServerSidePropsContext } from 'next';
 import { useSession } from 'next-auth/react';
 import { withTeamLayout } from '@/lib/layout-helpers';
 import { useTeamContext } from '@/context/TeamContext';
-import { Loading, Breadcrumb } from '@/components/shared';
+import { Loading, Breadcrumb, Error } from '@/components/shared';
 import Header from '@/components/oscrat/shared/header';
 import { ComplianceAssessmentWrapper } from '@/components/compliance';
 import { useComplianceData } from '@/hooks/useComplianceData';
@@ -28,7 +28,7 @@ const TeamCompliancePage = () => {
   const team = teamContext.team;
   if (!team) return null;
 
-  const { complianceData, isLoading } = useComplianceData({
+  const { complianceData, isLoading, error } = useComplianceData({
     teamSlug: team.slug,
     teamRole: team.orgRoles[0],
     complianceType: COMPLIANCE_TYPES.TEAM,
@@ -84,6 +84,10 @@ const TeamCompliancePage = () => {
       localStorage.removeItem(`team_compliance_${team.id}`);
     }
   };
+
+  if (error) {
+    return <Error message={error.message || t('unknown-error')} />;
+  }
 
   if (isLoading || !complianceData || !ready) {
     return <Loading />;
