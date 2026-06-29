@@ -14,8 +14,9 @@ interface CountChipProps {
 
 /**
  * Pill showing an item count. When `count > 0` it renders a warning icon and a
- * coloured border; otherwise a plain neutral pill. Shared by the product /
- * version cards and the version summary rows.
+ * coloured border; otherwise a plain neutral pill with the label flush-left
+ * (no reserved icon slot). Shared by the product / version cards and the
+ * version summary rows.
  */
 const CountChip: React.FC<CountChipProps> = ({
   count,
@@ -31,10 +32,12 @@ const CountChip: React.FC<CountChipProps> = ({
       role="status"
       aria-label={ariaLabel}
     >
-      <BsExclamationCircleFill
-        className={`${iconClassName} ${hasIssues ? '' : 'invisible'}`}
-        aria-hidden="true"
-      />
+      {hasIssues && (
+        <BsExclamationCircleFill
+          className={iconClassName}
+          aria-hidden="true"
+        />
+      )}
       <span>{displayText}</span>
     </div>
   );
