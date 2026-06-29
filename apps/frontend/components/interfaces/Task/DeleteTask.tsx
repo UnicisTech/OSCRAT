@@ -38,7 +38,7 @@ const DeleteTask = ({
 
   return (
     <Modal open={visible} close={() => setVisible(false)} size="sm">
-      <form onSubmit={formik.handleSubmit} method="POST">
+      <form onSubmit={formik.handleSubmit} method="POST" className="contents">
         <Modal.Header>{`Delete task`}</Modal.Header>
         <Modal.Body>
           <div className="mt-2 flex flex-col space-y-4">

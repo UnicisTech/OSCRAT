@@ -154,29 +154,32 @@ const Table: React.FC<SsmTableProps> = ({
   return (
     <div className="rounded-card w-full">
       <TableWrapper>
-        <table className={tableStyles.tableAuto}>
+        <table className={tableStyles.table}>
           <TableHeader
             columns={[
-              { label: t('status') },
-              { label: t('oscrat.ui.source'), className: 'text-center' },
+              { label: t('status'), className: 'w-[10%]' },
+              {
+                label: t('oscrat.ui.source'),
+                className: 'text-center w-[10%]',
+              },
               {
                 label: t('oscrat.ui.versions.sbom.started'),
-                className: 'text-center',
+                className: 'text-center w-[10%]',
               },
               {
                 label: t('oscrat.ui.versions.sbom.triggered-by'),
-                className: 'text-center',
+                className: 'text-center w-[14%]',
               },
               {
                 label: t('oscrat.ui.versions.sbom.duration'),
-                className: 'text-center',
+                className: 'text-center w-[8%]',
               },
               {
                 label: t('oscrat.ui.versions.sbom.packages'),
-                className: 'text-center',
+                className: 'text-center w-[8%]',
               },
-              { label: t('oscrat.ui.scan'), className: 'text-center' },
-              { label: t('actions'), className: 'text-center' },
+              { label: t('oscrat.ui.scan'), className: 'text-center w-[12%]' },
+              { label: t('actions'), className: 'text-center w-[28%]' },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -317,6 +320,9 @@ const Table: React.FC<SsmTableProps> = ({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={sortedReports.length}
+          itemsPerPage={pageSize}
         />
       )}
     </div>

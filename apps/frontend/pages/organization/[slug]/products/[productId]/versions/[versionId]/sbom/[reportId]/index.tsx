@@ -205,6 +205,9 @@ function PackagesTable({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={packages.length}
+          itemsPerPage={LISTING_PAGE_SIZE}
         />
       )}
     </div>

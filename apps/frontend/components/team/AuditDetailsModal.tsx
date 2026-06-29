@@ -69,6 +69,12 @@ interface PatchOperation {
   op: PatchOpValue;
   path: string;
   value?: unknown;
+  /**
+   * Old value at this op's path, captured server-side at write time. Absent
+   * on legacy log rows written before this field was added — in which case
+   * we render only the new value (the previous behaviour).
+   */
+  previousValue?: unknown;
 }
 
 const parseMetadata = (
@@ -113,35 +119,56 @@ const opIndicator: Record<PatchOpValue, { symbol: string; className: string }> =
     [PatchOp.Remove]: { symbol: '−', className: 'text-danger' },
   };
 
+const resolveDisplayValue = (
+  rawValue: unknown,
+  path: string,
+  resolveUserId?: (id: string) => string | undefined
+): string => {
+  if (
+    resolveUserId &&
+    isUserReferenceField(path) &&
+    typeof rawValue === 'string' &&
+    isUuid(rawValue)
+  ) {
+    return resolveUserId(rawValue) ?? formatValue(rawValue);
+  }
+  return formatValue(rawValue);
+};
+
 const PatchDisplay: React.FC<{
   patch: PatchOperation[];
   resolveUserId?: (id: string) => string | undefined;
 }> = ({ patch, resolveUserId }) => (
-  <dl className="grid grid-cols-[max-content_max-content_1fr] items-baseline gap-x-3 gap-y-1.5">
+  <dl className="grid grid-cols-[max-content_1fr_max-content_1fr] items-baseline gap-x-3 gap-y-1.5">
     {patch.map((op, index) => {
       const ind = opIndicator[op.op];
-      const userName =
-        resolveUserId &&
-        isUserReferenceField(op.path) &&
-        typeof op.value === 'string' &&
-        isUuid(op.value)
-          ? resolveUserId(op.value)
-          : undefined;
+      const hasPrevious =
+        op.op !== PatchOp.Add && op.previousValue !== undefined;
       return (
         <React.Fragment key={index}>
           <dt className="text-content-muted text-xs">
             {pathToFieldName(op.path)}
           </dt>
-          <span className={`font-mono text-sm ${ind.className}`}>
+          <dd className="text-content-muted break-words text-sm">
+            {hasPrevious ? (
+              <span className="line-through decoration-content-muted/40">
+                {resolveDisplayValue(op.previousValue, op.path, resolveUserId)}
+              </span>
+            ) : (
+              <span className="italic">—</span>
+            )}
+          </dd>
+          <span
+            className={`font-mono text-sm ${ind.className}`}
+            aria-hidden="true"
+          >
             {ind.symbol}
           </span>
           <dd className="text-content break-words text-sm">
             {op.op === PatchOp.Remove ? (
               <span className="text-danger italic">removed</span>
-            ) : userName ? (
-              userName
             ) : (
-              formatValue(op.value)
+              resolveDisplayValue(op.value, op.path, resolveUserId)
             )}
           </dd>
         </React.Fragment>

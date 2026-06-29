@@ -146,6 +146,9 @@ const FileTable: React.FC<FileTableProps> = ({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={sortedAttachments.length}
+          itemsPerPage={LISTING_PAGE_SIZE}
         />
       )}
     </div>

@@ -216,6 +216,9 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={sortedVulnerabilities.length}
+          itemsPerPage={pageSize}
         />
       )}
     </div>

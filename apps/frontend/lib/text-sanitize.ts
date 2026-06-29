@@ -1,11 +1,29 @@
 // Source-of-truth character classes for task-style text fields.
 // Validators and auto-generation sanitizers both consume these so they cannot drift.
-export const TITLE_CHAR_REGEX = /^[a-zA-Z0-9\s\-_.,()'[\]À-ſ]*$/;
-export const DESCRIPTION_CHAR_REGEX =
-  /^[a-zA-Z0-9\s\-_.,()':;@#&+/\\!?\n\rÀ-ſ]*$/;
+//
+// The Unicode block `\u2013\u2014\u2018\u2019\u201C\u201D\u2026` admits the
+// common typographic punctuation that appears in i18n templates and user
+// prose: en/em dashes, single/double curly quotes and the ellipsis. Without
+// it, auto-generated compliance-task titles (which include an em dash
+// separator) failed validate-on-change in the edit form and silently blocked
+// save.
+const TYPOGRAPHIC_PUNCT = '\\u2013\\u2014\\u2018\\u2019\\u201C\\u201D\\u2026';
 
-const TITLE_STRIP_REGEX = /[^a-zA-Z0-9\s\-_.,()'[\]À-ſ]/g;
-const DESCRIPTION_STRIP_REGEX = /[^a-zA-Z0-9\s\-_.,()':;@#&+/\\!?\n\rÀ-ſ]/g;
+export const TITLE_CHAR_REGEX = new RegExp(
+  `^[a-zA-Z0-9\\s\\-_.,()'\\[\\]À-ſ${TYPOGRAPHIC_PUNCT}]*$`
+);
+export const DESCRIPTION_CHAR_REGEX = new RegExp(
+  `^[a-zA-Z0-9\\s\\-_.,()':;@#&+/\\\\!?\\n\\rÀ-ſ${TYPOGRAPHIC_PUNCT}]*$`
+);
+
+const TITLE_STRIP_REGEX = new RegExp(
+  `[^a-zA-Z0-9\\s\\-_.,()'\\[\\]À-ſ${TYPOGRAPHIC_PUNCT}]`,
+  'g'
+);
+const DESCRIPTION_STRIP_REGEX = new RegExp(
+  `[^a-zA-Z0-9\\s\\-_.,()':;@#&+/\\\\!?\\n\\rÀ-ſ${TYPOGRAPHIC_PUNCT}]`,
+  'g'
+);
 
 function collapseWhitespace(input: string, preserveNewlines: boolean): string {
   if (preserveNewlines) {

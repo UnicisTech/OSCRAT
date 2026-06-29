@@ -10,6 +10,13 @@ import {
   IncidentAttackType,
   IncidentSeverity,
 } from '@oscrat/model';
+import { TITLE_CHAR_REGEX } from '@/lib/text-sanitize';
+
+const incidentNameSchema = Yup.string()
+  .trim()
+  .min(1, 'oscrat.ui.validation.incident-name-required')
+  .max(100, 'oscrat.ui.validation.title-too-long')
+  .matches(TITLE_CHAR_REGEX, 'oscrat.ui.validation.invalid-characters');
 
 const INCIDENT_STATUSES = Object.values(IncidentStatus);
 const INCIDENT_CLASSIFICATIONS = Object.values(IncidentClassification);
@@ -17,6 +24,10 @@ const INCIDENT_ATTACK_TYPES = Object.values(IncidentAttackType);
 const INCIDENT_SEVERITIES = Object.values(IncidentSeverity);
 
 export const incidentCreateSchema = Yup.object({
+  name: incidentNameSchema.required(
+    'oscrat.ui.validation.incident-name-required'
+  ),
+
   status: Yup.string()
     .oneOf(INCIDENT_STATUSES, 'oscrat.ui.validation.incident-status-invalid')
     .required('oscrat.ui.validation.incident-status-required'),
@@ -108,6 +119,8 @@ export const incidentCreateSchema = Yup.object({
 });
 
 export const incidentUpdateSchema = Yup.object({
+  name: incidentNameSchema.optional(),
+
   status: Yup.string()
     .oneOf(INCIDENT_STATUSES, 'oscrat.ui.validation.incident-status-invalid')
     .optional(),

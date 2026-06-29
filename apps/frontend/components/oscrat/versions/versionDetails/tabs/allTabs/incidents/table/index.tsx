@@ -116,13 +116,13 @@ const Table: React.FC<IncidentsTableProps> = ({
         <table className="text-content-secondary w-full text-left text-sm">
           <TableHeader
             columns={[
+              { label: t('oscrat.ui.versions.incidents.table-name') },
               { label: t('oscrat.ui.versions.incidents.table-status') },
               { label: t('oscrat.ui.versions.incidents.table-classification') },
               { label: t('oscrat.ui.versions.incidents.table-attack-type') },
               { label: t('oscrat.ui.versions.incidents.table-severity') },
               { label: t('oscrat.ui.versions.incidents.table-date-detected') },
               { label: t('oscrat.ui.versions.incidents.table-reporter') },
-              { label: t('oscrat.ui.versions.incidents.table-description') },
               { label: t('actions'), srOnly: true },
             ]}
           />
@@ -133,6 +133,18 @@ const Table: React.FC<IncidentsTableProps> = ({
                 onClick={() => handleViewDetails(incident.id)}
                 className="hover:bg-surface-muted cursor-pointer"
               >
+                <td className={tableStyles.td}>
+                  <div
+                    className="max-w-[200px] truncate font-medium"
+                    title={incident.name || ''}
+                  >
+                    {incident.name || (
+                      <span className="text-content-placeholder italic">
+                        {t('oscrat.ui.versions.incidents.unnamed')}
+                      </span>
+                    )}
+                  </div>
+                </td>
                 <td className={tableStyles.td}>
                   {getStatusBadge(incident.status)}
                 </td>
@@ -169,14 +181,6 @@ const Table: React.FC<IncidentsTableProps> = ({
                     title={incident.reporter.name}
                   >
                     {incident.reporter.name}
-                  </div>
-                </td>
-                <td className={tableStyles.td}>
-                  <div
-                    className="max-w-[250px] truncate"
-                    title={incident.description}
-                  >
-                    {incident.description}
                   </div>
                 </td>
                 <td className={tableStyles.td}>
@@ -228,6 +232,9 @@ const Table: React.FC<IncidentsTableProps> = ({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={sortedIncidents.length}
+          itemsPerPage={pageSize}
         />
       )}
     </div>

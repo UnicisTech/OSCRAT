@@ -122,39 +122,39 @@ const Table: React.FC<ConfigurationTableProps> = ({
   return (
     <div className="rounded-card w-full">
       <TableWrapper>
-        <table className={tableStyles.tableAuto}>
+        <table className={tableStyles.table}>
           <TableHeader
             columns={[
-              { label: t('status') },
+              { label: t('status'), className: 'w-[10%]' },
               {
                 label: t('oscrat.ui.versions.configuration.format'),
-                className: 'text-center',
+                className: 'text-center w-[10%]',
               },
               {
                 label: t('oscrat.ui.versions.configuration.started'),
-                className: 'text-center',
+                className: 'text-center w-[10%]',
               },
               {
                 label: t('oscrat.ui.versions.configuration.triggered-by'),
-                className: 'text-center',
+                className: 'text-center w-[14%]',
               },
               {
                 label: t('oscrat.ui.versions.configuration.duration'),
-                className: 'text-center',
+                className: 'text-center w-[8%]',
               },
               {
                 label: t('oscrat.ui.versions.configuration.total-rules'),
-                className: 'text-center',
+                className: 'text-center w-[8%]',
               },
               {
                 label: t('oscrat.ui.versions.configuration.pass-count'),
-                className: 'text-center',
+                className: 'text-center w-[8%]',
               },
               {
                 label: t('oscrat.ui.versions.configuration.fail-count'),
-                className: 'text-center',
+                className: 'text-center w-[8%]',
               },
-              { label: t('actions'), className: 'text-center' },
+              { label: t('actions'), className: 'text-center w-[24%]' },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -271,6 +271,9 @@ const Table: React.FC<ConfigurationTableProps> = ({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={sortedReports.length}
+          itemsPerPage={pageSize}
         />
       )}
     </div>

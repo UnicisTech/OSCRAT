@@ -79,11 +79,11 @@ export function ProductListContent() {
         }
       />
 
-      <div className="bg-surface rounded-card flex w-full flex-col gap-4">
-        {filteredProducts.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <>
+      {filteredProducts.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <>
+          <div className="flex w-full flex-col gap-4">
             {paginatedProducts.map((product) => (
               <ProductComponent
                 key={product.id}
@@ -91,22 +91,22 @@ export function ProductListContent() {
                 onShowMore={() => handleShowMore(product.id)}
               />
             ))}
-            {totalPages > 1 && (
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                prevButtonDisabled={prevButtonDisabled}
-                nextButtonDisabled={nextButtonDisabled}
-                goToPreviousPage={goToPreviousPage}
-                goToNextPage={goToNextPage}
-                showItemCount
-                totalItems={filteredProducts.length}
-                itemsPerPage={LISTING_PAGE_SIZE}
-              />
-            )}
-          </>
-        )}
-      </div>
+          </div>
+          {totalPages > 1 && (
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              prevButtonDisabled={prevButtonDisabled}
+              nextButtonDisabled={nextButtonDisabled}
+              goToPreviousPage={goToPreviousPage}
+              goToNextPage={goToNextPage}
+              showItemCount
+              totalItems={filteredProducts.length}
+              itemsPerPage={LISTING_PAGE_SIZE}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

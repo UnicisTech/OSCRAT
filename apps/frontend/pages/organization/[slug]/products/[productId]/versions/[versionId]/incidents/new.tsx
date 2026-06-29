@@ -48,6 +48,7 @@ function NewIncidentPage() {
   );
 
   const [formData, setFormData] = useState({
+    name: '',
     status: IncidentStatus.PENDING,
     classification: IncidentClassification.GENERAL,
     attackType: IncidentAttackType.OTHERS,
@@ -129,6 +130,7 @@ function NewIncidentPage() {
     e.preventDefault();
 
     const createData: OscratIncidentCreate = {
+      name: formData.name.trim(),
       status: formData.status,
       classification: formData.classification,
       attackType: formData.attackType,
@@ -254,6 +256,22 @@ function NewIncidentPage() {
               {t('oscrat.ui.versions.incidents.incident-information')}
             </h2>
             <div className="grid grid-cols-2 gap-6">
+              <div className="col-span-2">
+                <label className="text-content-secondary block text-sm font-medium">
+                  {t('oscrat.ui.versions.incidents.name')} *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  maxLength={100}
+                  placeholder={t('oscrat.ui.versions.incidents.name-placeholder')}
+                  className="border-line mt-1 w-full rounded-md border px-3 py-2"
+                />
+              </div>
+
               <div>
                 <label className="text-content-secondary block text-sm font-medium">
                   {t('oscrat.ui.versions.incidents.status')} *

@@ -8,6 +8,7 @@ import {
 
 export interface OscratIncidentSummary {
   id: string;
+  name?: string;
   status: IncidentStatus;
   classification: IncidentClassification;
   attackType: IncidentAttackType;
@@ -28,6 +29,7 @@ export interface OscratIncidentSummary {
 
 export interface OscratIncidentDetail {
   id: string;
+  name?: string;
   status: IncidentStatus;
   classification: IncidentClassification;
   attackType: IncidentAttackType;
@@ -67,6 +69,7 @@ export interface OscratIncidentDetail {
 }
 
 export interface OscratIncidentCreate {
+  name: string;
   status: IncidentStatus;
   classification: IncidentClassification;
   attackType: IncidentAttackType;
@@ -89,6 +92,7 @@ export interface OscratIncidentCreate {
 }
 
 export interface OscratIncidentUpdate {
+  name?: string;
   status?: IncidentStatus;
   classification?: IncidentClassification;
   attackType?: IncidentAttackType;

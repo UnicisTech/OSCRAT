@@ -164,31 +164,19 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
       </p>
 
       <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="flex-1">
-          <select
-            className="select select-bordered bg-surface w-full"
-            value={selectedLanguage}
-            onChange={(e) => setSelectedLanguage(e.target.value)}
-            disabled={isListLoading || isStarting || isLanguageLocked}
-          >
-            {availableLanguages.map((lang) => (
-              <option key={lang.code} value={lang.code}>
-                {lang.label}
-                {!lang.available && ' (Not available)'}
-              </option>
-            ))}
-          </select>
-          {selectedLang && !selectedLang.available && !isLanguageLocked && (
-            <p className="text-c1 text-warning mt-1">
-              {t('oscrat.ui.compliance-translation.default-english')}
-            </p>
-          )}
-          {isLanguageLocked && (
-            <p className="text-content-muted mt-1 text-xs">
-              {t('oscrat.ui.compliance-translation.language-locked')}
-            </p>
-          )}
-        </div>
+        <select
+          className="select select-bordered bg-surface w-full flex-1"
+          value={selectedLanguage}
+          onChange={(e) => setSelectedLanguage(e.target.value)}
+          disabled={isListLoading || isStarting || isLanguageLocked}
+        >
+          {availableLanguages.map((lang) => (
+            <option key={lang.code} value={lang.code}>
+              {lang.label}
+              {!lang.available && ' (Not available)'}
+            </option>
+          ))}
+        </select>
 
         {isAssessmentCompleted ? (
           <Button
@@ -218,6 +206,17 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
           </Button>
         )}
       </div>
+
+      {selectedLang && !selectedLang.available && !isLanguageLocked && (
+        <p className="text-c1 text-warning mt-2">
+          {t('oscrat.ui.compliance-translation.default-english')}
+        </p>
+      )}
+      {isLanguageLocked && (
+        <p className="text-content-muted mt-2 text-xs">
+          {t('oscrat.ui.compliance-translation.language-locked')}
+        </p>
+      )}
 
       <ConfirmationModal
         isOpen={isResetModalOpen}

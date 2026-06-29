@@ -70,7 +70,7 @@ const CreateAPIKeyForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} method="POST">
+    <form onSubmit={handleSubmit} method="POST" className="contents">
       <Modal.Header>{t('new-api-key')}</Modal.Header>
       <Modal.Description>{t('new-api-key-description')}</Modal.Description>
       <Modal.Body>

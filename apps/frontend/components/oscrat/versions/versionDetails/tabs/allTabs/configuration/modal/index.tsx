@@ -71,7 +71,7 @@ const ImportModal: React.FC<ImportModalProps> = ({
   return (
     <Modal open={isOpen} close={submitting ? undefined : handleClose} size="sm">
       <Modal.Header>{t('import-file')}</Modal.Header>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="contents">
         <Modal.Body>
           <div className="space-y-4">
             <div className="mb-4">

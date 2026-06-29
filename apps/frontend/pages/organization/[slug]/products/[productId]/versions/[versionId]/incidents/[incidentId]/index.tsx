@@ -174,9 +174,16 @@ function IncidentDetailsPage() {
         {/* Section 1: Basic Incident Information */}
         <div className="border-line bg-surface rounded-lg border p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h1 className="text-content text-2xl font-bold">
-              {t('oscrat.ui.versions.incidents.incident-details')}
-            </h1>
+            <div>
+              <h1 className="text-content text-2xl font-bold">
+                {incident.name || t('oscrat.ui.versions.incidents.incident-details')}
+              </h1>
+              {incident.name && (
+                <p className="text-content-muted mt-1 text-sm">
+                  {t('oscrat.ui.versions.incidents.incident-details')}
+                </p>
+              )}
+            </div>
             <div className="flex gap-2">
               <Button
                 variant="secondary"

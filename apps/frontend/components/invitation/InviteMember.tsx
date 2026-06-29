@@ -45,7 +45,7 @@ const InviteMember = ({
 
   return (
     <Modal open={visible} close={toggleVisible}>
-      <form onSubmit={formik.handleSubmit} method="POST">
+      <form onSubmit={formik.handleSubmit} method="POST" className="contents">
         <Modal.Header>{t('invite-new-member')}</Modal.Header>
         <Modal.Description>{t('invite-member-message')}</Modal.Description>
         <Modal.Body>

@@ -88,6 +88,7 @@ export const transformToIncidentSummary = (
   incident: IncidentSummaryPayload
 ): OscratIncidentSummary => ({
   id: incident.id,
+  name: incident.name || undefined,
   status: incident.status,
   classification: incident.classification,
   attackType: incident.attackType,
@@ -111,6 +112,7 @@ export const transformToIncidentDetail = (
   incident: IncidentDetailPayload
 ): OscratIncidentDetail => ({
   id: incident.id,
+  name: incident.name || undefined,
   status: incident.status,
   classification: incident.classification,
   attackType: incident.attackType,

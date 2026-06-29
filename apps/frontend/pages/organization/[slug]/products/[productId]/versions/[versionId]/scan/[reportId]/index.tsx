@@ -325,6 +325,9 @@ function VulnerabilitiesTable({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={vulnerabilities.length}
+          itemsPerPage={LISTING_PAGE_SIZE}
         />
       )}
     </div>

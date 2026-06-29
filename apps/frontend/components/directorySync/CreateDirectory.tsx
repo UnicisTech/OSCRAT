@@ -56,7 +56,7 @@ const CreateDirectory = ({
 
   return (
     <Modal open={visible} close={toggleVisible}>
-      <form onSubmit={formik.handleSubmit} method="POST">
+      <form onSubmit={formik.handleSubmit} method="POST" className="contents">
         <Modal.Header>{t('create-directory-connection')}</Modal.Header>
         <Modal.Body>
           <div className="mt-2 flex flex-col space-y-2">

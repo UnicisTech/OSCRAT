@@ -114,44 +114,44 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
   return (
     <div className="rounded-card w-full">
       <TableWrapper>
-        <table className={tableStyles.tableAuto}>
+        <table className={tableStyles.table}>
           <TableHeader
             columns={[
-              { label: t('status') },
-              { label: t('oscrat.ui.source'), className: 'text-center' },
+              { label: t('status'), className: 'w-[9%]' },
+              { label: t('oscrat.ui.source'), className: 'text-center w-[8%]' },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.started'),
-                className: 'text-center',
+                className: 'text-center w-[9%]',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.triggered-by'),
-                className: 'text-center',
+                className: 'text-center w-[12%]',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.duration'),
-                className: 'text-center',
+                className: 'text-center w-[7%]',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.total'),
-                className: 'text-center',
+                className: 'text-center w-[6%]',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.critical'),
-                className: 'text-center',
+                className: 'text-center w-[6%]',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.high'),
-                className: 'text-center',
+                className: 'text-center w-[6%]',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.medium'),
-                className: 'text-center',
+                className: 'text-center w-[6%]',
               },
               {
                 label: t('oscrat.ui.versions.vulnerability-scan.low'),
-                className: 'text-center',
+                className: 'text-center w-[6%]',
               },
-              { label: t('actions'), className: 'text-center' },
+              { label: t('actions'), className: 'text-center w-[25%]' },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -310,6 +310,9 @@ const Table: React.FC<VulnerabilityScanTableProps> = ({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={sortedReports.length}
+          itemsPerPage={pageSize}
         />
       )}
     </div>

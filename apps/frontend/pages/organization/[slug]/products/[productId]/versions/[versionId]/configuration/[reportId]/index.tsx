@@ -348,6 +348,9 @@ function RulesTable({
           nextButtonDisabled={nextButtonDisabled}
           goToPreviousPage={goToPreviousPage}
           goToNextPage={goToNextPage}
+          showItemCount
+          totalItems={rules.length}
+          itemsPerPage={LISTING_PAGE_SIZE}
         />
       )}
     </div>
