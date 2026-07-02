@@ -10,7 +10,7 @@ import {
 } from '@oscrat/model/operations';
 import type { AuditInfo } from '@oscrat/model/audit';
 import { processConfigurationScanPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
-import { withTempDirectory } from '../utils/filesystem';
+import { withTempDirectory, resolveInTempDir } from '../utils/filesystem';
 import {
   processWithOscapReport,
   parseScanReport,
@@ -21,7 +21,6 @@ import type { ConfigurationScanSummary } from '@oscrat/model/types/configuration
 import { validatePayload } from '../utils/validatePayload';
 import { saveJobError } from '../utils/JobError';
 import * as fs from 'fs';
-import * as path from 'path';
 import { gunzipSync } from 'zlib';
 import { createSingleFileZip } from '../utils/archive';
 
@@ -48,7 +47,7 @@ export async function executeConfigurationScan(
   try {
     return await withTempDirectory(`config-scan-${job.id}`, async (tempDir) => {
       try {
-        const inputFilePath = path.join(tempDir, payload.filename);
+        const inputFilePath = resolveInTempDir(tempDir, payload.filename);
         fs.writeFileSync(inputFilePath, fileBuffer);
 
         const isOval = payload.format === ConfigurationScanFormat.OVAL;

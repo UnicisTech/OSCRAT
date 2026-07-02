@@ -1,13 +1,17 @@
 import * as Yup from 'yup';
 import type { InferType } from 'yup';
 
+const safeFilename = Yup.string()
+  .required('Filename is required')
+  .matches(/^[^/\\]+$/, 'Invalid filename');
+
 export const repoGenerateSbomPayloadSchema = Yup.object({
   repositoryId: Yup.string().required('Repository ID is required'),
   reportId: Yup.string().required('Report ID is required'),
 });
 
 export const fileImportSbomPayloadSchema = Yup.object({
-  filename: Yup.string().required('Filename is required'),
+  filename: safeFilename,
   fileId: Yup.string().required('File ID is required'),
   mimeType: Yup.string().required('MIME type is required'),
   reportId: Yup.string().required('Report ID is required'),
@@ -24,7 +28,7 @@ export const sbomReportScanVulnerabilitiesPayloadSchema = Yup.object({
 });
 
 export const processConfigurationScanPayloadSchema = Yup.object({
-  filename: Yup.string().required('Filename is required'),
+  filename: safeFilename,
   fileId: Yup.string().required('File ID is required'),
   mimeType: Yup.string().required('MIME type is required'),
   reportId: Yup.string().required('Report ID is required'),

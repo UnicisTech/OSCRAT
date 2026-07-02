@@ -8,7 +8,7 @@ import {
   generateVulnerabilityScanFilename,
 } from '@oscrat/model/operations';
 import { sbomReportScanVulnerabilitiesPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
-import { withTempDirectory } from '../utils/filesystem';
+import { withTempDirectory, resolveInTempDir } from '../utils/filesystem';
 import { createSingleFileZip } from '../utils/archive';
 import {
   scanSbomFileWithGrype,
@@ -19,7 +19,6 @@ import { JobError, saveJobError } from '../utils/JobError';
 import { ERROR_CODES } from '@oscrat/model/constants/errorCodes';
 import { validatePayload } from '../utils/validatePayload';
 import * as fs from 'fs';
-import * as path from 'path';
 
 export async function executeSbomReportScan(
   job: WorkerJob,
@@ -54,7 +53,7 @@ export async function executeSbomReportScan(
         }
 
         // Write SBOM file to temp directory
-        const sbomFilePath = path.join(tempDir, sbomFile.filename);
+        const sbomFilePath = resolveInTempDir(tempDir, sbomFile.filename);
         fs.writeFileSync(sbomFilePath, sbomFile.fileData as any);
         console.log(`[SBOM Report Scan] SBOM file written: ${sbomFilePath}`);
 

@@ -1,5 +1,6 @@
 import formidable from 'formidable';
 import { NextApiRequest } from 'next';
+import * as path from 'path';
 
 // Shared file upload configuration and utilities
 
@@ -124,11 +125,13 @@ export const extractFileData = async (
 
   const fileData = await fs.promises.readFile(file.filepath);
 
+  const filename = path.basename(file.originalFilename.replace(/\\/g, '/'));
+
   return {
-    filename: file.originalFilename,
+    filename,
     fileData,
     fileSize: fileData.length,
-    mimeType: file.mimetype || getMimeTypeFromExtension(file.originalFilename),
+    mimeType: file.mimetype || getMimeTypeFromExtension(filename),
   };
 };
 

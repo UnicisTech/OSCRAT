@@ -9,7 +9,7 @@ import {
 import { getFileById, deleteFile } from '@oscrat/model/operations';
 import type { AuditInfo } from '@oscrat/model/audit';
 import { fileImportSbomPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
-import { withTempDirectory } from '../utils/filesystem';
+import { withTempDirectory, resolveInTempDir } from '../utils/filesystem';
 import { convertSbomToSyftJson, analyzeSBOM, SyftSBOM } from '../utils/sbom';
 import { saveJobError } from '../utils/JobError';
 import { validatePayload } from '../utils/validatePayload';
@@ -42,7 +42,7 @@ export async function executeSbomImport(
       try {
         // Save and convert file
         console.log(`[SBOM Import] Converting SBOM to Syft JSON...`);
-        const inputFilePath = path.join(tempDir, payload.filename);
+        const inputFilePath = resolveInTempDir(tempDir, payload.filename);
         fs.writeFileSync(inputFilePath, fileBuffer as any);
 
         const syftJsonPath = path.join(tempDir, 'converted-sbom.syft.json');
