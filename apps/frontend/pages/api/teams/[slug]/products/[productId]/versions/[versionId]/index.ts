@@ -7,6 +7,8 @@ import {
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductVersionUpdate } from '@oscrat/model';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { versionUpdateSchema } from '@/lib/validation/version';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -61,9 +63,8 @@ const handlePUT = async (
   const { teamMember } = req.teamContext;
 
   const { versionId } = req.query;
-  const versionData = req.body as OscratProductVersionUpdate;
+  const versionData = await parseBody(versionUpdateSchema, req);
 
-  // Add updatedBy field from the authenticated user
   const updateData: OscratProductVersionUpdate = {
     ...versionData,
     updatedBy: teamMember.userId,

@@ -5,7 +5,9 @@ import { ensureAwarenessTrainingTask } from 'models/task';
 import { withUserAuth, type AuthenticatedUserRequest } from '@/lib/middleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
-import { TeamCreateData, TeamCreateRequest } from '@oscrat/model';
+import { TeamCreateData, type OscratOrganizationSize } from '@oscrat/model';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { teamCreationSchema } from '@/lib/validation/team';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
@@ -40,7 +42,7 @@ const handlePOST = async (
   req: AuthenticatedUserRequest,
   res: NextApiResponse
 ) => {
-  const requestData: TeamCreateRequest = req.body;
+  const requestData = await parseBody(teamCreationSchema, req);
   const { user } = req.userContext;
 
   const slug = slugify(requestData.name);
@@ -58,13 +60,13 @@ const handlePOST = async (
     name: requestData.name,
     slug,
     type: requestData.type,
-    size: requestData.size,
+    size: requestData.size as OscratOrganizationSize | undefined,
     orgRoles: [requestData.orgRole],
     taxId: requestData.taxId,
     postalAddress: requestData.postalAddress,
     contactEmail: requestData.contactEmail,
-    contactPhone: requestData.contactPhone,
-    additionalInformation: requestData.additionalInformation,
+    contactPhone: requestData.contactPhone ?? undefined,
+    additionalInformation: requestData.additionalInformation ?? undefined,
   };
 
   let team;

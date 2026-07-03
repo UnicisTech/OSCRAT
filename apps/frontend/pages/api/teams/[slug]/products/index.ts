@@ -2,8 +2,9 @@ import { prisma } from '@/lib/prisma';
 import { getProducts, createProduct } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import type { OscratProductCreate } from '@oscrat/model';
 import { ApiError } from '@/lib/errors';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { productCreateSchema } from '@/lib/validation/product';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -41,12 +42,12 @@ const handlePOST = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const productData = req.body as OscratProductCreate;
+  const productData = await parseBody(productCreateSchema, req);
 
   const product = await createProduct(
     prisma,
     teamMember.teamId,
-    productData,
+    { ...productData, createdBy: teamMember.userId },
     req.auditInfo
   );
 

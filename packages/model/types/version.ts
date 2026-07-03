@@ -55,8 +55,8 @@ export interface OscratProductVersionDetail {
 export interface OscratProductVersionCreate {
   version: string;
   status?: OscratProductVersionStatus;
-  releaseDate?: Date;
-  supportEndDate?: Date;
+  releaseDate?: Date | null;
+  supportEndDate?: Date | null;
   productId: string;
   createdBy: string;
 }
@@ -64,7 +64,7 @@ export interface OscratProductVersionCreate {
 export interface OscratProductVersionUpdate {
   version?: string;
   status?: OscratProductVersionStatus;
-  releaseDate?: Date;
-  supportEndDate?: Date;
+  releaseDate?: Date | null;
+  supportEndDate?: Date | null;
   updatedBy?: string;
 }

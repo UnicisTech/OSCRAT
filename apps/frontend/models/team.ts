@@ -1,7 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import { getCscStatusesProp, getCscControlsProp } from '@/lib/csc';
 import { findOrCreateApp } from '@/lib/svix';
-import { Role, TeamCreateData, type AuditInfo } from '@oscrat/model';
+import {
+  Role,
+  TeamCreateData,
+  type AuditInfo,
+  type TeamUpdate,
+} from '@oscrat/model';
 import * as TeamOps from '@oscrat/model/operations';
 import { fromJsonObject } from '@oscrat/model/utils/json';
 import { controls } from '@/components/defaultLanding/data/configs/csc';
@@ -103,7 +108,7 @@ export const getTeamMembers = async (slug: string) => {
 
 export const updateTeam = async (
   slug: string,
-  data: any,
+  data: TeamUpdate,
   auditInfo?: AuditInfo
 ) => {
   return await TeamOps.updateTeam(prisma, { slug }, data, auditInfo);

@@ -2,8 +2,9 @@ import { prisma } from '@/lib/prisma';
 import { createAssessment } from '@oscrat/model/operations/assessment';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
-import type { OscratAssessmentCreate } from '@oscrat/model';
 import { ApiError } from '@/lib/errors';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { assessmentCreateSchema } from '@/lib/validation/assessment';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -26,12 +27,16 @@ const handlePOST = async (
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-  const assessmentData = req.body as OscratAssessmentCreate;
+  const assessmentData = await parseBody(assessmentCreateSchema, req);
 
   const assessment = await createAssessment(
     prisma,
     teamMember.teamId,
-    { ...assessmentData, teamId: teamMember.teamId },
+    {
+      ...assessmentData,
+      teamId: teamMember.teamId,
+      createdBy: teamMember.userId,
+    },
     req.auditInfo
   );
 

@@ -3,6 +3,8 @@ import { getTaskBySlugAndNumber, updateTask, deleteTask } from 'models/task';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { createTaskUpdateSchema } from '@/lib/validation/task';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -60,11 +62,20 @@ const handlePUT = async (
     throw new ApiError(400, 'Invalid task number');
   }
 
-  const data = req.body;
+  const { title, description, status, duedate, assigneeId, properties } =
+    await parseBody(createTaskUpdateSchema(), req);
+
   const task = await updateTask(
     taskNumberAsNumber,
     slug as string,
-    data,
+    {
+      title,
+      description,
+      status,
+      duedate: duedate?.toISOString(),
+      assigneeId,
+      properties,
+    },
     req.auditInfo
   );
 

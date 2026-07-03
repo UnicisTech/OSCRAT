@@ -5,7 +5,11 @@ import {
   acronymSchema,
   productDescriptionSchema,
 } from './inputs';
-import { OscratProductType, OscratProductCategory } from '@oscrat/model';
+import {
+  OscratProductType,
+  OscratProductCategory,
+  OscratProductVersionStatus,
+} from '@oscrat/model';
 
 // Product name with uniqueness validation
 const createProductNameWithUniquenessSchema = (
@@ -29,18 +33,32 @@ export const productCreateSchema = Yup.object({
     'oscrat.ui.validation.product-name-required'
   ),
   acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
-  type: Yup.string()
+  description: productDescriptionSchema.optional(),
+  type: Yup.mixed<OscratProductType>()
     .oneOf(
       Object.values(OscratProductType),
       'oscrat.ui.validation.product-type-invalid'
     )
     .required('oscrat.ui.validation.product-type-required'),
-  productCategory: Yup.string()
+  productCategory: Yup.mixed<OscratProductCategory>()
     .oneOf(
       Object.values(OscratProductCategory),
       'oscrat.ui.validation.product-category-invalid'
     )
     .required('oscrat.ui.validation.product-category-required'),
+  initialVersion: Yup.object({
+    version: versionNameSchema.required(
+      'oscrat.ui.validation.version-required'
+    ),
+    status: Yup.mixed<OscratProductVersionStatus>()
+      .oneOf(
+        Object.values(OscratProductVersionStatus),
+        'oscrat.ui.validation.status-invalid'
+      )
+      .required('oscrat.ui.validation.status-required'),
+  })
+    .optional()
+    .default(undefined),
 });
 
 export const productUpdateSchema = Yup.object({
@@ -49,10 +67,16 @@ export const productUpdateSchema = Yup.object({
   ),
   acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
   description: productDescriptionSchema.optional(),
-  type: Yup.string()
+  type: Yup.mixed<OscratProductType>()
     .oneOf(
       Object.values(OscratProductType),
       'oscrat.ui.validation.product-type-invalid'
+    )
+    .optional(),
+  productCategory: Yup.mixed<OscratProductCategory>()
+    .oneOf(
+      Object.values(OscratProductCategory),
+      'oscrat.ui.validation.product-category-invalid'
     )
     .optional(),
 });

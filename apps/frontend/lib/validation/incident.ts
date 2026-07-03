@@ -28,25 +28,25 @@ export const incidentCreateSchema = Yup.object({
     'oscrat.ui.validation.incident-name-required'
   ),
 
-  status: Yup.string()
+  status: Yup.mixed<IncidentStatus>()
     .oneOf(INCIDENT_STATUSES, 'oscrat.ui.validation.incident-status-invalid')
     .required('oscrat.ui.validation.incident-status-required'),
 
-  classification: Yup.string()
+  classification: Yup.mixed<IncidentClassification>()
     .oneOf(
       INCIDENT_CLASSIFICATIONS,
       'oscrat.ui.validation.incident-classification-invalid'
     )
     .required('oscrat.ui.validation.incident-classification-required'),
 
-  attackType: Yup.string()
+  attackType: Yup.mixed<IncidentAttackType>()
     .oneOf(
       INCIDENT_ATTACK_TYPES,
       'oscrat.ui.validation.incident-attack-type-invalid'
     )
     .required('oscrat.ui.validation.incident-attack-type-required'),
 
-  severity: Yup.string()
+  severity: Yup.mixed<IncidentSeverity>()
     .oneOf(
       INCIDENT_SEVERITIES,
       'oscrat.ui.validation.incident-severity-invalid'
@@ -115,31 +115,31 @@ export const incidentCreateSchema = Yup.object({
       otherwise: (schema) => schema.nullable(),
     }),
 
-  attachmentIds: Yup.array().of(Yup.string()).optional(),
+  attachmentIds: Yup.array().of(Yup.string().defined()).optional(),
 });
 
 export const incidentUpdateSchema = Yup.object({
   name: incidentNameSchema.optional(),
 
-  status: Yup.string()
+  status: Yup.mixed<IncidentStatus>()
     .oneOf(INCIDENT_STATUSES, 'oscrat.ui.validation.incident-status-invalid')
     .optional(),
 
-  classification: Yup.string()
+  classification: Yup.mixed<IncidentClassification>()
     .oneOf(
       INCIDENT_CLASSIFICATIONS,
       'oscrat.ui.validation.incident-classification-invalid'
     )
     .optional(),
 
-  attackType: Yup.string()
+  attackType: Yup.mixed<IncidentAttackType>()
     .oneOf(
       INCIDENT_ATTACK_TYPES,
       'oscrat.ui.validation.incident-attack-type-invalid'
     )
     .optional(),
 
-  severity: Yup.string()
+  severity: Yup.mixed<IncidentSeverity>()
     .oneOf(
       INCIDENT_SEVERITIES,
       'oscrat.ui.validation.incident-severity-invalid'
@@ -200,5 +200,5 @@ export const incidentUpdateSchema = Yup.object({
       otherwise: (schema) => schema.nullable(),
     }),
 
-  attachmentIds: Yup.array().of(Yup.string()).optional(),
+  attachmentIds: Yup.array().of(Yup.string().defined()).optional(),
 });

@@ -7,14 +7,23 @@ import { ApiError } from '@/lib/errors';
  */
 export async function validateRequest<T extends Yup.AnySchema>(
   schema: T,
-  data: unknown
+  data: unknown,
+  options?: Yup.ValidateOptions
 ): Promise<Yup.InferType<T>> {
   try {
-    return await schema.validate(data);
+    return await schema.validate(data, options);
   } catch (error) {
     if (error instanceof Yup.ValidationError) {
       throw new ApiError(400, error.message);
     }
     throw error;
   }
+}
+
+/** Validate a request body, stripping any keys not declared in the schema. */
+export function parseBody<T extends Yup.AnySchema>(
+  schema: T,
+  req: { body: unknown }
+): Promise<Yup.InferType<T>> {
+  return validateRequest(schema, req.body, { stripUnknown: true });
 }

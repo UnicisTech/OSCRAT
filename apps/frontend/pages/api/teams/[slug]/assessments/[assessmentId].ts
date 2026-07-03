@@ -7,6 +7,8 @@ import {
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { assessmentUpdateSchema } from '@/lib/validation/assessment';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -56,11 +58,13 @@ const handlePUT = async (
   const { teamMember } = req.teamContext;
   const { assessmentId } = req.query;
 
+  const assessmentData = await parseBody(assessmentUpdateSchema, req);
+
   const assessment = await updateAssessment(
     prisma,
     teamMember.teamId,
     assessmentId as string,
-    req.body,
+    assessmentData,
     req.auditInfo
   );
 

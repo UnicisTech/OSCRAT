@@ -6,7 +6,8 @@ import {
   DEFAULT_TASK_STATUS,
   DEFAULT_TASK_ORIGIN_TYPE,
 } from '@/constants/taskStatuses';
-import { taskPropertiesSchema } from '@/lib/validation/task';
+import { createTaskCreateSchema } from '@/lib/validation/task';
+import { parseBody } from '@/lib/validation/validateRequest';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -43,6 +44,7 @@ const handlePOST = async (
   res: NextApiResponse
 ) => {
   const { teamMember, user } = req.teamContext;
+  const { teamId } = teamMember;
 
   const {
     title,
@@ -53,20 +55,7 @@ const handlePOST = async (
     versionId,
     originType,
     properties,
-  } = req.body;
-  const { teamId } = teamMember;
-
-  let validatedProperties;
-  if (properties !== undefined) {
-    try {
-      validatedProperties = await taskPropertiesSchema.validate(properties, {
-        abortEarly: false,
-        stripUnknown: false,
-      });
-    } catch (err) {
-      throw new ApiError(400, (err as Error).message);
-    }
-  }
+  } = await parseBody(createTaskCreateSchema(), req);
 
   const task = await createTask(
     {
@@ -74,12 +63,12 @@ const handlePOST = async (
       teamId,
       title,
       status: status || DEFAULT_TASK_STATUS,
-      duedate,
+      duedate: duedate.toISOString(),
       description: description || '',
-      productId,
-      versionId,
+      productId: productId || undefined,
+      versionId: versionId || undefined,
       originType: originType || DEFAULT_TASK_ORIGIN_TYPE,
-      properties: validatedProperties,
+      properties,
     },
     req.auditInfo
   );

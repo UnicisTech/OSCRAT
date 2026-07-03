@@ -6,6 +6,8 @@ import {
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratVulnerabilityCreate } from '@oscrat/model';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { vulnerabilityCreateSchema } from '@/lib/validation/vulnerability';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -50,9 +52,9 @@ const handlePOST = async (
   const { teamMember } = req.teamContext;
 
   const { productId, versionId } = req.query;
-  const vulnerabilityData = req.body as OscratVulnerabilityCreate;
 
-  // Add createdBy field from the authenticated user
+  const vulnerabilityData = await parseBody(vulnerabilityCreateSchema, req);
+
   const createData: OscratVulnerabilityCreate = {
     ...vulnerabilityData,
     createdBy: teamMember.userId,

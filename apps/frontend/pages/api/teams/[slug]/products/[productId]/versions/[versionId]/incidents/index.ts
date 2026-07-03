@@ -3,6 +3,8 @@ import { getIncidents, createIncident } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratIncidentCreate } from '@oscrat/model';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { incidentCreateSchema } from '@/lib/validation/incident';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -49,9 +51,9 @@ const handlePOST = async (
   const { teamMember } = req.teamContext;
 
   const { productId, versionId } = req.query;
-  const incidentData = req.body as OscratIncidentCreate;
 
-  // Add createdBy field from the authenticated user
+  const incidentData = await parseBody(incidentCreateSchema, req);
+
   const createData: OscratIncidentCreate = {
     ...incidentData,
     createdBy: teamMember.userId,

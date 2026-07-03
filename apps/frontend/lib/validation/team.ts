@@ -22,7 +22,7 @@ export const teamCreationSchema = Yup.object({
   name: organizationNameSchema.required(
     'oscrat.ui.validation.team-name-required'
   ),
-  type: Yup.mixed()
+  type: Yup.mixed<OscratOrganizationType>()
     .oneOf(
       [
         OscratOrganizationType.NATURAL_PERSON,
@@ -73,6 +73,7 @@ export const teamSettingsSchema = Yup.object({
   slug: Yup.string().required('oscrat.ui.validation.slug-required'),
   domain: Yup.string().nullable().matches(domainRegex, {
     message: 'oscrat.ui.validation.domain-invalid',
+    excludeEmptyString: true,
   }),
 });
 

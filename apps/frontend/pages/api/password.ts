@@ -9,6 +9,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ApiError } from '@/lib/errors';
 import { recordMetric } from '@/lib/metrics';
 import { withApiHandler } from '@/lib/middleware';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { updatePasswordSchema } from '@/lib/validation/auth';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
@@ -26,10 +28,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getSession(req, res);
 
-  const { currentPassword, newPassword } = req.body as {
-    currentPassword: string;
-    newPassword: string;
-  };
+  const { currentPassword, newPassword } = await parseBody(
+    updatePasswordSchema,
+    req
+  );
 
   const user = await prisma.user.findFirstOrThrow({
     where: { id: session?.user.id },

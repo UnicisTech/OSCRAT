@@ -10,7 +10,7 @@ import {
 } from '@oscrat/model';
 
 const normalizeTaskTitle = (title: string) => title.trim();
-type TaskUpdateInput = Record<string, unknown>;
+type TaskUpdateInput = TaskOps.TaskUpdateInput;
 
 export const createTask = async (
   param: {

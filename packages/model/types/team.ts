@@ -104,7 +104,7 @@ export interface TeamCreateData {
 /** Interface for updating team settings via API (user-editable fields only) */
 export interface TeamSettingsUpdate {
   name?: string;
-  domain?: string;
+  domain?: string | null;
   type?: OscratOrganizationType;
   size?: OscratOrganizationSize;
   orgRoles?: OscratOrganizationRole[];

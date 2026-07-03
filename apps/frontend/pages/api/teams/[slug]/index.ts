@@ -2,9 +2,8 @@ import { deleteTeam, getTeamDetail, updateTeam } from 'models/team';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
-import { validateDomain } from '@/lib/common';
-import { ApiError } from '@/lib/errors';
-import type { TeamSettingsUpdate } from '@oscrat/model';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { teamSettingsSchema } from '@/lib/validation/team';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -48,18 +47,8 @@ const handlePUT = async (
 ) => {
   const { teamMember, user } = req.teamContext;
 
-  // Cast to TeamSettingsUpdate - only user-editable fields
-  const updateData = req.body as TeamSettingsUpdate;
+  const updateData = await parseBody(teamSettingsSchema, req);
 
-  if (
-    updateData.domain &&
-    updateData.domain.length > 0 &&
-    !validateDomain(updateData.domain)
-  ) {
-    throw new ApiError(400, 'Invalid domain name');
-  }
-
-  // Update team - Prisma will ignore undefined fields
   const updatedTeam = await updateTeam(teamMember.teamSlug, updateData, {
     user,
     team: { id: teamMember.teamId, name: teamMember.teamName },

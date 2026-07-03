@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 import {
   TaskStatus,
+  TaskOriginType,
   CONFIGURATION_SEVERITY,
   TASK_CONFIGURATION_PROPERTY_KEYS,
   TASK_CSC_PROPERTY_KEYS,
@@ -79,6 +80,10 @@ export const createTaskCreateSchema = () =>
     duedate: Yup.date().required('oscrat.ui.validation.task-due-date-required'),
     productId: Yup.string().optional(),
     versionId: Yup.string().optional(),
+    originType: Yup.mixed<TaskOriginType>()
+      .oneOf(Object.values(TaskOriginType))
+      .optional(),
+    properties: taskPropertiesSchema.optional(),
   });
 
 // Localized/automatic tasks (e.g. awareness training) store their title and
@@ -101,6 +106,7 @@ export const createTaskUpdateSchema = (options?: {
       .optional(),
     duedate: Yup.date().optional(),
     assigneeId: Yup.string().nullable().optional(),
+    properties: taskPropertiesSchema.optional(),
   });
 
 export type TaskCreateData = Yup.InferType<

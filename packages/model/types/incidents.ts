@@ -77,16 +77,16 @@ export interface OscratIncidentCreate {
   reporterId: string;
   dateOfDetection: Date;
   severity: IncidentSeverity;
-  handlingDate?: Date;
+  handlingDate?: Date | null;
   description: string;
   correctiveActions?: string;
   rootCause?: string;
   scope: string;
   preventiveActions?: string;
   suspectedUnlawfulAct?: boolean;
-  unlawfulActDescription?: string;
+  unlawfulActDescription?: string | null;
   crossBorderImpact?: boolean;
-  crossBorderImpactDetails?: string;
+  crossBorderImpactDetails?: string | null;
   attachmentIds?: string[];
   createdBy: string;
 }
@@ -100,16 +100,16 @@ export interface OscratIncidentUpdate {
   reporterId?: string;
   dateOfDetection?: Date;
   severity?: IncidentSeverity;
-  handlingDate?: Date;
+  handlingDate?: Date | null;
   description?: string;
   correctiveActions?: string;
   rootCause?: string;
   scope?: string;
   preventiveActions?: string;
   suspectedUnlawfulAct?: boolean;
-  unlawfulActDescription?: string;
+  unlawfulActDescription?: string | null;
   crossBorderImpact?: boolean;
-  crossBorderImpactDetails?: string;
+  crossBorderImpactDetails?: string | null;
   attachmentIds?: string[];
   updatedBy: string;
 }

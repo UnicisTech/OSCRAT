@@ -4,6 +4,8 @@ import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratProductVersionCreate } from '@oscrat/model';
 import { ApiError } from '@/lib/errors';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { versionCreateSchema } from '@/lib/validation/version';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -48,16 +50,11 @@ const handlePOST = async (
   const { teamMember } = req.teamContext;
 
   const { productId } = req.query;
-  const versionData = req.body as OscratProductVersionCreate;
+  const versionData = await parseBody(versionCreateSchema, req);
 
-  // Ensure the productId matches the URL parameter
-  if (versionData.productId !== productId) {
-    throw new ApiError(400, 'Product ID in body must match URL parameter');
-  }
-
-  // Add createdBy field from the authenticated user
   const createData: OscratProductVersionCreate = {
     ...versionData,
+    productId: productId as string,
     createdBy: teamMember.userId,
   };
 

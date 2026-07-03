@@ -70,12 +70,21 @@ export const createTask = async (
   });
 };
 
+export interface TaskUpdateInput {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+  duedate?: string;
+  assigneeId?: string | null;
+  properties?: TaskProperties;
+}
+
 /** Update a task by task number and team slug */
 export const updateTask = async (
   prisma: PrismaClient,
   taskNumber: number,
   slug: string,
-  data: any,
+  data: TaskUpdateInput,
   auditInfo: AuditInfo
 ) => {
   return await prisma.$transaction(async (tx) => {
@@ -94,11 +103,16 @@ export const updateTask = async (
       return null;
     }
 
+    const { properties, ...rest } = data;
+
     const updatedTask = await tx.task.update({
       where: {
         id: taskToEdit.id,
       },
-      data: data,
+      data: {
+        ...rest,
+        ...(properties !== undefined && { properties: toJsonInput(properties) }),
+      },
     });
 
     await logUpdate(EntityType.Task, audit, { ...taskToEdit, id: String(taskToEdit.id), name: taskToEdit.title }, { ...updatedTask, id: String(updatedTask.id), name: updatedTask.title });

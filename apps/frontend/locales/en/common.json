@@ -1163,7 +1163,11 @@
         "no-file-uploaded": "No file uploaded",
         "exactly-one-file-required": "Exactly one file must be uploaded",
         "car-invalid-file-type": "Only PDF and Excel (XLS/XLSX) files are allowed for Conformity Assessment Reports.",
-        "doc-invalid-file-type": "Only PDF files are allowed for Declaration of Conformity."
+        "doc-invalid-file-type": "Only PDF files are allowed for Declaration of Conformity.",
+        "assessment-type-required": "Assessment type is required",
+        "assessment-type-invalid": "Please select a valid assessment type",
+        "schema-version-required": "Schema version is required",
+        "raw-data-required": "Assessment data is required"
       },
       "messages": {
         "saving": "Saving...",
