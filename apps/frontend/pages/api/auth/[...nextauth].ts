@@ -5,8 +5,8 @@ import { ApiError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { Role } from '@oscrat/model';
-import { getAccount } from 'models/account';
-import { addTeamMember, getTeam, getTeamDetail } from 'models/team';
+import { getLinkedAccount } from 'models/account';
+import { addTeamMember, getTeamDetail } from 'models/team';
 import { createUser, getUser } from 'models/user';
 import { ensureAwarenessTrainingTask } from 'models/task';
 import NextAuth, { Account, NextAuthOptions, Profile, User } from 'next-auth';
@@ -17,6 +17,7 @@ import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 import { isAuthProviderEnabled } from '@/lib/auth';
 import type { Provider } from 'next-auth/providers';
+import type { NextApiRequest } from 'next';
 import { validateRecaptcha } from '@/lib/recaptcha';
 import rateLimit from '@/lib/rate-limit';
 import { getIpAddress } from '@/lib/utils';
@@ -41,8 +42,8 @@ if (isAuthProviderEnabled('credentials')) {
       },
       async authorize(credentials, req) {
         try {
-          await limiter.check(5, getIpAddress(req as any)); // 5 requests per minute for IP address
-        } catch (e) {
+          await limiter.check(5, getIpAddress(req as NextApiRequest)); // 5 requests per minute for IP address
+        } catch {
           throw new Error('auth-limited');
         }
 
@@ -92,7 +93,6 @@ if (isAuthProviderEnabled('github')) {
     GitHubProvider({
       clientId: env.github.clientId,
       clientSecret: env.github.clientSecret,
-      allowDangerousEmailAccountLinking: true,
     })
   );
 }
@@ -102,7 +102,6 @@ if (isAuthProviderEnabled('google')) {
     GoogleProvider({
       clientId: env.google.clientId,
       clientSecret: env.google.clientSecret,
-      allowDangerousEmailAccountLinking: true,
     })
   );
 }
@@ -114,7 +113,6 @@ if (isAuthProviderEnabled('saml')) {
       issuer: env.appUrl,
       clientId: 'dummy',
       clientSecret: 'dummy',
-      allowDangerousEmailAccountLinking: true,
       httpOptions: {
         timeout: 30000,
       },
@@ -204,6 +202,14 @@ export const authOptions: NextAuthOptions = {
 
       // First time users
       if (!existingUser) {
+        if (
+          account.provider === 'google' &&
+          profile &&
+          (profile as { email_verified?: boolean }).email_verified === false
+        ) {
+          return '/auth/login?error=email-unverified';
+        }
+
         const [firstName, lastName] = user.name?.split(' ') || ['', ''];
 
         const newUser = await createUser({
@@ -222,14 +228,20 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
 
-      // Existing users reach here
-      const linkedAccount = await getAccount({ userId: existingUser.id });
+      const linkedAccount = await getLinkedAccount({
+        provider: account.provider,
+        providerAccountId: account.providerAccountId,
+      });
 
-      if (!linkedAccount) {
-        await linkAccount(existingUser, account);
+      if (linkedAccount && linkedAccount.userId === existingUser.id) {
+        return true;
       }
 
-      return true;
+      console.warn(
+        `[auth] refused to link ${account.provider} identity to existing ` +
+          `account for ${user.email} — identity not previously linked.`
+      );
+      return '/auth/login?error=account-exists';
     },
 
     async session({ session, token }) {
@@ -288,21 +300,12 @@ const linkToTeam = async (
   const roles = profile.roles || profile.groups || [];
   let userRole: Role = team.defaultRole || Role.MEMBER;
 
-  for (let role of roles) {
-    if (env.groupPrefix) {
-      role = role.replace(env.groupPrefix, '');
-    }
-    // Owner > Admin > Member
-    if (
-      role.toUpperCase() === Role.ADMIN &&
-      userRole.toUpperCase() !== Role.OWNER.toUpperCase()
-    ) {
+  if (env.groupPrefix && userRole === Role.MEMBER) {
+    const grantsAdmin = roles.some(
+      (role) => role.replace(env.groupPrefix!, '').toUpperCase() === Role.ADMIN
+    );
+    if (grantsAdmin) {
       userRole = Role.ADMIN;
-      continue;
-    }
-    if (role.toUpperCase() === Role.OWNER) {
-      userRole = Role.OWNER;
-      break;
     }
   }
 

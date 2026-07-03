@@ -1,7 +1,15 @@
 import { prisma } from '@/lib/prisma';
 
-export const getAccount = async (key: { userId: string }) => {
-  return await prisma.account.findFirst({
-    where: key,
+export const getLinkedAccount = async (key: {
+  provider: string;
+  providerAccountId: string;
+}) => {
+  return await prisma.account.findUnique({
+    where: {
+      provider_providerAccountId: {
+        provider: key.provider,
+        providerAccountId: key.providerAccountId,
+      },
+    },
   });
 };
