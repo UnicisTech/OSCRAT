@@ -35,7 +35,7 @@ export default function Sbom() {
   const createSbomReportVulnerabilityScanMutation =
     useCreateSbomReportVulnerabilityScan(teamId, productId, versionId);
 
-  const { downloadAttachment } = useAttachments();
+  const { downloadAttachment } = useAttachments(teamId);
   const handleCreateRepoSbomReport = async () => {
     if (!repository?.id) {
       toast.error(t('oscrat.ui.repository-not-configured'));

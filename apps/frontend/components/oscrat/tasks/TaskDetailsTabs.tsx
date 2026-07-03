@@ -215,7 +215,11 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     filename: string
   ) => {
     try {
-      await downloadMutation.mutateAsync({ attachmentId, filename });
+      await downloadMutation.mutateAsync({
+        slug: team.slug,
+        attachmentId,
+        filename,
+      });
     } catch (error: unknown) {
       toast.error(
         extractErrorMessage(error, t('oscrat.ui.failed-to-download'))

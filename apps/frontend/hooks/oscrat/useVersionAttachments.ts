@@ -13,7 +13,7 @@ export function useVersionAttachments(
   filters?: AttachmentEntityFilters
 ) {
   // Get common attachment functionality
-  const baseAttachments = useAttachments();
+  const baseAttachments = useAttachments(teamId);
 
   const {
     data: attachments,

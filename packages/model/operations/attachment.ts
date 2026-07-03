@@ -143,6 +143,10 @@ export const getAttachmentById = async (
   });
 };
 
+/**
+ * WARNING: no ownership check — do not use for user-facing downloads.
+ * Use getAttachmentWithFileForTeam for anything reachable by a request.
+ */
 export const getAttachmentWithFileById = async (
   prisma: PrismaClient,
   attachmentId: string
@@ -153,6 +157,36 @@ export const getAttachmentWithFileById = async (
 
   return await prisma.attachment.findUnique({
     where: { id: attachmentId },
+    include: {
+      file: true,
+    },
+  });
+};
+
+export const getAttachmentWithFileForTeam = async (
+  prisma: PrismaClient,
+  attachmentId: string,
+  teamId: string
+): Promise<AttachmentWithFile | null> => {
+  console.log(
+    `[Attachment Operations] Getting attachment with file data for team ${teamId}: ${attachmentId}`
+  );
+
+  return await prisma.attachment.findFirst({
+    where: {
+      id: attachmentId,
+      OR: [
+        { task: { teamId } },
+        { version: { teamId } },
+        { incident: { teamId } },
+        { documentation: { teamId } },
+        { assessment: { teamId } },
+        { vulnerability: { version: { product: { teamId } } } },
+        { sbomReport: { version: { product: { teamId } } } },
+        { vulnerabilityScanReport: { version: { product: { teamId } } } },
+        { configurationScanReport: { version: { product: { teamId } } } },
+      ],
+    },
     include: {
       file: true,
     },

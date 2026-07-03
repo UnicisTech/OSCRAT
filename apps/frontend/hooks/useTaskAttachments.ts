@@ -17,7 +17,7 @@ export interface AttachmentUploadData {
  */
 export function useTaskAttachments(slug: string, taskNumber: string) {
   // Get common attachment functionality
-  const baseAttachments = useAttachments();
+  const baseAttachments = useAttachments(slug);
 
   const uploadMutation = useUploadTaskAttachment(slug, taskNumber);
   const deleteMutation = useDeleteTaskAttachment(slug, taskNumber);

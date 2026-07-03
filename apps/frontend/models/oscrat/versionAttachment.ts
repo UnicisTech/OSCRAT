@@ -53,10 +53,6 @@ export const getVersionAttachmentById = async (
   return await AttachmentOps.getAttachmentById(prisma, attachmentId);
 };
 
-export const getVersionAttachmentWithData = async (attachmentId: string) => {
-  return await AttachmentOps.getAttachmentWithFileById(prisma, attachmentId);
-};
-
 export const deleteVersionAttachment = async (
   attachmentId: string,
   auditInfo?: AuditInfo

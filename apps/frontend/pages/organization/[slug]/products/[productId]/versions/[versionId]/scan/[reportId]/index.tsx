@@ -356,7 +356,7 @@ export default function VulnerabilityScanSummary() {
     { enabled: !!reportId }
   );
 
-  const { downloadAttachment } = useAttachments();
+  const { downloadAttachment } = useAttachments(teamId);
 
   const scanData = report?.scanData ?? null;
   const vulnerabilities = scanData?.vulnerabilities ?? [];

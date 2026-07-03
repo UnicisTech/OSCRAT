@@ -1,8 +1,8 @@
 import { api } from '@/lib/api/client';
 
 export const attachmentsEndpoints = {
-  downloadAttachment: (attachmentId: string) =>
-    api.get<Blob>(`/attachments/${attachmentId}/download`, {
+  downloadAttachment: (slug: string, attachmentId: string) =>
+    api.get<Blob>(`/teams/${slug}/attachments/${attachmentId}/download`, {
       responseType: 'blob',
     }),
 };

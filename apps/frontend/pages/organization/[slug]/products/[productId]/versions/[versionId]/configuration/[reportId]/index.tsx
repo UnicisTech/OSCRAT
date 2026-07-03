@@ -379,7 +379,7 @@ export default function ConfigurationScanSummaryPage() {
     { enabled: !!reportId }
   );
 
-  const { downloadAttachment } = useAttachments();
+  const { downloadAttachment } = useAttachments(teamId);
 
   const summary = report?.scanData ?? null;
   const sortedRules = useMemo(

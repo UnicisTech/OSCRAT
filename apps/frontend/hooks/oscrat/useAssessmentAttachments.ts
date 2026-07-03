@@ -10,7 +10,7 @@ export function useAssessmentAttachments(
   assessmentId: string,
   options?: { enabled?: boolean }
 ) {
-  const baseAttachments = useAttachments();
+  const baseAttachments = useAttachments(teamSlug);
 
   const enabled = options?.enabled !== false && !!assessmentId;
 

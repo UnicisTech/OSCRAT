@@ -54,6 +54,6 @@ export const docEndpoints = {
     ),
 
   // Generic attachment download - used for CAR/DoC downloads
-  downloadAttachment: (attachmentId: string) =>
-    `/api/attachments/${attachmentId}/download`,
+  downloadAttachment: (teamId: string, attachmentId: string) =>
+    `/api/teams/${teamId}/attachments/${attachmentId}/download`,
 };

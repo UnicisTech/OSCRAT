@@ -28,7 +28,7 @@ export default function Configuration() {
     refreshReports,
   } = useOscratVersionConfigurationScanReports(teamId, productId, versionId);
 
-  const { downloadAttachment } = useAttachments();
+  const { downloadAttachment } = useAttachments(teamId);
 
   const handleFileImportAsReport = async (file: File) => {
     try {

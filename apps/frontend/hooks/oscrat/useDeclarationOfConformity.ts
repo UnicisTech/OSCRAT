@@ -56,10 +56,10 @@ export function useDeclarationOfConformity(
   };
 
   const carDownloadUrl = carData?.id
-    ? docEndpoints.downloadAttachment(carData.id)
+    ? docEndpoints.downloadAttachment(teamId, carData.id)
     : '';
   const docDownloadUrl = docData?.id
-    ? docEndpoints.downloadAttachment(docData.id)
+    ? docEndpoints.downloadAttachment(teamId, docData.id)
     : '';
 
   const isLoading =

@@ -536,6 +536,10 @@ export const getTeamMember = async (
   userId: string,
   slug: string
 ): Promise<TeamMemberDetail | null> => {
+  if (!slug) {
+    return null;
+  }
+
   const member = await prisma.teamMember.findFirst({
     where: {
       userId,

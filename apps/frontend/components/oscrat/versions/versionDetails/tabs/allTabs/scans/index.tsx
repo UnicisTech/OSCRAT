@@ -18,7 +18,7 @@ export default function Vulnerabilities() {
   const { reports, deleteVulnerabilityScanReport, refreshReports } =
     useOscratVersionVulnerabilityScanReports(teamId, productId, versionId);
 
-  const { downloadAttachment } = useAttachments();
+  const { downloadAttachment } = useAttachments(teamId);
 
   const handleRefresh = async () => {
     await refreshReports();

@@ -1,7 +1,7 @@
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import {
-  getAttachmentWithFileById,
+  getAttachmentWithFileForTeam,
   getAttachmentLinkedEntity,
 } from '@oscrat/model/operations';
 import { createAuditContext, CrudType, EntityType } from '@oscrat/model/audit';
@@ -30,19 +30,18 @@ const handleGET = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
+  const { teamMember } = req.teamContext;
   const { attachmentId } = req.query;
 
-  const attachment = await getAttachmentWithFileById(
+  const attachment = await getAttachmentWithFileForTeam(
     prisma,
-    attachmentId as string
+    attachmentId as string,
+    teamMember.teamId
   );
 
   if (!attachment) {
     throw new ApiError(404, 'oscrat.ui.validation.attachment-not-found');
   }
-
-  // TODO: Implement proper access control based on attachment's linked entity
-  // For now, rely on team auth middleware for basic access control
 
   const audit = createAuditContext(prisma, {
     ...req.auditInfo,

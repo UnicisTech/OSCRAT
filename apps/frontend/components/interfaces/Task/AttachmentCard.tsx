@@ -33,7 +33,10 @@ export default function AttachmentsCard({
   return (
     <div className="flex w-full flex-row items-center justify-between rounded-md p-2 text-center">
       <a
-        href={attachment.url || `/api/attachments/${attachment.id}/download`}
+        href={
+          attachment.url ||
+          `/api/teams/${teamSlug}/attachments/${attachment.id}/download`
+        }
         target="_blank"
         rel="noreferrer"
       >

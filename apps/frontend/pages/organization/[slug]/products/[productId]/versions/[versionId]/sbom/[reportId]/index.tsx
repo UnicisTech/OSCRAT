@@ -235,7 +235,7 @@ export default function SbomSummary() {
     { enabled: !!reportId }
   );
 
-  const { downloadAttachment } = useAttachments();
+  const { downloadAttachment } = useAttachments(teamId);
 
   const sbomData = report?.sbomData as any;
 
