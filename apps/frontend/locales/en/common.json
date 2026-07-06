@@ -791,6 +791,7 @@
       "assigner": "Assigner",
       "references": "References",
       "show-more": "Show More",
+      "show-less": "Show Less",
       "withdraw": "Withdraw",
       "withdraw-product": "Withdraw Product",
       "withdraw-product-confirmation": "Are you sure you want to withdraw this product? You can reactivate it at any time.",

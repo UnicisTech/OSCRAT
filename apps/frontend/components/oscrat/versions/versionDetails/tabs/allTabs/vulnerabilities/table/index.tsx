@@ -113,23 +113,38 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
   return (
     <div className="w-full">
       <TableWrapper>
-        <table className="text-content-secondary w-full text-left text-sm">
+        <table className={tableStyles.table}>
           <TableHeader
             columns={[
-              { label: t('oscrat.ui.versions.vulnerabilities.table-name') },
-              { label: t('oscrat.ui.versions.vulnerabilities.table-status') },
-              { label: t('oscrat.ui.versions.vulnerabilities.table-severity') },
+              {
+                label: t('oscrat.ui.versions.vulnerabilities.table-name'),
+                className: 'w-[22%]',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerabilities.table-status'),
+                className: 'w-[13%]',
+              },
+              {
+                label: t('oscrat.ui.versions.vulnerabilities.table-severity'),
+                className: 'w-[10%]',
+              },
               {
                 label: t(
                   'oscrat.ui.versions.vulnerabilities.table-date-of-discovery'
                 ),
+                className: 'w-[12%]',
               },
               {
                 label: t(
                   'oscrat.ui.versions.vulnerabilities.table-description'
                 ),
+                className: 'w-[20%]',
               },
-              { label: t('actions'), srOnly: true },
+              {
+                label: t('actions'),
+                srOnly: true,
+                className: 'w-[23%]',
+              },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -140,10 +155,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                 onClick={() => handleViewDetails(vulnerability.id)}
               >
                 <td className={tableStyles.td}>
-                  <div
-                    className="max-w-[200px] truncate"
-                    title={vulnerability.name}
-                  >
+                  <div className="truncate" title={vulnerability.name}>
                     {vulnerability.name}
                   </div>
                 </td>
@@ -161,7 +173,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                 </td>
                 <td className={tableStyles.td}>
                   <div
-                    className="max-w-[300px] truncate"
+                    className="truncate"
                     title={vulnerability.description}
                   >
                     {vulnerability.description}
@@ -169,7 +181,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                 </td>
                 <td className={tableStyles.td}>
                   <div
-                    className="flex items-center gap-2"
+                    className="flex items-center justify-end gap-2"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ActionButton

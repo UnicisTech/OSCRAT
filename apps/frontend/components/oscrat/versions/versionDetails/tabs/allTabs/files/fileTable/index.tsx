@@ -79,22 +79,31 @@ const FileTable: React.FC<FileTableProps> = ({
                 </td>
               </tr>
             )}
-            {pageData.map((attachment) => (
+            {pageData.map((attachment) => {
+              const addedByName = attachment.createdByUser
+                ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
+                  attachment.createdByUser.name
+                : t('oscrat.ui.unknown');
+              const descriptionText =
+                attachment.description || t('oscrat.ui.no-description');
+              return (
               <TableRow key={attachment.id}>
                 <td className={tableStyles.td}>
-                  <div className="font-medium">{attachment.name}</div>
+                  <div
+                    className="truncate font-medium"
+                    title={attachment.name}
+                  >
+                    {attachment.name}
+                  </div>
                 </td>
-                <td className={tableStyles.td}>
-                  {attachment.description || t('oscrat.ui.no-description')}
+                <td className={tableStyles.td} title={descriptionText}>
+                  {descriptionText}
                 </td>
                 <td className={tableStyles.td}>
                   {formatDateShort(attachment.createdAt)}
                 </td>
-                <td className={tableStyles.td}>
-                  {attachment.createdByUser
-                    ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
-                      attachment.createdByUser.name
-                    : t('oscrat.ui.unknown')}
+                <td className={tableStyles.td} title={addedByName}>
+                  {addedByName}
                 </td>
                 <td className={`${tableStyles.td} text-right`}>
                   <div className="flex items-center justify-end space-x-1">
@@ -133,7 +142,8 @@ const FileTable: React.FC<FileTableProps> = ({
                   </div>
                 </td>
               </TableRow>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </TableWrapper>

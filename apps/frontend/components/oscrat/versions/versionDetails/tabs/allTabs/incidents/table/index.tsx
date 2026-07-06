@@ -19,7 +19,6 @@ import {
 import {
   INCIDENT_STATUS_MAP,
   INCIDENT_CLASSIFICATION_MAP,
-  INCIDENT_ATTACK_TYPE_MAP,
   INCIDENT_SEVERITY_MAP,
 } from '@/utils/incidentEnumMaps';
 import { LISTING_PAGE_SIZE } from '@/constants/pagination';
@@ -113,17 +112,34 @@ const Table: React.FC<IncidentsTableProps> = ({
   return (
     <div className="w-full">
       <TableWrapper>
-        <table className="text-content-secondary w-full text-left text-sm">
+        <table className={tableStyles.table}>
           <TableHeader
             columns={[
-              { label: t('oscrat.ui.versions.incidents.table-name') },
-              { label: t('oscrat.ui.versions.incidents.table-status') },
-              { label: t('oscrat.ui.versions.incidents.table-classification') },
-              { label: t('oscrat.ui.versions.incidents.table-attack-type') },
-              { label: t('oscrat.ui.versions.incidents.table-severity') },
-              { label: t('oscrat.ui.versions.incidents.table-date-detected') },
-              { label: t('oscrat.ui.versions.incidents.table-reporter') },
-              { label: t('actions'), srOnly: true },
+              {
+                label: t('oscrat.ui.versions.incidents.table-name'),
+                className: 'w-[22%]',
+              },
+              {
+                label: t('oscrat.ui.versions.incidents.table-status'),
+                className: 'w-[13%]',
+              },
+              {
+                label: t('oscrat.ui.versions.incidents.table-classification'),
+                className: 'w-[15%]',
+              },
+              {
+                label: t('oscrat.ui.versions.incidents.table-severity'),
+                className: 'w-[10%]',
+              },
+              {
+                label: t('oscrat.ui.versions.incidents.table-date-detected'),
+                className: 'w-[13%]',
+              },
+              {
+                label: t('actions'),
+                srOnly: true,
+                className: 'w-[27%]',
+              },
             ]}
           />
           <tbody className={tableStyles.tbody}>
@@ -135,7 +151,7 @@ const Table: React.FC<IncidentsTableProps> = ({
               >
                 <td className={tableStyles.td}>
                   <div
-                    className="max-w-[200px] truncate font-medium"
+                    className="truncate font-medium"
                     title={incident.name || ''}
                   >
                     {incident.name || (
@@ -150,20 +166,12 @@ const Table: React.FC<IncidentsTableProps> = ({
                 </td>
                 <td className={tableStyles.td}>
                   <div
-                    className="max-w-[150px] truncate"
+                    className="truncate"
                     title={t(
                       INCIDENT_CLASSIFICATION_MAP[incident.classification]
                     )}
                   >
                     {t(INCIDENT_CLASSIFICATION_MAP[incident.classification])}
-                  </div>
-                </td>
-                <td className={tableStyles.td}>
-                  <div
-                    className="max-w-[150px] truncate"
-                    title={t(INCIDENT_ATTACK_TYPE_MAP[incident.attackType])}
-                  >
-                    {t(INCIDENT_ATTACK_TYPE_MAP[incident.attackType])}
                   </div>
                 </td>
                 <td className={tableStyles.td}>
@@ -176,15 +184,7 @@ const Table: React.FC<IncidentsTableProps> = ({
                   {formatDateShort(incident.dateOfDetection)}
                 </td>
                 <td className={tableStyles.td}>
-                  <div
-                    className="max-w-[150px] truncate"
-                    title={incident.reporter.name}
-                  >
-                    {incident.reporter.name}
-                  </div>
-                </td>
-                <td className={tableStyles.td}>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-end gap-2">
                     <ActionButton
                       onClick={(e) => {
                         e.stopPropagation();
@@ -212,7 +212,7 @@ const Table: React.FC<IncidentsTableProps> = ({
             {!sortedIncidents.length && (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={6}
                   className="text-content-muted px-6 py-8 text-center text-sm"
                 >
                   {t('oscrat.ui.versions.incidents.no-incidents-added')}

@@ -100,7 +100,19 @@ const Table: React.FC<VersionLogTableProps> = ({
                 </td>
               </tr>
             )}
-            {logs.map((log) => (
+            {logs.map((log) => {
+              const userLabel = log.userName || log.userId;
+              const actionLabel = t(getAuditActionTranslationKey(log.action), {
+                defaultValue: log.action,
+              });
+              const targetTypeLabel = t(
+                oscratEntityTypeTranslationMap[log.targetType],
+                { defaultValue: log.targetType }
+              );
+              const targetNameLabel = log.targetName
+                ? formatNameWithUuidFallback(log.targetName, t)
+                : '';
+              return (
               <TableRow key={log.id}>
                 <td className={tableStyles.td}>
                   <span className="text-content-secondary text-sm">
@@ -108,34 +120,40 @@ const Table: React.FC<VersionLogTableProps> = ({
                   </span>
                 </td>
                 <td className={tableStyles.td}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">
-                      {log.userName || log.userId}
+                  <div className="flex min-w-0 flex-col">
+                    <span
+                      className="truncate font-medium"
+                      title={userLabel}
+                    >
+                      {userLabel}
                     </span>
                     {log.userEmail && (
-                      <span className="text-content-muted text-xs">
+                      <span
+                        className="text-content-muted truncate text-xs"
+                        title={log.userEmail}
+                      >
                         {log.userEmail}
                       </span>
                     )}
                   </div>
                 </td>
-                <td className={tableStyles.td}>
-                  <span className="text-sm">
-                    {t(getAuditActionTranslationKey(log.action), {
-                      defaultValue: log.action,
-                    })}
-                  </span>
+                <td className={tableStyles.td} title={actionLabel}>
+                  <span className="text-sm">{actionLabel}</span>
                 </td>
                 <td className={tableStyles.td}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">
-                      {t(oscratEntityTypeTranslationMap[log.targetType], {
-                        defaultValue: log.targetType,
-                      })}
+                  <div className="flex min-w-0 flex-col">
+                    <span
+                      className="truncate font-medium"
+                      title={targetTypeLabel}
+                    >
+                      {targetTypeLabel}
                     </span>
-                    {log.targetName && (
-                      <span className="text-content-muted text-xs">
-                        {formatNameWithUuidFallback(log.targetName, t)}
+                    {targetNameLabel && (
+                      <span
+                        className="text-content-muted truncate text-xs"
+                        title={targetNameLabel}
+                      >
+                        {targetNameLabel}
                       </span>
                     )}
                   </div>
@@ -152,7 +170,8 @@ const Table: React.FC<VersionLogTableProps> = ({
                   )}
                 </td>
               </TableRow>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </TableWrapper>

@@ -19,15 +19,23 @@ const EmailLayout = ({ children }: EmailLayoutProps) => {
   // Emails are rendered outside the app, so relative asset paths do not
   // resolve. Build an absolute URL to a raster (PNG) logo so it loads in mail
   // clients (SVG is unsupported by most clients, and a relative path falls
-  // back to the <Img> alt text).
-  const baseUrl = env.appUrl || env.publicAppUrl;
+  // back to the <Img> alt text). Trailing slashes on APP_URL would produce
+  // `//logo-oscrat.png` which some proxies (incl. Brevo's image fetcher)
+  // treat as 404 and cache permanently.
+  const baseUrl = (env.appUrl || env.publicAppUrl).replace(/\/+$/, '');
   const logoSrc = `${baseUrl}${app.emailLogoUrl}`;
 
   return (
     <Tailwind>
       <Body className="bg-surface mx-auto my-auto font-sans">
         <Container className="bg-surface mx-auto my-[40px] w-[465px] rounded border border-solid border-[#f0f0f0] p-[20px]">
-          <Img src={logoSrc} alt={app.name} className="mx-auto my-8" />
+          <Img
+            src={logoSrc}
+            alt={app.name}
+            width="200"
+            height="60"
+            style={{ display: 'block', margin: '32px auto' }}
+          />
 
           <Section>
             {children}

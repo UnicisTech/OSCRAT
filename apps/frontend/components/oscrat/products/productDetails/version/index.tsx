@@ -42,27 +42,26 @@ const Version: React.FC<VersionProps> = ({
     />
   );
 
-  // If status is not supported, show simplified variant
+  // Same grid template is used on every row of a given tab so that titles,
+  // meta fields and the trailing button line up column-by-column across rows.
+  // The title cell uses `minmax(0,1fr)` so it flexes/truncates instead of
+  // pushing the fixed-width meta columns around.
   if (variant === 'notSupported') {
     return (
       <Card className="flex flex-col gap-2">
-        <div className="flex items-center">
-          <div className="flex flex-1 flex-col justify-center">
-            <div className="text-h6 text-content font-bold">
-              {t('version')} - {title}
-            </div>
+        <div className="flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,1fr)_180px_auto] md:items-center md:gap-8">
+          <div className="text-h6 text-content min-w-0 truncate font-bold">
+            {t('version')} - {title}
           </div>
 
-          <div className="flex items-center gap-4">
-            <MetaField label={t('status')}>
-              <StatusPill
-                status={status}
-                label={t(getProductVersionStatusKey(status))}
-              />
-            </MetaField>
-          </div>
+          <MetaField label={t('status')}>
+            <StatusPill
+              status={status}
+              label={t(getProductVersionStatusKey(status))}
+            />
+          </MetaField>
 
-          <div className="ml-12 flex flex-1 justify-end">{showMoreButton}</div>
+          <div className="flex justify-end">{showMoreButton}</div>
         </div>
       </Card>
     );
@@ -70,38 +69,36 @@ const Version: React.FC<VersionProps> = ({
 
   return (
     <Card className="flex flex-col gap-2">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-8">
-        <div className="text-h6 text-content font-bold">
+      <div className="flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,1fr)_140px_140px_160px_120px_auto] md:items-center md:gap-6">
+        <div className="text-h6 text-content min-w-0 truncate font-bold">
           {t('version')} - {title}
         </div>
 
-        <div className="text-content-secondary text-b2 flex flex-wrap items-start gap-8">
-          <MetaField className="min-w-0" label={t('status')}>
-            <StatusPill
-              status={status}
-              label={t(getProductVersionStatusKey(status))}
-            />
-          </MetaField>
-          <MetaField className="min-w-0" label={t('oscrat.ui.incidents')}>
-            <CountChip
-              count={data.openIncidents}
-              displayText={openLabel(data.openIncidents)}
-            />
-          </MetaField>
-          <MetaField className="min-w-0" label={t('oscrat.ui.vulnerabilities')}>
-            <CountChip
-              count={data.openVulnerabilities}
-              displayText={openLabel(data.openVulnerabilities)}
-            />
-          </MetaField>
-          <MetaField className="min-w-0" label={t('oscrat.ui.tasks.title')}>
-            <CountChip
-              count={data.openTasks}
-              displayText={openLabel(data.openTasks)}
-              iconClassName="text-primary"
-            />
-          </MetaField>
-        </div>
+        <MetaField className="min-w-0" label={t('status')}>
+          <StatusPill
+            status={status}
+            label={t(getProductVersionStatusKey(status))}
+          />
+        </MetaField>
+        <MetaField className="min-w-0" label={t('oscrat.ui.incidents')}>
+          <CountChip
+            count={data.openIncidents}
+            displayText={openLabel(data.openIncidents)}
+          />
+        </MetaField>
+        <MetaField className="min-w-0" label={t('oscrat.ui.vulnerabilities')}>
+          <CountChip
+            count={data.openVulnerabilities}
+            displayText={openLabel(data.openVulnerabilities)}
+          />
+        </MetaField>
+        <MetaField className="min-w-0" label={t('oscrat.ui.tasks.title')}>
+          <CountChip
+            count={data.openTasks}
+            displayText={openLabel(data.openTasks)}
+            iconClassName="text-primary"
+          />
+        </MetaField>
 
         <div className="flex justify-end">{showMoreButton}</div>
       </div>

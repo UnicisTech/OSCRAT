@@ -181,7 +181,8 @@ const AssessmentLanguageSelector: React.FC<Props> = ({
         {isAssessmentCompleted ? (
           <Button
             type="button"
-            variant="secondary"
+            tone="danger"
+            variant="primary"
             startIcon={<FaRedo />}
             onClick={() => setIsResetModalOpen(true)}
             disabled={!onReset || isResetting}

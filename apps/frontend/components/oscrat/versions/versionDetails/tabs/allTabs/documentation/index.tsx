@@ -160,8 +160,13 @@ export default function Documentation() {
                     className="hover:bg-surface-muted cursor-pointer transition-colors"
                   >
                     <td className={tableStyles.td}>
-                      <div className="font-medium">{doc.title}</div>
-                      <div className="text-content-muted text-xs">
+                      <div className="truncate font-medium" title={doc.title}>
+                        {doc.title}
+                      </div>
+                      <div
+                        className="text-content-muted truncate text-xs"
+                        title={doc.version}
+                      >
                         {doc.version}
                       </div>
                     </td>

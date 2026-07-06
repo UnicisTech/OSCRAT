@@ -108,24 +108,27 @@ const TaskTable: React.FC<TaskTableProps> = ({
                 </td>
               </tr>
             ) : (
-              tasks.map((task) => (
+              tasks.map((task) => {
+                const taskLabel = formatTaskLabel(task, t);
+                const assigneeLabel = task.assigneeId
+                  ? memberMap.get(task.assigneeId) || t('assigned')
+                  : t('unassigned');
+                return (
                 <TableRow
                   key={task.id}
                   onClick={() => onViewTask(task.taskNumber)}
                   className="hover:bg-surface-muted cursor-pointer transition-colors"
                 >
                   <td className={tableStyles.td}>
-                    <div className="font-medium">
-                      {formatTaskLabel(task, t)}
+                    <div className="truncate font-medium" title={taskLabel}>
+                      {taskLabel}
                     </div>
                   </td>
                   <td className={tableStyles.td}>
                     {formatDateShort(task.duedate)}
                   </td>
-                  <td className={tableStyles.td}>
-                    {task.assigneeId
-                      ? memberMap.get(task.assigneeId) || t('assigned')
-                      : t('unassigned')}
+                  <td className={tableStyles.td} title={assigneeLabel}>
+                    {assigneeLabel}
                   </td>
                   <td
                     className={tableStyles.td}
@@ -134,7 +137,8 @@ const TaskTable: React.FC<TaskTableProps> = ({
                     <TaskStatusDropdown task={task} team={team} />
                   </td>
                 </TableRow>
-              ))
+                );
+              })
             )}
           </tbody>
         </table>

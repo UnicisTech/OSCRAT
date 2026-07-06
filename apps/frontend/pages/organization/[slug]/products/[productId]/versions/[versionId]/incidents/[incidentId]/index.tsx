@@ -16,7 +16,11 @@ import { FaDownload, FaTrash, FaInfoCircle } from 'react-icons/fa';
 import { IncidentStatus } from '@oscrat/model';
 import normalizeText from '@/utils/normalizeText';
 import { formatDateLong } from '@/utils/dateFormat';
-import { Breadcrumb, FullScreenModal } from '@/components/shared';
+import {
+  Breadcrumb,
+  ClampableText,
+  FullScreenModal,
+} from '@/components/shared';
 import Button from '@/components/button';
 
 function IncidentDetailsPage() {
@@ -148,6 +152,18 @@ function IncidentDetailsPage() {
     );
   }
 
+  // Cap the displayed incident name so a long title cannot push the action
+  // buttons off-screen in the header row. Validation allows up to 100 chars,
+  // so we truncate here rather than at the data layer to avoid invalidating
+  // existing records.
+  const MAX_TITLE_DISPLAY_CHARS = 40;
+  const incidentName = incident.name?.trim();
+  const displayedIncidentName = incidentName
+    ? incidentName.length > MAX_TITLE_DISPLAY_CHARS
+      ? `${incidentName.slice(0, MAX_TITLE_DISPLAY_CHARS)}…`
+      : incidentName
+    : t('oscrat.ui.versions.incidents.incident-details');
+
   const breadcrumbItems = [
     {
       label: t('oscrat.ui.products'),
@@ -175,8 +191,11 @@ function IncidentDetailsPage() {
         <div className="border-line bg-surface rounded-lg border p-6">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h1 className="text-content text-2xl font-bold">
-                {incident.name || t('oscrat.ui.versions.incidents.incident-details')}
+              <h1
+                className="text-content text-2xl font-bold"
+                title={incidentName || undefined}
+              >
+                {displayedIncidentName}
               </h1>
               {incident.name && (
                 <p className="text-content-muted mt-1 text-sm">
@@ -221,13 +240,14 @@ function IncidentDetailsPage() {
                 {normalizeText(incident.attackType)}
               </p>
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.asset-details')}
               </label>
-              <p className="text-content mt-1 text-lg font-semibold">
-                {incident.assetDetails || '-'}
-              </p>
+              <ClampableText
+                text={incident.assetDetails}
+                className="text-content mt-1 text-lg font-semibold"
+              />
             </div>
           </div>
         </div>
@@ -319,43 +339,50 @@ function IncidentDetailsPage() {
               <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.description')}
               </label>
-              <p className="text-content mt-1 text-base">
-                {incident.description}
-              </p>
+              <ClampableText
+                text={incident.description}
+                className="text-content mt-1 text-base"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.corrective-actions')}
               </label>
-              <p className="text-content mt-1 text-base">
-                {incident.correctiveActions || '-'}
-              </p>
+              <ClampableText
+                text={incident.correctiveActions}
+                className="text-content mt-1 text-base"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.root-cause')}
               </label>
-              <p className="text-content mt-1 text-base">
-                {incident.rootCause || '-'}
-              </p>
+              <ClampableText
+                text={incident.rootCause}
+                className="text-content mt-1 text-base"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.scope')}
               </label>
-              <p className="text-content mt-1 text-base">{incident.scope}</p>
+              <ClampableText
+                text={incident.scope}
+                className="text-content mt-1 text-base"
+              />
             </div>
 
             <div className="col-span-2">
               <label className="text-content-muted block text-sm font-medium">
                 {t('oscrat.ui.versions.incidents.preventive-actions')}
               </label>
-              <p className="text-content mt-1 text-base">
-                {incident.preventiveActions || '-'}
-              </p>
+              <ClampableText
+                text={incident.preventiveActions}
+                className="text-content mt-1 text-base"
+              />
             </div>
 
             {incident.suspectedUnlawfulAct && (
@@ -363,9 +390,10 @@ function IncidentDetailsPage() {
                 <label className="text-content-muted block text-sm font-medium">
                   {t('oscrat.ui.versions.incidents.unlawful-act-description')}
                 </label>
-                <p className="text-content mt-1 text-base">
-                  {incident.unlawfulActDescription || '-'}
-                </p>
+                <ClampableText
+                  text={incident.unlawfulActDescription}
+                  className="text-content mt-1 text-base"
+                />
               </div>
             )}
 
@@ -374,9 +402,10 @@ function IncidentDetailsPage() {
                 <label className="text-content-muted block text-sm font-medium">
                   {t('oscrat.ui.versions.incidents.cross-border-details')}
                 </label>
-                <p className="text-content mt-1 text-base">
-                  {incident.crossBorderImpactDetails || '-'}
-                </p>
+                <ClampableText
+                  text={incident.crossBorderImpactDetails}
+                  className="text-content mt-1 text-base"
+                />
               </div>
             )}
           </div>
