@@ -165,7 +165,7 @@ export default function Documentation() {
                       </div>
                       <div
                         className="text-content-muted truncate text-xs"
-                        title={doc.version}
+                        title={String(doc.version)}
                       >
                         {doc.version}
                       </div>
