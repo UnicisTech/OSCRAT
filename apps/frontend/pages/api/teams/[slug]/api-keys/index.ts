@@ -4,6 +4,8 @@ import type { NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import env from '@/lib/env';
 import { ApiError } from '@/lib/errors';
+import { parseBody } from '@/lib/validation/validateRequest';
+import { apiKeyCreateSchema } from '@/lib/validation/apiKey';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -47,7 +49,7 @@ const handlePOST = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const { name } = JSON.parse(req.body) as { name: string };
+  const { name } = await parseBody(apiKeyCreateSchema, req);
 
   const apiKey = await createApiKey({
     name,
