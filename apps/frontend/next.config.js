@@ -5,6 +5,20 @@ const { withGlobalCss } = require('next-global-css');
 
 const withConfig = withGlobalCss();
 
+const csp = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https://api.dicebear.com",
+  "frame-src https://www.google.com",
+  'upgrade-insecure-requests',
+].join('; ');
+
 // Redirect root url to login page; legacy /teams/* → /organization/*
 const redirects = [
   {
@@ -84,6 +98,22 @@ module.exports = withConfig({
           {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: csp,
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
           },
         ],
       },
