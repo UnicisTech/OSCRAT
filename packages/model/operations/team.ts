@@ -536,7 +536,7 @@ export const getTeamMember = async (
   userId: string,
   slug: string
 ): Promise<TeamMemberDetail | null> => {
-  if (!slug) {
+  if (!userId || !slug) {
     return null;
   }
 

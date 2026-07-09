@@ -19,6 +19,8 @@ import {
 } from '@/components/defaultLanding/data/configs/csc';
 import { useTeamTasks } from 'hooks/useTeamTasks';
 import { getCscStatusesBySlug } from 'models/team';
+import { getSession } from '@/lib/session';
+import { getTeamMember, isAllowed } from '@/lib/middleware/auth';
 import type { Option } from 'types';
 import useISO from 'hooks/useISO';
 import { useTeam } from 'hooks/useTeam';
@@ -187,8 +189,18 @@ CscDashboard.getLayout = function getLayout(page: React.ReactNode) {
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { locale, query }: GetServerSidePropsContext = context;
+  const { locale, req, res, query }: GetServerSidePropsContext = context;
   const slug = query.slug as string;
+
+  const session = await getSession(req, res);
+  if (!session) {
+    return { notFound: true };
+  }
+
+  const teamMember = await getTeamMember(session.user.id, slug);
+  if (!teamMember || !isAllowed(teamMember.role, 'team', 'read')) {
+    return { notFound: true };
+  }
 
   return {
     props: {

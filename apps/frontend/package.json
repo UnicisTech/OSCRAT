@@ -126,7 +126,6 @@
     "@types/crypto-js": "4.2.2",
     "@types/file-saver": "^2.0.7",
     "@types/formidable": "3.4.5",
-    "@types/micromatch": "^4.0.9",
     "@types/mixpanel-browser": "2.49.0",
     "@types/multer": "^1.4.11",
     "@types/node": "20.14.0",
@@ -137,7 +136,6 @@
     "@types/uuid": "9.0.8",
     "daisyui": "^4.11.1",
     "eslint-config-next": "^16.1.2",
-    "micromatch": "^4.0.8",
     "postcss": "8.4.38"
   }
 }

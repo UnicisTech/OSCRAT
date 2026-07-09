@@ -3,6 +3,12 @@ import { isBusinessEmail } from '@/lib/email/utils';
 import env from '@/lib/env';
 import { ApiError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
+import {
+  createServerSession,
+  JWT_SESSION_MAX_AGE,
+  refreshServerSession,
+  revokeServerSession,
+} from '@/lib/auth-session';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { Role } from '@oscrat/model';
 import { getLinkedAccount } from 'models/account';
@@ -172,7 +178,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 7 * 24 * 60 * 60, // 7 days
+    maxAge: JWT_SESSION_MAX_AGE,
   },
   ...cookiesOptions,
   secret: env.nextAuth.secret,
@@ -246,37 +252,45 @@ export const authOptions: NextAuthOptions = {
 
     async session({ session, token }) {
       if (token && session && token.sub) {
-        let user;
-        try {
-          user = await getUser({ id: token.sub });
-        } catch (error) {
-          // DB unreachable — return session with token data only
-          console.error('Database error in session callback:', error);
-          session.user.id = token.sub;
-          return session;
-        }
+        const currentUser = await getUser({ id: token.sub });
 
-        if (!user) {
+        if (!currentUser) {
           throw new ApiError(401, 'User not found');
         }
 
-        session.user.id = token.sub;
-        session.user.name = user.name;
-        session.user.email = user.email;
-        session.user.image = user.image;
-        session.user.firstName = user.firstName;
-        session.user.lastName = user.lastName;
+        session.user.id = currentUser.id;
+        session.user.name = currentUser.name;
+        session.user.email = currentUser.email;
+        session.user.image = currentUser.image;
+        session.user.firstName = currentUser.firstName;
+        session.user.lastName = currentUser.lastName;
       }
 
       return session;
     },
 
     async jwt({ token, user, trigger, session }) {
+      if (user?.id) {
+        token.sessionId = await createServerSession(user.id);
+      } else if (
+        !token.sessionId ||
+        !(await refreshServerSession(token.sessionId))
+      ) {
+        throw new Error('Session revoked');
+      }
+
       if (trigger === 'update' && session?.user.name) {
         const updateUsername = { ...user, name: session.user.name };
         return { ...token, ...updateUsername };
       }
       return { ...token, ...user };
+    },
+  },
+  events: {
+    async signOut({ token }) {
+      if (token?.sessionId) {
+        await revokeServerSession(token.sessionId);
+      }
     },
   },
 };
