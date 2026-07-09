@@ -14,10 +14,11 @@ const DocumentationDetailPage = () => {
   const { team, isLoading: teamLoading, isError: teamError } = teamContext;
   const { t, ready } = useTranslation('common');
 
-  const { data: documentation, isLoading: docLoading } = useGetDocumentation(
-    slug,
-    docId
-  );
+  const {
+    data: documentation,
+    isLoading: docLoading,
+    isError: docError,
+  } = useGetDocumentation(slug, docId);
 
   if (teamLoading || !ready) {
     return <div>{t('loading')}</div>;
@@ -29,6 +30,14 @@ const DocumentationDetailPage = () => {
 
   if (docLoading) {
     return <div>{t('loading')}</div>;
+  }
+
+  if (docError || !documentation) {
+    return (
+      <div className="text-content-muted p-4 text-center">
+        {t('oscrat.ui.documentation.not-found')}
+      </div>
+    );
   }
 
   const breadcrumbItems =

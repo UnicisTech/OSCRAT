@@ -18,6 +18,7 @@ import type {
 import { queryClient } from '@/lib/api/hooks';
 import { cscEndpoints } from '@/lib/api/endpoints/csc';
 import { useSession } from 'next-auth/react';
+import { useCallback, useMemo } from 'react';
 
 /**
  * Hook to fetch and manage team data
@@ -50,33 +51,45 @@ export function useTeam(slug: string) {
   const updateCscStatusMutation = useUpdateCscStatus(slug);
 
   // Team actions
-  const updateTeam = async (data: TeamSettingsUpdate) => {
-    return updateMutation.mutateAsync(data);
-  };
+  const updateTeam = useCallback(
+    async (data: TeamSettingsUpdate) => {
+      return updateMutation.mutateAsync(data);
+    },
+    [updateMutation.mutateAsync]
+  );
 
-  const deleteTeam = async () => {
+  const deleteTeam = useCallback(async () => {
     return deleteMutation.mutateAsync();
-  };
+  }, [deleteMutation.mutateAsync]);
 
-  const leaveTeam = async () => {
+  const leaveTeam = useCallback(async () => {
     return leaveMutation.mutateAsync();
-  };
+  }, [leaveMutation.mutateAsync]);
 
-  const setCscIso = async (iso: ISO) => {
-    return setIsoMutation.mutateAsync(iso);
-  };
+  const setCscIso = useCallback(
+    async (iso: ISO) => {
+      return setIsoMutation.mutateAsync(iso);
+    },
+    [setIsoMutation.mutateAsync]
+  );
 
-  const updateCscStatus = async (data: UpdateCscStatusData) => {
-    return updateCscStatusMutation.mutateAsync(data);
-  };
+  const updateCscStatus = useCallback(
+    async (data: UpdateCscStatusData) => {
+      return updateCscStatusMutation.mutateAsync(data);
+    },
+    [updateCscStatusMutation.mutateAsync]
+  );
 
-  const updateTaskCsc = async (taskNumber: number, data: UpdateTaskCscData) => {
-    const result = await cscEndpoints.updateTaskCsc(slug, taskNumber, data);
-    queryClient.invalidateQueries({
-      queryKey: ['teams', 'tasks', 'all', slug],
-    });
-    return result;
-  };
+  const updateTaskCsc = useCallback(
+    async (taskNumber: number, data: UpdateTaskCscData) => {
+      const result = await cscEndpoints.updateTaskCsc(slug, taskNumber, data);
+      queryClient.invalidateQueries({
+        queryKey: ['teams', 'tasks', 'all', slug],
+      });
+      return result;
+    },
+    [slug]
+  );
 
   const isLoading =
     isFetching ||
@@ -87,20 +100,37 @@ export function useTeam(slug: string) {
     setIsoMutation.isPending ||
     updateCscStatusMutation.isPending;
 
-  return {
-    team,
-    isLoading,
-    isError,
-    error,
-    updateTeam,
-    deleteTeam,
-    leaveTeam,
-    // CSC related data and actions
-    cscIso: cscIsoData,
-    isCscIsoError,
-    cscIsoError,
-    setCscIso,
-    updateCscStatus,
-    updateTaskCsc,
-  };
+  return useMemo(
+    () => ({
+      team,
+      isLoading,
+      isError,
+      error,
+      updateTeam,
+      deleteTeam,
+      leaveTeam,
+      // CSC related data and actions
+      cscIso: cscIsoData,
+      isCscIsoError,
+      cscIsoError,
+      setCscIso,
+      updateCscStatus,
+      updateTaskCsc,
+    }),
+    [
+      team,
+      isLoading,
+      isError,
+      error,
+      cscIsoData,
+      isCscIsoError,
+      cscIsoError,
+      updateTeam,
+      deleteTeam,
+      leaveTeam,
+      setCscIso,
+      updateCscStatus,
+      updateTaskCsc,
+    ]
+  );
 }

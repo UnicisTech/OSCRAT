@@ -145,7 +145,7 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
     if (result) setStatus(DocumentationStatus.ARCHIVED);
   };
 
-  if (isLoading || !isInitialized) {
+  if (isLoading) {
     return <Loading />;
   }
 
@@ -155,6 +155,10 @@ const DocumentationEditor: React.FC<Props> = ({ docId }) => {
         {t('oscrat.ui.documentation.not-found')}
       </div>
     );
+  }
+
+  if (!isInitialized) {
+    return <Loading />;
   }
 
   const isArchived = status === DocumentationStatus.ARCHIVED;
