@@ -63,6 +63,14 @@ export function useComplianceTaskGeneration({
         requirement.genericTask ||
         t('oscrat.ui.remediate-compliance-requirement');
 
+      // Auto-generated compliance remediation tasks need a due date because
+      // the create-task endpoint requires one (see createTaskCreateSchema).
+      // 30 days from now matches the standard SLA for compliance remediation
+      // and gives the assignee room to plan the work; the user can always
+      // edit it after the task is created.
+      const duedate = new Date();
+      duedate.setDate(duedate.getDate() + 30);
+
       const taskData: CreateTaskData = {
         title,
         description,
@@ -70,6 +78,7 @@ export function useComplianceTaskGeneration({
         originType: TaskOriginType.AUTOMATIC,
         productId,
         versionId,
+        duedate,
       };
 
       return taskData;

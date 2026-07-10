@@ -23,18 +23,26 @@ export const capitalizeCountryName = (name: string) => {
  */
 export function extractErrorMessage(
   error: unknown,
-  fallbackMessage: string
+  fallbackMessage: string,
+  /**
+   * Optional translator. Server-side ApiError messages are frequently raw
+   * i18n keys (e.g. `oscrat.ui.validation.task-due-date-required`) because
+   * validation schemas store keys as their message strings. When `t` is
+   * passed, we run the extracted message through it — i18next returns the
+   * input unchanged for unknown keys, so plain strings stay plain and real
+   * keys get localized.
+   */
+  t?: (key: string) => string
 ): string {
+  let raw: string;
   if (error instanceof Error) {
-    return error.message || fallbackMessage;
+    raw = error.message || fallbackMessage;
+  } else {
+    const apiError = error as ApiError;
+    raw = apiError?.message || fallbackMessage;
   }
 
-  const apiError = error as ApiError;
-  if (apiError?.message) {
-    return apiError.message;
-  }
-
-  return fallbackMessage;
+  return t ? t(raw) : raw;
 }
 
 /**

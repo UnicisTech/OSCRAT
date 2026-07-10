@@ -777,6 +777,7 @@
       "pending-uploads": "Pending uploads",
       "failed-to-upload-file": "Failed to upload file",
       "failed-to-download": "Failed to download file",
+      "failed-to-create-task": "Failed to create task",
       "new-comment": "New Comment",
       "add-comment": "Add Comment",
       "add-new-repo": "Add New Repository",

@@ -451,7 +451,11 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
                         toast.dismiss(toastInstance.id);
                       } catch (e) {
                         toast.error(
-                          extractErrorMessage(e, 'Failed to create task')
+                          extractErrorMessage(
+                            e,
+                            t('oscrat.ui.failed-to-create-task'),
+                            t
+                          )
                         );
                         toast.dismiss(toastInstance.id);
                       }
