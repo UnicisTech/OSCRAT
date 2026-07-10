@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
-import type { Task, Team } from '@oscrat/model';
+import type { Task, TaskProperties, Team } from '@oscrat/model';
 import Button from '@/components/button';
 import { useTask } from '@/hooks/useTask';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
@@ -18,7 +18,6 @@ import {
   RISK_CATEGORIES,
   RISK_TREATMENT_OPTIONS,
   type RiskLevel,
-  type TaskRiskProperties,
 } from '@/types/risk';
 import {
   calculateExposure,
@@ -45,7 +44,7 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({
     { enabled: !!task.productId }
   );
 
-  const existingProps = task.properties as TaskRiskProperties | null;
+  const existingProps = task.properties as TaskProperties | null;
   const existingDetails = existingProps?.riskDetails;
   const existingTreatment = existingProps?.riskTreatment;
 
@@ -80,11 +79,11 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({
     onSubmit: async (values) => {
       try {
         const exposure = calculateExposure(values.likelihood, values.impact);
-        const mergedProps: TaskRiskProperties = {
+        const mergedProps: TaskProperties = {
           ...existingProps,
           riskDetails: { ...values, exposure },
         };
-        await updateTask({ properties: mergedProps } as any);
+        await updateTask({ properties: mergedProps });
         toast.success(t('oscrat.ui.risk.risk-details-saved'));
       } catch (error: unknown) {
         const apiError = error as ApiError;
@@ -101,11 +100,11 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({
     validateOnBlur: true,
     onSubmit: async (values) => {
       try {
-        const mergedProps: TaskRiskProperties = {
+        const mergedProps: TaskProperties = {
           ...existingProps,
           riskTreatment: values,
         };
-        await updateTask({ properties: mergedProps } as any);
+        await updateTask({ properties: mergedProps });
         toast.success(t('oscrat.ui.risk.risk-treatment-saved'));
       } catch (error: unknown) {
         const apiError = error as ApiError;

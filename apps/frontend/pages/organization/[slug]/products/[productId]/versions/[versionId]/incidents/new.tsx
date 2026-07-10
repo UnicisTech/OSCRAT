@@ -179,7 +179,8 @@ function NewIncidentPage() {
       toast.error(
         extractErrorMessage(
           error,
-          t('oscrat.ui.versions.incidents.failed-to-create')
+          t('oscrat.ui.versions.incidents.failed-to-create'),
+          t
         )
       );
     }
@@ -267,7 +268,9 @@ function NewIncidentPage() {
                   onChange={handleInputChange}
                   required
                   maxLength={100}
-                  placeholder={t('oscrat.ui.versions.incidents.name-placeholder')}
+                  placeholder={t(
+                    'oscrat.ui.versions.incidents.name-placeholder'
+                  )}
                   className="border-line mt-1 w-full rounded-md border px-3 py-2"
                 />
               </div>

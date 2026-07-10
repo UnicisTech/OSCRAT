@@ -30,7 +30,15 @@ const AccountSettings = () => {
       href="/settings/account"
       className="border-line-subtle text-content-secondary hover:bg-surface-muted hover:text-content flex items-center gap-3 border-t px-3 py-2 pt-4 text-sm font-medium transition-colors"
     >
-      <UserCircleIcon className="text-content-placeholder h-8 w-8 shrink-0" />
+      {data.user.image ? (
+        <img
+          src={data.user.image}
+          alt={data.user.name || data.user.email || ''}
+          className="h-8 w-8 shrink-0 rounded-full object-cover"
+        />
+      ) : (
+        <UserCircleIcon className="text-content-placeholder h-8 w-8 shrink-0" />
+      )}
       <div className="flex min-w-0 flex-col">
         <span className="truncate text-sm font-medium">{data.user.name}</span>
         <span className="text-content-muted truncate text-xs">

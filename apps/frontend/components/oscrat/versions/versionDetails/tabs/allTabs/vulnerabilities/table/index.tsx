@@ -110,6 +110,14 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
     );
   };
 
+  if (!sortedVulnerabilities.length) {
+    return (
+      <div className="text-content-muted px-6 py-8 text-center text-sm">
+        {t('oscrat.ui.versions.vulnerabilities.no-vulnerabilities-added')}
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       <TableWrapper>
@@ -172,10 +180,7 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                   {formatDateShort(vulnerability.dateOfDiscovery)}
                 </td>
                 <td className={tableStyles.td}>
-                  <div
-                    className="truncate"
-                    title={vulnerability.description}
-                  >
+                  <div className="truncate" title={vulnerability.description}>
                     {vulnerability.description}
                   </div>
                 </td>
@@ -204,18 +209,6 @@ const Table: React.FC<VulnerabilitiesTableProps> = ({
                 </td>
               </TableRow>
             ))}
-            {!sortedVulnerabilities.length && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="text-content-muted px-6 py-8 text-center text-sm"
-                >
-                  {t(
-                    'oscrat.ui.versions.vulnerabilities.no-vulnerabilities-added'
-                  )}
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </TableWrapper>

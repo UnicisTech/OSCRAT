@@ -25,6 +25,11 @@ import {
   type OscratVulnerabilityCreate,
 } from '@oscrat/model';
 import { vulnerabilityFormSchema } from '@/lib/validation/vulnerability';
+import {
+  sanitizeForDescription,
+  sanitizeForTitle,
+  truncateAtWordBoundary,
+} from '@/lib/text-sanitize';
 
 const PAGE_STYLES = {
   sectionCard: 'rounded-lg border border-line bg-surface p-6',
@@ -132,7 +137,8 @@ function NewVulnerabilityPage() {
         toast.error(
           extractErrorMessage(
             error,
-            t('oscrat.ui.versions.vulnerabilities.failed-to-create')
+            t('oscrat.ui.versions.vulnerabilities.failed-to-create'),
+            t
           )
         );
       }
@@ -158,12 +164,20 @@ function NewVulnerabilityPage() {
         ? mapScanSeverityToVulnerabilitySeverity(severity as string)
         : OscratProductVulnerabilitySeverity.LOW;
 
-      const descriptionText = description
+      const rawDescription = description
         ? `${description as string}${ver ? ` (Package: ${pkg}@${ver})` : ''}`
         : `Vulnerability in package ${pkg}${ver ? `@${ver}` : ''}`;
+      const name = truncateAtWordBoundary(
+        sanitizeForTitle(`${pkg} - ${advisoryId || cve}`),
+        100
+      );
+      const descriptionText = truncateAtWordBoundary(
+        sanitizeForDescription(rawDescription),
+        500
+      );
 
       formik.setValues({
-        name: `${pkg} - ${advisoryId || cve}`,
+        name,
         description: descriptionText,
         severity: mappedSeverity,
         status: OscratProductVulnerabilityStatus.PENDING,

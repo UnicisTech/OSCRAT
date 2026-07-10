@@ -10,13 +10,15 @@ import {
   TabLoading,
 } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { tableStyles } from '@/components/oscrat/tableStyles';
-import { StatusBadge } from '@/components/shared';
+import { PaginationControls, StatusBadge } from '@/components/shared';
 import { useVersionContext } from '@/context/VersionContext';
 import { useTeamContext } from '@/context/TeamContext';
 import { useListDocumentation } from '@/lib/api/hooks';
 import { CreateDocumentationModal } from '@/components/documentation';
 import { DocumentationStatus, DocumentationVisibility } from '@oscrat/model';
 import { formatDateShort } from '@/utils/dateFormat';
+import usePagination from '@/hooks/usePagination';
+import { LISTING_PAGE_SIZE } from '@/constants/pagination';
 
 const STATUS_OPTIONS = Object.values(DocumentationStatus);
 const VISIBILITY_OPTIONS = Object.values(DocumentationVisibility);
@@ -63,6 +65,15 @@ export default function Documentation() {
   }, [documentation, statusFilter, visibilityFilter, sortOrder]);
 
   const tableHeaders = [t('title'), t('status'), t('visibility'), t('updated')];
+  const {
+    currentPage,
+    totalPages,
+    pageData,
+    goToPreviousPage,
+    goToNextPage,
+    prevButtonDisabled,
+    nextButtonDisabled,
+  } = usePagination(filteredDocumentation, LISTING_PAGE_SIZE);
 
   if (isLoading || !team) {
     return (
@@ -144,73 +155,85 @@ export default function Documentation() {
           </TabActionButton>
         </TabHeader>
 
-        <TableWrapper>
-          <table className={tableStyles.table}>
-            <TableHeader columns={tableHeaders.map((h) => ({ label: h }))} />
-            <tbody className={tableStyles.tbody}>
-              {filteredDocumentation.length > 0 ? (
-                filteredDocumentation.map((doc) => (
-                  <TableRow
-                    key={doc.id}
-                    onClick={() =>
-                      router.push(
-                        `/organization/${slug}/documentation/${doc.id}`
-                      )
-                    }
-                    className="hover:bg-surface-muted cursor-pointer transition-colors"
-                  >
-                    <td className={tableStyles.td}>
-                      <div className="truncate font-medium" title={doc.title}>
-                        {doc.title}
-                      </div>
-                      <div
-                        className="text-content-muted truncate text-xs"
-                        title={String(doc.version)}
-                      >
-                        {doc.version}
-                      </div>
-                    </td>
-                    <td className={tableStyles.td}>
-                      <StatusBadge
-                        value={doc.status}
-                        label={t(
-                          `oscrat.ui.documentation.status.${doc.status.toLowerCase()}`
-                        )}
-                      />
-                    </td>
-                    <td className={tableStyles.td}>
-                      <span
-                        className={`text-sm ${
-                          doc.visibility === 'PUBLIC'
-                            ? 'text-success'
-                            : 'text-content-muted'
-                        }`}
-                      >
-                        {doc.visibility === 'PUBLIC'
-                          ? t('oscrat.ui.documentation.visibility.public')
-                          : t('oscrat.ui.documentation.visibility.private')}
-                      </span>
-                    </td>
-                    <td className={tableStyles.td}>
-                      <span className="text-content-muted text-sm">
-                        {formatDateShort(doc.updatedAt)}
-                      </span>
-                    </td>
-                  </TableRow>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="text-content-muted px-6 py-8 text-center"
-                  >
-                    {t('oscrat.ui.documentation.no-documents')}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </TableWrapper>
+        {filteredDocumentation.length > 0 ? (
+          <>
+            <TableWrapper>
+              <table className={tableStyles.table}>
+                <TableHeader
+                  columns={tableHeaders.map((h) => ({ label: h }))}
+                />
+                <tbody className={tableStyles.tbody}>
+                  {pageData.map((doc) => (
+                    <TableRow
+                      key={doc.id}
+                      onClick={() =>
+                        router.push(
+                          `/organization/${slug}/documentation/${doc.id}`
+                        )
+                      }
+                      className="hover:bg-surface-muted cursor-pointer transition-colors"
+                    >
+                      <td className={tableStyles.td}>
+                        <div className="truncate font-medium" title={doc.title}>
+                          {doc.title}
+                        </div>
+                        <div
+                          className="text-content-muted truncate text-xs"
+                          title={String(doc.version)}
+                        >
+                          {doc.version}
+                        </div>
+                      </td>
+                      <td className={tableStyles.td}>
+                        <StatusBadge
+                          value={doc.status}
+                          label={t(
+                            `oscrat.ui.documentation.status.${doc.status.toLowerCase()}`
+                          )}
+                        />
+                      </td>
+                      <td className={tableStyles.td}>
+                        <span
+                          className={`text-sm ${
+                            doc.visibility === 'PUBLIC'
+                              ? 'text-success'
+                              : 'text-content-muted'
+                          }`}
+                        >
+                          {doc.visibility === 'PUBLIC'
+                            ? t('oscrat.ui.documentation.visibility.public')
+                            : t('oscrat.ui.documentation.visibility.private')}
+                        </span>
+                      </td>
+                      <td className={tableStyles.td}>
+                        <span className="text-content-muted text-sm">
+                          {formatDateShort(doc.updatedAt)}
+                        </span>
+                      </td>
+                    </TableRow>
+                  ))}
+                </tbody>
+              </table>
+            </TableWrapper>
+            {totalPages > 1 && (
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                prevButtonDisabled={prevButtonDisabled}
+                nextButtonDisabled={nextButtonDisabled}
+                goToPreviousPage={goToPreviousPage}
+                goToNextPage={goToNextPage}
+                showItemCount
+                totalItems={filteredDocumentation.length}
+                itemsPerPage={LISTING_PAGE_SIZE}
+              />
+            )}
+          </>
+        ) : (
+          <div className="text-content-muted px-6 py-8 text-center">
+            {t('oscrat.ui.documentation.no-documents')}
+          </div>
+        )}
       </div>
 
       <CreateDocumentationModal

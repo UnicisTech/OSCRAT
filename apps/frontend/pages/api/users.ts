@@ -96,6 +96,7 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
       name: user.name,
       firstName: user.firstName,
       lastName: user.lastName,
+      image: user.image,
     } as UserReturned,
   });
 };

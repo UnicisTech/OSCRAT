@@ -1,4 +1,9 @@
-import { PrismaClient, Prisma, WorkerJobStatus, WorkerJobType } from '@prisma/client';
+import {
+  PrismaClient,
+  Prisma,
+  WorkerJobStatus,
+  WorkerJobType,
+} from '@prisma/client';
 import { format } from 'date-fns';
 import { randomUUID } from 'crypto';
 import { gzipSync } from 'zlib';
@@ -7,7 +12,14 @@ import { createFileInTransaction } from './file';
 import { slugify } from '../utils/slugify';
 import { fromJson, toJsonInput } from '../utils/json';
 import { SbomSource, createWorkerJobWithTx } from './workerJob';
-import { createAuditContextWithTx, logCreate, logDelete, EntityType, CrudType, type AuditInfo } from '../audit';
+import {
+  createAuditContextWithTx,
+  logCreate,
+  logDelete,
+  EntityType,
+  CrudType,
+  type AuditInfo,
+} from '../audit';
 import type { SBOMSummary } from '../types/sbom';
 
 export interface SbomReportSummary {
@@ -181,7 +193,10 @@ const transformToSbomReportDetails = (
     include: typeof SBOM_REPORT_DETAILS_INCLUDE;
   }>
 ): SbomReportDetails => {
-  const source = report.job.type === WorkerJobType.REPO_GENERATE_SBOM ? SbomSource.REPO : SbomSource.FILE;
+  const source =
+    report.job.type === WorkerJobType.REPO_GENERATE_SBOM
+      ? SbomSource.REPO
+      : SbomSource.FILE;
   const latestScan = report.vulnerabilityScans?.[0];
 
   return {
@@ -403,7 +418,9 @@ export const createSbomReportWithJob = async (
 
   // For file-import flow, gzip outside the transaction to keep CPU work off
   // the DB session. Worker gunzips on read.
-  let compressedFileImport: { data: Buffer; filename: string; mimeType: string } | undefined;
+  let compressedFileImport:
+    | { data: Buffer; filename: string; mimeType: string }
+    | undefined;
   if (params.fileImport) {
     const data = gzipSync(params.fileImport.fileData);
     console.log(
@@ -424,7 +441,9 @@ export const createSbomReportWithJob = async (
 
     // 2. Persist the gzipped bytes in the File table; only the small fileId
     //    travels through the WorkerJob payload.
-    let fileImportPayload: { fileId: string; filename: string; mimeType: string } | undefined;
+    let fileImportPayload:
+      | { fileId: string; filename: string; mimeType: string }
+      | undefined;
     if (compressedFileImport) {
       const inputFile = await createFileInTransaction(tx, {
         fileData: compressedFileImport.data,
@@ -472,7 +491,10 @@ export const createSbomReportWithJob = async (
       throw new Error(`SBOM report ${sbomReport.id} not found after creation`);
     }
 
-    const action = params.jobType === 'REPO_GENERATE_SBOM' ? 'sbomreport.generate' : 'sbomreport.import';
+    const action =
+      params.jobType === 'REPO_GENERATE_SBOM'
+        ? 'sbomreport.generate'
+        : 'sbomreport.import';
     await audit.log({
       action,
       crud: CrudType.Create,
@@ -485,7 +507,9 @@ export const createSbomReportWithJob = async (
       },
       productId: audit.productId,
       versionId: audit.versionId,
-      metadata: params.fileImport ? { inputFilename: params.fileImport.filename } : {},
+      metadata: params.fileImport
+        ? { inputFilename: params.fileImport.filename }
+        : {},
     });
 
     console.log(`[SBOM Report Operations] Created SBOM report and job:`, {
@@ -504,13 +528,11 @@ export const createSbomReportWithJob = async (
 export const getSbomReportsWithDetails = async (
   prisma: PrismaClient,
   teamId: string,
-  versionId: string,
-  limit: number = 50
+  versionId: string
 ): Promise<SbomReportDetails[]> => {
   console.log(`[SBOM Report Operations] Getting SBOM reports with details:`, {
     teamId,
     versionId,
-    limit,
   });
 
   const reports = await prisma.sbomReport.findMany({
@@ -524,7 +546,6 @@ export const getSbomReportsWithDetails = async (
     },
     include: SBOM_REPORT_DETAILS_INCLUDE,
     orderBy: { createdAt: 'desc' },
-    take: limit,
   });
 
   console.log(
@@ -626,7 +647,9 @@ export const updateSbomReport = async (
         },
         productId: audit.productId,
         versionId: audit.versionId,
-        metadata: params.sbomFile ? { outputFilename: params.sbomFile.filename } : {},
+        metadata: params.sbomFile
+          ? { outputFilename: params.sbomFile.filename }
+          : {},
       });
     }
   });

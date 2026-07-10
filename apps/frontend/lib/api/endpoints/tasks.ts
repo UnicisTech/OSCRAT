@@ -23,7 +23,7 @@ export type CreateTaskData = {
   title: string;
   description?: string;
   assigneeId?: string | null;
-  duedate?: Date;
+  duedate: Date;
   priority?: string;
   status?: TaskStatus;
   productId?: string;

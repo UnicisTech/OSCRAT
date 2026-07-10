@@ -67,7 +67,11 @@ const VersionEditModal: React.FC<VersionEditModalProps> = ({
     },
   });
 
-  const versionStatuses = Object.values(OscratProductVersionStatus);
+  const versionStatuses = Object.values(OscratProductVersionStatus).filter(
+    (status) =>
+      status !== OscratProductVersionStatus.SUPPORTED ||
+      status === initialData.status
+  );
 
   if (!ready) return null;
 

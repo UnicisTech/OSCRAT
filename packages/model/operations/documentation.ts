@@ -71,7 +71,9 @@ type DocumentationDetailResult = Prisma.DocumentationGetPayload<{
   include: typeof detailInclude;
 }>;
 
-const toSummary = (doc: DocumentationSummaryResult | DocumentationDetailResult): DocumentationSummary => ({
+const toSummary = (
+  doc: DocumentationSummaryResult | DocumentationDetailResult
+): DocumentationSummary => ({
   id: doc.id,
   slug: doc.slug,
   title: doc.title,
@@ -170,7 +172,10 @@ export const createDocumentation = async (
       include: detailInclude,
     });
 
-    await logCreate(EntityType.Documentation, audit, { id: doc.id, name: doc.title });
+    await logCreate(EntityType.Documentation, audit, {
+      id: doc.id,
+      name: doc.title,
+    });
 
     return toDetails(doc);
   });
@@ -217,8 +222,10 @@ export const updateDocumentation = async (
     }
 
     // Increment version on substantive changes (content or title)
-    const contentChanged = input.content !== undefined && input.content !== existing.content;
-    const titleChanged = input.title !== undefined && input.title !== existing.title;
+    const contentChanged =
+      input.content !== undefined && input.content !== existing.content;
+    const titleChanged =
+      input.title !== undefined && input.title !== existing.title;
     const shouldIncrementVersion = contentChanged || titleChanged;
 
     const doc = await tx.documentation.update({
@@ -254,13 +261,26 @@ export const deleteDocumentation = async (
   await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
 
+    // Remove task links explicitly before the document. The database relation
+    // is configured with ON DELETE CASCADE, but doing this in the transaction
+    // also supports environments created before that constraint was added.
+    await tx.documentationTask.deleteMany({
+      where: {
+        documentationId,
+        documentation: { teamId },
+      },
+    });
+
     // Will throw if not found - let Prisma handle it
     const deleted = await tx.documentation.delete({
       where: { id: documentationId, teamId },
       select: { id: true, title: true, productId: true, versionId: true },
     });
 
-    await logDelete(EntityType.Documentation, audit, { ...deleted, name: deleted.title });
+    await logDelete(EntityType.Documentation, audit, {
+      ...deleted,
+      name: deleted.title,
+    });
   });
 };
 
@@ -354,7 +374,11 @@ export const linkDocumentationToTask = async (
           crud: CrudType.Update,
           user: audit.user,
           team: audit.team,
-          target: { id: doc.id, name: doc.title, type: EntityType.Documentation },
+          target: {
+            id: doc.id,
+            name: doc.title,
+            type: EntityType.Documentation,
+          },
           productId: doc.productId ?? audit.productId,
           versionId: doc.versionId ?? audit.versionId,
           metadata: { taskId: String(taskId) },
@@ -439,7 +463,9 @@ export const getPublicDocumentation = async (
   });
 
   if (!doc) return null;
-  return includeContent ? toDetails(doc as DocumentationDetailResult) : toSummary(doc);
+  return includeContent
+    ? toDetails(doc as DocumentationDetailResult)
+    : toSummary(doc);
 };
 
 export interface LinkedDocumentationSummary {

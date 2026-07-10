@@ -2,12 +2,14 @@ import { prisma } from '@/lib/prisma';
 import {
   getVulnerabilities,
   createVulnerability,
+  VULNERABILITY_NAME_CONFLICT,
 } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratVulnerabilityCreate } from '@oscrat/model';
 import { parseBody } from '@/lib/validation/validateRequest';
 import { vulnerabilityCreateSchema } from '@/lib/validation/vulnerability';
+import { ApiError, isPrismaUniqueConstraintError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -60,14 +62,26 @@ const handlePOST = async (
     createdBy: teamMember.userId,
   };
 
-  const vulnerability = await createVulnerability(
-    prisma,
-    teamMember.teamId,
-    productId as string,
-    versionId as string,
-    createData,
-    req.auditInfo
-  );
+  let vulnerability: Awaited<ReturnType<typeof createVulnerability>>;
+  try {
+    vulnerability = await createVulnerability(
+      prisma,
+      teamMember.teamId,
+      productId as string,
+      versionId as string,
+      createData,
+      req.auditInfo
+    );
+  } catch (error) {
+    if (
+      (error instanceof Error &&
+        error.message === VULNERABILITY_NAME_CONFLICT) ||
+      isPrismaUniqueConstraintError(error)
+    ) {
+      throw new ApiError(409, VULNERABILITY_NAME_CONFLICT);
+    }
+    throw error;
+  }
 
   res.status(201).json({ data: vulnerability });
 };

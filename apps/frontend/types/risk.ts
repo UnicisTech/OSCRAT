@@ -1,6 +1,18 @@
-export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
-export type RiskCategory = 'CONFIDENTIALITY' | 'INTEGRITY' | 'AVAILABILITY';
-export type RiskTreatmentOption = 'ACCEPT' | 'REDUCE' | 'AVOID' | 'TRANSFER';
+import type {
+  RiskCategory,
+  RiskDetailsProperties,
+  RiskLevel,
+  RiskTreatmentOption,
+  RiskTreatmentProperties,
+} from '@oscrat/model';
+
+export type {
+  RiskCategory,
+  RiskDetailsProperties,
+  RiskLevel,
+  RiskTreatmentOption,
+  RiskTreatmentProperties,
+};
 
 export const RISK_LEVELS: RiskLevel[] = ['LOW', 'MEDIUM', 'HIGH'];
 export const RISK_CATEGORIES: RiskCategory[] = [
@@ -14,22 +26,6 @@ export const RISK_TREATMENT_OPTIONS: RiskTreatmentOption[] = [
   'AVOID',
   'TRANSFER',
 ];
-
-export interface RiskDetailsProperties {
-  threat: string;
-  category: RiskCategory[];
-  likelihood: RiskLevel;
-  impact: RiskLevel;
-  exposure: RiskLevel;
-  ownerId: string;
-}
-
-export interface RiskTreatmentProperties {
-  treatment: RiskTreatmentOption;
-  measures?: string;
-  residualExposure: RiskLevel;
-  responsibleId: string;
-}
 
 export interface TaskRiskProperties {
   riskDetails?: RiskDetailsProperties;

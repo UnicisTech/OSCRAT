@@ -21,16 +21,16 @@ export function useUpdateUser() {
   return useMutation({
     mutationFn: (data: UpdateUserData) => usersEndpoints.updateUser(data),
     onSuccess: async (response, variables) => {
-      if (response.data && session) {
+      if (session) {
         // Update session with new user data if it contains name related fields
         if ('firstName' in variables || 'lastName' in variables) {
           await update({
             ...session,
             user: {
               ...session.user,
-              name: response.data.name,
-              firstName: response.data.firstName,
-              lastName: response.data.lastName,
+              name: response.name,
+              firstName: response.firstName,
+              lastName: response.lastName,
             },
           });
         }
@@ -60,42 +60,24 @@ export function useUpdatePassword() {
 }
 
 export function useUpdateAvatar() {
-  const { data: session, update } = useSession();
+  const { update } = useSession();
 
   return useMutation({
     mutationFn: (imageData: string) => usersEndpoints.updateAvatar(imageData),
-    onSuccess: async (response, imageData) => {
-      if (response.data && session) {
-        await update({
-          ...session,
-          user: {
-            ...session.user,
-            image: imageData,
-          },
-        });
-      }
-
+    onSuccess: async () => {
+      await update();
       queryClient.invalidateQueries({ queryKey: queryKeys.users });
     },
   });
 }
 
 export function useDeleteAvatar() {
-  const { data: session, update } = useSession();
+  const { update } = useSession();
 
   return useMutation({
     mutationFn: () => usersEndpoints.deleteAvatar(),
-    onSuccess: async (response) => {
-      if (session) {
-        await update({
-          ...session,
-          user: {
-            ...session.user,
-            image: null,
-          },
-        });
-      }
-
+    onSuccess: async () => {
+      await update();
       queryClient.invalidateQueries({ queryKey: queryKeys.users });
     },
   });

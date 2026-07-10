@@ -94,55 +94,50 @@ const TaskTable: React.FC<TaskTableProps> = ({
         </TabActionButton>
       </TabHeader>
 
-      <TableWrapper>
-        <table className={tableStyles.table}>
-          <TableHeader columns={tableHeaders.map((h) => ({ label: h }))} />
-          <tbody className={tableStyles.tbody}>
-            {tasks.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={4}
-                  className="text-content-muted px-6 py-8 text-center"
-                >
-                  {t('no-tasks-yet')}
-                </td>
-              </tr>
-            ) : (
-              tasks.map((task) => {
+      {tasks.length > 0 ? (
+        <TableWrapper>
+          <table className={tableStyles.table}>
+            <TableHeader columns={tableHeaders.map((h) => ({ label: h }))} />
+            <tbody className={tableStyles.tbody}>
+              {tasks.map((task) => {
                 const taskLabel = formatTaskLabel(task, t);
                 const assigneeLabel = task.assigneeId
                   ? memberMap.get(task.assigneeId) || t('assigned')
                   : t('unassigned');
                 return (
-                <TableRow
-                  key={task.id}
-                  onClick={() => onViewTask(task.taskNumber)}
-                  className="hover:bg-surface-muted cursor-pointer transition-colors"
-                >
-                  <td className={tableStyles.td}>
-                    <div className="truncate font-medium" title={taskLabel}>
-                      {taskLabel}
-                    </div>
-                  </td>
-                  <td className={tableStyles.td}>
-                    {formatDateShort(task.duedate)}
-                  </td>
-                  <td className={tableStyles.td} title={assigneeLabel}>
-                    {assigneeLabel}
-                  </td>
-                  <td
-                    className={tableStyles.td}
-                    onClick={(e) => e.stopPropagation()}
+                  <TableRow
+                    key={task.id}
+                    onClick={() => onViewTask(task.taskNumber)}
+                    className="hover:bg-surface-muted cursor-pointer transition-colors"
                   >
-                    <TaskStatusDropdown task={task} team={team} />
-                  </td>
-                </TableRow>
+                    <td className={tableStyles.td}>
+                      <div className="truncate font-medium" title={taskLabel}>
+                        {taskLabel}
+                      </div>
+                    </td>
+                    <td className={tableStyles.td}>
+                      {formatDateShort(task.duedate)}
+                    </td>
+                    <td className={tableStyles.td} title={assigneeLabel}>
+                      {assigneeLabel}
+                    </td>
+                    <td
+                      className={tableStyles.td}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <TaskStatusDropdown task={task} team={team} />
+                    </td>
+                  </TableRow>
                 );
-              })
-            )}
-          </tbody>
-        </table>
-      </TableWrapper>
+              })}
+            </tbody>
+          </table>
+        </TableWrapper>
+      ) : (
+        <div className="text-content-muted px-6 py-8 text-center">
+          {t('no-tasks-yet')}
+        </div>
+      )}
     </div>
   );
 };

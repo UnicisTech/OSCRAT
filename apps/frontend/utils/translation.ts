@@ -68,7 +68,7 @@ export const oscratProductStatusTranslationMap = {
 // Product Version Status mappings
 export const oscratProductVersionStatusTranslationMap = {
   DRAFT: 'oscrat.ui.draft',
-  ACTIVE: 'oscrat.ui.supported',
+  ACTIVE: 'active',
   DEPRECATED: 'oscrat.ui.not-supported',
   ARCHIVED: 'oscrat.ui.archived',
   WITHDRAWN: 'oscrat.ui.withdrawn',

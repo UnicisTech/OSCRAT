@@ -65,88 +65,84 @@ const FileTable: React.FC<FileTableProps> = ({
         </TabActionButton>
       </TabHeader>
 
-      <TableWrapper>
-        <table className={tableStyles.table}>
-          <TableHeader columns={tableHeaders} />
-          <tbody className={tableStyles.tbody}>
-            {!sortedAttachments.length && (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="text-content-muted px-6 py-8 text-center text-sm"
-                >
-                  {t('oscrat.ui.no-files-added')}
-                </td>
-              </tr>
-            )}
-            {pageData.map((attachment) => {
-              const addedByName = attachment.createdByUser
-                ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
-                  attachment.createdByUser.name
-                : t('oscrat.ui.unknown');
-              const descriptionText =
-                attachment.description || t('oscrat.ui.no-description');
-              return (
-              <TableRow key={attachment.id}>
-                <td className={tableStyles.td}>
-                  <div
-                    className="truncate font-medium"
-                    title={attachment.name}
-                  >
-                    {attachment.name}
-                  </div>
-                </td>
-                <td className={tableStyles.td} title={descriptionText}>
-                  {descriptionText}
-                </td>
-                <td className={tableStyles.td}>
-                  {formatDateShort(attachment.createdAt)}
-                </td>
-                <td className={tableStyles.td} title={addedByName}>
-                  {addedByName}
-                </td>
-                <td className={`${tableStyles.td} text-right`}>
-                  <div className="flex items-center justify-end space-x-1">
-                    {onDownloadFile && (
-                      <ActionButton
-                        onClick={() =>
-                          onDownloadFile(attachment.id, attachment.name)
-                        }
-                        disabled={downloadingFiles.has(attachment.id)}
-                        icon={<FaDownload size={12} />}
-                        title={
-                          downloadingFiles.has(attachment.id)
-                            ? t('oscrat.ui.downloading')
-                            : t('oscrat.ui.download')
-                        }
+      {sortedAttachments.length > 0 ? (
+        <TableWrapper>
+          <table className={tableStyles.table}>
+            <TableHeader columns={tableHeaders} />
+            <tbody className={tableStyles.tbody}>
+              {pageData.map((attachment) => {
+                const addedByName = attachment.createdByUser
+                  ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
+                    attachment.createdByUser.name
+                  : t('oscrat.ui.unknown');
+                const descriptionText =
+                  attachment.description || t('oscrat.ui.no-description');
+                return (
+                  <TableRow key={attachment.id}>
+                    <td className={tableStyles.td}>
+                      <div
+                        className="truncate font-medium"
+                        title={attachment.name}
                       >
-                        {downloadingFiles.has(attachment.id)
-                          ? t('oscrat.ui.downloading')
-                          : t('oscrat.ui.download')}
-                      </ActionButton>
-                    )}
-                    {onDeleteFile && (
-                      <ActionButton
-                        onClick={() => onDeleteFile(attachment.id)}
-                        disabled={downloadingFiles.has(attachment.id)}
-                        icon={<FaTrash size={12} />}
-                        title={
-                          downloadingFiles.has(attachment.id)
-                            ? t('oscrat.ui.download-in-progress')
-                            : t('delete')
-                        }
-                      >
-                        {t('delete')}
-                      </ActionButton>
-                    )}
-                  </div>
-                </td>
-              </TableRow>
-              );
-            })}
-          </tbody>
-        </table>
-      </TableWrapper>
+                        {attachment.name}
+                      </div>
+                    </td>
+                    <td className={tableStyles.td} title={descriptionText}>
+                      {descriptionText}
+                    </td>
+                    <td className={tableStyles.td}>
+                      {formatDateShort(attachment.createdAt)}
+                    </td>
+                    <td className={tableStyles.td} title={addedByName}>
+                      {addedByName}
+                    </td>
+                    <td className={`${tableStyles.td} text-right`}>
+                      <div className="flex items-center justify-end space-x-1">
+                        {onDownloadFile && (
+                          <ActionButton
+                            onClick={() =>
+                              onDownloadFile(attachment.id, attachment.name)
+                            }
+                            disabled={downloadingFiles.has(attachment.id)}
+                            icon={<FaDownload size={12} />}
+                            title={
+                              downloadingFiles.has(attachment.id)
+                                ? t('oscrat.ui.downloading')
+                                : t('oscrat.ui.download')
+                            }
+                          >
+                            {downloadingFiles.has(attachment.id)
+                              ? t('oscrat.ui.downloading')
+                              : t('oscrat.ui.download')}
+                          </ActionButton>
+                        )}
+                        {onDeleteFile && (
+                          <ActionButton
+                            onClick={() => onDeleteFile(attachment.id)}
+                            disabled={downloadingFiles.has(attachment.id)}
+                            icon={<FaTrash size={12} />}
+                            title={
+                              downloadingFiles.has(attachment.id)
+                                ? t('oscrat.ui.download-in-progress')
+                                : t('delete')
+                            }
+                          >
+                            {t('delete')}
+                          </ActionButton>
+                        )}
+                      </div>
+                    </td>
+                  </TableRow>
+                );
+              })}
+            </tbody>
+          </table>
+        </TableWrapper>
+      ) : (
+        <div className="text-content-muted px-6 py-8 text-center text-sm">
+          {t('oscrat.ui.no-files-added')}
+        </div>
+      )}
 
       {sortedAttachments.length > LISTING_PAGE_SIZE && (
         <PaginationControls

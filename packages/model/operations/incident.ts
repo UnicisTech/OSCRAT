@@ -5,7 +5,17 @@ import type {
   OscratIncidentSummary,
   OscratIncidentDetail,
 } from '../types/incidents';
-import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
+import {
+  createAuditContextWithTx,
+  logCreate,
+  logUpdate,
+  logDelete,
+  EntityType,
+  type AuditInfo,
+} from '../audit';
+
+export const INCIDENT_NAME_CONFLICT =
+  'oscrat.ui.validation.incident-name-already-exists';
 
 const USER_SELECT = {
   id: true,
@@ -70,7 +80,9 @@ const validateAttachmentsForIncident = async (
     (att) => att.versionId !== versionId
   );
   if (invalidAttachments.length > 0) {
-    throw new Error('All attachments must belong to the same version as the incident');
+    throw new Error(
+      'All attachments must belong to the same version as the incident'
+    );
   }
 
   // Validate attachments are not already linked to another incident
@@ -80,7 +92,9 @@ const validateAttachmentsForIncident = async (
       : att.incidentId !== null
   );
   if (alreadyLinked.length > 0) {
-    throw new Error('One or more attachments are already linked to another incident');
+    throw new Error(
+      'One or more attachments are already linked to another incident'
+    );
   }
 };
 
@@ -106,7 +120,6 @@ export const transformToIncidentSummary = (
   createdBy: incident.createdBy,
   updatedBy: incident.updatedBy,
 });
-
 
 export const transformToIncidentDetail = (
   incident: IncidentDetailPayload
@@ -194,6 +207,21 @@ export const createIncident = async (
 ): Promise<OscratIncidentDetail> => {
   return await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
+    const normalizedName = data.name?.trim();
+
+    if (normalizedName) {
+      const duplicate = await tx.oscratProductIncident.findFirst({
+        where: {
+          versionId,
+          name: { equals: normalizedName, mode: 'insensitive' },
+        },
+        select: { id: true },
+      });
+
+      if (duplicate) {
+        throw new Error(INCIDENT_NAME_CONFLICT);
+      }
+    }
 
     if (data.attachmentIds) {
       const attachments = await tx.attachment.findMany({
@@ -215,12 +243,18 @@ export const createIncident = async (
         (att) => att.versionId !== versionId
       );
       if (invalidAttachments.length > 0) {
-        throw new Error('All attachments must belong to the same version as the incident');
+        throw new Error(
+          'All attachments must belong to the same version as the incident'
+        );
       }
 
-      const alreadyLinked = attachments.filter((att) => att.incidentId !== null);
+      const alreadyLinked = attachments.filter(
+        (att) => att.incidentId !== null
+      );
       if (alreadyLinked.length > 0) {
-        throw new Error('One or more attachments are already linked to another incident');
+        throw new Error(
+          'One or more attachments are already linked to another incident'
+        );
       }
     }
 
@@ -229,6 +263,7 @@ export const createIncident = async (
     const newIncident = await tx.oscratProductIncident.create({
       data: {
         ...createData,
+        name: normalizedName,
         suspectedUnlawfulAct: createData.suspectedUnlawfulAct ?? false,
         crossBorderImpact: createData.crossBorderImpact ?? false,
         versionId: versionId,
@@ -284,6 +319,22 @@ export const updateIncident = async (
       throw new Error('Incident not found or does not belong to team');
     }
 
+    const normalizedName = data.name?.trim();
+    if (normalizedName) {
+      const duplicate = await tx.oscratProductIncident.findFirst({
+        where: {
+          id: { not: incidentId },
+          versionId,
+          name: { equals: normalizedName, mode: 'insensitive' },
+        },
+        select: { id: true },
+      });
+
+      if (duplicate) {
+        throw new Error(INCIDENT_NAME_CONFLICT);
+      }
+    }
+
     if (data.attachmentIds) {
       const attachments = await tx.attachment.findMany({
         where: {
@@ -304,14 +355,18 @@ export const updateIncident = async (
         (att) => att.versionId !== versionId
       );
       if (invalidAttachments.length > 0) {
-        throw new Error('All attachments must belong to the same version as the incident');
+        throw new Error(
+          'All attachments must belong to the same version as the incident'
+        );
       }
 
-      const alreadyLinked = attachments.filter((att) =>
-        att.incidentId !== null && att.incidentId !== incidentId
+      const alreadyLinked = attachments.filter(
+        (att) => att.incidentId !== null && att.incidentId !== incidentId
       );
       if (alreadyLinked.length > 0) {
-        throw new Error('One or more attachments are already linked to another incident');
+        throw new Error(
+          'One or more attachments are already linked to another incident'
+        );
       }
     }
 
@@ -323,7 +378,10 @@ export const updateIncident = async (
         id: incidentId,
         teamId: teamId,
       },
-      data: updateData,
+      data: {
+        ...updateData,
+        ...(normalizedName !== undefined && { name: normalizedName }),
+      },
     });
 
     // Handle attachment updates if provided

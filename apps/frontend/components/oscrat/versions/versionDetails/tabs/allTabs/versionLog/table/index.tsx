@@ -84,97 +84,96 @@ const Table: React.FC<VersionLogTableProps> = ({
         />
       </TabHeader>
 
-      <TableWrapper>
-        <table className={tableStyles.table}>
-          <TableHeader
-            columns={tableHeaders.map((header) => ({ label: header }))}
-          />
-          <tbody className={tableStyles.tbody}>
-            {(!logs || logs.length === 0) && (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="text-content-muted px-6 py-8 text-center text-sm"
-                >
-                  {t('oscrat.ui.no-version-logs')}
-                </td>
-              </tr>
-            )}
-            {logs.map((log) => {
-              const userLabel = log.userName || log.userId;
-              const actionLabel = t(getAuditActionTranslationKey(log.action), {
-                defaultValue: log.action,
-              });
-              const targetTypeLabel = t(
-                oscratEntityTypeTranslationMap[log.targetType],
-                { defaultValue: log.targetType }
-              );
-              const targetNameLabel = log.targetName
-                ? formatNameWithUuidFallback(log.targetName, t)
-                : '';
-              return (
-              <TableRow key={log.id}>
-                <td className={tableStyles.td}>
-                  <span className="text-content-secondary text-sm">
-                    {formatTimestamp(log.createdAt)}
-                  </span>
-                </td>
-                <td className={tableStyles.td}>
-                  <div className="flex min-w-0 flex-col">
-                    <span
-                      className="truncate font-medium"
-                      title={userLabel}
-                    >
-                      {userLabel}
-                    </span>
-                    {log.userEmail && (
-                      <span
-                        className="text-content-muted truncate text-xs"
-                        title={log.userEmail}
-                      >
-                        {log.userEmail}
+      {logs.length > 0 ? (
+        <TableWrapper>
+          <table className={tableStyles.table}>
+            <TableHeader
+              columns={tableHeaders.map((header) => ({ label: header }))}
+            />
+            <tbody className={tableStyles.tbody}>
+              {logs.map((log) => {
+                const userLabel = log.userName || log.userId;
+                const actionLabel = t(
+                  getAuditActionTranslationKey(log.action),
+                  {
+                    defaultValue: log.action,
+                  }
+                );
+                const targetTypeLabel = t(
+                  oscratEntityTypeTranslationMap[log.targetType],
+                  { defaultValue: log.targetType }
+                );
+                const targetNameLabel = log.targetName
+                  ? formatNameWithUuidFallback(log.targetName, t)
+                  : '';
+                return (
+                  <TableRow key={log.id}>
+                    <td className={tableStyles.td}>
+                      <span className="text-content-secondary text-sm">
+                        {formatTimestamp(log.createdAt)}
                       </span>
-                    )}
-                  </div>
-                </td>
-                <td className={tableStyles.td} title={actionLabel}>
-                  <span className="text-sm">{actionLabel}</span>
-                </td>
-                <td className={tableStyles.td}>
-                  <div className="flex min-w-0 flex-col">
-                    <span
-                      className="truncate font-medium"
-                      title={targetTypeLabel}
-                    >
-                      {targetTypeLabel}
-                    </span>
-                    {targetNameLabel && (
-                      <span
-                        className="text-content-muted truncate text-xs"
-                        title={targetNameLabel}
-                      >
-                        {targetNameLabel}
-                      </span>
-                    )}
-                  </div>
-                </td>
-                <td className={tableStyles.td}>
-                  {log.metadata && (
-                    <Button
-                      variant="tertiary"
-                      size="m"
-                      onClick={() => handleViewDetails(log)}
-                      className="hover:underline"
-                      text={t('view-details')}
-                    />
-                  )}
-                </td>
-              </TableRow>
-              );
-            })}
-          </tbody>
-        </table>
-      </TableWrapper>
+                    </td>
+                    <td className={tableStyles.td}>
+                      <div className="flex min-w-0 flex-col">
+                        <span
+                          className="truncate font-medium"
+                          title={userLabel}
+                        >
+                          {userLabel}
+                        </span>
+                        {log.userEmail && (
+                          <span
+                            className="text-content-muted truncate text-xs"
+                            title={log.userEmail}
+                          >
+                            {log.userEmail}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className={tableStyles.td} title={actionLabel}>
+                      <span className="text-sm">{actionLabel}</span>
+                    </td>
+                    <td className={tableStyles.td}>
+                      <div className="flex min-w-0 flex-col">
+                        <span
+                          className="truncate font-medium"
+                          title={targetTypeLabel}
+                        >
+                          {targetTypeLabel}
+                        </span>
+                        {targetNameLabel && (
+                          <span
+                            className="text-content-muted truncate text-xs"
+                            title={targetNameLabel}
+                          >
+                            {targetNameLabel}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className={tableStyles.td}>
+                      {log.metadata && (
+                        <Button
+                          variant="tertiary"
+                          size="m"
+                          onClick={() => handleViewDetails(log)}
+                          className="hover:underline"
+                          text={t('view-details')}
+                        />
+                      )}
+                    </td>
+                  </TableRow>
+                );
+              })}
+            </tbody>
+          </table>
+        </TableWrapper>
+      ) : (
+        <div className="text-content-muted px-6 py-8 text-center text-sm">
+          {t('oscrat.ui.no-version-logs')}
+        </div>
+      )}
 
       {totalLogs > 0 && totalPages > 1 && (
         <PaginationControls

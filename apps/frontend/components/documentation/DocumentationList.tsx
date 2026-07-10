@@ -122,23 +122,23 @@ const DocumentationList = () => {
           </div>
 
           {/* Table */}
-          <div className="bg-surface border-line rounded-card min-h-[400px] overflow-x-auto border">
-            <table className="text-content-secondary divide-line-subtle min-w-full divide-y text-left text-sm">
+          <div className="bg-surface border-line rounded-card min-h-[400px] overflow-hidden border">
+            <table className="text-content-secondary divide-line-subtle w-full table-fixed divide-y text-left text-sm">
               <thead className="bg-surface-muted text-content border-line-header border-b">
                 <tr>
-                  <th className="text-content text-b2 p-4 font-medium">
+                  <th className="text-content text-b2 w-[40%] p-4 font-medium">
                     {t('title')}
                   </th>
-                  <th className="text-content text-b2 hidden whitespace-nowrap p-4 font-medium md:table-cell">
+                  <th className="text-content text-b2 hidden w-[18%] whitespace-nowrap p-4 font-medium md:table-cell">
                     {t('oscrat.ui.documentation.level.label')}
                   </th>
-                  <th className="text-content text-b2 whitespace-nowrap p-4 font-medium">
+                  <th className="text-content text-b2 w-[18%] whitespace-nowrap p-4 font-medium">
                     {t('status')}
                   </th>
-                  <th className="text-content text-b2 hidden whitespace-nowrap p-4 font-medium sm:table-cell">
+                  <th className="text-content text-b2 hidden w-[12%] whitespace-nowrap p-4 font-medium sm:table-cell">
                     {t('visibility')}
                   </th>
-                  <th className="text-content text-b2 hidden whitespace-nowrap p-4 font-medium lg:table-cell">
+                  <th className="text-content text-b2 hidden w-[12%] whitespace-nowrap p-4 font-medium lg:table-cell">
                     {t('updated')}
                   </th>
                 </tr>
@@ -151,7 +151,7 @@ const DocumentationList = () => {
                       className="hover:bg-surface-muted cursor-pointer"
                       onClick={() => handleRowClick(doc.id)}
                     >
-                      <td className="px-4 py-3">
+                      <td className="min-w-0 px-4 py-3">
                         <div className="flex min-w-0 flex-col">
                           <span
                             className="text-content truncate font-medium"
@@ -160,7 +160,10 @@ const DocumentationList = () => {
                             {doc.title}
                           </span>
                           {doc.productName && (
-                            <span className="text-content-muted truncate text-xs">
+                            <span
+                              className="text-content-muted truncate text-xs"
+                              title={`${doc.productName}${doc.versionName ? ` ${doc.versionName}` : ''}`}
+                            >
                               {doc.productName}
                               {doc.versionName && ` ${doc.versionName}`}
                             </span>

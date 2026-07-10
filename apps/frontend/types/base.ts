@@ -132,4 +132,7 @@ export type ExtendedComment = Comment & {
   createdBy: User;
 };
 
-export type UserReturned = Pick<User, 'name' | 'firstName' | 'lastName'>;
+export type UserReturned = Pick<
+  User,
+  'name' | 'firstName' | 'lastName' | 'image'
+>;

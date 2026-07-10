@@ -1,6 +1,6 @@
 import { api } from '@/lib/api/client';
 import { User } from '@oscrat/model';
-import { ApiResponse } from '@/types';
+import type { UserReturned } from '@/types';
 
 export type UpdateUserData = {
   firstName?: string;
@@ -14,26 +14,17 @@ export type UpdatePasswordData = {
   newPassword: string;
 };
 
-export type UserReturned = {
-  name: string;
-  firstName: string;
-  lastName: string;
-};
-
 export const usersEndpoints = {
   getCurrentUser: () => api.get<User>('/users'),
 
-  updateUser: (data: UpdateUserData) =>
-    api.put<ApiResponse<UserReturned>>('/users', data),
+  updateUser: (data: UpdateUserData) => api.put<UserReturned>('/users', data),
 
   updatePassword: (data: UpdatePasswordData) =>
-    api.put<ApiResponse<void>>('/password', data),
+    api.put<void>('/password', data),
 
-  updateAvatar: (image: string) =>
-    api.put<ApiResponse<UserReturned>>('/users', { image }),
+  updateAvatar: (image: string) => api.put<UserReturned>('/users', { image }),
 
-  deleteAvatar: () =>
-    api.put<ApiResponse<UserReturned>>('/users', { image: null }),
+  deleteAvatar: () => api.put<UserReturned>('/users', { image: null }),
 
   deleteUser: (password: string) =>
     api.delete<void>('/users', {

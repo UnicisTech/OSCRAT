@@ -12,6 +12,10 @@ import {
   type TaskProperties,
 } from '@oscrat/model';
 import { descriptionSchema } from './inputs';
+import {
+  riskDetailsPropertiesSchema,
+  riskTreatmentPropertiesSchema,
+} from './risk';
 import { TITLE_CHAR_REGEX } from '@/lib/text-sanitize';
 
 const taskConfigurationPropertiesSchema = {
@@ -48,6 +52,8 @@ const taskTrainingPropertiesSchema = {
 
 const taskRiskFlagPropertiesSchema = {
   [TASK_RISK_PROPERTY_KEYS.ENABLE_RISK_ASSESSMENT]: Yup.boolean().optional(),
+  [TASK_RISK_PROPERTY_KEYS.DETAILS]: riskDetailsPropertiesSchema.optional(),
+  [TASK_RISK_PROPERTY_KEYS.TREATMENT]: riskTreatmentPropertiesSchema.optional(),
 };
 
 export const taskPropertiesSchema: Yup.ObjectSchema<TaskProperties> =

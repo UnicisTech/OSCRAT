@@ -109,6 +109,14 @@ const Table: React.FC<IncidentsTableProps> = ({
     );
   };
 
+  if (!sortedIncidents.length) {
+    return (
+      <div className="text-content-muted px-6 py-8 text-center text-sm">
+        {t('oscrat.ui.versions.incidents.no-incidents-added')}
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       <TableWrapper>
@@ -209,16 +217,6 @@ const Table: React.FC<IncidentsTableProps> = ({
                 </td>
               </TableRow>
             ))}
-            {!sortedIncidents.length && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="text-content-muted px-6 py-8 text-center text-sm"
-                >
-                  {t('oscrat.ui.versions.incidents.no-incidents-added')}
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </TableWrapper>

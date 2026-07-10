@@ -62,5 +62,13 @@ export const riskTreatmentSchema = Yup.object({
     .required('oscrat.ui.risk.validation.responsible-required'),
 });
 
+export const riskDetailsPropertiesSchema = riskDetailsSchema.shape({
+  exposure: Yup.mixed<RiskLevel>()
+    .oneOf([...RISK_LEVELS])
+    .required(),
+});
+
+export const riskTreatmentPropertiesSchema = riskTreatmentSchema;
+
 export type RiskDetailsFormValues = Yup.InferType<typeof riskDetailsSchema>;
 export type RiskTreatmentFormValues = Yup.InferType<typeof riskTreatmentSchema>;

@@ -1,4 +1,9 @@
-import { PrismaClient, Prisma, WorkerJobStatus, ConfigurationScanFormat } from '@prisma/client';
+import {
+  PrismaClient,
+  Prisma,
+  WorkerJobStatus,
+  ConfigurationScanFormat,
+} from '@prisma/client';
 import { format } from 'date-fns';
 import { randomUUID } from 'crypto';
 import { gzipSync } from 'zlib';
@@ -7,7 +12,14 @@ import { createFileInTransaction } from './file';
 import { slugify } from '../utils/slugify';
 import { fromJson, toJsonInput } from '../utils/json';
 import { createWorkerJobWithTx } from './workerJob';
-import { createAuditContextWithTx, logCreate, logDelete, CrudType, EntityType, type AuditInfo } from '../audit';
+import {
+  createAuditContextWithTx,
+  logCreate,
+  logDelete,
+  CrudType,
+  EntityType,
+  type AuditInfo,
+} from '../audit';
 import { getConfigurationTasksByVersion } from './task';
 import type {
   ConfigurationScanRuleResult,
@@ -246,10 +258,13 @@ export const getConfigurationScanReportById = async (
   teamId: string,
   reportId: string
 ): Promise<ConfigurationScanReportSummary | null> => {
-  console.log(`[Configuration Scan Report Operations] Getting configuration scan report by ID:`, {
-    teamId,
-    reportId,
-  });
+  console.log(
+    `[Configuration Scan Report Operations] Getting configuration scan report by ID:`,
+    {
+      teamId,
+      reportId,
+    }
+  );
 
   const report = await prisma.configurationScanReport.findFirst({
     where: {
@@ -280,10 +295,13 @@ export const getConfigurationScanReportFile = async (
   fileData: Buffer;
   mimeType?: string;
 } | null> => {
-  console.log(`[Configuration Scan Report Operations] Getting configuration scan report file:`, {
-    teamId,
-    reportId,
-  });
+  console.log(
+    `[Configuration Scan Report Operations] Getting configuration scan report file:`,
+    {
+      teamId,
+      reportId,
+    }
+  );
 
   const report = await prisma.configurationScanReport.findFirst({
     where: {
@@ -321,15 +339,13 @@ export const getConfigurationScanReportFile = async (
 export const getConfigurationScanReportsWithDetails = async (
   prisma: PrismaClient,
   teamId: string,
-  versionId: string,
-  limit: number = 50
+  versionId: string
 ): Promise<ConfigurationScanReportDetails[]> => {
   console.log(
     `[Configuration Scan Report Operations] Getting configuration scan reports with details:`,
     {
       teamId,
       versionId,
-      limit,
     }
   );
 
@@ -344,7 +360,6 @@ export const getConfigurationScanReportsWithDetails = async (
     },
     include: CONFIGURATION_SCAN_REPORT_DETAILS_INCLUDE,
     orderBy: { createdAt: 'desc' },
-    take: limit,
   });
 
   console.log(
@@ -390,7 +405,11 @@ export const getConfigurationScanReportDetailsById = async (
   const transformed = transformToConfigurationScanReportDetails(report);
 
   if (transformed.scanData?.rules?.length) {
-    const tasksByRule = await getConfigurationTasksByVersion(prisma, teamId, report.versionId);
+    const tasksByRule = await getConfigurationTasksByVersion(
+      prisma,
+      teamId,
+      report.versionId
+    );
     if (tasksByRule.size > 0) {
       transformed.scanData.rules = transformed.scanData.rules.map(
         (rule: ConfigurationScanRuleResult) => ({
@@ -502,7 +521,9 @@ export const createConfigurationScanReportWithJob = async (
       );
     }
 
-    await logCreate(EntityType.ConfigurationScanReport, audit, { id: completeReport.id });
+    await logCreate(EntityType.ConfigurationScanReport, audit, {
+      id: completeReport.id,
+    });
 
     console.log(
       `[Configuration Scan Report Operations] Created configuration scan report and job:`,

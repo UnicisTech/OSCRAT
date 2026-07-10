@@ -19,7 +19,29 @@ export const TASK_TRAINING_PROPERTY_KEYS = {
 
 export const TASK_RISK_PROPERTY_KEYS = {
   ENABLE_RISK_ASSESSMENT: 'enableRiskAssessment',
+  DETAILS: 'riskDetails',
+  TREATMENT: 'riskTreatment',
 } as const;
+
+type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
+type RiskCategory = 'CONFIDENTIALITY' | 'INTEGRITY' | 'AVAILABILITY';
+type RiskTreatmentOption = 'ACCEPT' | 'REDUCE' | 'AVOID' | 'TRANSFER';
+
+interface RiskDetailsProperties {
+  threat: string;
+  category: RiskCategory[];
+  likelihood: RiskLevel;
+  impact: RiskLevel;
+  exposure: RiskLevel;
+  ownerId: string;
+}
+
+interface RiskTreatmentProperties {
+  treatment: RiskTreatmentOption;
+  measures?: string;
+  residualExposure: RiskLevel;
+  responsibleId: string;
+}
 
 interface TaskByRuleSummary {
   id: number;
@@ -59,9 +81,14 @@ interface TaskTrainingProperties {
 
 interface TaskRiskFlagProperties {
   [TASK_RISK_PROPERTY_KEYS.ENABLE_RISK_ASSESSMENT]?: boolean;
+  [TASK_RISK_PROPERTY_KEYS.DETAILS]?: RiskDetailsProperties;
+  [TASK_RISK_PROPERTY_KEYS.TREATMENT]?: RiskTreatmentProperties;
 }
 
-type TaskProperties = TaskConfigurationProperties & TaskCscProperties & TaskTrainingProperties & TaskRiskFlagProperties;
+type TaskProperties = TaskConfigurationProperties &
+  TaskCscProperties &
+  TaskTrainingProperties &
+  TaskRiskFlagProperties;
 
 export type {
   TaskByRuleSummary,
@@ -70,6 +97,11 @@ export type {
   TaskCscAuditLogEntry,
   TaskCscProperties,
   TaskTrainingProperties,
+  RiskLevel,
+  RiskCategory,
+  RiskTreatmentOption,
+  RiskDetailsProperties,
+  RiskTreatmentProperties,
   TaskRiskFlagProperties,
   TaskProperties,
 };

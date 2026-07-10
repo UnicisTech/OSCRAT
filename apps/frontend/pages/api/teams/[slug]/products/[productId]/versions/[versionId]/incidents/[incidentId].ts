@@ -3,12 +3,14 @@ import {
   getIncidentDetail,
   updateIncident,
   deleteIncident,
+  INCIDENT_NAME_CONFLICT,
 } from '@oscrat/model/operations';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import type { OscratIncidentUpdate } from '@oscrat/model';
 import { parseBody } from '@/lib/validation/validateRequest';
 import { incidentUpdateSchema } from '@/lib/validation/incident';
+import { ApiError, isPrismaUniqueConstraintError } from '@/lib/errors';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -71,14 +73,25 @@ const handlePUT = async (
     updatedBy: teamMember.userId,
   };
 
-  const incident = await updateIncident(
-    prisma,
-    teamMember.teamId,
-    versionId as string,
-    incidentId as string,
-    updateData,
-    req.auditInfo
-  );
+  let incident: Awaited<ReturnType<typeof updateIncident>>;
+  try {
+    incident = await updateIncident(
+      prisma,
+      teamMember.teamId,
+      versionId as string,
+      incidentId as string,
+      updateData,
+      req.auditInfo
+    );
+  } catch (error) {
+    if (
+      (error instanceof Error && error.message === INCIDENT_NAME_CONFLICT) ||
+      isPrismaUniqueConstraintError(error)
+    ) {
+      throw new ApiError(409, INCIDENT_NAME_CONFLICT);
+    }
+    throw error;
+  }
 
   res.status(200).json({ data: incident });
 };

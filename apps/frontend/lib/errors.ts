@@ -16,6 +16,9 @@ export const isPrismaError = (error: any): boolean => {
   );
 };
 
+export const isPrismaUniqueConstraintError = (error: unknown): boolean =>
+  error instanceof PrismaClientKnownRequestError && error.code === 'P2002';
+
 export class ApiError extends Error {
   status: number;
   code?: string;

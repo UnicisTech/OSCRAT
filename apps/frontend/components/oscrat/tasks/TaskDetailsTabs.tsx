@@ -28,6 +28,7 @@ import { useComments } from '@/hooks/useComments';
 import { extractErrorMessage } from '@/lib/utils';
 import { checkExtensionAndMIMEType, isEmptyFile } from '@/utils/fileValidation';
 import { formatDateShort, formatDateTime } from '@/utils/dateFormat';
+import { truncateAtWordBoundary } from '@/lib/text-sanitize';
 import type { Attachment } from '@/types';
 
 interface TaskDetailsTabsProps {
@@ -242,18 +243,18 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
         {canUpdateTask && (
           <div className="flex justify-end">
             {showLinkDocPicker ? (
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <select
                   value={selectedDocId}
                   onChange={(e) => setSelectedDocId(e.target.value)}
-                  className="border-line focus:border-primary focus:ring-primary rounded-input border px-3 py-1.5 text-sm focus:outline-none focus:ring-2"
+                  className="border-line focus:border-primary focus:ring-primary rounded-input w-72 max-w-[40vw] truncate border px-3 py-1.5 text-sm focus:outline-none focus:ring-2"
                 >
                   <option value="">
                     {t('oscrat.ui.select-documentation')}
                   </option>
                   {availableDocsToLink.map((doc) => (
-                    <option key={doc.id} value={doc.id}>
-                      {doc.title}
+                    <option key={doc.id} value={doc.id} title={doc.title}>
+                      {truncateAtWordBoundary(doc.title, 50)}
                     </option>
                   ))}
                 </select>
