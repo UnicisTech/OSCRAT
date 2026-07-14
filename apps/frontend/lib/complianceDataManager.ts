@@ -66,11 +66,12 @@ function createComplianceDataManager(config: ComplianceDataConfig) {
 const versionDataManager = createComplianceDataManager({
   dataPath: 'lib/compliance/assessments/version',
   roleFileMapping: {
-    [OscratOrganizationRole.MANUFACTURER]: 'manufacturer-4b.json',
+    [OscratOrganizationRole.MANUFACTURER]: 'importer-3b.json',
     [OscratOrganizationRole.DISTRIBUTOR]: 'distributor-5b.json',
-    [OscratOrganizationRole.IMPORTER]: 'importer-3b.json',
+    [OscratOrganizationRole.IMPORTER]: 'manufacturer-4b.json',
     [OscratOrganizationRole.DATA_STEWARD]: 'sme-manufacturer-7b.json',
-    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]: 'manufacturer-4b.json',
+    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]:
+      'authorized-representative-7b.json',
   },
   errorPrefix: 'Compliance',
 });
@@ -78,11 +79,12 @@ const versionDataManager = createComplianceDataManager({
 const teamDataManager = createComplianceDataManager({
   dataPath: 'lib/compliance/assessments/team',
   roleFileMapping: {
-    [OscratOrganizationRole.MANUFACTURER]: 'manufacturer-4a.json',
+    [OscratOrganizationRole.MANUFACTURER]: 'importer-3a.json',
     [OscratOrganizationRole.DISTRIBUTOR]: 'distributor-5a.json',
-    [OscratOrganizationRole.IMPORTER]: 'importer-3a.json',
+    [OscratOrganizationRole.IMPORTER]: 'manufacturer-4a.json',
     [OscratOrganizationRole.DATA_STEWARD]: 'sme-manufacturer-7a.json',
-    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]: 'manufacturer-4a.json',
+    [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]:
+      'authorized-representative-7a.json',
   },
   errorPrefix: 'Team compliance',
 });

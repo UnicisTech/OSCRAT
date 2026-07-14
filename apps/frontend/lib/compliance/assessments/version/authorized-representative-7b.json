@@ -1,0 +1,89 @@
+[
+  {
+    "id": 1,
+    "areaOfRequirements": "area-1.name",
+    "content": [
+      {
+        "reqId": "ARP1",
+        "requirement": "area-1.ARP1.requirement",
+        "craReference": "Article 13, point 15; Article 13, point 13; Article 18, point 1; Article 18, point 3; Article 23, points 1 and 2; Article 13, point 16; Article 13, point 18; Article 13, point 19",
+        "genericTask": "Ensure long-term availability of technical documentation and EU Declaration of Conformity, with clear product identification and accessible user information",
+        "questions": [
+          {
+            "questionId": "ARP1-Q1",
+            "questionText": "area-1.ARP1.questions.Q1.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARP1-Q2",
+            "questionText": "area-1.ARP1.questions.Q2.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARP1-Q3",
+            "questionText": "area-1.ARP1.questions.Q3.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARP1-Q4",
+            "questionText": "area-1.ARP1.questions.Q4.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            },
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARP1-Q5",
+            "questionText": "area-1.ARP1.questions.Q5.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            },
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARP1-Q6",
+            "questionText": "area-1.ARP1.questions.Q6.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARP1-Q7",
+            "questionText": "area-1.ARP1.questions.Q7.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARP1-Q8",
+            "questionText": "area-1.ARP1.questions.Q8.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            },
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-1.ARP1.hint"
+      }
+    ]
+  }
+]

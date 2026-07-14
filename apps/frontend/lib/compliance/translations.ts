@@ -17,6 +17,10 @@ export const COMPLIANCE_NAMESPACES = {
   VERSION_IMPORTER: 'compliance-version-importer-3b',
   TEAM_DATA_STEWARD: 'compliance-team-sme-manufacturer-7a',
   VERSION_DATA_STEWARD: 'compliance-version-sme-manufacturer-7b',
+  TEAM_AUTHORIZED_REPRESENTATIVE:
+    'compliance-team-authorized-representative-7a',
+  VERSION_AUTHORIZED_REPRESENTATIVE:
+    'compliance-version-authorized-representative-7b',
 } as const;
 
 export const TECH_DOC_CHECKLIST_NAMESPACE =
@@ -36,24 +40,24 @@ export function getComplianceNamespace(
   const roleFileMap: Record<OscratOrganizationRole, ComplianceNamespace> = {
     [OscratOrganizationRole.MANUFACTURER]:
       type === 'team'
-        ? COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER
-        : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER,
+        ? COMPLIANCE_NAMESPACES.TEAM_IMPORTER
+        : COMPLIANCE_NAMESPACES.VERSION_IMPORTER,
     [OscratOrganizationRole.DISTRIBUTOR]:
       type === 'team'
         ? COMPLIANCE_NAMESPACES.TEAM_DISTRIBUTOR
         : COMPLIANCE_NAMESPACES.VERSION_DISTRIBUTOR,
     [OscratOrganizationRole.IMPORTER]:
       type === 'team'
-        ? COMPLIANCE_NAMESPACES.TEAM_IMPORTER
-        : COMPLIANCE_NAMESPACES.VERSION_IMPORTER,
+        ? COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER
+        : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER,
     [OscratOrganizationRole.DATA_STEWARD]:
       type === 'team'
         ? COMPLIANCE_NAMESPACES.TEAM_DATA_STEWARD
         : COMPLIANCE_NAMESPACES.VERSION_DATA_STEWARD,
     [OscratOrganizationRole.AUTHORIZED_REPRESENTATIVE]:
       type === 'team'
-        ? COMPLIANCE_NAMESPACES.TEAM_MANUFACTURER
-        : COMPLIANCE_NAMESPACES.VERSION_MANUFACTURER,
+        ? COMPLIANCE_NAMESPACES.TEAM_AUTHORIZED_REPRESENTATIVE
+        : COMPLIANCE_NAMESPACES.VERSION_AUTHORIZED_REPRESENTATIVE,
   };
 
   return roleFileMap[role];

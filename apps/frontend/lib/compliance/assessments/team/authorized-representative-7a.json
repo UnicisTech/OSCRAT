@@ -1,0 +1,313 @@
+[
+  {
+    "id": 1,
+    "areaOfRequirements": "area-1.name",
+    "content": [
+      {
+        "reqId": "ARO1",
+        "requirement": "area-1.ARO1.requirement",
+        "craReference": "Article 14, point (8); Annex I, Part II, points (4), (7)",
+        "genericTask": "Create and maintain a trusted vulnerability disclosure and advisory communication process",
+        "questions": [
+          {
+            "questionId": "ARO1-Q1",
+            "questionText": "area-1.ARO1.questions.Q1.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARO1-Q2",
+            "questionText": "area-1.ARO1.questions.Q2.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARO1-Q3",
+            "questionText": "area-1.ARO1.questions.Q3.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO1-Q4",
+            "questionText": "area-1.ARO1.questions.Q4.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARO1-Q5",
+            "questionText": "area-1.ARO1.questions.Q5.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO1-Q6",
+            "questionText": "area-1.ARO1.questions.Q6.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-1.ARO1.hint"
+      },
+      {
+        "reqId": "ARO2",
+        "requirement": "area-1.ARO2.requirement",
+        "craReference": "Article 13, point (8); Article 14, points (1), (2), (3), (4), (8); Annex I, Part II, points (5), (6); Annex II, point (2)",
+        "genericTask": "Implement and maintain a coordinated vulnerability disclosure policy and response process",
+        "questions": [
+          {
+            "questionId": "ARO2-Q1",
+            "questionText": "area-1.ARO2.questions.Q1.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARO2-Q2",
+            "questionText": "area-1.ARO2.questions.Q2.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARO2-Q3",
+            "questionText": "area-1.ARO2.questions.Q3.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARO2-Q4",
+            "questionText": "area-1.ARO2.questions.Q4.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ARO2-Q5",
+            "questionText": "area-1.ARO2.questions.Q5.text",
+            "answerType": "text"
+          }
+        ],
+        "hint": "area-1.ARO2.hint"
+      },
+      {
+        "reqId": "ARO3",
+        "requirement": "area-1.ARO3.requirement",
+        "craReference": "Article 13, point (17); Annex II, point (2)",
+        "genericTask": "Establish secure intake, tracking, and communication process for external vulnerability reports",
+        "questions": [
+          {
+            "questionId": "ARO3-Q1",
+            "questionText": "area-1.ARO3.questions.Q1.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO3-Q2",
+            "questionText": "area-1.ARO3.questions.Q2.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO3-Q3",
+            "questionText": "area-1.ARO3.questions.Q3.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO3-Q4",
+            "questionText": "area-1.ARO3.questions.Q4.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO3-Q5",
+            "questionText": "area-1.ARO3.questions.Q5.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO3-Q6",
+            "questionText": "area-1.ARO3.questions.Q6.text",
+            "answerType": "text"
+          }
+        ],
+        "hint": "area-1.ARO3.hint"
+      },
+      {
+        "reqId": "ARO4",
+        "requirement": "area-1.ARO4.requirement",
+        "craReference": "Article 14, points (3), (4)(a), (4)(b), (5), (7); Article 16, point (1)",
+        "genericTask": "Establish and operate a structured security incident response and timely notification process",
+        "questions": [
+          {
+            "questionId": "ARO4-Q1",
+            "questionText": "area-1.ARO4.questions.Q1.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO4-Q2",
+            "questionText": "area-1.ARO4.questions.Q2.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO4-Q3",
+            "questionText": "area-1.ARO4.questions.Q3.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO4-Q4",
+            "questionText": "area-1.ARO4.questions.Q4.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO4-Q5",
+            "questionText": "area-1.ARO4.questions.Q5.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO4-Q6",
+            "questionText": "area-1.ARO4.questions.Q6.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO4-Q7",
+            "questionText": "area-1.ARO4.questions.Q7.text",
+            "answerType": "text"
+          }
+        ],
+        "hint": "area-1.ARO4.hint"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "areaOfRequirements": "area-2.name",
+    "content": [
+      {
+        "reqId": "ARO5",
+        "requirement": "area-2.ARO5.requirement",
+        "craReference": "Article 13(17); Recital (63); Annex VII point 2b",
+        "genericTask": "Include details of single point of contact",
+        "questions": [
+          {
+            "questionId": "ARO5-Q1",
+            "questionText": "area-2.ARO5.questions.Q1.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ARO5-Q2",
+            "questionText": "area-2.ARO5.questions.Q2.text",
+            "answerType": "text"
+          }
+        ],
+        "hint": "area-2.ARO5.hint"
+      },
+      {
+        "reqId": "ARO6",
+        "requirement": "area-2.ARO6.requirement",
+        "craReference": "Article 14(2)(8); Annex VII point 2b",
+        "genericTask": "Document and maintain detailed processes for timely vulnerability and incident reporting to CSIRT and ENISA, including data requirements and machine-readable formats",
+        "questions": [
+          {
+            "questionId": "ARO6-Q1",
+            "questionText": "area-2.ARO6.questions.Q1.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false,
+              "hint": "Attach a document describing the process of reporting to CSIRT and ENISA."
+            }
+          },
+          {
+            "questionId": "ARO6-Q2",
+            "questionText": "area-2.ARO6.questions.Q2.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO6-Q3",
+            "questionText": "area-2.ARO6.questions.Q3.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO6-Q4",
+            "questionText": "area-2.ARO6.questions.Q4.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO6-Q5",
+            "questionText": "area-2.ARO6.questions.Q5.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO6-Q6",
+            "questionText": "area-2.ARO6.questions.Q6.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO6-Q7",
+            "questionText": "area-2.ARO6.questions.Q7.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO6-Q8",
+            "questionText": "area-2.ARO6.questions.Q8.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          }
+        ],
+        "hint": "area-2.ARO6.hint"
+      },
+      {
+        "reqId": "ARO7",
+        "requirement": "area-2.ARO7.requirement",
+        "craReference": "Article 31(4); Article 13(13)",
+        "genericTask": "Ensure technical documentation and EU Declaration of Conformity are properly maintained, accessible to authorities, and that production processes consistently comply with regulations",
+        "questions": [
+          {
+            "questionId": "ARO7-Q1",
+            "questionText": "area-2.ARO7.questions.Q1.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ARO7-Q2",
+            "questionText": "area-2.ARO7.questions.Q2.text",
+            "answerType": "text"
+          }
+        ],
+        "hint": "area-2.ARO7.hint"
+      }
+    ]
+  }
+]

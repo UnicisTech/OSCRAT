@@ -11,6 +11,12 @@ export const TRANSLATION_NAMESPACES: Record<string, { label: string }> = {
   'version-distributor': { label: 'Distributor (Version)' },
   'version-importer': { label: 'Importer (Version)' },
   'version-sme-manufacturer': { label: 'SME Manufacturer (Version)' },
+  'team-authorized-representative': {
+    label: 'Authorized Representative (Team)',
+  },
+  'version-authorized-representative': {
+    label: 'Authorized Representative (Version)',
+  },
 };
 
 export type TranslationNamespaceKey =
@@ -21,7 +27,9 @@ export type TranslationNamespaceKey =
   | 'version-manufacturer'
   | 'version-distributor'
   | 'version-importer'
-  | 'version-sme-manufacturer';
+  | 'version-sme-manufacturer'
+  | 'team-authorized-representative'
+  | 'version-authorized-representative';
 
 // EU official languages (English included - can be customized per team)
 export const SUPPORTED_LANGUAGES = [
