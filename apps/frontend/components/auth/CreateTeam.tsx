@@ -85,6 +85,7 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
           postalAddress: values.postalAddress,
           contactEmail: values.contactEmail,
           contactPhone: values.contactPhone,
+          countryCode: values.countryCode,
           additionalInformation: values.additionalInformation,
         };
 

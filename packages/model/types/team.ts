@@ -81,6 +81,7 @@ export interface TeamCreateRequest {
   postalAddress?: string;
   contactEmail?: string;
   contactPhone?: string;
+  countryCode?: string;
   additionalInformation?: string;
 }
 
