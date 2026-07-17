@@ -52,7 +52,7 @@ const handlePOST = async (
   const teamExists = userTeams.some((team) => team.slug === slug);
 
   if (teamExists) {
-    throw new ApiError(400, 'You already have a team with this name.');
+    throw new ApiError(400, 'You already have an organization with this name.');
   }
 
   const teamData: TeamCreateData = {
@@ -79,7 +79,7 @@ const handlePOST = async (
     ) {
       throw new ApiError(
         400,
-        'This team name is already taken. Please choose a different name.'
+        'This organization name is already taken. Please choose a different name.'
       );
     }
     throw error;

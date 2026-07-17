@@ -26,7 +26,12 @@ import Button from '@/components/button';
 import useCanAccess from '@/hooks/useCanAccess';
 import { useComments } from '@/hooks/useComments';
 import { extractErrorMessage } from '@/lib/utils';
+import {
+  COMMENT_MAX_LENGTH,
+  commentTextSchema,
+} from '@/lib/validation/comment';
 import { checkExtensionAndMIMEType, isEmptyFile } from '@/utils/fileValidation';
+import * as Yup from 'yup';
 import { formatDateShort, formatDateTime } from '@/utils/dateFormat';
 import { truncateAtWordBoundary } from '@/lib/text-sanitize';
 import type { Attachment } from '@/types';
@@ -146,6 +151,15 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
     event.preventDefault();
     const trimmedComment = newComment.trim();
     if (!trimmedComment) return;
+
+    try {
+      await commentTextSchema.validate(trimmedComment);
+    } catch (validationError) {
+      if (validationError instanceof Yup.ValidationError) {
+        setCommentError(t(validationError.message));
+      }
+      return;
+    }
 
     try {
       await createComment({ text: trimmedComment });
@@ -407,6 +421,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
             onChange={(event) => setNewComment(event.target.value)}
             placeholder={t('oscrat.ui.new-comment')}
             rows={4}
+            maxLength={COMMENT_MAX_LENGTH}
             className="border-line text-content-secondary focus:ring-primary rounded-input w-full border px-3 py-2 focus:outline-none focus:ring-2"
           />
           {commentError && (
@@ -438,7 +453,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
                   {formatDateTime(comment.createdAt)}
                 </p>
               </div>
-              <p className="text-content-secondary whitespace-pre-wrap text-sm">
+              <p className="text-content-secondary whitespace-pre-wrap break-words text-sm">
                 {comment.text}
               </p>
             </div>

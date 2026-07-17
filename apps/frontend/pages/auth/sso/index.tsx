@@ -25,7 +25,7 @@ const SSO: NextPageWithLayout = () => {
       slug: '',
     },
     validationSchema: Yup.object().shape({
-      slug: Yup.string().required('Team slug is required'),
+      slug: Yup.string().required('Organization slug is required'),
     }),
     onSubmit: async (values) => {
       const response = await fetch('/api/auth/sso/verify', {
@@ -65,11 +65,11 @@ const SSO: NextPageWithLayout = () => {
           <div className="space-y-2">
             <InputWithLabel
               type="text"
-              label="Team slug"
+              label="Organization slug"
               name="slug"
               placeholder="boxyhq"
               value={formik.values.slug}
-              descriptionText="Contact your administrator to get your team slug"
+              descriptionText="Contact your administrator to get your organization slug"
               error={
                 formik.touched.slug && formik.errors.slug
                   ? t(formik.errors.slug)

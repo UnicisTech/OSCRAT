@@ -89,14 +89,7 @@ const CompliancePage = () => {
     enabled: !!team && !!versionData,
   });
 
-  if (
-    !ready ||
-    isLoading ||
-    isLoadingAssessments ||
-    !complianceData ||
-    !project ||
-    !versionData
-  ) {
+  if (!ready || isLoading || isLoadingAssessments || !project || !versionData) {
     return <Loading />;
   }
 
@@ -133,20 +126,28 @@ const CompliancePage = () => {
         </p>
       </div>
 
-      <ComplianceAssessmentWrapper
-        complianceData={complianceData}
-        productId={productId}
-        versionId={versionId}
-        teamSlug={team.slug}
-        teamId={team.id}
-        teamRole={getRoleForTeam(team.orgRoles[0])}
-        teamName={team.name}
-        productName={`${project.name} (${versionData.version})`}
-        complianceType={COMPLIANCE_TYPES.VERSION}
-        isAssessmentStarted={hasStartedAssessment}
-        isAssessmentCompleted={isAssessmentCompleted}
-        onReset={resetAssessment}
-      />
+      {complianceData?.length ? (
+        <ComplianceAssessmentWrapper
+          complianceData={complianceData}
+          productId={productId}
+          versionId={versionId}
+          teamSlug={team.slug}
+          teamId={team.id}
+          teamRole={getRoleForTeam(team.orgRoles[0])}
+          teamName={team.name}
+          productName={`${project.name} (${versionData.version})`}
+          complianceType={COMPLIANCE_TYPES.VERSION}
+          isAssessmentStarted={hasStartedAssessment}
+          isAssessmentCompleted={isAssessmentCompleted}
+          onReset={resetAssessment}
+        />
+      ) : (
+        <div className="border-line bg-surface rounded-card flex w-full flex-col items-center border p-8">
+          <p className="text-content-muted">
+            {t('oscrat.ui.versions.compliance.no-data')}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

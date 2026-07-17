@@ -13,7 +13,7 @@ export const sendTeamInviteEmail = async (
 
   await sendEmail({
     to: invitation.email,
-    subject: 'Team Invitation',
+    subject: 'Organization Invitation',
     html,
   });
 };

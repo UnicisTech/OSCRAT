@@ -207,9 +207,83 @@
             "questionId": "ESO4-Q6",
             "questionText": "area-2.ESO4.questions.Q6.text",
             "answerType": "text"
+          },
+          {
+            "questionId": "ESO4-Q7",
+            "questionText": "area-2.ESO4.questions.Q7.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ESO4-Q8",
+            "questionText": "area-2.ESO4.questions.Q8.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ESO4-Q9",
+            "questionText": "area-2.ESO4.questions.Q9.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ESO4-Q10",
+            "questionText": "area-2.ESO4.questions.Q10.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
           }
         ],
         "hint": "area-2.ESO4.hint"
+      },
+      {
+        "reqId": "ESO5",
+        "requirement": "area-2.ESO5.requirement",
+        "craReference": "Article 13 (5),(6),(8); Article 14 (8); Annex I Part II (1),(4),(6)",
+        "genericTask": "Implement secure lifecycle management and communication for third-party and open-source components",
+        "questions": [
+          {
+            "questionId": "ESO5-Q1",
+            "questionText": "area-2.ESO5.questions.Q1.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ESO5-Q2",
+            "questionText": "area-2.ESO5.questions.Q2.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ESO5-Q3",
+            "questionText": "area-2.ESO5.questions.Q3.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ESO5-Q4",
+            "questionText": "area-2.ESO5.questions.Q4.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ESO5-Q5",
+            "questionText": "area-2.ESO5.questions.Q5.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-2.ESO5.hint"
       }
     ]
   },
@@ -492,6 +566,28 @@
             "questionText": "area-6.ESO11.questions.Q6.text",
             "answerType": "boolean",
             "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ESO11-Q7",
+            "questionText": "area-6.ESO11.questions.Q7.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ESO11-Q8",
+            "questionText": "area-6.ESO11.questions.Q8.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ESO11-Q9",
+            "questionText": "area-6.ESO11.questions.Q9.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
           }
         ],
         "hint": "area-6.ESO11.hint"
@@ -595,6 +691,87 @@
           }
         ],
         "hint": "area-6.ESO14.hint"
+      },
+      {
+        "reqId": "ES013",
+        "requirement": "area-6.ES013.requirement",
+        "craReference": "Article 13(2); Annex I Part 1 points (1), (2); Annex I Part 2; ANNEX VII, point (3); ISO/IEC 27005, ISO/IEC 31000; Article 13 (2)(3)(4)(7)",
+        "genericTask": "Document comprehensive cybersecurity risk assessment procedures, including context, applicability, lifecycle integration, and systematic updates throughout product support period",
+        "questions": [
+          {
+            "questionId": "ES013-Q1",
+            "questionText": "area-6.ES013.questions.Q1.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ES013-Q2",
+            "questionText": "area-6.ES013.questions.Q2.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ES013-Q3",
+            "questionText": "area-6.ES013.questions.Q3.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          },
+          {
+            "questionId": "ES013-Q4",
+            "questionText": "area-6.ES013.questions.Q4.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ES013-Q5",
+            "questionText": "area-6.ES013.questions.Q5.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ES013-Q6",
+            "questionText": "area-6.ES013.questions.Q6.text",
+            "answerType": "text",
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
+          }
+        ],
+        "hint": "area-6.ES013.hint"
+      },
+      {
+        "reqId": "ES014",
+        "requirement": "area-6.ES014.requirement",
+        "craReference": "Article 31(4)",
+        "genericTask": "Ensure technical documentation and EU Declaration of Conformity are properly maintained, accessible to authorities, and that production processes consistently comply with regulations",
+        "questions": [
+          {
+            "questionId": "ES014-Q1",
+            "questionText": "area-6.ES014.questions.Q1.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          },
+          {
+            "questionId": "ES014-Q2",
+            "questionText": "area-6.ES014.questions.Q2.text",
+            "answerType": "text"
+          },
+          {
+            "questionId": "ES014-Q3",
+            "questionText": "area-6.ES014.questions.Q3.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"]
+          }
+        ],
+        "hint": "area-6.ES014.hint"
       }
     ]
   }

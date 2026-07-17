@@ -487,12 +487,12 @@
         "attachment.create": "Uploaded attachment",
         "attachment.download": "Downloaded attachment",
         "attachment.delete": "Deleted attachment",
-        "invitation.create": "Invited team member",
+        "invitation.create": "Invited organization member",
         "invitation.delete": "Revoked invitation",
-        "teammember.delete": "Removed team member",
+        "teammember.delete": "Removed organization member",
         "teammember.update": "Updated member role",
-        "team.update": "Updated team settings",
-        "team.delete": "Deleted team",
+        "team.update": "Updated organization settings",
+        "team.delete": "Deleted organization",
         "webhook.create": "Created webhook",
         "webhook.update": "Updated webhook",
         "webhook.delete": "Deleted webhook",
@@ -1171,7 +1171,9 @@
         "assessment-type-required": "Assessment type is required",
         "assessment-type-invalid": "Please select a valid assessment type",
         "schema-version-required": "Schema version is required",
-        "raw-data-required": "Assessment data is required"
+        "raw-data-required": "Assessment data is required",
+        "comment-required": "Comment cannot be empty",
+        "comment-too-long": "Comment must be 1000 characters or less"
       },
       "messages": {
         "saving": "Saving...",
@@ -1202,7 +1204,7 @@
           "audit-log": "Audit Log"
         },
         "compliance": {
-          "no-data": "No compliance data available. Please complete the product applicability survey first."
+          "no-data": "No product compliance assessment is required for this organization role."
         },
         "sbom": {
           "title": "SBOM Report",
@@ -1745,7 +1747,7 @@
       },
       "compliance-translation": {
         "title": "Compliance Assessment Translations",
-        "description": "Manage translations for compliance assessment questionnaires. Download the default English template, translate it, and upload for your desired language. These translations will be used when team members take assessments.",
+        "description": "Manage translations for compliance assessment questionnaires. Download the default English template, translate it, and upload for your desired language. These translations will be used when organization members take assessments.",
         "upload-new": "Upload New Translation",
         "assessment-type": "Assessment Type",
         "language": "Language",
@@ -1889,8 +1891,8 @@
       "vulnerability-scan-report": "Vulnerability Scan Report",
       "configuration-scan-report": "Configuration Scan",
       "file": "File",
-      "team": "Team",
-      "team-member": "Team Member",
+      "team": "Organization",
+      "team-member": "Organization Member",
       "invitation": "Invitation",
       "sso-connection": "SSO Connection",
       "directory-sync": "Directory Sync",

@@ -119,6 +119,20 @@
               "type": "fileUpload",
               "required": false
             }
+          },
+          {
+            "questionId": "DP4-Q2",
+            "questionText": "area-1.DP4.questions.Q2.text",
+            "answerType": "boolean",
+            "options": ["common.yes", "common.no"],
+            "additionalInformation": {
+              "type": "text",
+              "required": false
+            },
+            "evidence": {
+              "type": "fileUpload",
+              "required": false
+            }
           }
         ],
         "hint": "area-1.DP4.hint"

@@ -22,12 +22,15 @@ const TeamInviteEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>Team Invitation</Preview>
+      <Preview>Organization Invitation</Preview>
       <EmailLayout>
         {userFirstname && <Text>Hi {userFirstname},</Text>}
-        <Text>You have been invited to join the team at {teamName}.</Text>
         <Text>
-          Click the link below to accept the invitation and join the team:
+          You have been invited to join the organization at {teamName}.
+        </Text>
+        <Text>
+          Click the link below to accept the invitation and join the
+          organization:
         </Text>
 
         <Container className="text-center">
@@ -36,7 +39,7 @@ const TeamInviteEmail = ({
             style={{ padding: '16px 20px' }}
             className="rounded bg-[#000000] text-center text-[12px] font-semibold text-white no-underline"
           >
-            Join team
+            Join organization
           </Button>
         </Container>
       </EmailLayout>

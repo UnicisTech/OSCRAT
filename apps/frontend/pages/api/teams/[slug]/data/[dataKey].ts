@@ -35,7 +35,7 @@ const handleGET = async (
   const data = await getTeamData(teamMember.teamId, dataKey);
 
   if (!data) {
-    throw new ApiError(404, 'Team data not found');
+    throw new ApiError(404, 'Organization data not found');
   }
 
   res.json({ data });

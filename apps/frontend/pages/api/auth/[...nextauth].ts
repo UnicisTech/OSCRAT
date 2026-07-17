@@ -307,7 +307,9 @@ const linkToTeam = async (
   });
 
   if (!team) {
-    throw new Error(`Team with ID ${profile.requested.tenant} not found`);
+    throw new Error(
+      `Organization with ID ${profile.requested.tenant} not found`
+    );
   }
 
   // Sort out roles

@@ -35,7 +35,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const team = await getTeam({ slug });
 
   if (!team) {
-    throw new ApiError(404, 'Team not found.');
+    throw new ApiError(404, 'Organization not found.');
   }
 
   const connections = await apiController.getConnections({
@@ -44,7 +44,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   if (!connections || connections.length === 0) {
-    throw new ApiError(404, 'No SSO connections found for this team.');
+    throw new ApiError(404, 'No SSO connections found for this organization.');
   }
 
   console.log(

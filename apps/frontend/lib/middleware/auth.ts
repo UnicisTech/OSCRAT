@@ -51,7 +51,7 @@ export const getAuthenticatedTeamContext = async (
   );
 
   if (!teamMember) {
-    throw new Error('You do not have access to this team');
+    throw new Error('You do not have access to this organization');
   }
 
   return {

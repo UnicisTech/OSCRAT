@@ -38,7 +38,7 @@ const Teams = () => {
   };
 
   return (
-    <Card heading="Your Teams">
+    <Card heading="Your Organizations">
       <Card.Body>
         <table className="text-content-muted w-full table-fixed text-left text-sm">
           <thead className="bg-surface-muted text-content border-line-header border-b">

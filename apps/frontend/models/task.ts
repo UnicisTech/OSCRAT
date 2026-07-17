@@ -32,7 +32,7 @@ export const createTask = async (
   const normalizedTitle = normalizeTaskTitle(param.title);
   const team = await TeamOps.getTeamDetail(prisma, { id: teamId });
   if (!team) {
-    throw new Error('Team not found');
+    throw new Error('Organization not found');
   }
   const taskNumber = team.taskIndex;
 

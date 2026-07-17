@@ -6,7 +6,7 @@ import { validateRequest } from '@/lib/validation/validateRequest';
 import type { DocumentationDetails } from '@oscrat/model';
 
 const querySchema = Yup.object({
-  slug: Yup.string().required('Team slug is required'),
+  slug: Yup.string().required('Organization slug is required'),
   docSlug: Yup.string().required('Document slug is required'),
 });
 

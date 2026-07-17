@@ -69,7 +69,7 @@ const handlePOST = async (
   });
 
   if (userExist) {
-    throw new ApiError(400, 'This user already in your team.');
+    throw new ApiError(400, 'This user is already in your organization.');
   }
 
   const invitation = await createInvitation(

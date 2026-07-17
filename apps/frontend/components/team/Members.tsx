@@ -69,7 +69,9 @@ const Members = ({ team }: { team: Team }) => {
         <div className="flex items-center justify-between">
           <Card.Header>
             <Card.Title>Members</Card.Title>
-            <Card.Description>Team members and their roles.</Card.Description>
+            <Card.Description>
+              Organization members and their roles.
+            </Card.Description>
           </Card.Header>
           {canAccess('team_invitation', ['create']) && (
             <Button variant="primary" onClick={() => setVisible(!visible)}>
@@ -78,13 +80,13 @@ const Members = ({ team }: { team: Team }) => {
           )}
         </div>
         <table className="table w-full border-b text-sm">
-          <thead className="bg-surface-muted text-content border-b border-line-header">
+          <thead className="bg-surface-muted text-content border-line-header border-b">
             <tr>
-              <th className="p-4 text-b2 font-medium">{t('name')}</th>
-              <th className="p-4 text-b2 font-medium">{t('email')}</th>
-              <th className="p-4 text-b2 font-medium">{t('role')}</th>
+              <th className="text-b2 p-4 font-medium">{t('name')}</th>
+              <th className="text-b2 p-4 font-medium">{t('email')}</th>
+              <th className="text-b2 p-4 font-medium">{t('role')}</th>
               {canAccess('team_member', ['delete']) && (
-                <th className="p-4 text-b2 font-medium">{t('action')}</th>
+                <th className="text-b2 p-4 font-medium">{t('action')}</th>
               )}
             </tr>
           </thead>

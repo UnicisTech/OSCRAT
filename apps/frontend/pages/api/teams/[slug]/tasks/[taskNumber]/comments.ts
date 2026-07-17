@@ -8,6 +8,8 @@ import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import type { NextApiResponse } from 'next';
 import { sendEvent } from '@/lib/svix';
 import { ApiError } from '@/lib/errors';
+import { commentTextSchema } from '@/lib/validation/comment';
+import { validateRequest } from '@/lib/validation/validateRequest';
 
 export default function handler(
   req: AuthenticatedTeamRequest,
@@ -74,7 +76,10 @@ const handlePOST = async (
     });
   }
 
-  const { text } = req.body;
+  const text = await validateRequest(
+    commentTextSchema.required(),
+    req.body?.text
+  );
   const userId = user.id;
 
   const comment = await createComment({
@@ -104,7 +109,11 @@ const handlePUT = async (
 ) => {
   const { teamMember } = req.teamContext;
 
-  const { text, id } = req.body;
+  const { id } = req.body;
+  const text = await validateRequest(
+    commentTextSchema.required(),
+    req.body?.text
+  );
 
   const comment = await updateComment(id, text);
 

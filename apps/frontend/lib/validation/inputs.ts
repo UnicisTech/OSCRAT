@@ -166,10 +166,12 @@ export const productDescriptionSchema = Yup.string()
   });
 
 // Generic reusable schemas for titles and descriptions
+export const TITLE_MAX_LENGTH = 100;
+
 export const titleSchema = Yup.string()
   .trim()
   .min(1, 'oscrat.ui.validation.title-required')
-  .max(100, 'oscrat.ui.validation.title-too-long')
+  .max(TITLE_MAX_LENGTH, 'oscrat.ui.validation.title-too-long')
   .matches(SAFE_TEXT_REGEX, 'oscrat.ui.validation.invalid-characters');
 
 export const descriptionSchema = Yup.string()

@@ -3,16 +3,16 @@ import { OscratOrganizationRole } from '@oscrat/model';
 import type { ComplianceType } from '@/lib/compliance/translations';
 
 export const TRANSLATION_NAMESPACES: Record<string, { label: string }> = {
-  'team-manufacturer': { label: 'Manufacturer (Team)' },
-  'team-distributor': { label: 'Distributor (Team)' },
-  'team-importer': { label: 'Importer (Team)' },
-  'team-sme-manufacturer': { label: 'SME Manufacturer (Team)' },
+  'team-manufacturer': { label: 'Manufacturer (Organization)' },
+  'team-distributor': { label: 'Distributor (Organization)' },
+  'team-importer': { label: 'Importer (Organization)' },
+  'team-sme-manufacturer': { label: 'SME Manufacturer (Organization)' },
   'version-manufacturer': { label: 'Manufacturer (Version)' },
   'version-distributor': { label: 'Distributor (Version)' },
   'version-importer': { label: 'Importer (Version)' },
   'version-sme-manufacturer': { label: 'SME Manufacturer (Version)' },
   'team-authorized-representative': {
-    label: 'Authorized Representative (Team)',
+    label: 'Authorized Representative (Organization)',
   },
   'version-authorized-representative': {
     label: 'Authorized Representative (Version)',
@@ -31,7 +31,7 @@ export type TranslationNamespaceKey =
   | 'team-authorized-representative'
   | 'version-authorized-representative';
 
-// EU official languages (English included - can be customized per team)
+// EU official languages (English included - can be customized per organization)
 export const SUPPORTED_LANGUAGES = [
   { code: 'en', label: 'English' },
   { code: 'de', label: 'German' },

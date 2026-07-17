@@ -12,6 +12,7 @@
   "area-1.DP3.requirement": "Accompanying information",
   "area-1.DP4.hint": "Check that users are clearly informed of the support period (e.g., start and end date/year) and how security updates are provided throughout the period.",
   "area-1.DP4.questions.Q1.text": "Does the product with digital elements include a clear statement of the support period (e.g., end date or year), including what is supported and how security updates are provided during the period?",
+  "area-1.DP4.questions.Q2.text": "Is the end of support date easily accessible, and where applicable, provided on the product, its packaging, or through digital means, as required by the manufacturer?",
   "area-1.DP4.requirement": "Support period",
   "area-1.name": "Product compliance",
   "area-2.DO1.hint": "Distributors should have procedures to ensure products comply with CRA before market release, prevent distribution of non-compliant products, take corrective actions (withdrawal/recall) where non-compliance is suspected, promptly notify the manufacturer and market surveillance authorities of significant cybersecurity risks and corrective measures, and fully cooperate with authorities by providing requested documentation.",

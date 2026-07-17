@@ -139,7 +139,7 @@ export const getTeamProducts = async (slug: string) => {
   });
 
   if (!teamWithProducts) {
-    throw new Error(`Team with slug '${slug}' not found`);
+    throw new Error(`Organization with slug '${slug}' not found`);
   }
 
   return teamWithProducts.products;

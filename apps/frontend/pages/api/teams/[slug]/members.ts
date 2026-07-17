@@ -18,7 +18,7 @@ async function assertTeamHasOtherOwners(teamId: string) {
     where: { teamId, role: Role.OWNER },
   });
   if (owners <= 1) {
-    throw new ApiError(400, 'A team should have at least one owner.');
+    throw new ApiError(400, 'An organization should have at least one owner.');
   }
 }
 
@@ -80,7 +80,7 @@ const handleDELETE = async (
   });
 
   if (!existingMember) {
-    throw new ApiError(404, 'Team member not found.');
+    throw new ApiError(404, 'Organization member not found.');
   }
 
   if (existingMember.role === Role.OWNER) {
@@ -91,7 +91,7 @@ const handleDELETE = async (
     await removeTeamMember(teamMember.teamId, userId, req.auditInfo);
   } catch (error) {
     console.error('Error removing team member:', error);
-    throw new ApiError(500, 'Failed to remove team member.');
+    throw new ApiError(500, 'Failed to remove organization member.');
   }
 
   await sendEvent(teamMember.teamId, 'member.removed', existingMember);

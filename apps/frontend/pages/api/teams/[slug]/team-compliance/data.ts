@@ -34,7 +34,7 @@ const handleGET = async (
   if (!data) {
     throw new ApiError(
       404,
-      `Team compliance data not found for role "${role}"`
+      `Organization compliance data not found for role "${role}"`
     );
   }
 

@@ -9,6 +9,7 @@ import {
   DOCUMENTATION_TEMPLATES,
   type TemplateType,
 } from '@/constants/documentationTemplates';
+import { TITLE_MAX_LENGTH } from '@/lib/validation/inputs';
 import { useCreateDocumentationWizard } from './hooks/useCreateDocumentationWizard';
 
 interface Props {
@@ -126,7 +127,7 @@ const CreateDocumentationModal: React.FC<Props> = ({
               value={wizard.title}
               onChange={(e) => wizard.setTitle(e.target.value)}
               placeholder={t('oscrat.ui.documentation.title-placeholder')}
-              maxLength={100}
+              maxLength={TITLE_MAX_LENGTH}
               required
             />
 

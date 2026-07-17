@@ -4,6 +4,7 @@ import { Button } from '@/components/shared';
 import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
 import MarkdownEditor from '@/components/shared/MarkdownEditorDynamic';
+import { TITLE_MAX_LENGTH } from '@/lib/validation/inputs';
 import PublicUrlDisplay from './PublicUrlDisplay';
 import LinkedTasksSection from './LinkedTasksSection';
 import DeleteDocumentationModal from './DeleteDocumentationModal';
@@ -165,7 +166,7 @@ const DocumentationEditorView: React.FC<DocumentationEditorViewProps> = ({
           value={title}
           onChange={onTitleChange}
           disabled={!canEdit}
-          maxLength={100}
+          maxLength={TITLE_MAX_LENGTH}
           required
         />
 
