@@ -186,6 +186,8 @@
   "assertion-encryption": "Assertion Encryption",
   "token-not-found": "The verification token is invalid or has already been used.",
   "email-verified": "Your email has been successfully verified. Thank you for confirming your account.",
+  "email-changed": "Your email address has been updated. Please sign in with your new email.",
+  "email-change-pending": "We sent a confirmation link to {{email}}. Click it to finish changing your email address.",
   "invalid-credentials": "Invalid login credentials",
   "no-credentials": "No credentials found.",
   "confirm-email": "Confirm your email address",

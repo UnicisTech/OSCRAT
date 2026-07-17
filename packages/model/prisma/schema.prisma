@@ -90,6 +90,16 @@ model PasswordReset {
   expiresAt DateTime
 }
 
+model EmailChange {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  newEmail  String
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+}
+
 // Team & Task Management Models
 
 model Team {

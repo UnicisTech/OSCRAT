@@ -11,6 +11,7 @@ export * from './assessment';
 export * from './incident';
 export * from './vulnerability';
 export * from './user';
+export * from './emailChange';
 export * from './invitation';
 export * from './apiKey';
 export * from './task';

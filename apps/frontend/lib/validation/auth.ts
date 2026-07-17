@@ -58,10 +58,13 @@ export const updatePasswordSchema = Yup.object().shape({
 });
 
 /**
- * Validation schema for updating email
+ * Validation schema for changing email (requires current password re-auth)
  */
-export const updateEmailSchema = Yup.object().shape({
+export const changeEmailSchema = Yup.object().shape({
   email: emailSchema.required('oscrat.ui.validation.email-required'),
+  currentPassword: Yup.string().required(
+    'oscrat.ui.validation.current-password-required'
+  ),
 });
 
 /**
@@ -89,7 +92,7 @@ export type JoinWithInvitationData = Yup.InferType<
   typeof joinWithInvitationSchema
 >;
 export type UpdatePasswordData = Yup.InferType<typeof updatePasswordSchema>;
-export type UpdateEmailData = Yup.InferType<typeof updateEmailSchema>;
+export type ChangeEmailData = Yup.InferType<typeof changeEmailSchema>;
 export type UpdateNameData = Yup.InferType<typeof updateNameSchema>;
 export type JoinOrgWithInvitationData = Yup.InferType<
   typeof joinOrgWithInvitationSchema

@@ -73,6 +73,8 @@ export type AppEvent =
   | 'user.password.updated'
   | 'user.password.request'
   | 'user.updated'
+  | 'user.email.updated'
+  | 'user.email.request'
   | 'user.signup'
   | 'user.password.reset'
   | 'team.fetched'

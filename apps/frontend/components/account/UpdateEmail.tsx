@@ -1,26 +1,52 @@
+import { useState } from 'react';
 import { useTranslation } from 'next-i18next';
+import { useFormik } from 'formik';
+import toast from 'react-hot-toast';
+import type { User } from '@oscrat/model';
 
 import Button from '@/components/button';
-import { Card } from '@/components/shared';
-import { useAccount } from '@/hooks/useAccount';
-import type { User } from '@oscrat/model';
-import { updateEmailSchema } from '@/lib/validation/auth';
-import { useAccountForm } from '@/hooks/useAccountForm';
+import { Alert, Card, InputWithLabel } from '@/components/shared';
+import { useChangeEmail } from '@/lib/api/hooks/users';
+import { changeEmailSchema } from '@/lib/validation/auth';
+import { extractErrorMessage } from '@/lib/utils';
 
 interface UpdateEmailProps {
   user: Partial<User>;
-  allowEmailChange: boolean;
 }
 
-const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
+const UpdateEmail = ({ user }: UpdateEmailProps) => {
   const { t } = useTranslation('common');
-  const { updateUser, isUpdateUserLoading } = useAccount();
+  const changeEmail = useChangeEmail();
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
-  const formik = useAccountForm({
-    initialValues: { email: user.email },
-    validationSchema: updateEmailSchema,
-    submitFn: updateUser,
+  const formik = useFormik({
+    initialValues: {
+      email: user.email ?? '',
+      currentPassword: '',
+    },
+    validationSchema: changeEmailSchema,
     enableReinitialize: true,
+    onSubmit: async (values) => {
+      try {
+        const result = await changeEmail.mutateAsync({
+          email: values.email,
+          currentPassword: values.currentPassword,
+        });
+
+        if (result.pendingEmail) {
+          // Deferred: a confirmation link was sent to the new address.
+          setPendingEmail(result.pendingEmail);
+        } else {
+          // Applied immediately (dev / CONFIRM_EMAIL=false).
+          setPendingEmail(null);
+          toast.success(t('successfully-updated'));
+        }
+
+        formik.setFieldValue('currentPassword', '');
+      } catch (error) {
+        toast.error(extractErrorMessage(error, t('error.update-failed'), t));
+      }
+    },
   });
 
   return (
@@ -33,29 +59,55 @@ const UpdateEmail = ({ user, allowEmailChange }: UpdateEmailProps) => {
               {t('email-address-description')}
             </Card.Description>
           </Card.Header>
-          <input
-            type="email"
-            name="email"
-            placeholder={t('your-email')}
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            className="border-line text-content-secondary placeholder-content-placeholder focus:border-primary focus:ring-primary rounded-input w-full max-w-md border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2"
-            required
-            disabled={!allowEmailChange}
-          />
+          <div className="flex flex-col space-y-3">
+            {pendingEmail && (
+              <Alert status="info">
+                {t('email-change-pending', { email: pendingEmail })}
+              </Alert>
+            )}
+            <InputWithLabel
+              type="email"
+              label={t('email-address')}
+              name="email"
+              placeholder={t('your-email')}
+              value={formik.values.email}
+              error={
+                formik.touched.email && formik.errors.email
+                  ? t(formik.errors.email)
+                  : undefined
+              }
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              required
+            />
+            <InputWithLabel
+              type="password"
+              label={t('current-password')}
+              name="currentPassword"
+              placeholder={t('current-password')}
+              value={formik.values.currentPassword}
+              error={
+                formik.touched.currentPassword && formik.errors.currentPassword
+                  ? t(formik.errors.currentPassword)
+                  : undefined
+              }
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              autoComplete="current-password"
+              required
+            />
+          </div>
         </Card.Body>
-        {allowEmailChange && (
-          <Card.Footer>
-            <Button
-              type="submit"
-              variant="primary"
-              loading={isUpdateUserLoading}
-              disabled={!formik.dirty || !formik.isValid}
-            >
-              {t('save-changes')}
-            </Button>
-          </Card.Footer>
-        )}
+        <Card.Footer>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={changeEmail.isPending}
+            disabled={!formik.dirty || !formik.isValid}
+          >
+            {t('save-changes')}
+          </Button>
+        </Card.Footer>
       </Card>
     </form>
   );

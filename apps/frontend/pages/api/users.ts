@@ -3,8 +3,6 @@ import { getSession } from '@/lib/session';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { recordMetric } from '@/lib/metrics';
 import { ApiError } from '@/lib/errors';
-import env from '@/lib/env';
-import { getUser } from 'models/user';
 import { UserReturned } from 'types';
 import { withApiHandler } from '@/lib/middleware';
 
@@ -32,7 +30,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 export default withApiHandler(handler);
 
 const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
-  const allowEmailChange = env.confirmEmail === false;
   const session = await getSession(req, res);
 
   if (!session) {
@@ -51,21 +48,6 @@ const handlePUT = async (req: NextApiRequest, res: NextApiResponse) => {
     toUpdate['lastName'] = req.body.lastName.trim();
     toUpdate['name'] =
       `${req.body.firstName.trim()} ${req.body.lastName.trim()}`;
-  }
-
-  // Only allow email change if confirmEmail is false
-  if (
-    'email' in req.body &&
-    typeof req.body.email === 'string' &&
-    allowEmailChange
-  ) {
-    const user = await getUser({ email: req.body.email.trim().toLowerCase() });
-
-    if (user && user.id !== session?.user.id) {
-      throw new ApiError(400, 'Email already in use.');
-    }
-
-    toUpdate['email'] = req.body.email.trim().toLowerCase();
   }
 
   if ('image' in req.body) {

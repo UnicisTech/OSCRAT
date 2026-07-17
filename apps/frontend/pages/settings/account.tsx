@@ -9,11 +9,10 @@ import { getSession } from '@/lib/session';
 import { inferSSRProps } from '@/lib/inferSSRProps';
 import { UpdateAccount } from '@/components/account';
 import { useTeams } from 'hooks/useTeams';
-import env from '@/lib/env';
 
 type AccountProps = inferSSRProps<typeof getServerSideProps>;
 
-const Account: NextPageWithLayout<AccountProps> = ({ allowEmailChange }) => {
+const Account: NextPageWithLayout<AccountProps> = () => {
   const { data: session } = useSession();
   const { t } = useTranslation('common');
   const { teams } = useTeams();
@@ -41,7 +40,7 @@ const Account: NextPageWithLayout<AccountProps> = ({ allowEmailChange }) => {
       >
         {t('oscrat.ui.go-home')}
       </Link>
-      <UpdateAccount user={user} allowEmailChange={allowEmailChange} />
+      <UpdateAccount user={user} />
     </div>
   );
 };
@@ -61,7 +60,6 @@ export const getServerSideProps = async (
   return {
     props: {
       ...(locale ? await serverSideTranslations(locale, ['common']) : {}),
-      allowEmailChange: env.confirmEmail === false,
     },
   };
 };

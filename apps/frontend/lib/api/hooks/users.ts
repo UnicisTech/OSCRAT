@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import type {
   UpdateUserData,
   UpdatePasswordData,
+  ChangeEmailData,
 } from '@/lib/api/endpoints/users';
 
 export function useGetCurrentUser() {
@@ -34,17 +35,30 @@ export function useUpdateUser() {
             },
           });
         }
+      }
 
-        // If email was updated and we received the data
-        if ('email' in variables && variables.email) {
-          await update({
-            ...session,
-            user: {
-              ...session.user,
-              email: variables.email,
-            },
-          });
-        }
+      queryClient.invalidateQueries({ queryKey: queryKeys.users });
+    },
+  });
+}
+
+export function useChangeEmail() {
+  const { data: session, update } = useSession();
+
+  return useMutation({
+    mutationFn: (data: ChangeEmailData) => usersEndpoints.changeEmail(data),
+    onSuccess: async (response) => {
+      // Dev path (CONFIRM_EMAIL=false) applies immediately — refresh the session
+      // with the new email. The deferred path returns `pendingEmail` and leaves
+      // the session untouched until the user confirms via the emailed link.
+      if (session && response.email) {
+        await update({
+          ...session,
+          user: {
+            ...session.user,
+            email: response.email,
+          },
+        });
       }
 
       queryClient.invalidateQueries({ queryKey: queryKeys.users });

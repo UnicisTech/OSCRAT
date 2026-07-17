@@ -6,14 +6,13 @@ import SignOut from './SignOut';
 
 interface UpdateAccountProps {
   user: Partial<User>;
-  allowEmailChange: boolean;
 }
 
-const UpdateAccount = ({ user, allowEmailChange }: UpdateAccountProps) => {
+const UpdateAccount = ({ user }: UpdateAccountProps) => {
   return (
     <div className="flex flex-col gap-6">
       <UpdateName user={user} />
-      <UpdateEmail user={user} allowEmailChange={allowEmailChange} />
+      <UpdateEmail user={user} />
       <UploadAvatar user={user} />
       <SignOut />
     </div>

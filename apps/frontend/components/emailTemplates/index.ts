@@ -1,3 +1,4 @@
+export { default as EmailChangeEmail } from './EmailChangeEmail';
 export { default as ResetPasswordEmail } from './ResetPassword';
 export { default as TeamInviteEmail } from './TeamInvite';
 export { default as VerificationEmail } from './VerificationEmail';
