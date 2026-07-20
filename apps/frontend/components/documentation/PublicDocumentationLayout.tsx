@@ -1,3 +1,4 @@
+import type { FC } from 'react';
 import { useTranslation } from 'next-i18next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -27,7 +28,7 @@ interface PublicDocumentationLayoutProps {
   productBadge?: string;
 }
 
-const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
+const PublicDocumentationLayout: FC<PublicDocumentationLayoutProps> = ({
   doc,
   isLoading,
   isError,
@@ -117,7 +118,7 @@ const PublicDocumentationLayout: React.FC<PublicDocumentationLayoutProps> = ({
             </header>
 
             {/* Document Content */}
-            <div className="prose prose-gray prose-headings:text-content prose-p:text-content-secondary prose-li:text-content-secondary prose-strong:text-content max-w-none">
+            <div className="prose prose-gray prose-headings:text-content prose-p:text-content-secondary prose-li:text-content-secondary prose-strong:text-content prose-pre:whitespace-pre-wrap max-w-none break-words [overflow-wrap:anywhere]">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {doc.content}
               </ReactMarkdown>
