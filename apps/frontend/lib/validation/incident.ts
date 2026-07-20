@@ -11,6 +11,7 @@ import {
   IncidentSeverity,
 } from '@oscrat/model';
 import { TITLE_CHAR_REGEX } from '@/lib/text-sanitize';
+import { notFutureDateSchema } from './date';
 
 const incidentNameSchema = Yup.string()
   .trim()
@@ -57,9 +58,9 @@ export const incidentCreateSchema = Yup.object({
     .trim()
     .required('oscrat.ui.validation.incident-reporter-required'),
 
-  dateOfDetection: Yup.date()
-    .required('oscrat.ui.validation.incident-date-of-detection-required')
-    .max(new Date(), 'oscrat.ui.validation.date-cannot-be-future'),
+  dateOfDetection: notFutureDateSchema.required(
+    'oscrat.ui.validation.incident-date-of-detection-required'
+  ),
 
   description: productDescriptionSchema.required(
     'oscrat.ui.validation.description-required'
@@ -148,9 +149,7 @@ export const incidentUpdateSchema = Yup.object({
 
   reporterId: Yup.string().trim().optional(),
 
-  dateOfDetection: Yup.date()
-    .optional()
-    .max(new Date(), 'oscrat.ui.validation.date-cannot-be-future'),
+  dateOfDetection: notFutureDateSchema.optional(),
 
   description: productDescriptionSchema.optional(),
   scope: incidentScopeSchema.optional(),
