@@ -1,7 +1,14 @@
 {
   "phases": {
     "setup": {
-      "nixPkgs": ["...", "nodejs", "syft", "grype", "python3", "python3Packages.pip"]
+      "nixPkgs": ["...", "nodejs", "syft", "python3", "python3Packages.pip", "curl"]
+    },
+    "grype": {
+      "dependsOn": ["setup"],
+      "cmds": [
+        "curl -sSfL https://raw.githubusercontent.com/anchore/grype/v0.116.0/install.sh | sh -s -- -b /usr/local/bin v0.116.0",
+        "ln -sf /usr/local/bin/grype /usr/bin/grype"
+      ]
     },
     "openscap": {
       "dependsOn": ["install"],

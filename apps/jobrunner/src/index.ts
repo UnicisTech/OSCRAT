@@ -22,6 +22,8 @@ class JobRunner {
   private pollTimeout: NodeJS.Timeout | null = null;
   private isProcessingJobs = false;
   private trainingCheckTimeout: NodeJS.Timeout | null = null;
+  private grypeDbRefreshTimeout: NodeJS.Timeout | null = null;
+  private grypeDbRefreshDue = false;
   private workspaceRoot: string;
 
   constructor() {
@@ -116,9 +118,17 @@ class JobRunner {
       await this.ensureWorkspaceRoot();
       await this.prisma.$connect();
       console.log('[Job Runner] Database connected');
+
+      try {
+        await this.updateGrypeDb();
+      } catch (error) {
+        console.error('[Job Runner] Initial grype DB update failed:', error);
+      }
+
       this.isRunning = true;
       this.processJobs();
       this.startTrainingRegeneration();
+      this.scheduleGrypeDbRefresh();
       console.log(
         `[Job Runner] Started successfully (max ${this.maxConcurrentJobs} concurrent jobs)`
       );
@@ -149,6 +159,21 @@ class JobRunner {
     this.trainingCheckTimeout = setTimeout(() => this.runTrainingCheck(), intervalMs);
   }
 
+  private async updateGrypeDb() {
+    console.log('[Job Runner] Updating grype vulnerability DB...');
+    await $`grype db update`;
+    console.log('[Job Runner] grype vulnerability DB up to date');
+  }
+
+  private scheduleGrypeDbRefresh() {
+    if (!this.isRunning) return;
+    const intervalMs = 24 * 60 * 60 * 1000;
+    this.grypeDbRefreshTimeout = setTimeout(() => {
+      this.grypeDbRefreshDue = true;
+      this.processJobs();
+    }, intervalMs);
+  }
+
   async stop() {
     console.log('[Job Runner] Stopping...');
     this.isRunning = false;
@@ -156,6 +181,11 @@ class JobRunner {
     if (this.trainingCheckTimeout) {
       clearTimeout(this.trainingCheckTimeout);
       this.trainingCheckTimeout = null;
+    }
+
+    if (this.grypeDbRefreshTimeout) {
+      clearTimeout(this.grypeDbRefreshTimeout);
+      this.grypeDbRefreshTimeout = null;
     }
 
     if (this.pollTimeout) {
@@ -184,6 +214,18 @@ class JobRunner {
       if (this.pollTimeout) {
         clearTimeout(this.pollTimeout);
         this.pollTimeout = null;
+      }
+
+      if (this.grypeDbRefreshDue) {
+        if (this.runningJobs.size > 0) return;
+        this.grypeDbRefreshDue = false;
+        try {
+          await this.updateGrypeDb();
+        } catch (err) {
+          console.error('[Job Runner] grype DB refresh failed:', err);
+        } finally {
+          this.scheduleGrypeDbRefresh();
+        }
       }
 
       let jobsStarted = 0;
