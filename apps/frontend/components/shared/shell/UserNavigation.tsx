@@ -1,5 +1,4 @@
 import {
-  LockClosedIcon,
   RectangleStackIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
@@ -22,12 +21,6 @@ const UserNavigation = ({ activePathname }: NavigationProps) => {
       href: '/settings/account',
       icon: UserCircleIcon,
       active: activePathname === '/settings/account',
-    },
-    {
-      name: t('password'),
-      href: '/settings/password',
-      icon: LockClosedIcon,
-      active: activePathname === '/settings/password',
     },
   ];
 

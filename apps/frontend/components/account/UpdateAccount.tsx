@@ -2,6 +2,7 @@ import type { User } from '@oscrat/model';
 import UploadAvatar from './UploadAvatar';
 import UpdateName from './UpdateName';
 import UpdateEmail from './UpdateEmail';
+import UpdatePassword from './UpdatePassword';
 import SignOut from './SignOut';
 
 interface UpdateAccountProps {
@@ -13,6 +14,7 @@ const UpdateAccount = ({ user }: UpdateAccountProps) => {
     <div className="flex flex-col gap-6">
       <UpdateName user={user} />
       <UpdateEmail user={user} />
+      <UpdatePassword />
       <UploadAvatar user={user} />
       <SignOut />
     </div>
