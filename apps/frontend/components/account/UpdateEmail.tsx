@@ -92,7 +92,6 @@ const UpdateEmail = ({ user }: UpdateEmailProps) => {
                   : undefined
               }
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
               autoComplete="current-password"
               required
             />
