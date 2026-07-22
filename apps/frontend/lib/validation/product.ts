@@ -34,6 +34,7 @@ export const productCreateSchema = Yup.object({
   ),
   acronym: acronymSchema.required('oscrat.ui.validation.acronym-required'),
   description: productDescriptionSchema.optional(),
+  sourceProductId: Yup.string().optional(),
   type: Yup.mixed<OscratProductType>()
     .oneOf(
       Object.values(OscratProductType),

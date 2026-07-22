@@ -1076,7 +1076,6 @@
         "user-information-not-available": "User information not available",
         "please-select-source-product": "Please select a source product",
         "product-copied-successfully": "Product copied successfully",
-        "failed-to-copy-survey": "Product created, but copying the applicability survey from the source product failed. You can retake the survey on the new product.",
         "file-empty": "The selected file is empty. Please choose a file with content.",
         "provide-initial-information": "Provide some initial information about your product",
         "enter-product-name-placeholder": "Enter product name",

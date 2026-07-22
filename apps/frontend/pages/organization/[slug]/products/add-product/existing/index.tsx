@@ -14,15 +14,12 @@ import toast from 'react-hot-toast';
 import { useTeamContext } from '@/context/TeamContext';
 import { useGetProducts } from '@/lib/api/hooks/oscrat/projects';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
-import { useCreateAssessment } from '@/lib/api/hooks/oscrat/assessments';
-import { oscratAssessmentEndpoints } from '@/lib/api/endpoints/oscrat/assessments';
 
 // Models & Types
 import {
   OscratProductType,
   OscratProductCategory,
   OscratProductVersionStatus,
-  OscratAssessmentType,
 } from '@oscrat/model';
 import type { OscratProductCreate } from '@oscrat/model';
 import type { ApiError } from '@/types';
@@ -49,7 +46,6 @@ export default function Existing() {
     '',
     { enabled: false }
   );
-  const createAssessmentMutation = useCreateAssessment(teamId);
 
   // Create validation schema with uniqueness check
   const validationSchema = useMemo(
@@ -86,6 +82,7 @@ export default function Existing() {
         const productData: OscratProductCreate = {
           name: values.name.trim(),
           acronym: values.acronym.trim(),
+          sourceProductId: values.sourceProductId,
           type: selectedProduct.type as OscratProductType,
           productCategory:
             selectedProduct.productCategory as OscratProductCategory,
@@ -98,42 +95,6 @@ export default function Existing() {
         };
 
         const createdProduct = await createProject(productData);
-
-        // Copy the source product's applicability survey (latest CRA assessment)
-        // to the new product so the user can view/continue it instead of starting
-        // a fresh survey. Failure here is non-fatal — surface a warning and let
-        // the user retake the survey on the new product if needed.
-        try {
-          const sourceAssessments =
-            await oscratAssessmentEndpoints.findAssessments(teamId, {
-              productId: values.sourceProductId,
-            });
-          const latestCra = sourceAssessments
-            .filter((a) => a.type === OscratAssessmentType.CRA)
-            .sort(
-              (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-            )[0];
-
-          if (latestCra) {
-            const sourceDetail =
-              await oscratAssessmentEndpoints.getAssessmentDetail(
-                teamId,
-                latestCra.id
-              );
-            await createAssessmentMutation.mutateAsync({
-              type: OscratAssessmentType.CRA,
-              schemaVersion: sourceDetail.schemaVersion,
-              rawData: sourceDetail.rawData,
-              productId: createdProduct.id,
-              createdBy: userId,
-            });
-          }
-        } catch (surveyErr) {
-          console.error('Failed to copy source survey:', surveyErr);
-          toast.error(t('oscrat.ui.validation.failed-to-copy-survey'));
-        }
 
         toast.success(t('oscrat.ui.validation.product-copied-successfully'));
 
@@ -151,7 +112,7 @@ export default function Existing() {
     existingProducts?.find((p) => p.id === formik.values.sourceProductId) ??
     null;
 
-  const isLoading = isCreatingProject || createAssessmentMutation.isPending;
+  const isLoading = isCreatingProject;
 
   const productOptions = [
     { value: '', label: t('choose') },

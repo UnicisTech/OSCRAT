@@ -72,9 +72,7 @@ function NewProductVersionPage() {
 
   if (!ready || !teamId || !productId) return null;
 
-  const STATUS_OPTIONS = Object.values(OscratProductVersionStatus).filter(
-    (status) => status !== OscratProductVersionStatus.SUPPORTED
-  );
+  const STATUS_OPTIONS = Object.values(OscratProductVersionStatus);
 
   const breadcrumbItems = [
     {

@@ -1,6 +1,7 @@
 import {
   PrismaClient,
   type Prisma,
+  OscratAssessmentType,
   OscratProductVersionStatus,
   TaskStatus,
 } from '@prisma/client';
@@ -14,7 +15,15 @@ import type {
 } from '../types/product';
 import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
 import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
-import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
+import {
+  createAuditContextWithTx,
+  logCreate,
+  logUpdate,
+  logDelete,
+  EntityType,
+  type AuditInfo,
+} from '../audit';
+import { toJsonInput } from '../utils/json';
 
 /** Include for product summary queries (lightweight with counts) */
 const PRODUCT_SUMMARY_INCLUDE = {
@@ -85,7 +94,11 @@ const PRODUCT_DETAIL_INCLUDE = {
           tasks: {
             where: {
               status: {
-                in: [TaskStatus.TODO, TaskStatus.PLANNED, TaskStatus.IN_PROGRESS],
+                in: [
+                  TaskStatus.TODO,
+                  TaskStatus.PLANNED,
+                  TaskStatus.IN_PROGRESS,
+                ],
               },
             },
           },
@@ -249,8 +262,21 @@ export const createProduct = async (
     });
 
     if (existingProduct) {
-      throw new Error('A product with this name already exists. Please choose a different name.');
+      throw new Error(
+        'A product with this name already exists. Please choose a different name.'
+      );
     }
+
+    const sourceAssessment = data.sourceProductId
+      ? await tx.oscratAssessment.findFirst({
+          where: {
+            teamId,
+            productId: data.sourceProductId,
+            type: OscratAssessmentType.CRA,
+          },
+          orderBy: { createdAt: 'desc' },
+        })
+      : null;
 
     const product = await tx.oscratProduct.create({
       data: {
@@ -279,6 +305,24 @@ export const createProduct = async (
     });
 
     await logCreate(EntityType.Product, audit, product);
+
+    if (sourceAssessment) {
+      const copiedAssessment = await tx.oscratAssessment.create({
+        data: {
+          type: sourceAssessment.type,
+          schemaVersion: sourceAssessment.schemaVersion,
+          rawData: toJsonInput(sourceAssessment.rawData),
+          teamId,
+          productId: product.id,
+          createdBy: data.createdBy,
+        },
+      });
+
+      await logCreate(EntityType.Assessment, audit, {
+        ...copiedAssessment,
+        name: `${copiedAssessment.type}-${copiedAssessment.id.slice(0, 8)}`,
+      });
+    }
 
     return transformToProductDetail(product);
   });

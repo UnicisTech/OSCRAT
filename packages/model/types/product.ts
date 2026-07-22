@@ -49,6 +49,7 @@ export interface OscratProductCreate {
   name: string;
   acronym: string;
   description?: string;
+  sourceProductId?: string;
   type: OscratProductType;
   productCategory: OscratProductCategory;
   createdBy: string;
