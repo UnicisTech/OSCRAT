@@ -5,6 +5,7 @@ import {
   Text,
   View,
   StyleSheet,
+  Font,
   pdf,
 } from '@react-pdf/renderer';
 import { ComplianceArea, ComplianceState } from '@/types/compliance';
@@ -13,6 +14,14 @@ import { CONFORMITY_STATUS } from '@/constants/conformityStatuses';
 import type { PDFTranslations } from '@/lib/compliance/pdfTranslations';
 import checklistTranslations from '@/locales/en/compliance-tech-doc-checklist.json';
 import { formatDateTime } from '@/utils/dateFormat';
+
+// Break overly long unbroken tokens so they wrap instead of overflowing the page.
+const MAX_UNBROKEN_TOKEN_LENGTH = 16;
+Font.registerHyphenationCallback((word) =>
+  word.length > MAX_UNBROKEN_TOKEN_LENGTH
+    ? (word.match(new RegExp(`.{1,${MAX_UNBROKEN_TOKEN_LENGTH}}`, 'g')) ?? [word])
+    : [word]
+);
 
 const styles = StyleSheet.create({
   page: {

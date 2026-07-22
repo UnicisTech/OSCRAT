@@ -15,7 +15,7 @@ import {
   type TaskUpdateData,
 } from '@/lib/validation/task';
 import { resolveTaskTitle } from '@/lib/tasks';
-import type { ApiError } from '@/types';
+import { extractErrorMessage } from '@/lib/utils';
 
 const EditTask = ({
   visible,
@@ -61,8 +61,7 @@ const EditTask = ({
         toast.success(t('task-updated'));
         setVisible(false);
       } catch (error: unknown) {
-        const apiError = error as ApiError;
-        toast.error(apiError.message);
+        toast.error(extractErrorMessage(error, t('error-updating-task'), t));
       }
     },
   });

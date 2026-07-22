@@ -16,13 +16,13 @@ export const versionCreateSchema = Yup.object({
 });
 
 export const versionUpdateSchema = Yup.object({
-  version: versionNameSchema.required('oscrat.ui.validation.version-required'),
+  version: versionNameSchema.optional(),
   status: Yup.mixed<OscratProductVersionStatus>()
     .oneOf(
       Object.values(OscratProductVersionStatus),
       'oscrat.ui.validation.status-invalid'
     )
-    .required('oscrat.ui.validation.status-required'),
+    .optional(),
   releaseDate: Yup.date().nullable().optional(),
   supportEndDate: Yup.date().nullable().optional(),
 });

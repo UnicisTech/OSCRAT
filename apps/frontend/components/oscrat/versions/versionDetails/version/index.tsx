@@ -104,7 +104,7 @@ const Index = () => {
       setModalAction(null);
     } catch (error) {
       toast.error(
-        extractErrorMessage(error, t('oscrat.ui.failed-to-withdraw-version'))
+        extractErrorMessage(error, t('oscrat.ui.failed-to-withdraw-version'), t)
       );
     }
   };

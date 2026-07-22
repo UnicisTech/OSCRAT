@@ -193,7 +193,7 @@ const Index: React.FC<ProductProps> = ({
         <Divider />
 
         <MetaField label={t('description')}>
-          <p className="text-content-secondary text-b2 break-words">
+          <p className="text-content-secondary text-b2 min-w-0 break-words">
             {project.description}
           </p>
         </MetaField>

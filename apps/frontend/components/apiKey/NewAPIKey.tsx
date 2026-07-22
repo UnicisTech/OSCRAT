@@ -65,7 +65,7 @@ const CreateAPIKeyForm = ({
       }
     } catch (error: unknown) {
       setSubmitting(false);
-      toast.error(extractErrorMessage(error, t('error-creating-api-key')));
+      toast.error(extractErrorMessage(error, t('error-creating-api-key'), t));
     }
   };
 

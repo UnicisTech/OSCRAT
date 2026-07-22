@@ -22,7 +22,7 @@ import {
   createTaskCreateSchema,
   type TaskCreateData,
 } from '@/lib/validation/task';
-import type { ApiError } from '@/types';
+import { extractErrorMessage } from '@/lib/utils';
 import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
 
 interface CreateTaskProps {
@@ -101,8 +101,7 @@ const CreateTask = ({
           onSuccess(result.id);
         }
       } catch (error: unknown) {
-        const apiError = error as ApiError;
-        toast.error(apiError.message);
+        toast.error(extractErrorMessage(error, t('error-creating-task'), t));
       }
     },
   });

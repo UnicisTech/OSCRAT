@@ -94,7 +94,7 @@ const Product: React.FC<ProductProps> = ({ project, onShowMore }) => {
       <Divider />
 
       <section
-        className="text-content-secondary text-b2 flex flex-wrap items-start gap-x-8 gap-y-4"
+        className="text-content-secondary text-b2 grid grid-cols-2 items-start gap-4 sm:grid-cols-3 lg:grid-cols-6"
         aria-label="Product details"
       >
         <MetaField
