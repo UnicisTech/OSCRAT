@@ -36,6 +36,13 @@ const handleAuthorize = async (req: NextApiRequest, res: NextApiResponse) => {
   } else {
     console.log('[OAuth] authorize form displayed');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    // Jackson's auto-submit form needs an inline onload handler, an inline
+    // <script> and a cross-origin POST to the IdP, all of which the global CSP
+    // blocks. Without this, SSO dead-ends for IdPs using the HTTP-POST binding.
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'none'; script-src 'unsafe-inline'; form-action https:; base-uri 'none'"
+    );
     res.send(authorize_form);
   }
 };

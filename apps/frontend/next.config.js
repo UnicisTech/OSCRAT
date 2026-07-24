@@ -5,19 +5,61 @@ const { withGlobalCss } = require('next-global-css');
 
 const withConfig = withGlobalCss();
 
-const csp = [
+const isDev = process.env.NODE_ENV !== 'production';
+
+const cspDirectives = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+  `script-src 'self'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
+  "script-src-attr 'none'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://api.dicebear.com",
-  "frame-src https://www.google.com",
-  'upgrade-insecure-requests',
-].join('; ');
+  `connect-src 'self'${isDev ? ' ws:' : ''} https://www.google.com/recaptcha/`,
+  'frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/',
+  ...(isDev ? [] : ['upgrade-insecure-requests']),
+];
+
+const reportDirectives = [
+  'report-uri /api/csp-report',
+  'report-to csp-endpoint',
+];
+
+const csp = [...cspDirectives, ...reportDirectives].join('; ');
+
+const securityHeaders = [
+  {
+    key: 'X-Frame-Options',
+    value: 'DENY',
+  },
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
+  },
+  {
+    key: 'Content-Security-Policy',
+    value: csp,
+  },
+  {
+    key: 'Reporting-Endpoints',
+    value: 'csp-endpoint="/api/csp-report"',
+  },
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+  {
+    key: 'Referrer-Policy',
+    value: 'strict-origin-when-cross-origin',
+  },
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
+  },
+];
 
 // Redirect root url to login page; legacy /teams/* → /organization/*
 const redirects = [
@@ -90,32 +132,14 @@ module.exports = withConfig({
     return [
       {
         source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
-          },
-          {
-            key: 'Content-Security-Policy-Report-Only',
-            value: csp,
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
-          },
-        ],
+        headers: securityHeaders,
+      },
+      {
+        // Next serves build output from its own static handler, which the
+        // catch-all above never reaches.
+        source: '/_next/static/:path*',
+        locale: false,
+        headers: securityHeaders,
       },
     ];
   },
