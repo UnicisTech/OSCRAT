@@ -24,3 +24,4 @@ export * from './webhook';
 export * from './ssoConnection';
 export * from './directorySync';
 export * from './documentation';
+export * from './ownership';

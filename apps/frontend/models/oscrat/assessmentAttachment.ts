@@ -43,9 +43,15 @@ export const getAssessmentAttachments = async (
 
 export const deleteAssessmentAttachment = async (
   attachmentId: string,
+  teamId: string,
   auditInfo?: AuditInfo
 ): Promise<void> => {
-  return await AttachmentOps.deleteAttachment(prisma, attachmentId, auditInfo);
+  return await AttachmentOps.deleteAttachment(
+    prisma,
+    attachmentId,
+    teamId,
+    auditInfo
+  );
 };
 
 // Use shared file handling utilities

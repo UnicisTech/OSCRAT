@@ -17,10 +17,14 @@ export const createComment = async (params: {
   return await CommentOps.createComment(prisma, params);
 };
 
-export const updateComment = async (id: number, text: string) => {
-  return await CommentOps.updateComment(prisma, id, text);
+export const updateComment = async (
+  id: number,
+  text: string,
+  teamId: string
+) => {
+  return await CommentOps.updateComment(prisma, id, text, teamId);
 };
 
-export const deleteComment = async (id: number) => {
-  return await CommentOps.deleteComment(prisma, id);
+export const deleteComment = async (id: number, teamId: string) => {
+  return await CommentOps.deleteComment(prisma, id, teamId);
 };

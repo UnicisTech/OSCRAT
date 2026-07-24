@@ -71,10 +71,8 @@ const FileTable: React.FC<FileTableProps> = ({
             <TableHeader columns={tableHeaders} />
             <tbody className={tableStyles.tbody}>
               {pageData.map((attachment) => {
-                const addedByName = attachment.createdByUser
-                  ? `${attachment.createdByUser.firstName} ${attachment.createdByUser.lastName}`.trim() ||
-                    attachment.createdByUser.name
-                  : t('oscrat.ui.unknown');
+                const addedByName =
+                  attachment.createdByUser?.name || t('oscrat.ui.unknown');
                 const descriptionText =
                   attachment.description || t('oscrat.ui.no-description');
                 return (

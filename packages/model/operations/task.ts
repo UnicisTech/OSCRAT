@@ -1,5 +1,17 @@
-import { PrismaClient, TaskStatus, TaskOriginType, Prisma } from '@prisma/client';
-import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
+import {
+  PrismaClient,
+  TaskStatus,
+  TaskOriginType,
+  Prisma,
+} from '@prisma/client';
+import {
+  createAuditContextWithTx,
+  logCreate,
+  logUpdate,
+  logDelete,
+  EntityType,
+  type AuditInfo,
+} from '../audit';
 import { toJsonInput } from '../utils/json';
 import {
   TASK_CONFIGURATION_PROPERTY_KEYS,
@@ -14,6 +26,7 @@ import {
   AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
 } from '../constants/awarenessTraining';
 import { getTeamDetail, incrementTaskIndex } from './team';
+import { assertOwnership } from './ownership';
 
 const { RULE_ID: CONFIGURATION_RULE_ID } = TASK_CONFIGURATION_PROPERTY_KEYS;
 
@@ -41,9 +54,27 @@ export const createTask = async (
   return await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
     const {
-      authorId, teamId, title, titleLocId, status, duedate, description,
-      descriptionLocId, taskNumber, assigneeId, productId, versionId, originType, properties,
+      authorId,
+      teamId,
+      title,
+      titleLocId,
+      status,
+      duedate,
+      description,
+      descriptionLocId,
+      taskNumber,
+      assigneeId,
+      productId,
+      versionId,
+      originType,
+      properties,
     } = param;
+
+    await assertOwnership(tx, teamId, {
+      product: productId,
+      version: versionId,
+      member: assigneeId,
+    });
 
     const task = await tx.task.create({
       data: {
@@ -64,7 +95,11 @@ export const createTask = async (
       },
     });
 
-    await logCreate(EntityType.Task, audit, { ...task, id: String(task.id), name: task.title });
+    await logCreate(EntityType.Task, audit, {
+      ...task,
+      id: String(task.id),
+      name: task.title,
+    });
 
     return task;
   });
@@ -111,11 +146,18 @@ export const updateTask = async (
       },
       data: {
         ...rest,
-        ...(properties !== undefined && { properties: toJsonInput(properties) }),
+        ...(properties !== undefined && {
+          properties: toJsonInput(properties),
+        }),
       },
     });
 
-    await logUpdate(EntityType.Task, audit, { ...taskToEdit, id: String(taskToEdit.id), name: taskToEdit.title }, { ...updatedTask, id: String(updatedTask.id), name: updatedTask.title });
+    await logUpdate(
+      EntityType.Task,
+      audit,
+      { ...taskToEdit, id: String(taskToEdit.id), name: taskToEdit.title },
+      { ...updatedTask, id: String(updatedTask.id), name: updatedTask.title }
+    );
 
     return updatedTask;
   });
@@ -145,7 +187,10 @@ export const deleteTask = async (
       return null;
     }
 
-    await logDelete(EntityType.Task, audit, { id: String(taskToDelete.id), name: taskToDelete.title });
+    await logDelete(EntityType.Task, audit, {
+      id: String(taskToDelete.id),
+      name: taskToDelete.title,
+    });
 
     return await tx.task.delete({
       where: {
@@ -171,6 +216,20 @@ export const getTasks = async (prisma: PrismaClient, userId: string) => {
 };
 
 /** Get task by task number and team slug with full details */
+export const getTaskRefBySlugAndNumber = async (
+  prisma: PrismaClient,
+  taskNumber: number,
+  slug: string
+) => {
+  return await prisma.task.findFirst({
+    where: {
+      taskNumber,
+      team: { slug },
+    },
+    select: { id: true, versionId: true },
+  });
+};
+
 export const getTaskBySlugAndNumber = async (
   prisma: PrismaClient,
   taskNumber: number,
@@ -276,9 +335,9 @@ export const getConfigurationTasksByVersion = async (
 
   const byRule = new Map<string, TaskByRuleSummary>();
   for (const t of tasks) {
-    const ruleId = (t.properties as Record<string, unknown>)?.[CONFIGURATION_RULE_ID] as
-      | string
-      | undefined;
+    const ruleId = (t.properties as Record<string, unknown>)?.[
+      CONFIGURATION_RULE_ID
+    ] as string | undefined;
     if (ruleId && !byRule.has(ruleId)) {
       byRule.set(ruleId, {
         id: t.id,
@@ -347,7 +406,9 @@ export const ensureAwarenessTrainingTask = async (
       assigneeId: userId,
       originType: TaskOriginType.AUTOMATIC,
       taskNumber: team.taskIndex,
-      properties: { [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]: TRAINING_TASK_TYPE_VALUE },
+      properties: {
+        [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]: TRAINING_TASK_TYPE_VALUE,
+      },
     },
     auditInfo
   );
@@ -355,4 +416,3 @@ export const ensureAwarenessTrainingTask = async (
   await incrementTaskIndex(prisma, teamId);
   return task;
 };
-

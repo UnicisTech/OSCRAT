@@ -88,7 +88,6 @@ const Attachments = ({ task }: { task: Task }) => {
         try {
           await uploadAttachment({
             file: selectedFile,
-            taskId: task.id,
           });
           toast.success('Attachment uploaded');
         } catch (error: unknown) {
@@ -100,7 +99,7 @@ const Attachments = ({ task }: { task: Task }) => {
     };
 
     uploadFile();
-  }, [routeTaskNumber, selectedFile, slug, task.id, uploadAttachment]);
+  }, [routeTaskNumber, selectedFile, slug, uploadAttachment]);
 
   // TODO: refactoring after attachments added in DB
   const attachments = (task as TaskWithAttachments).attachments || [];

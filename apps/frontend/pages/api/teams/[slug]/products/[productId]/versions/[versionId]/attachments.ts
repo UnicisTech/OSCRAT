@@ -46,7 +46,7 @@ const handleGET = async (
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
-  const { versionId, vulnerabilityId, incidentId } = req.query;
+  const { versionId, productId, vulnerabilityId, incidentId } = req.query;
 
   try {
     const filters = {
@@ -56,6 +56,8 @@ const handleGET = async (
 
     const attachments = await getVersionAttachments(
       versionId as string,
+      teamMember.teamId,
+      productId as string,
       Object.keys(filters).length > 0 ? filters : undefined
     );
 
@@ -97,6 +99,7 @@ const handlePOST = async (
       try {
         const uploadParams = {
           versionId: versionId as string,
+          teamId: teamMember.teamId,
           file: file[0],
           createdBy: teamMember.userId,
           description: getFirstFieldValue(fields.description),
@@ -139,6 +142,7 @@ const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
+  const { teamMember } = req.teamContext;
   const { id } = req.query;
 
   try {
@@ -149,7 +153,11 @@ const handleDELETE = async (
       });
     }
 
-    await deleteVersionAttachment(id as string, req.auditInfo);
+    await deleteVersionAttachment(
+      id as string,
+      teamMember.teamId,
+      req.auditInfo
+    );
 
     return res.status(200).json({
       data: {},

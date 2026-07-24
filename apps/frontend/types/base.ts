@@ -40,8 +40,8 @@ export type Attachment = {
   createdByUser: {
     id: string;
     name: string;
-    firstName: string;
-    lastName: string;
+    firstName?: string;
+    lastName?: string;
   };
 };
 

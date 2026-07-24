@@ -46,10 +46,7 @@ export type UpdateCommentData = {
 // Attachment types
 export interface AttachmentUploadParams {
   file: File;
-  taskId: number;
   description?: string;
-  slug: string;
-  versionId?: string;
 }
 
 export const tasksEndpoints = {
@@ -101,13 +98,8 @@ export const tasksEndpoints = {
   ) => {
     const formData = new FormData();
     formData.append('file', params.file);
-    formData.append('slug', params.slug);
-    formData.append('taskId', String(params.taskId));
     if (params.description) {
       formData.append('description', params.description);
-    }
-    if (params.versionId) {
-      formData.append('versionId', params.versionId);
     }
 
     return api.post<{ url: string }>(

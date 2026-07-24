@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { randomUUID } from 'crypto';
 import { gzipSync } from 'zlib';
 import { createAttachmentWithTx } from './attachment';
+import { assertVersionInTeam } from './ownership';
 import { createFileInTransaction } from './file';
 import { slugify } from '../utils/slugify';
 import { fromJson, toJsonInput } from '../utils/json';
@@ -469,6 +470,13 @@ export const createConfigurationScanReportWithJob = async (
 
   const result = await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
+
+    await assertVersionInTeam(
+      tx,
+      params.versionId,
+      params.teamId,
+      params.productId
+    );
 
     // 1. Pre-generate the report ID
     const reportId = randomUUID();

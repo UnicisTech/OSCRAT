@@ -115,7 +115,7 @@ const handlePUT = async (
     req.body?.text
   );
 
-  const comment = await updateComment(id, text);
+  const comment = await updateComment(id, text, teamMember.teamId);
 
   if (!comment) {
     return res.status(503).json({
@@ -137,7 +137,7 @@ const handleDELETE = async (
 
   const { id } = req.body;
 
-  const comment = await deleteComment(id);
+  const comment = await deleteComment(id, teamMember.teamId);
 
   if (!comment) {
     return res.status(400).json({

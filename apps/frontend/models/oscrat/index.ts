@@ -1,7 +1,6 @@
 export {
   createVersionAttachment,
   getVersionAttachments,
-  getVersionAttachmentById,
   deleteVersionAttachment,
   readFile as readVersionAttachmentFile,
   saveFileAsVersionAttachment,

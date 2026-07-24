@@ -1,6 +1,11 @@
 import { prisma } from '@/lib/prisma';
 import * as AttachmentOps from '@oscrat/model/operations/attachment';
 import {
+  assertVersionInTeam,
+  assertVulnerabilityInVersion,
+  assertIncidentInVersion,
+} from '@oscrat/model/operations';
+import {
   parseFormData,
   validateFile,
   extractFileData,
@@ -12,6 +17,7 @@ import type { AuditInfo } from '@oscrat/model/audit';
 
 export interface CreateVersionAttachmentParams {
   versionId: string;
+  teamId: string;
   filename: string;
   fileData: Buffer;
   createdBy: string;
@@ -24,6 +30,14 @@ export interface CreateVersionAttachmentParams {
 export const createVersionAttachment = async (
   params: CreateVersionAttachmentParams
 ) => {
+  await assertVersionInTeam(prisma, params.versionId, params.teamId);
+  await assertVulnerabilityInVersion(
+    prisma,
+    params.vulnerabilityId,
+    params.versionId
+  );
+  await assertIncidentInVersion(prisma, params.incidentId, params.versionId);
+
   return await AttachmentOps.createAttachment(
     prisma,
     {
@@ -42,22 +56,30 @@ export const createVersionAttachment = async (
 
 export const getVersionAttachments = async (
   versionId: string,
+  teamId: string,
+  productId: string,
   filters?: AttachmentEntityFilters
 ): Promise<Attachment[]> => {
-  return await AttachmentOps.getVersionAttachments(prisma, versionId, filters);
-};
-
-export const getVersionAttachmentById = async (
-  attachmentId: string
-): Promise<Attachment | null> => {
-  return await AttachmentOps.getAttachmentById(prisma, attachmentId);
+  return await AttachmentOps.getVersionAttachments(
+    prisma,
+    versionId,
+    teamId,
+    productId,
+    filters
+  );
 };
 
 export const deleteVersionAttachment = async (
   attachmentId: string,
+  teamId: string,
   auditInfo?: AuditInfo
 ): Promise<void> => {
-  return await AttachmentOps.deleteAttachment(prisma, attachmentId, auditInfo);
+  return await AttachmentOps.deleteAttachment(
+    prisma,
+    attachmentId,
+    teamId,
+    auditInfo
+  );
 };
 
 // Use shared file handling utilities
@@ -65,6 +87,7 @@ export const readFile = parseFormData;
 
 export interface UploadVersionAttachmentParams {
   versionId: string;
+  teamId: string;
   file: formidable.File;
   createdBy: string;
   description?: string;
@@ -80,6 +103,7 @@ export const saveFileAsVersionAttachment = async (
 
   const attachment = await createVersionAttachment({
     versionId: params.versionId,
+    teamId: params.teamId,
     filename: fileUpload.filename,
     fileData: fileUpload.fileData,
     createdBy: params.createdBy,

@@ -6,7 +6,6 @@ import { useAttachments } from '@/hooks/useAttachments';
 
 export interface AttachmentUploadData {
   file: File;
-  taskId: number;
   description?: string;
 }
 
@@ -25,9 +24,7 @@ export function useTaskAttachments(slug: string, taskNumber: string) {
   const uploadAttachment = async (data: AttachmentUploadData) => {
     return uploadMutation.mutateAsync({
       file: data.file,
-      taskId: data.taskId,
       description: data.description,
-      slug,
     });
   };
 

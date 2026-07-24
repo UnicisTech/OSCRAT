@@ -37,33 +37,42 @@ export const createAttachment = async (
   );
 };
 
-export const findAttachmentById = async (id: string) => {
-  return await AttachmentOps.getAttachmentById(prisma, id);
-};
-
-export const deleteAttachment = async (id: string, auditInfo?: AuditInfo) => {
-  return await AttachmentOps.deleteAttachment(prisma, id, auditInfo);
+export const deleteAttachment = async (
+  id: string,
+  teamId: string,
+  auditInfo?: AuditInfo
+) => {
+  return await AttachmentOps.deleteAttachment(prisma, id, teamId, auditInfo);
 };
 
 // Use shared file handling utilities
 export const readFile = parseFormData;
 
 export interface UploadAttachmentParams {
-  taskId: number;
+  taskNumber: number;
+  slug: string;
   file: formidable.File;
   createdBy: string;
   description?: string;
   auditInfo?: AuditInfo;
-  versionId?: string;
 }
 
 export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
+  const task = await AttachmentOps.getTaskRefBySlugAndNumber(
+    prisma,
+    params.taskNumber,
+    params.slug
+  );
+  if (!task) {
+    throw new Error('Task not found');
+  }
+
   const fileUpload = await extractFileData(params.file);
   const attachmentId = uuidv4();
   const url = `/attachments/${attachmentId}`;
 
   await createAttachment(
-    params.taskId,
+    task.id,
     fileUpload.filename,
     fileUpload.fileData,
     url,
@@ -71,7 +80,7 @@ export const saveFileAsAttachment = async (params: UploadAttachmentParams) => {
     params.createdBy,
     params.description,
     params.auditInfo,
-    params.versionId
+    task.versionId || undefined
   );
 
   return url;

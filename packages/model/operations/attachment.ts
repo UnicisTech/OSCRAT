@@ -1,7 +1,12 @@
 import { PrismaClient, Attachment, File, Prisma } from '@prisma/client';
 import { createFileInTransaction } from './file';
 import { AttachmentEntityFilters } from '../types/attachments';
-import { createAuditContextWithTx, logCreate, logDelete, EntityType } from '../audit';
+import {
+  createAuditContextWithTx,
+  logCreate,
+  logDelete,
+  EntityType,
+} from '../audit';
 import type { AuditInfo } from '../audit';
 
 // Attachment with file data for downloads
@@ -163,6 +168,20 @@ export const getAttachmentWithFileById = async (
   });
 };
 
+const attachmentTeamScope = (teamId: string): Prisma.AttachmentWhereInput => ({
+  OR: [
+    { task: { teamId } },
+    { version: { teamId } },
+    { incident: { teamId } },
+    { documentation: { teamId } },
+    { assessment: { teamId } },
+    { vulnerability: { version: { product: { teamId } } } },
+    { sbomReport: { version: { product: { teamId } } } },
+    { vulnerabilityScanReport: { version: { product: { teamId } } } },
+    { configurationScanReport: { version: { product: { teamId } } } },
+  ],
+});
+
 export const getAttachmentWithFileForTeam = async (
   prisma: PrismaClient,
   attachmentId: string,
@@ -175,17 +194,7 @@ export const getAttachmentWithFileForTeam = async (
   return await prisma.attachment.findFirst({
     where: {
       id: attachmentId,
-      OR: [
-        { task: { teamId } },
-        { version: { teamId } },
-        { incident: { teamId } },
-        { documentation: { teamId } },
-        { assessment: { teamId } },
-        { vulnerability: { version: { product: { teamId } } } },
-        { sbomReport: { version: { product: { teamId } } } },
-        { vulnerabilityScanReport: { version: { product: { teamId } } } },
-        { configurationScanReport: { version: { product: { teamId } } } },
-      ],
+      ...attachmentTeamScope(teamId),
     },
     include: {
       file: true,
@@ -202,13 +211,19 @@ export const getAttachmentLinkedEntity = (
   attachment: Attachment
 ): AttachmentLinkedEntity | null => {
   if (attachment.configurationScanReportId) {
-    return { type: EntityType.ConfigurationScanReport, id: attachment.configurationScanReportId };
+    return {
+      type: EntityType.ConfigurationScanReport,
+      id: attachment.configurationScanReportId,
+    };
   }
   if (attachment.sbomReportId) {
     return { type: EntityType.SbomReport, id: attachment.sbomReportId };
   }
   if (attachment.vulnerabilityScanReportId) {
-    return { type: EntityType.VulnerabilityScanReport, id: attachment.vulnerabilityScanReportId };
+    return {
+      type: EntityType.VulnerabilityScanReport,
+      id: attachment.vulnerabilityScanReportId,
+    };
   }
   if (attachment.taskId) {
     return { type: EntityType.Task, id: String(attachment.taskId) };
@@ -255,6 +270,8 @@ export const getTaskAttachments = async (
 export const getVersionAttachments = async (
   prisma: PrismaClient,
   versionId: string,
+  teamId: string,
+  productId: string,
   filters?: AttachmentEntityFilters
 ) => {
   console.log(
@@ -265,12 +282,15 @@ export const getVersionAttachments = async (
   const attachments = await prisma.attachment.findMany({
     where: {
       versionId,
-      ...(filters?.vulnerabilityId && { vulnerabilityId: filters.vulnerabilityId }),
+      version: { teamId, productId },
+      ...(filters?.vulnerabilityId && {
+        vulnerabilityId: filters.vulnerabilityId,
+      }),
       ...(filters?.incidentId && { incidentId: filters.incidentId }),
     },
     include: {
       createdByUser: {
-        select: { id: true, name: true, firstName: true, lastName: true },
+        select: { name: true },
       },
     },
     orderBy: { createdAt: 'desc' },
@@ -322,13 +342,14 @@ export const getSbomReportAttachment = async (
 export const deleteAttachment = async (
   prisma: PrismaClient,
   attachmentId: string,
+  teamId: string,
   auditInfo?: AuditInfo
 ): Promise<void> => {
   console.log(`[Attachment Operations] Deleting attachment: ${attachmentId}`);
 
   await prisma.$transaction(async (tx) => {
-    const attachment = await tx.attachment.findUnique({
-      where: { id: attachmentId },
+    const attachment = await tx.attachment.findFirst({
+      where: { id: attachmentId, ...attachmentTeamScope(teamId) },
       select: { id: true, name: true, fileId: true },
     });
 
@@ -338,7 +359,10 @@ export const deleteAttachment = async (
 
     if (auditInfo) {
       const audit = createAuditContextWithTx(tx, auditInfo);
-      await logDelete(EntityType.Attachment, audit, { id: attachment.id, name: attachment.name });
+      await logDelete(EntityType.Attachment, audit, {
+        id: attachment.id,
+        name: attachment.name,
+      });
     }
 
     await tx.attachment.delete({

@@ -13,12 +13,24 @@ import type {
 import { OPEN_VULNERABILITY_STATUSES } from '../constants/vulnerability';
 import { OPEN_INCIDENT_STATUSES } from '../types/incidents';
 
-const OPEN_TASK_STATUSES: TaskStatus[] = [TaskStatus.TODO, TaskStatus.PLANNED, TaskStatus.IN_PROGRESS];
+const OPEN_TASK_STATUSES: TaskStatus[] = [
+  TaskStatus.TODO,
+  TaskStatus.PLANNED,
+  TaskStatus.IN_PROGRESS,
+];
 import {
   upsertAttachmentFileWithTx,
   deleteAttachmentWithTx,
 } from './attachment';
-import { createAuditContextWithTx, logCreate, logUpdate, logDelete, EntityType, type AuditInfo } from '../audit';
+import {
+  createAuditContextWithTx,
+  logCreate,
+  logUpdate,
+  logDelete,
+  EntityType,
+  type AuditInfo,
+} from '../audit';
+import { assertProductInTeam } from './ownership';
 
 const VERSION_SUMMARY_INCLUDE = {
   _count: {
@@ -250,6 +262,8 @@ export const createVersion = async (
   return await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
 
+    await assertProductInTeam(tx, data.productId, teamId);
+
     const version = await tx.oscratProductVersion.create({
       data: {
         version: data.version,
@@ -264,7 +278,10 @@ export const createVersion = async (
       include: VERSION_DETAIL_INCLUDE,
     });
 
-    await logCreate(EntityType.ProductVersion, audit, { ...version, name: version.version });
+    await logCreate(EntityType.ProductVersion, audit, {
+      ...version,
+      name: version.version,
+    });
 
     return transformToVersionDetail(version);
   });
@@ -303,7 +320,12 @@ export const updateVersion = async (
       include: VERSION_DETAIL_INCLUDE,
     });
 
-    await logUpdate(EntityType.ProductVersion, audit, { ...existing, name: existing.version }, { ...version, name: version.version });
+    await logUpdate(
+      EntityType.ProductVersion,
+      audit,
+      { ...existing, name: existing.version },
+      { ...version, name: version.version }
+    );
 
     return transformToVersionDetail(version);
   });
@@ -327,7 +349,10 @@ export const deleteVersion = async (
       throw new Error('Version not found or does not belong to team');
     }
 
-    await logDelete(EntityType.ProductVersion, audit, { id: version.id, name: version.version });
+    await logDelete(EntityType.ProductVersion, audit, {
+      id: version.id,
+      name: version.version,
+    });
 
     await tx.oscratProductVersion.delete({
       where: {
@@ -368,7 +393,11 @@ export const upsertVersionCAR = async (
     const existingAttachmentId = current?.conformityAssessmentReportId ?? null;
     const isUpdate = existingAttachmentId !== null;
 
-    let existingAttachment: { id: string; name: string; mimeType: string | null } | null = null;
+    let existingAttachment: {
+      id: string;
+      name: string;
+      mimeType: string | null;
+    } | null = null;
     if (isUpdate && existingAttachmentId) {
       existingAttachment = await tx.attachment.findUnique({
         where: { id: existingAttachmentId },
@@ -402,7 +431,12 @@ export const upsertVersionCAR = async (
     };
 
     if (isUpdate && existingAttachment) {
-      await logUpdate(EntityType.File, audit, existingAttachment, newAttachmentData);
+      await logUpdate(
+        EntityType.File,
+        audit,
+        existingAttachment,
+        newAttachmentData
+      );
     } else {
       await logCreate(EntityType.File, audit, newAttachmentData);
     }
@@ -421,7 +455,11 @@ export const removeVersionCAR = async (
     const audit = createAuditContextWithTx(tx, auditInfo);
     const current = await tx.oscratProductVersion.findFirst({
       where: { id: versionId, teamId },
-      select: { conformityAssessmentReportId: true, declarationOfConformityId: true, status: true },
+      select: {
+        conformityAssessmentReportId: true,
+        declarationOfConformityId: true,
+        status: true,
+      },
     });
 
     if (current?.conformityAssessmentReportId) {
@@ -490,7 +528,11 @@ export const upsertVersionDoC = async (
     const existingAttachmentId = current?.declarationOfConformityId ?? null;
     const isUpdate = existingAttachmentId !== null;
 
-    let existingAttachment: { id: string; name: string; mimeType: string | null } | null = null;
+    let existingAttachment: {
+      id: string;
+      name: string;
+      mimeType: string | null;
+    } | null = null;
     if (isUpdate && existingAttachmentId) {
       existingAttachment = await tx.attachment.findUnique({
         where: { id: existingAttachmentId },
@@ -529,7 +571,12 @@ export const upsertVersionDoC = async (
     };
 
     if (isUpdate && existingAttachment) {
-      await logUpdate(EntityType.File, audit, existingAttachment, newAttachmentData);
+      await logUpdate(
+        EntityType.File,
+        audit,
+        existingAttachment,
+        newAttachmentData
+      );
     } else {
       await logCreate(EntityType.File, audit, newAttachmentData);
     }

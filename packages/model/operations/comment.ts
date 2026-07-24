@@ -81,11 +81,13 @@ export const createComment = async (
 export const updateComment = async (
   prisma: PrismaClient,
   id: number,
-  text: string
+  text: string,
+  teamId: string
 ) => {
   const commentToEdit = await prisma.comment.findFirst({
     where: {
       id,
+      task: { teamId },
     },
   });
 
@@ -104,10 +106,26 @@ export const updateComment = async (
 };
 
 /** Delete a comment */
-export const deleteComment = async (prisma: PrismaClient, id: number) => {
-  return await prisma.comment.delete({
+export const deleteComment = async (
+  prisma: PrismaClient,
+  id: number,
+  teamId: string
+) => {
+  const commentToDelete = await prisma.comment.findFirst({
     where: {
       id,
+      task: { teamId },
+    },
+    select: { id: true },
+  });
+
+  if (!commentToDelete) {
+    return null;
+  }
+
+  return await prisma.comment.delete({
+    where: {
+      id: commentToDelete.id,
     },
   });
 };

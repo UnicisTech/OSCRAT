@@ -133,6 +133,7 @@ const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
+  const { teamMember } = req.teamContext;
   const { id } = req.query;
 
   try {
@@ -143,7 +144,11 @@ const handleDELETE = async (
       });
     }
 
-    await deleteAssessmentAttachment(id as string, req.auditInfo);
+    await deleteAssessmentAttachment(
+      id as string,
+      teamMember.teamId,
+      req.auditInfo
+    );
 
     return res.status(200).json({
       data: {},

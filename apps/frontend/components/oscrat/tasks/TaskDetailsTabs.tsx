@@ -182,12 +182,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
         return;
       }
       try {
-        await uploadMutation.mutateAsync({
-          file,
-          taskId: task.id,
-          slug: team.slug,
-          versionId: task.versionId ?? undefined,
-        });
+        await uploadMutation.mutateAsync({ file });
         toast.success(t('oscrat.ui.file-uploaded-successfully'));
       } catch (error: unknown) {
         toast.error(
@@ -195,7 +190,7 @@ const TaskDetailsTabs: React.FC<TaskDetailsTabsProps> = ({ task, team }) => {
         );
       }
     },
-    [uploadMutation, task.id, team.slug, t]
+    [uploadMutation, t]
   );
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

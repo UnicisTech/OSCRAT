@@ -62,23 +62,23 @@ model User {
   assignedTasks Task[]       @relation("TaskAssignee")
   teamMembers   TeamMember[]
 
-  createdOscratProducts           OscratProduct[]               @relation("OscratProductCreatedBy")
-  updatedOscratProducts           OscratProduct[]               @relation("OscratProductUpdatedBy")
-  createdOscratProductVersions    OscratProductVersion[]        @relation("OscratProductVersionCreatedBy")
-  updatedOscratProductVersions    OscratProductVersion[]        @relation("OscratProductVersionUpdatedBy")
-  createdOscratAssessments        OscratAssessment[]            @relation("OscratAssessmentCreatedBy")
-  createdOscratReportingOrgs      OscratReportingOrganization[] @relation("OscratReportingOrganizationCreatedBy")
-  updatedOscratReportingOrgs      OscratReportingOrganization[] @relation("OscratReportingOrganizationUpdatedBy")
-  createdOscratVulnerabilities    OscratProductVulnerability[]  @relation("OscratProductVulnerabilityCreatedBy")
-  updatedOscratVulnerabilities    OscratProductVulnerability[]  @relation("OscratProductVulnerabilityUpdatedBy")
-  createdOscratIncidents          OscratProductIncident[]       @relation("OscratProductIncidentCreatedBy")
-  updatedOscratIncidents          OscratProductIncident[]       @relation("OscratProductIncidentUpdatedBy")
-  reportedIncidents               OscratProductIncident[]       @relation("OscratProductIncidentReporter")
-  triggeredWorkerJobs             WorkerJob[]                   @relation("WorkerJobTriggeredBy")
-  createdAttachments              Attachment[]                  @relation("AttachmentCreatedBy")
-  updatedTeamData                 TeamData[]                    @relation("TeamDataUpdatedBy")
-  createdDocumentation            Documentation[]               @relation("DocumentationCreatedBy")
-  updatedDocumentation            Documentation[]               @relation("DocumentationUpdatedBy")
+  createdOscratProducts        OscratProduct[]               @relation("OscratProductCreatedBy")
+  updatedOscratProducts        OscratProduct[]               @relation("OscratProductUpdatedBy")
+  createdOscratProductVersions OscratProductVersion[]        @relation("OscratProductVersionCreatedBy")
+  updatedOscratProductVersions OscratProductVersion[]        @relation("OscratProductVersionUpdatedBy")
+  createdOscratAssessments     OscratAssessment[]            @relation("OscratAssessmentCreatedBy")
+  createdOscratReportingOrgs   OscratReportingOrganization[] @relation("OscratReportingOrganizationCreatedBy")
+  updatedOscratReportingOrgs   OscratReportingOrganization[] @relation("OscratReportingOrganizationUpdatedBy")
+  createdOscratVulnerabilities OscratProductVulnerability[]  @relation("OscratProductVulnerabilityCreatedBy")
+  updatedOscratVulnerabilities OscratProductVulnerability[]  @relation("OscratProductVulnerabilityUpdatedBy")
+  createdOscratIncidents       OscratProductIncident[]       @relation("OscratProductIncidentCreatedBy")
+  updatedOscratIncidents       OscratProductIncident[]       @relation("OscratProductIncidentUpdatedBy")
+  reportedIncidents            OscratProductIncident[]       @relation("OscratProductIncidentReporter")
+  triggeredWorkerJobs          WorkerJob[]                   @relation("WorkerJobTriggeredBy")
+  createdAttachments           Attachment[]                  @relation("AttachmentCreatedBy")
+  updatedTeamData              TeamData[]                    @relation("TeamDataUpdatedBy")
+  createdDocumentation         Documentation[]               @relation("DocumentationCreatedBy")
+  updatedDocumentation         Documentation[]               @relation("DocumentationUpdatedBy")
 }
 
 model PasswordReset {
@@ -103,72 +103,72 @@ model EmailChange {
 // Team & Task Management Models
 
 model Team {
-  id                 String              @id @default(uuid())
-  taskIndex          Int                 @default(1)
-  name               String
-  slug               String              @unique
-  domain             String?             @unique
-  defaultRole        Role                @default(MEMBER)
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @default(now())
-  properties         Json                @default("{}")
+  id          String   @id @default(uuid())
+  taskIndex   Int      @default(1)
+  name        String
+  slug        String   @unique
+  domain      String?  @unique
+  defaultRole Role     @default(MEMBER)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  properties  Json     @default("{}")
 
-  type               OscratOrganizationType   @default(OTHER)
-  size               OscratOrganizationSize   @default(SMALL_ENTERPRISE)
-  orgRoles           OscratOrganizationRole[] @default([MANUFACTURER])
+  type     OscratOrganizationType   @default(OTHER)
+  size     OscratOrganizationSize   @default(SMALL_ENTERPRISE)
+  orgRoles OscratOrganizationRole[] @default([MANUFACTURER])
 
-  taxId              String?
-  postalAddress      String?
-  contactEmail       String?
-  contactPhone       String?
+  taxId                 String?
+  postalAddress         String?
+  contactEmail          String?
+  contactPhone          String?
   additionalInformation String?
 
-  apiKeys            ApiKey[]
-  invitations        Invitation[]
-  tasks              Task[]
-  members            TeamMember[]
+  apiKeys     ApiKey[]
+  invitations Invitation[]
+  tasks       Task[]
+  members     TeamMember[]
 
   // Relationships from OscratOrganization
-  products                    OscratProduct[]
-  productVersions             OscratProductVersion[]
-  repositories                OscratRepository[]
-  reportingOrganizations      OscratReportingOrganization[]
-  workerJobs                  WorkerJob[]
-  incidents                   OscratProductIncident[] @relation("TeamIncidents")
-  assessments                 OscratAssessment[]
-  teamData                    TeamData[]
-  auditLogs                   AuditLog[]
-  documentation               Documentation[]
+  products               OscratProduct[]
+  productVersions        OscratProductVersion[]
+  repositories           OscratRepository[]
+  reportingOrganizations OscratReportingOrganization[]
+  workerJobs             WorkerJob[]
+  incidents              OscratProductIncident[]       @relation("TeamIncidents")
+  assessments            OscratAssessment[]
+  teamData               TeamData[]
+  auditLogs              AuditLog[]
+  documentation          Documentation[]
 }
 
 model Task {
-  id          Int          @id @default(autoincrement())
-  taskNumber  Int
-  teamId      String
-  authorId    String
-  assigneeId  String?
-  title       String
-  titleLocId  String?
-  status      TaskStatus   @default(TODO)
-  duedate     String
-  description    String
+  id               Int        @id @default(autoincrement())
+  taskNumber       Int
+  teamId           String
+  authorId         String
+  assigneeId       String?
+  title            String
+  titleLocId       String?
+  status           TaskStatus @default(TODO)
+  duedate          String
+  description      String
   descriptionLocId String?
-  properties  Json
-  
-  productId   String?
-  versionId   String?
-  version     OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
-  
-  originType  TaskOriginType @default(MANUAL)
-  
+  properties       Json
+
+  productId String?
+  versionId String?
+  version   OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
+
+  originType TaskOriginType @default(MANUAL)
+
   attachments Attachment[]
   comments    Comment[]
   author      User         @relation("TaskAuthor", fields: [authorId], references: [id])
   assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
   team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  
+
   linkedDocumentation DocumentationTask[]
-  
+
   @@index([taskNumber, teamId])
 }
 
@@ -183,17 +183,16 @@ model Comment {
   task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
-
 model TeamMember {
-  id        String   @id @default(uuid())
-  teamId    String
-  userId    String
-  role      Role     @default(MEMBER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id                              String    @id @default(uuid())
+  teamId                          String
+  userId                          String
+  role                            Role      @default(MEMBER)
+  createdAt                       DateTime  @default(now())
+  updatedAt                       DateTime  @default(now())
   lastAwarenessTrainingCompletion DateTime?
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team                            Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user                            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, userId])
   @@index([userId])
@@ -439,19 +438,18 @@ enum OscratProductVersionStatus {
   SUPPORTED
 }
 
-
 // OSCRAT Models
 
 // OscratOrganization model removed - merged into Team
 
 model OscratProduct {
-  id          String  @id @default(uuid())
+  id          String @id @default(uuid())
   name        String
-  acronym     String  @default("")
-  description String  @default("")
+  acronym     String @default("")
+  description String @default("")
 
   teamId String
-  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   type                   OscratProductType
   reportingOrganizations OscratReportingOrganization[]
@@ -476,8 +474,8 @@ model OscratProduct {
 model OscratProductVersion {
   id String @id @default(uuid())
 
-  version String
-  status  OscratProductVersionStatus @default(DRAFT)
+  version        String
+  status         OscratProductVersionStatus @default(DRAFT)
   releaseDate    DateTime?
   supportEndDate DateTime?
 
@@ -485,7 +483,7 @@ model OscratProductVersion {
   product   OscratProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   teamId String
-  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   assessments              OscratAssessment[]
   vulnerabilities          OscratProductVulnerability[]
@@ -500,11 +498,11 @@ model OscratProductVersion {
   documentation            Documentation[]
 
   // Conformity Assessment Report (prerequisite for DoC)
-  conformityAssessmentReportId String?    @unique
+  conformityAssessmentReportId String?     @unique
   conformityAssessmentReport   Attachment? @relation("VersionCAR", fields: [conformityAssessmentReportId], references: [id], onDelete: SetNull)
 
   // Declaration of Conformity (final PDF)
-  declarationOfConformityId String?    @unique
+  declarationOfConformityId String?     @unique
   declarationOfConformity   Attachment? @relation("VersionDoC", fields: [declarationOfConformityId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
@@ -530,7 +528,7 @@ model OscratAssessment {
   rawData       Json
 
   teamId String
-  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   productId String? // Optional - null for ORG type
   versionId String? // Optional - null for ORG and CRA types
@@ -557,7 +555,7 @@ model OscratReportingOrganization {
   reportingEmail String
 
   teamId String
-  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   assignedProducts OscratProduct[]
 
@@ -581,9 +579,9 @@ model OscratProductVulnerability {
   affectedVendor String?
   references     String[]
 
-  advisoryId            String?
-  dateOfDiscovery       DateTime
-  affectedMemberStates  String[]
+  advisoryId           String?
+  dateOfDiscovery      DateTime
+  affectedMemberStates String[]
 
   versionId String
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
@@ -616,17 +614,17 @@ model OscratProductIncident {
   assetDetails   String?
 
   reporterId String
-  reporter   User @relation("OscratProductIncidentReporter", fields: [reporterId], references: [id])
+  reporter   User   @relation("OscratProductIncidentReporter", fields: [reporterId], references: [id])
 
   dateOfDetection DateTime
   severity        IncidentSeverity
   handlingDate    DateTime?
 
-  description        String
-  correctiveActions  String?
-  rootCause          String?
-  scope              String
-  preventiveActions  String?
+  description       String
+  correctiveActions String?
+  rootCause         String?
+  scope             String
+  preventiveActions String?
 
   suspectedUnlawfulAct     Boolean @default(false)
   unlawfulActDescription   String?
@@ -639,7 +637,7 @@ model OscratProductIncident {
   productId String // Denormalized for easier queries
 
   teamId String
-  team   Team @relation("TeamIncidents", fields: [teamId], references: [id], onDelete: Cascade)
+  team   Team   @relation("TeamIncidents", fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -676,18 +674,18 @@ model OscratRepository {
 
   authType    OscratRepositoryAuthType @default(PERSONAL_ACCESS_TOKEN)
   accessToken String?
-  
+
   teamId String
-  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  
-  versionId String        @unique
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  versionId String               @unique
   version   OscratProductVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
   productId String // Denormalized for easier queries
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([teamId, versionId])
   @@index([teamId, productId])
 }
@@ -704,8 +702,8 @@ model WorkerJob {
   triggeredByUser   User   @relation("WorkerJobTriggeredBy", fields: [triggeredByUserId], references: [id])
 
   // Context fields - team is mandatory, others optional
-  contextTeamId    String
-  contextTeam      Team @relation(fields: [contextTeamId], references: [id], onDelete: Cascade)
+  contextTeamId String
+  contextTeam   Team   @relation(fields: [contextTeamId], references: [id], onDelete: Cascade)
 
   contextProductId String?
   contextProduct   OscratProduct? @relation(fields: [contextProductId], references: [id], onDelete: Cascade)
@@ -722,7 +720,7 @@ model WorkerJob {
   errMessage String?
   errCode    String?
 
-  sbomReport              SbomReport? @relation("SbomReportJob")
+  sbomReport              SbomReport?              @relation("SbomReportJob")
   vulnerabilityScanReport VulnerabilityScanReport? @relation("VulnerabilityScanReportJob")
   configurationScanReport ConfigurationScanReport? @relation("ConfigurationScanReportJob")
 
@@ -822,13 +820,13 @@ model ConfigurationScanReport {
 // TeamData Model - Generic JSON storage per team
 
 model TeamData {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  dataKey   String
-  payload   Json
+  dataKey String
+  payload Json
 
-  teamId    String
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -859,17 +857,17 @@ model File {
 // Unified Attachment model
 model Attachment {
   id String @id @default(uuid())
-  
+
   // Display metadata - stored here for UI performance
   name        String
   fileSize    Int
   mimeType    String?
   description String?
   url         String?
-  
+
   fileId String @unique
   file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
-  
+
   // Polymorphic associations
   taskId Int?
   task   Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
@@ -877,20 +875,20 @@ model Attachment {
   versionId String?
   version   OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
-  sbomReportId String? @unique
+  sbomReportId String?     @unique
   sbomReport   SbomReport? @relation(fields: [sbomReportId], references: [id], onDelete: Cascade)
 
-  vulnerabilityScanReportId String? @unique
+  vulnerabilityScanReportId String?                  @unique
   vulnerabilityScanReport   VulnerabilityScanReport? @relation(fields: [vulnerabilityScanReportId], references: [id], onDelete: Cascade)
 
-  configurationScanReportId String? @unique
+  configurationScanReportId String?                  @unique
   configurationScanReport   ConfigurationScanReport? @relation(fields: [configurationScanReportId], references: [id], onDelete: Cascade)
 
   incidentId String?
-  incident   OscratProductIncident? @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  incident   OscratProductIncident? @relation(fields: [incidentId], references: [id], onDelete: SetNull)
 
   vulnerabilityId String?
-  vulnerability   OscratProductVulnerability? @relation(fields: [vulnerabilityId], references: [id], onDelete: Cascade)
+  vulnerability   OscratProductVulnerability? @relation(fields: [vulnerabilityId], references: [id], onDelete: SetNull)
 
   documentationId String?
   documentation   Documentation? @relation(fields: [documentationId], references: [id], onDelete: Cascade)
@@ -923,26 +921,26 @@ model Attachment {
 // Documentation Models
 
 model Documentation {
-  id          String   @id @default(uuid())
-  slug        String
+  id   String @id @default(uuid())
+  slug String
 
-  title       String
-  content     String   @default("")
+  title   String
+  content String @default("")
 
-  visibility  DocumentationVisibility @default(PRIVATE)
-  status      DocumentationStatus     @default(DRAFT)
+  visibility DocumentationVisibility @default(PRIVATE)
+  status     DocumentationStatus     @default(DRAFT)
 
   // Version tracking (simple incrementing version number)
-  version     Int      @default(1)
+  version Int @default(1)
 
-  teamId      String
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   // Optional product/version association (for PRODUCT level)
-  productId   String?
-  product     OscratProduct? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String?
+  product   OscratProduct? @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  versionId   String?
+  versionId      String?
   productVersion OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: Cascade)
 
   // Task backlinks (many-to-many)
@@ -951,10 +949,10 @@ model Documentation {
   // Attachments
   attachments Attachment[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   String
-  updatedBy   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String
 
   createdByUser User @relation("DocumentationCreatedBy", fields: [createdBy], references: [id])
   updatedByUser User @relation("DocumentationUpdatedBy", fields: [updatedBy], references: [id])
@@ -968,15 +966,15 @@ model Documentation {
 
 // Junction table for Documentation <-> Task many-to-many relationship
 model DocumentationTask {
-  id              String   @id @default(uuid())
+  id String @id @default(uuid())
 
   documentationId String
   documentation   Documentation @relation(fields: [documentationId], references: [id], onDelete: Cascade)
 
-  taskId          Int
-  task            Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId Int
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
-  createdAt       DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([documentationId, taskId])
   @@index([documentationId])
@@ -984,30 +982,30 @@ model DocumentationTask {
 }
 
 model AuditLog {
-  id          String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  userId      String
-  userType    AuditUserType @default(USER)
-  userName    String?
-  userEmail   String?
+  userId    String
+  userType  AuditUserType @default(USER)
+  userName  String?
+  userEmail String?
 
-  action      String
-  crud        String
-  targetType  String
-  targetId    String?
-  targetName  String?
+  action     String
+  crud       String
+  targetType String
+  targetId   String?
+  targetName String?
 
   teamId      String
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team        Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
   productId   String?
   productName String?
   versionId   String?
   versionName String?
   metadata    Json?
 
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
 
   @@index([teamId, createdAt(sort: Desc)])
   @@index([teamId, action])

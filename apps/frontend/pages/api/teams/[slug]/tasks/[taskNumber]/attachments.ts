@@ -9,7 +9,8 @@ import { handleFormidableError } from '@/lib/utils/fileUpload';
 import { withTeamAuth, type AuthenticatedTeamRequest } from '@/lib/middleware';
 import { ApiError } from '@/lib/errors';
 import type { NextApiResponse } from 'next';
-import { getTaskBySlugAndNumber } from 'models/task';
+import { getTaskBySlugAndNumber } from '@oscrat/model/operations';
+import { prisma } from '@/lib/prisma';
 
 export const config = {
   api: {
@@ -49,6 +50,7 @@ const handleGET = async (
 
   try {
     const task = await getTaskBySlugAndNumber(
+      prisma,
       parseInt(taskNumber as string, 10),
       slug as string
     );
@@ -82,10 +84,11 @@ const handlePOST = async (
   res: NextApiResponse
 ) => {
   const { teamMember } = req.teamContext;
+  const { slug, taskNumber } = req.query;
 
   try {
     const { fields, files } = await readFile(req);
-    const { taskId, description, versionId } = fields;
+    const { description } = fields;
 
     const file = Object.values(files)[0] as formidable.File[];
     if (!file?.[0]) {
@@ -96,19 +99,15 @@ const handlePOST = async (
 
     if (isAllowed) {
       try {
-        const resolvedVersionId = Array.isArray(versionId)
-          ? versionId[0]
-          : versionId;
-
         const uploadParams = {
-          taskId: Number(taskId),
+          taskNumber: parseInt(taskNumber as string, 10),
+          slug: slug as string,
           file: file[0],
           description: Array.isArray(description)
             ? description[0]
             : description,
           createdBy: teamMember.userId,
           auditInfo: req.auditInfo,
-          versionId: resolvedVersionId || undefined,
         };
 
         const url = await saveFileAsAttachment(uploadParams);
@@ -136,6 +135,7 @@ const handleDELETE = async (
   req: AuthenticatedTeamRequest,
   res: NextApiResponse
 ) => {
+  const { teamMember } = req.teamContext;
   const { id } = req.query;
 
   try {
@@ -143,7 +143,7 @@ const handleDELETE = async (
       throw new ApiError(400, 'Attachment ID is required');
     }
 
-    await deleteAttachment(id as string, req.auditInfo);
+    await deleteAttachment(id as string, teamMember.teamId, req.auditInfo);
 
     return res.status(200).json({ data: {}, error: null });
   } catch (error: any) {

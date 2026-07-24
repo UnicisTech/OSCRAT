@@ -13,6 +13,7 @@ import {
   EntityType,
   type AuditInfo,
 } from '../audit';
+import { assertVersionInTeam } from './ownership';
 
 export const INCIDENT_NAME_CONFLICT =
   'oscrat.ui.validation.incident-name-already-exists';
@@ -47,56 +48,6 @@ type IncidentSummaryPayload = Prisma.OscratProductIncidentGetPayload<{
 type IncidentDetailPayload = Prisma.OscratProductIncidentGetPayload<{
   include: typeof INCIDENT_DETAIL_INCLUDE;
 }>;
-
-/**
- * Validates that attachments exist, belong to the correct version,
- * and are not already linked to other incidents
- */
-const validateAttachmentsForIncident = async (
-  prisma: PrismaClient,
-  attachmentIds: string[],
-  versionId: string,
-  existingIncidentId?: string
-): Promise<void> => {
-  if (attachmentIds.length === 0) return;
-
-  const attachments = await prisma.attachment.findMany({
-    where: {
-      id: { in: attachmentIds },
-    },
-    select: {
-      id: true,
-      versionId: true,
-      incidentId: true,
-    },
-  });
-
-  if (attachments.length !== attachmentIds.length) {
-    throw new Error('One or more attachments not found');
-  }
-
-  // Validate all attachments belong to the same version
-  const invalidAttachments = attachments.filter(
-    (att) => att.versionId !== versionId
-  );
-  if (invalidAttachments.length > 0) {
-    throw new Error(
-      'All attachments must belong to the same version as the incident'
-    );
-  }
-
-  // Validate attachments are not already linked to another incident
-  const alreadyLinked = attachments.filter((att) =>
-    existingIncidentId
-      ? att.incidentId !== null && att.incidentId !== existingIncidentId
-      : att.incidentId !== null
-  );
-  if (alreadyLinked.length > 0) {
-    throw new Error(
-      'One or more attachments are already linked to another incident'
-    );
-  }
-};
 
 export const transformToIncidentSummary = (
   incident: IncidentSummaryPayload
@@ -209,6 +160,8 @@ export const createIncident = async (
     const audit = createAuditContextWithTx(tx, auditInfo);
     const normalizedName = data.name?.trim();
 
+    await assertVersionInTeam(tx, versionId, teamId, productId);
+
     if (normalizedName) {
       const duplicate = await tx.oscratProductIncident.findFirst({
         where: {
@@ -308,6 +261,8 @@ export const updateIncident = async (
   return await prisma.$transaction(async (tx) => {
     const audit = createAuditContextWithTx(tx, auditInfo);
 
+    await assertVersionInTeam(tx, versionId, teamId);
+
     const existing = await tx.oscratProductIncident.findFirst({
       where: {
         id: incidentId,
@@ -317,6 +272,10 @@ export const updateIncident = async (
 
     if (!existing) {
       throw new Error('Incident not found or does not belong to team');
+    }
+
+    if (existing.versionId !== versionId) {
+      throw new Error('Version does not match the incident');
     }
 
     const normalizedName = data.name?.trim();

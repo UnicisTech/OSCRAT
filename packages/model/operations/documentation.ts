@@ -15,6 +15,7 @@ import {
 } from '../audit';
 import { slugify } from '../utils/slugify';
 import { nanoid } from 'nanoid';
+import { assertOwnership } from './ownership';
 import type {
   DocumentationSummary,
   DocumentationDetails,
@@ -155,7 +156,11 @@ export const createDocumentation = async (
 
     const slug = generateSlug(input.title);
 
-    // Let FK constraints handle product/version validation - insert will fail if IDs are invalid
+    await assertOwnership(tx, teamId, {
+      product: input.productId,
+      version: input.versionId,
+    });
+
     const doc = await tx.documentation.create({
       data: {
         slug,
