@@ -843,6 +843,7 @@
       "assessment-completed-generating-car": "Assessment completed! Generating Conformity Assessment Report...",
       "car-generated-and-set": "Conformity Assessment Report generated and set for this version",
       "car-generation-failed": "Failed to generate Conformity Assessment Report",
+      "pdf-export-failed": "Failed to export the compliance report as PDF",
       "failed-to-save-assessment": "Failed to save assessment",
       "assessment-deleted-successfully": "Assessment deleted successfully",
       "failed-to-delete-assessment": "Failed to delete assessment",

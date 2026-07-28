@@ -226,8 +226,9 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
       toast.success(t('oscrat.ui.assessment-completed-generating-car'));
       const pdfTranslations = buildPDFTranslations(t);
 
+      let pdfBlob: Blob | void;
       try {
-        const pdfBlob = await exportComplianceToPDF(
+        pdfBlob = await exportComplianceToPDF(
           complianceData,
           state,
           versionId!,
@@ -237,19 +238,31 @@ const ComplianceForm: React.FC<ComplianceFormProps> = ({
           (key: string) => t(key, { ns: complianceNamespace }),
           true
         );
+      } catch (error) {
+        toast.error(
+          extractErrorMessage(error, t('oscrat.ui.car-generation-failed'), t)
+        );
+        return;
+      }
 
-        if (pdfBlob) {
-          const file = new File([pdfBlob], generateCARFilename(productName), {
-            type: 'application/pdf',
-          });
-          await uploadCAR(file);
-          toast.success(t('oscrat.ui.car-generated-and-set'));
-          router.push(
-            `/organization/${teamSlug}/products/${productId}/versions/${versionId}`
-          );
-        }
-      } catch {
+      if (!pdfBlob) {
         toast.error(t('oscrat.ui.car-generation-failed'));
+        return;
+      }
+
+      try {
+        const file = new File([pdfBlob], generateCARFilename(productName), {
+          type: 'application/pdf',
+        });
+        await uploadCAR(file);
+        toast.success(t('oscrat.ui.car-generated-and-set'));
+        router.push(
+          `/organization/${teamSlug}/products/${productId}/versions/${versionId}`
+        );
+      } catch (error) {
+        toast.error(
+          extractErrorMessage(error, t('oscrat.ui.doc.car-upload-failed'), t)
+        );
       }
     },
     [

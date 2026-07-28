@@ -28,8 +28,10 @@ import {
 import { useLatestAssessment } from '@/hooks/oscrat/useLatestAssessment';
 import { transformOrgAssessmentToComplianceState } from '@/utils/compliance';
 import { buildPDFTranslations } from '@/lib/compliance/pdfTranslations';
+import { extractErrorMessage } from '@/lib/utils';
 import useTasks from '@/hooks/useTasks';
 import Button from '@/components/button';
+import toast from 'react-hot-toast';
 
 const TeamDashboard = () => {
   const { teamContext } = useTeamContext();
@@ -129,16 +131,22 @@ const TeamDashboard = () => {
 
     const pdfTranslations = buildPDFTranslations(t);
 
-    await exportComplianceToPDF(
-      complianceData,
-      complianceState,
-      team.id,
-      team.name,
-      undefined,
-      pdfTranslations,
-      (key: string) => t(key, { ns: complianceNamespace }),
-      false
-    );
+    try {
+      await exportComplianceToPDF(
+        complianceData,
+        complianceState,
+        team.id,
+        team.name,
+        undefined,
+        pdfTranslations,
+        (key: string) => t(key, { ns: complianceNamespace }),
+        false
+      );
+    } catch (error) {
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.pdf-export-failed'), t)
+      );
+    }
   };
 
   const handleGoToAssessment = () => {

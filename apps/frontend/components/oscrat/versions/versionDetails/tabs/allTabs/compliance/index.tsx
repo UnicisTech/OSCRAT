@@ -24,6 +24,8 @@ import {
 } from '@/lib/compliance/translations';
 import { buildPDFTranslations } from '@/lib/compliance/pdfTranslations';
 import { getRoleForTeam } from '@/lib/compliance/utils';
+import { extractErrorMessage } from '@/lib/utils';
+import toast from 'react-hot-toast';
 import { FaDownload, FaPlayCircle, FaRedo } from 'react-icons/fa';
 import { OscratOrganizationRole } from '@oscrat/model';
 import useTasks from '@/hooks/useTasks';
@@ -114,16 +116,22 @@ export default function Compliance() {
 
     const pdfTranslations = buildPDFTranslations(t);
 
-    await exportComplianceToPDF(
-      complianceData,
-      complianceState,
-      versionId,
-      team.name,
-      `${project.name} (${versionData.version})`,
-      pdfTranslations,
-      (key: string) => t(key, { ns: complianceNamespace }),
-      false
-    );
+    try {
+      await exportComplianceToPDF(
+        complianceData,
+        complianceState,
+        versionId,
+        team.name,
+        `${project.name} (${versionData.version})`,
+        pdfTranslations,
+        (key: string) => t(key, { ns: complianceNamespace }),
+        false
+      );
+    } catch (error) {
+      toast.error(
+        extractErrorMessage(error, t('oscrat.ui.pdf-export-failed'), t)
+      );
+    }
   };
 
   const handleResetClick = () => {

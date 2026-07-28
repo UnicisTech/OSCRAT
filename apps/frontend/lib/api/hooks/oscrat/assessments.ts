@@ -29,13 +29,16 @@ export function useGetAssessmentDetail(
   });
 }
 
+// Mutations invalidate the `find` list rather than `all`: every assessment
+// detail key is nested under `all`, so invalidating it refetches detail queries
+// for assessments that were deleted earlier in the session, yielding 404s.
 export function useCreateAssessment(teamSlug: string) {
   return useMutation({
     mutationFn: (data: OscratAssessmentCreateRequest) =>
       oscratAssessmentEndpoints.createAssessment(teamSlug, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.assessments.all(teamSlug),
+        queryKey: queryKeys.oscrat.assessments.find(teamSlug),
       });
     },
   });
@@ -59,7 +62,7 @@ export function useUpdateAssessment(teamSlug: string) {
         ),
       });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.assessments.all(teamSlug),
+        queryKey: queryKeys.oscrat.assessments.find(teamSlug),
       });
     },
   });
@@ -71,7 +74,7 @@ export function useDeleteAssessment(teamSlug: string) {
       oscratAssessmentEndpoints.deleteAssessment(teamSlug, assessmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.oscrat.assessments.all(teamSlug),
+        queryKey: queryKeys.oscrat.assessments.find(teamSlug),
       });
     },
   });

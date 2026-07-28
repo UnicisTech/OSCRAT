@@ -13,7 +13,11 @@ const cspDirectives = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  `script-src 'self'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
+  // 'wasm-unsafe-eval' is required by @react-pdf/renderer, whose layout engine
+  // (yoga-layout) instantiates a WebAssembly module in the browser. Without it
+  // every client-side PDF export fails outside dev, where 'unsafe-eval' happens
+  // to cover it.
+  `script-src 'self' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
   "script-src-attr 'none'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
