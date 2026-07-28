@@ -1,4 +1,4 @@
-# OSCRAT Platform  (free and open source)
+# OSCRAT Platform (free and open source)
 
 OSCRAT Platform - an open core, enterprise-ready trust management platform for startups and SMEs.
 
