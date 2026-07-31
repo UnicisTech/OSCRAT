@@ -11,6 +11,7 @@ import {
 import { FaDownload, FaTrash } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
+import { isEmptyFile } from '@/utils/fileValidation';
 import ActionButton from '@/components/oscrat/ActionButton';
 import Button from '@/components/button';
 import Modal from '@/components/shared/Modal';
@@ -117,9 +118,15 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    e.target.value = '';
+
+    if (isEmptyFile(file)) {
+      toast.error(t('oscrat.ui.validation.file-empty'));
+      return;
+    }
+
     setPendingFiles((prev) => [...prev, file]);
     toast.success(t('oscrat.ui.file-added-will-upload-on-save'));
-    e.target.value = '';
   };
 
   const handleRemovePendingFile = (index: number) => {
@@ -153,7 +160,8 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
         toast.error(
           extractErrorMessage(
             error,
-            `${t('oscrat.ui.failed-to-upload-file')}: ${file.name}`
+            `${t('oscrat.ui.failed-to-upload-file')}: ${file.name}`,
+            t
           )
         );
         throw error; // Re-throw to stop the save process
@@ -226,7 +234,8 @@ const EditIncidentModal: React.FC<EditIncidentModalProps> = ({
       toast.error(
         extractErrorMessage(
           error,
-          t('oscrat.ui.versions.incidents.failed-to-update')
+          t('oscrat.ui.versions.incidents.failed-to-update'),
+          t
         )
       );
     } finally {

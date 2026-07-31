@@ -50,7 +50,10 @@ export const parseFormData = (
 
   return new Promise((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
+      if (err) {
+        reject(err);
+        return;
+      }
       resolve({ fields, files });
     });
   });
@@ -149,6 +152,26 @@ export const cleanupTempFile = async (filepath: string): Promise<void> => {
 };
 
 /**
+ * Numeric `code` values formidable v3 puts on the errors it rejects with, taken
+ * from its FormidableError module. They are duplicated as literals rather than
+ * read from `formidable.errors` because that table only exists on the CommonJS
+ * default export, and the ESM/CJS interop Next.js applies to API routes leaves
+ * it undefined.
+ */
+const FORMIDABLE_ERROR = {
+  aborted: 1002,
+  maxFieldsExceeded: 1007,
+  smallerThanMinFileSize: 1008,
+  biggerThanTotalMaxFileSize: 1009,
+  noEmptyFiles: 1010,
+  missingContentType: 1011,
+  malformedMultipart: 1012,
+  missingMultipartBoundary: 1013,
+  maxFilesExceeded: 1015,
+  biggerThanMaxFileSize: 1016,
+} as const;
+
+/**
  * Handle formidable errors with specific error codes
  */
 export const handleFormidableError = async (
@@ -158,23 +181,29 @@ export const handleFormidableError = async (
   // Import ApiError dynamically to avoid circular dependencies
   const { ApiError } = await import('@/lib/errors');
 
-  // Handle specific formidable error codes
-  const errorWithCode = error as { code?: string };
+  const errorWithCode = error as { code?: number };
   switch (errorWithCode.code) {
-    case 'LIMIT_FILE_SIZE': {
+    case FORMIDABLE_ERROR.noEmptyFiles:
+    case FORMIDABLE_ERROR.smallerThanMinFileSize: {
+      throw new ApiError(400, 'oscrat.ui.validation.file-empty');
+    }
+    case FORMIDABLE_ERROR.biggerThanMaxFileSize:
+    case FORMIDABLE_ERROR.biggerThanTotalMaxFileSize: {
       const sizeMsg = maxSizeMB ? `Maximum size is ${maxSizeMB}MB.` : '';
       throw new ApiError(400, `File is too large. ${sizeMsg}`.trim());
     }
-    case 'LIMIT_FILE_COUNT': {
+    case FORMIDABLE_ERROR.maxFilesExceeded: {
       throw new ApiError(400, 'Only one file can be uploaded at a time.');
     }
-    case 'LIMIT_FIELD_COUNT': {
+    case FORMIDABLE_ERROR.maxFieldsExceeded: {
       throw new ApiError(400, 'Too many form fields.');
     }
-    case 'ABORTED': {
+    case FORMIDABLE_ERROR.aborted: {
       throw new ApiError(400, 'Upload was interrupted.');
     }
-    case 'PARSER_ERROR': {
+    case FORMIDABLE_ERROR.malformedMultipart:
+    case FORMIDABLE_ERROR.missingMultipartBoundary:
+    case FORMIDABLE_ERROR.missingContentType: {
       throw new ApiError(400, 'Invalid file format or corrupted upload.');
     }
     default: {

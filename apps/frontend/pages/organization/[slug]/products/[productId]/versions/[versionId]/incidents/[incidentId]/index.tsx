@@ -12,6 +12,7 @@ import { tableStyles } from '@/components/oscrat/tableStyles';
 import EditIncidentModal from '@/components/oscrat/versions/versionDetails/tabs/allTabs/incidents/EditIncidentModal';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
+import { isEmptyFile } from '@/utils/fileValidation';
 import { FaDownload, FaTrash, FaInfoCircle } from 'react-icons/fa';
 import { IncidentStatus } from '@oscrat/model';
 import normalizeText from '@/utils/normalizeText';
@@ -83,13 +84,20 @@ function IncidentDetailsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    e.target.value = '';
+
+    if (isEmptyFile(file)) {
+      toast.error(t('oscrat.ui.validation.file-empty'));
+      return;
+    }
+
     setUploadingFile(true);
     try {
       await uploadAttachment(file);
       toast.success(t('oscrat.ui.file-uploaded-successfully'));
     } catch (error: unknown) {
       toast.error(
-        extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file'))
+        extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file'), t)
       );
     } finally {
       setUploadingFile(false);

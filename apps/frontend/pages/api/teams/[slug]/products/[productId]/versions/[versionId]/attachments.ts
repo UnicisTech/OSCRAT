@@ -133,7 +133,7 @@ const handlePOST = async (
       throw error;
     }
 
-    handleFormidableError(error, 10);
+    await handleFormidableError(error, 10);
   }
 };
 

@@ -16,6 +16,7 @@ import VulnerabilityFormFields, {
 } from '@/components/oscrat/VulnerabilityFormFields';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/utils';
+import { isEmptyFile } from '@/utils/fileValidation';
 import { mapScanSeverityToVulnerabilitySeverity } from '@/lib/utils/severity';
 import { Breadcrumb } from '@/components/shared';
 import Button from '@/components/button';
@@ -212,6 +213,13 @@ function NewVulnerabilityPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    e.target.value = '';
+
+    if (isEmptyFile(file)) {
+      toast.error(t('oscrat.ui.validation.file-empty'));
+      return;
+    }
+
     setUploadingFile(true);
     try {
       const attachment = await uploadAttachment(file);
@@ -219,7 +227,7 @@ function NewVulnerabilityPage() {
       toast.success(t('oscrat.ui.file-uploaded-successfully'));
     } catch (error: unknown) {
       toast.error(
-        extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file'))
+        extractErrorMessage(error, t('oscrat.ui.failed-to-upload-file'), t)
       );
     } finally {
       setUploadingFile(false);
