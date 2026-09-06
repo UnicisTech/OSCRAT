@@ -3,7 +3,7 @@ import { useTranslation } from 'next-i18next';
 import { XMarkIcon, LinkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/shared';
 import { CreateTask } from '@/components/interfaces/Task';
-import { TaskStatus, type TeamDetail } from '@oscrat/model';
+import { TaskStatus, TaskType, type TeamDetail } from '@oscrat/model';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 import { resolveTaskTitle } from '@/lib/tasks';
 import { useLinkedTasks } from './hooks/useLinkedTasks';
@@ -181,6 +181,7 @@ const LinkedTasksSection: React.FC<LinkedTasksSectionProps> = ({
           team={team}
           defaultProductId={defaultProductId}
           defaultVersionId={defaultVersionId}
+          defaultTaskType={TaskType.DOCUMENTATION}
           onSuccess={handleTaskCreatedAndLink}
         />
       )}

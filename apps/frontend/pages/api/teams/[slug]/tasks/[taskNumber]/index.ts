@@ -62,8 +62,15 @@ const handlePUT = async (
     throw new ApiError(400, 'Invalid task number');
   }
 
-  const { title, description, status, duedate, assigneeId, properties } =
-    await parseBody(createTaskUpdateSchema(), req);
+  const {
+    title,
+    description,
+    status,
+    duedate,
+    assigneeId,
+    taskType,
+    properties,
+  } = await parseBody(createTaskUpdateSchema(), req);
 
   const task = await updateTask(
     taskNumberAsNumber,
@@ -74,6 +81,7 @@ const handlePUT = async (
       status,
       duedate: duedate?.toISOString(),
       assigneeId,
+      taskType,
       properties,
     },
     req.auditInfo

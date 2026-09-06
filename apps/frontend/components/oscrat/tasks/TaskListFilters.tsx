@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/button';
-import { TASK_STATUS_TRANSLATION_MAP } from '../../../constants/taskStatuses';
+import {
+  TASK_STATUS_TRANSLATION_MAP,
+  TASK_TYPE_TRANSLATION_MAP,
+} from '../../../constants/taskStatuses';
 
 interface FilterState {
   status: string[];
+  taskType: string[];
   productId: string[];
   versionId: string[];
 }
@@ -37,8 +41,16 @@ const TaskListFilters: React.FC<TaskListFiltersProps> = ({
     })
   );
 
+  const typeOptions = Object.entries(TASK_TYPE_TRANSLATION_MAP).map(
+    ([type, translationKey]) => ({
+      value: type,
+      label: t(translationKey),
+    })
+  );
+
   const hasActiveFilters =
     filters.status.length > 0 ||
+    filters.taskType.length > 0 ||
     filters.productId.length > 0 ||
     filters.versionId.length > 0;
 
@@ -110,6 +122,13 @@ const TaskListFilters: React.FC<TaskListFiltersProps> = ({
           filterKey="status"
           options={statusOptions}
           selectedValues={filters.status}
+        />
+
+        <FilterDropdown
+          label={t('type')}
+          filterKey="taskType"
+          options={typeOptions}
+          selectedValues={filters.taskType}
         />
 
         <FilterDropdown

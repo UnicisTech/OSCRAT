@@ -5,9 +5,13 @@ import { useTeamContext } from '@/context/TeamContext';
 import { useProductContext } from '@/context/ProductContext';
 import { useVersionContext } from '@/context/VersionContext';
 import { useTask } from '@/hooks/useTask';
-import { TaskDetailsForm, TaskDetailsTabs, RiskAssessmentSection } from '@/components/oscrat/tasks';
+import {
+  TaskDetailsForm,
+  TaskDetailsTabs,
+  RiskAssessmentSection,
+} from '@/components/oscrat/tasks';
 import { Breadcrumb } from '@/components/shared';
-import { Team } from '@oscrat/model';
+import { Team, TaskType } from '@oscrat/model';
 import { formatTaskLabel, resolveTaskTitle } from '@/lib/tasks';
 // import TabsManager from '@/components/shared/TabsManager';
 // import TABS_CONFIG from '@/components/oscrat/versions/versionDetails/tabs/allTabs/task/taskDetails/tabs';
@@ -63,7 +67,9 @@ function TaskDetailsWithVersionContext({
       href: `/organization/${team.slug}/products/${routeProductId}/versions/${routeVersionId}`,
     },
     {
-      label: resolveTaskTitle(task, t) ? formatTaskLabel(task, t) : t('task-details'),
+      label: resolveTaskTitle(task, t)
+        ? formatTaskLabel(task, t)
+        : t('task-details'),
       current: true,
     },
   ];
@@ -72,7 +78,7 @@ function TaskDetailsWithVersionContext({
     <div className="flex flex-col space-y-6">
       <Breadcrumb items={breadcrumbItems} />
       <TaskDetailsForm task={task} team={team} />
-      {(task.properties as Record<string, unknown>)?.enableRiskAssessment === true && (
+      {task.taskType === TaskType.RISK && (
         <RiskAssessmentSection task={task} team={team} />
       )}
       <TaskDetailsTabs task={task} team={team} />
@@ -114,7 +120,9 @@ function TaskDetailsStandalone({
       href: `/organization/${team.slug}/tasks`,
     },
     {
-      label: resolveTaskTitle(task, t) ? formatTaskLabel(task, t) : t('task-details'),
+      label: resolveTaskTitle(task, t)
+        ? formatTaskLabel(task, t)
+        : t('task-details'),
       current: true,
     },
   ];
@@ -123,7 +131,7 @@ function TaskDetailsStandalone({
     <div className="flex flex-col space-y-6">
       <Breadcrumb items={breadcrumbItems} />
       <TaskDetailsForm task={task} team={team} />
-      {(task.properties as Record<string, unknown>)?.enableRiskAssessment === true && (
+      {task.taskType === TaskType.RISK && (
         <RiskAssessmentSection task={task} team={team} />
       )}
       <TaskDetailsTabs task={task} team={team} />

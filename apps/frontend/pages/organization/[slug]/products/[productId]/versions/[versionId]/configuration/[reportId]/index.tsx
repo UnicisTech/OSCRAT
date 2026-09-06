@@ -25,6 +25,7 @@ import {
   CONFIGURATION_RESULT,
   CONFIGURATION_SEVERITY,
   TaskOriginType,
+  TaskType,
   sortConfigurationScanRules,
   TASK_CONFIGURATION_PROPERTY_KEYS,
 } from '@oscrat/model';
@@ -531,6 +532,7 @@ export default function ConfigurationScanSummaryPage() {
           defaultTitle={taskTitle}
           defaultDescription={taskDescription}
           defaultOriginType={TaskOriginType.AUTOMATIC}
+          defaultTaskType={TaskType.CONFIGURATION_MANAGEMENT}
           linkedProperties={linkedProperties}
         />
       )}

@@ -4,7 +4,7 @@ import * as TeamOps from '@oscrat/model/operations';
 import {
   TaskStatus,
   TaskOriginType,
-  TRAINING_TASK_TYPE_VALUE,
+  TaskType,
   type AuditInfo,
   type TaskProperties,
 } from '@oscrat/model';
@@ -24,6 +24,7 @@ export const createTask = async (
     productId?: string;
     versionId?: string;
     originType?: TaskOriginType;
+    taskType?: TaskType;
     properties?: TaskProperties;
   },
   audit: AuditInfo
@@ -63,18 +64,20 @@ export const updateTask = async (
   if (data?.status === TaskStatus.DONE) {
     const task = await prisma.task.findFirst({
       where: { taskNumber, team: { slug } },
-      select: { assigneeId: true, teamId: true, properties: true },
+      select: {
+        assigneeId: true,
+        teamId: true,
+        taskType: true,
+      },
     });
-    if (task?.assigneeId) {
-      const props = task.properties as Record<string, unknown>;
-      if (props?.task_type === TRAINING_TASK_TYPE_VALUE) {
-        await TeamOps.updateLastAwarenessTrainingCompletion(
-          prisma,
-          task.teamId,
-          task.assigneeId,
-          new Date()
-        );
-      }
+
+    if (task?.assigneeId && task.taskType === TaskType.TRAINING) {
+      await TeamOps.updateLastAwarenessTrainingCompletion(
+        prisma,
+        task.teamId,
+        task.assigneeId,
+        new Date()
+      );
     }
   }
 

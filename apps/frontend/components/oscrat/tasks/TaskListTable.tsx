@@ -26,19 +26,22 @@ const TaskListTable: React.FC<TaskListTableProps> = ({
       <table className="text-content-secondary divide-line-subtle w-full table-fixed divide-y text-left text-sm">
         <thead className="bg-surface-muted">
           <tr>
-            <th className="text-content w-[40%] p-4 text-b2 font-medium">
+            <th className="text-content text-b2 w-[32%] p-4 font-medium">
               {t('task')}
             </th>
-            <th className="text-content hidden w-[20%] whitespace-nowrap p-4 text-b2 font-medium md:table-cell">
+            <th className="text-content text-b2 hidden w-[14%] whitespace-nowrap p-4 font-medium md:table-cell">
+              {t('type')}
+            </th>
+            <th className="text-content text-b2 hidden w-[16%] whitespace-nowrap p-4 font-medium md:table-cell">
               {t('product')}
             </th>
-            <th className="text-content hidden w-[15%] whitespace-nowrap p-4 text-b2 font-medium lg:table-cell">
+            <th className="text-content text-b2 hidden w-[13%] whitespace-nowrap p-4 font-medium lg:table-cell">
               {t('version')}
             </th>
-            <th className="text-content hidden w-[12%] whitespace-nowrap p-4 text-b2 font-medium sm:table-cell">
+            <th className="text-content text-b2 hidden w-[12%] whitespace-nowrap p-4 font-medium sm:table-cell">
               {t('due-date')}
             </th>
-            <th className="text-content w-[13%] whitespace-nowrap p-4 text-b2 font-medium">
+            <th className="text-content text-b2 w-[13%] whitespace-nowrap p-4 font-medium">
               {t('status')}
             </th>
           </tr>
@@ -47,7 +50,7 @@ const TaskListTable: React.FC<TaskListTableProps> = ({
           {tasks.length === 0 ? (
             <tr>
               <td
-                colSpan={5}
+                colSpan={6}
                 className="text-content-muted px-6 py-8 text-center"
               >
                 {t('no-tasks-yet')}

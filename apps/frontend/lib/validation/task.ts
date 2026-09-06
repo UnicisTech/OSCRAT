@@ -2,10 +2,10 @@ import * as Yup from 'yup';
 import {
   TaskStatus,
   TaskOriginType,
+  TaskType,
   CONFIGURATION_SEVERITY,
   TASK_CONFIGURATION_PROPERTY_KEYS,
   TASK_CSC_PROPERTY_KEYS,
-  TASK_TRAINING_PROPERTY_KEYS,
   TASK_RISK_PROPERTY_KEYS,
   type ConfigurationSeverity,
   type TaskCscAuditLogEntry,
@@ -46,12 +46,7 @@ const taskCscPropertiesSchema = {
     .optional(),
 };
 
-const taskTrainingPropertiesSchema = {
-  [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]: Yup.string().trim().optional(),
-};
-
 const taskRiskFlagPropertiesSchema = {
-  [TASK_RISK_PROPERTY_KEYS.ENABLE_RISK_ASSESSMENT]: Yup.boolean().optional(),
   [TASK_RISK_PROPERTY_KEYS.DETAILS]: riskDetailsPropertiesSchema.optional(),
   [TASK_RISK_PROPERTY_KEYS.TREATMENT]: riskTreatmentPropertiesSchema.optional(),
 };
@@ -60,7 +55,6 @@ export const taskPropertiesSchema: Yup.ObjectSchema<TaskProperties> =
   Yup.object({
     ...taskConfigurationPropertiesSchema,
     ...taskCscPropertiesSchema,
-    ...taskTrainingPropertiesSchema,
     ...taskRiskFlagPropertiesSchema,
   })
     .noUnknown()
@@ -89,6 +83,9 @@ export const createTaskCreateSchema = () =>
     originType: Yup.mixed<TaskOriginType>()
       .oneOf(Object.values(TaskOriginType))
       .optional(),
+    taskType: Yup.mixed<TaskType>()
+      .oneOf(Object.values(TaskType), 'oscrat.ui.validation.task-type-invalid')
+      .optional(),
     properties: taskPropertiesSchema.optional(),
   });
 
@@ -112,6 +109,9 @@ export const createTaskUpdateSchema = (options?: {
       .optional(),
     duedate: Yup.date().optional(),
     assigneeId: Yup.string().nullable().optional(),
+    taskType: Yup.mixed<TaskType>()
+      .oneOf(Object.values(TaskType), 'oscrat.ui.validation.task-type-invalid')
+      .optional(),
     properties: taskPropertiesSchema.optional(),
   });
 

@@ -2,6 +2,7 @@ import {
   PrismaClient,
   TaskStatus,
   TaskOriginType,
+  TaskType,
   Prisma,
 } from '@prisma/client';
 import {
@@ -15,12 +16,10 @@ import {
 import { toJsonInput } from '../utils/json';
 import {
   TASK_CONFIGURATION_PROPERTY_KEYS,
-  TASK_TRAINING_PROPERTY_KEYS,
   type TaskByRuleSummary,
   type TaskProperties,
 } from '../types/task';
 import {
-  TRAINING_TASK_TYPE_VALUE,
   AWARENESS_TRAINING_DUE_DAYS,
   AWARENESS_TRAINING_TITLE_LOC_ID,
   AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
@@ -47,6 +46,7 @@ export const createTask = async (
     productId?: string;
     versionId?: string;
     originType?: TaskOriginType;
+    taskType?: TaskType;
     properties?: TaskProperties;
   },
   auditInfo: AuditInfo
@@ -67,6 +67,7 @@ export const createTask = async (
       productId,
       versionId,
       originType,
+      taskType,
       properties,
     } = param;
 
@@ -92,6 +93,7 @@ export const createTask = async (
         productId,
         versionId,
         originType,
+        taskType,
       },
     });
 
@@ -111,6 +113,7 @@ export interface TaskUpdateInput {
   status?: TaskStatus;
   duedate?: string;
   assigneeId?: string | null;
+  taskType?: TaskType;
   properties?: TaskProperties;
 }
 
@@ -350,11 +353,6 @@ export const getConfigurationTasksByVersion = async (
   return byRule;
 };
 
-const TRAINING_TYPE_FILTER = {
-  path: [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE],
-  equals: TRAINING_TASK_TYPE_VALUE,
-};
-
 /** Find an active (non-DONE) training task assigned to a user in a team */
 export const findActiveTrainingTaskForUser = async (
   prisma: PrismaClient,
@@ -365,7 +363,7 @@ export const findActiveTrainingTaskForUser = async (
     where: {
       teamId,
       assigneeId: userId,
-      properties: TRAINING_TYPE_FILTER,
+      taskType: TaskType.TRAINING,
       status: { not: TaskStatus.DONE },
     },
   });
@@ -405,10 +403,9 @@ export const ensureAwarenessTrainingTask = async (
       descriptionLocId: AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
       assigneeId: userId,
       originType: TaskOriginType.AUTOMATIC,
+      taskType: TaskType.TRAINING,
       taskNumber: team.taskIndex,
-      properties: {
-        [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]: TRAINING_TASK_TYPE_VALUE,
-      },
+      properties: {},
     },
     auditInfo
   );

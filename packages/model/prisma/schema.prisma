@@ -160,6 +160,7 @@ model Task {
   version   OscratProductVersion? @relation(fields: [versionId], references: [id], onDelete: SetNull)
 
   originType TaskOriginType @default(MANUAL)
+  taskType   TaskType       @default(GENERIC)
 
   attachments Attachment[]
   comments    Comment[]
@@ -410,6 +411,18 @@ enum TaskStatus {
 enum TaskOriginType {
   MANUAL
   AUTOMATIC
+}
+
+enum TaskType {
+  GENERIC
+  TRAINING
+  VULNERABILITY
+  INCIDENT
+  SBOM
+  DOCUMENTATION
+  RISK
+  CONFIGURATION_MANAGEMENT
+  REQUIREMENTS
 }
 
 enum DocumentationVisibility {

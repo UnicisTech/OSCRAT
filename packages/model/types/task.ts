@@ -13,12 +13,7 @@ export const TASK_CSC_PROPERTY_KEYS = {
   AUDIT_LOGS: 'csc_audit_logs',
 } as const;
 
-export const TASK_TRAINING_PROPERTY_KEYS = {
-  TASK_TYPE: 'task_type',
-} as const;
-
 export const TASK_RISK_PROPERTY_KEYS = {
-  ENABLE_RISK_ASSESSMENT: 'enableRiskAssessment',
   DETAILS: 'riskDetails',
   TREATMENT: 'riskTreatment',
 } as const;
@@ -75,19 +70,13 @@ interface TaskCscProperties {
   [TASK_CSC_PROPERTY_KEYS.AUDIT_LOGS]?: TaskCscAuditLogEntry[];
 }
 
-interface TaskTrainingProperties {
-  [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]?: string;
-}
-
 interface TaskRiskFlagProperties {
-  [TASK_RISK_PROPERTY_KEYS.ENABLE_RISK_ASSESSMENT]?: boolean;
   [TASK_RISK_PROPERTY_KEYS.DETAILS]?: RiskDetailsProperties;
   [TASK_RISK_PROPERTY_KEYS.TREATMENT]?: RiskTreatmentProperties;
 }
 
 type TaskProperties = TaskConfigurationProperties &
   TaskCscProperties &
-  TaskTrainingProperties &
   TaskRiskFlagProperties;
 
 export type {
@@ -96,7 +85,6 @@ export type {
   TaskCscAuditLogActor,
   TaskCscAuditLogEntry,
   TaskCscProperties,
-  TaskTrainingProperties,
   RiskLevel,
   RiskCategory,
   RiskTreatmentOption,

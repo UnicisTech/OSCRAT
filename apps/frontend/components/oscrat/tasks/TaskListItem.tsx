@@ -7,6 +7,7 @@ import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { formatTaskLabel } from '@/lib/tasks';
 import { formatDateShort } from '@/utils/dateFormat';
+import { getTaskTypeTranslationKey } from '@/constants/taskStatuses';
 
 interface TaskListItemProps {
   task: Task;
@@ -88,6 +89,13 @@ const TaskListItem: React.FC<TaskListItemProps> = ({
             {displayTitle}
           </div>
         </div>
+      </td>
+      <td className="text-content-secondary hidden px-4 py-4 align-middle md:table-cell">
+        <span className="bg-surface-muted text-content-secondary border-line inline-flex max-w-full items-center rounded border px-2 py-0.5 text-xs">
+          <span className="truncate">
+            {t(getTaskTypeTranslationKey(task.taskType))}
+          </span>
+        </span>
       </td>
       <td className="text-content-secondary hidden px-4 py-4 align-middle md:table-cell">
         <div className="truncate" title={product?.name}>

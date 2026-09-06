@@ -16,6 +16,7 @@ interface TaskListProps {
 
 interface FilterState {
   status: string[];
+  taskType: string[];
   productId: string[];
   versionId: string[];
 }
@@ -30,6 +31,7 @@ const TaskList: React.FC<TaskListProps> = ({
 
   const [filters, setFilters] = useState<FilterState>({
     status: [],
+    taskType: [],
     productId: [],
     versionId: [],
   });
@@ -113,6 +115,9 @@ const TaskList: React.FC<TaskListProps> = ({
       .filter((task) => {
         const matchesStatus =
           filters.status.length === 0 || filters.status.includes(task.status);
+        const matchesType =
+          filters.taskType.length === 0 ||
+          filters.taskType.includes(task.taskType);
         const matchesProduct =
           filters.productId.length === 0 ||
           (task.productId && filters.productId.includes(task.productId));
@@ -120,7 +125,7 @@ const TaskList: React.FC<TaskListProps> = ({
           filters.versionId.length === 0 ||
           (task.versionId && filters.versionId.includes(task.versionId));
 
-        return matchesStatus && matchesProduct && matchesVersion;
+        return matchesStatus && matchesType && matchesProduct && matchesVersion;
       })
       .sort((a, b) => b.taskNumber - a.taskNumber);
   }, [tasks, filters]);
@@ -144,6 +149,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const clearFilters = () => {
     setFilters({
       status: [],
+      taskType: [],
       productId: [],
       versionId: [],
     });

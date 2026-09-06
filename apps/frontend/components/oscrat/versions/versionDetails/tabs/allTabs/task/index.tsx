@@ -9,12 +9,17 @@ import {
   TabActionButton,
 } from '@/components/oscrat/versions/versionDetails/tabs/allTabs/shared';
 import { tableStyles } from '@/components/oscrat/tableStyles';
-import { TaskStatus } from '@oscrat/model';
+import { TaskStatus, TaskType } from '@oscrat/model';
 import type { Task, Team } from '@oscrat/model';
 import { useVersionContext } from '@/context/VersionContext';
 import { useTeamContext } from '@/context/TeamContext';
 import useTasks from '@/hooks/useTasks';
-import { TASK_STATUS_TRANSLATION_MAP } from '@/constants/taskStatuses';
+import {
+  TASK_STATUS_TRANSLATION_MAP,
+  TASK_TYPE_TRANSLATION_MAP,
+  TASK_TYPE_ORDER,
+  getTaskTypeTranslationKey,
+} from '@/constants/taskStatuses';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { CreateTask } from '@/components/interfaces/Task';
 import TaskStatusDropdown from '@/components/oscrat/tasks/TaskStatusDropdown';
@@ -33,6 +38,9 @@ interface TaskTableProps {
   statusFilter: string;
   onStatusFilterChange: (status: string) => void;
   statusOptions: TaskStatus[];
+  typeFilter: string;
+  onTypeFilterChange: (taskType: string) => void;
+  typeOptions: TaskType[];
 }
 
 const TaskTable: React.FC<TaskTableProps> = ({
@@ -43,6 +51,9 @@ const TaskTable: React.FC<TaskTableProps> = ({
   statusFilter,
   onStatusFilterChange,
   statusOptions,
+  typeFilter,
+  onTypeFilterChange,
+  typeOptions,
 }) => {
   const { t, ready } = useTranslation('common');
   const { members } = useTeamMembers(team.slug);
@@ -57,7 +68,13 @@ const TaskTable: React.FC<TaskTableProps> = ({
 
   if (!ready) return null;
 
-  const tableHeaders = [t('task'), t('due-date'), t('assignee'), t('status')];
+  const tableHeaders = [
+    t('task'),
+    t('type'),
+    t('due-date'),
+    t('assignee'),
+    t('status'),
+  ];
 
   return (
     <div className="w-full">
@@ -80,6 +97,33 @@ const TaskTable: React.FC<TaskTableProps> = ({
               {statusOptions.map((opt) => (
                 <option key={opt} value={opt}>
                   {t(TASK_STATUS_TRANSLATION_MAP[opt])}
+                </option>
+              ))}
+            </select>
+            <ChevronDownIcon
+              className="text-content-placeholder pointer-events-none absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2"
+              aria-hidden="true"
+            />
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <label
+            htmlFor="type-filter"
+            className="text-content text-sm font-medium"
+          >
+            {t('type')}
+          </label>
+          <div className="relative">
+            <select
+              id="type-filter"
+              value={typeFilter}
+              onChange={(e) => onTypeFilterChange(e.target.value)}
+              className="border-line bg-surface text-b2 text-content focus:border-primary rounded-input h-8 appearance-none border py-0 pl-2 pr-8 focus:outline-none"
+            >
+              <option value="All">{t('all')}</option>
+              {typeOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {t(TASK_TYPE_TRANSLATION_MAP[opt])}
                 </option>
               ))}
             </select>
@@ -114,6 +158,9 @@ const TaskTable: React.FC<TaskTableProps> = ({
                       <div className="truncate font-medium" title={taskLabel}>
                         {taskLabel}
                       </div>
+                    </td>
+                    <td className={tableStyles.td}>
+                      {t(getTaskTypeTranslationKey(task.taskType))}
                     </td>
                     <td className={tableStyles.td}>
                       {formatDateShort(task.duedate)}
@@ -152,6 +199,7 @@ export default function Index() {
   const { team } = teamContext;
 
   const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [typeFilter, setTypeFilter] = useState<string>('All');
   const [createTaskVisible, setCreateTaskVisible] = useState(false);
 
   const { tasks: allTasks, isLoading } = useTasks(team?.slug || '');
@@ -164,15 +212,17 @@ export default function Index() {
       .sort((a, b) => b.taskNumber - a.taskNumber);
   }, [allTasks, versionId]);
 
-  // Apply status filter
+  // Apply status and type filters
   const filteredTasks = useMemo(() => {
-    if (statusFilter === 'All') {
-      return versionTasks;
-    }
-    return versionTasks.filter((task) => task.status === statusFilter);
-  }, [versionTasks, statusFilter]);
+    return versionTasks.filter(
+      (task) =>
+        (statusFilter === 'All' || task.status === statusFilter) &&
+        (typeFilter === 'All' || task.taskType === typeFilter)
+    );
+  }, [versionTasks, statusFilter, typeFilter]);
 
   const allStatusOptions = Object.values(TaskStatus);
+  const allTypeOptions = TASK_TYPE_ORDER;
 
   const {
     currentPage,
@@ -217,6 +267,9 @@ export default function Index() {
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
           statusOptions={allStatusOptions}
+          typeFilter={typeFilter}
+          onTypeFilterChange={setTypeFilter}
+          typeOptions={allTypeOptions}
         />
         {totalPages > 1 && (
           <PaginationControls

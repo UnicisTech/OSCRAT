@@ -41,6 +41,7 @@ export {
   WorkerJobStatus,
   TaskStatus,
   TaskOriginType,
+  TaskType,
   AuditUserType,
   DocumentationVisibility,
   DocumentationStatus,
@@ -73,7 +74,6 @@ export * from './audit';
 export { OPEN_VULNERABILITY_STATUSES } from './constants/vulnerability';
 
 export {
-  TRAINING_TASK_TYPE_VALUE,
   AWARENESS_TRAINING_DUE_DAYS,
   AWARENESS_TRAINING_REGENERATION_DAYS,
   AWARENESS_TRAINING_TITLE_LOC_ID,

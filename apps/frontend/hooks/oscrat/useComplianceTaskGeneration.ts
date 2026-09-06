@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
-import { TaskStatus, TaskOriginType } from '@oscrat/model';
+import { TaskStatus, TaskOriginType, TaskType } from '@oscrat/model';
 import {
   ComplianceRequirement,
   RequirementAssessment,
@@ -76,6 +76,7 @@ export function useComplianceTaskGeneration({
         description,
         status: TaskStatus.TODO,
         originType: TaskOriginType.AUTOMATIC,
+        taskType: TaskType.REQUIREMENTS,
         productId,
         versionId,
         duedate,

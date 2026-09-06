@@ -54,6 +54,7 @@ const handlePOST = async (
     productId,
     versionId,
     originType,
+    taskType,
     properties,
   } = await parseBody(createTaskCreateSchema(), req);
 
@@ -68,6 +69,7 @@ const handlePOST = async (
       productId: productId || undefined,
       versionId: versionId || undefined,
       originType: originType || DEFAULT_TASK_ORIGIN_TYPE,
+      taskType,
       properties,
     },
     req.auditInfo

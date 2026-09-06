@@ -3,12 +3,16 @@ import { useTranslation } from 'next-i18next';
 import toast from 'react-hot-toast';
 import { CogIcon, HandRaisedIcon } from '@heroicons/react/24/outline';
 import type { Task, Team } from '@oscrat/model';
-import { TaskStatus } from '@oscrat/model';
+import { TaskStatus, TaskType } from '@oscrat/model';
 import { useTask } from '@/hooks/useTask';
 import { useOscratProject } from '@/hooks/oscrat/useOscratProject';
 import { useOscratVersion } from '@/hooks/oscrat/useOscratVersion';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
-import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
+import {
+  TASK_TYPE_ORDER,
+  getTaskStatusTranslationKey,
+  getTaskTypeTranslationKey,
+} from '@/constants/taskStatuses';
 import { resolveTaskTitle, resolveTaskDescription } from '@/lib/tasks';
 import { useFormik } from 'formik';
 import { createTaskUpdateSchema } from '@/lib/validation/task';
@@ -57,6 +61,7 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
       duedate: task?.duedate ? new Date(task.duedate) : undefined,
       description: task?.description || '',
       assigneeId: task?.assigneeId || null,
+      taskType: task?.taskType || TaskType.GENERIC,
     }),
     [task]
   );
@@ -76,6 +81,7 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
           status: values.status,
           duedate: values.duedate,
           assigneeId: values.assigneeId,
+          taskType: values.taskType,
         };
         if (!hasLocalizedTitle) payload.title = values.title;
         if (!hasLocalizedDescription) payload.description = values.description;
@@ -88,25 +94,6 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
       }
     },
   });
-
-  const existingProps = (task.properties || {}) as Record<string, unknown>;
-  const [enableRiskAssessment, setEnableRiskAssessment] = React.useState(
-    !!existingProps?.enableRiskAssessment
-  );
-
-  const handleRiskAssessmentToggle = async (checked: boolean) => {
-    setEnableRiskAssessment(checked);
-    try {
-      await updateTask({
-        properties: { ...existingProps, enableRiskAssessment: checked },
-      } as any);
-      toast.success(t('task-updated-successfully'));
-    } catch (error: unknown) {
-      const apiError = error as ApiError;
-      toast.error(apiError.message);
-      setEnableRiskAssessment(!checked);
-    }
-  };
 
   const handleInputChange =
     (field: keyof UpdateTaskData) =>
@@ -131,8 +118,7 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
           return;
         }
       } else if (field === 'assigneeId') {
-        const assigneeValue = newValue || null;
-        formik.setFieldValue(field, assigneeValue);
+        formik.setFieldValue(field, newValue || null);
       } else {
         formik.setFieldValue(field, newValue);
       }
@@ -320,6 +306,16 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
           )}
           {renderField('duedate', t('due-date'))}
           {renderField(
+            'taskType',
+            t('type'),
+            'select',
+            TASK_TYPE_ORDER.map((taskType) => ({
+              value: taskType,
+              label: t(getTaskTypeTranslationKey(taskType)),
+            }))
+          )}
+
+          {renderField(
             'status',
             t('status'),
             'select',
@@ -366,23 +362,6 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
             ) : (
               renderField('description', t('description'), 'textarea')
             )}
-          </div>
-
-          <div className="mt-4 flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="enableRiskAssessment"
-              checked={enableRiskAssessment}
-              onChange={(e) => handleRiskAssessmentToggle(e.target.checked)}
-              disabled={formik.isSubmitting}
-              className="border-line text-primary focus:ring-primary h-4 w-4 rounded disabled:cursor-not-allowed"
-            />
-            <label
-              htmlFor="enableRiskAssessment"
-              className="text-content-secondary text-sm font-medium"
-            >
-              {t('oscrat.ui.enable-risk-assessment')}
-            </label>
           </div>
         </div>
 

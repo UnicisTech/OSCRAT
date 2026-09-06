@@ -4,6 +4,7 @@ import {
   Task,
   TaskStatus,
   TaskOriginType,
+  TaskType,
   DocumentationStatus,
   type TaskProperties,
 } from '@oscrat/model';
@@ -29,6 +30,7 @@ export type CreateTaskData = {
   productId?: string;
   versionId?: string;
   originType?: TaskOriginType;
+  taskType?: TaskType;
   properties?: TaskProperties;
 };
 

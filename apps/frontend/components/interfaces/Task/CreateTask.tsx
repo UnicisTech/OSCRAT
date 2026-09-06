@@ -3,6 +3,7 @@ import {
   Team,
   TaskStatus,
   TaskOriginType,
+  TaskType,
   type TaskProperties,
 } from '@oscrat/model';
 import toast from 'react-hot-toast';
@@ -13,7 +14,10 @@ import InputWithLabel from '@/components/shared/InputWithLabel';
 import SelectWithLabel from '@/components/shared/SelectWithLabel';
 import {
   DEFAULT_TASK_STATUS,
+  DEFAULT_TASK_TYPE,
+  TASK_TYPE_ORDER,
   getTaskStatusTranslationKey,
+  getTaskTypeTranslationKey,
 } from '@/constants/taskStatuses';
 import { getCurrentStringDate } from '@/utils/dateFormat';
 import useTasks from '@/hooks/useTasks';
@@ -34,6 +38,7 @@ interface CreateTaskProps {
   defaultTitle?: string;
   defaultDescription?: string;
   defaultOriginType?: TaskOriginType;
+  defaultTaskType?: TaskType;
   linkedProperties?: TaskProperties;
   onSuccess?: (taskId: number) => void;
 }
@@ -47,6 +52,7 @@ const CreateTask = ({
   defaultTitle,
   defaultDescription,
   defaultOriginType,
+  defaultTaskType,
   linkedProperties,
   onSuccess,
 }: CreateTaskProps) => {
@@ -59,11 +65,10 @@ const CreateTask = ({
 
   const validationSchema = useMemo(() => createTaskCreateSchema(), []);
 
-  const [enableRiskAssessment, setEnableRiskAssessment] = React.useState(false);
-
   const initialValues: TaskCreateData = {
     title: defaultTitle || '',
     status: DEFAULT_TASK_STATUS,
+    taskType: defaultTaskType || DEFAULT_TASK_TYPE,
     duedate: new Date(getCurrentStringDate()),
     description: defaultDescription || '',
     productId: defaultProductId || '',
@@ -86,10 +91,8 @@ const CreateTask = ({
           productId: values.productId || undefined,
           versionId: values.versionId || undefined,
           originType: defaultOriginType,
-          properties: {
-            ...linkedProperties,
-            ...(enableRiskAssessment ? { enableRiskAssessment: true } : {}),
-          },
+          taskType: values.taskType,
+          properties: { ...linkedProperties },
         });
 
         toast.success(t('task-created'));
@@ -126,7 +129,6 @@ const CreateTask = ({
 
   const handleClose = () => {
     formik.resetForm();
-    setEnableRiskAssessment(false);
     setVisible(false);
   };
 
@@ -136,11 +138,7 @@ const CreateTask = ({
     <Modal open={visible} close={handleClose}>
       <Modal.Header>{t('create-task')}</Modal.Header>
 
-      <form
-        onSubmit={formik.handleSubmit}
-        method="POST"
-        className="contents"
-      >
+      <form onSubmit={formik.handleSubmit} method="POST" className="contents">
         <Modal.Body>
           <div className="space-y-4">
             <InputWithLabel
@@ -156,6 +154,20 @@ const CreateTask = ({
               error={formik.errors.title ? t(formik.errors.title) : undefined}
               required
               placeholder={t('task-title-placeholder')}
+            />
+
+            <SelectWithLabel
+              name="taskType"
+              label={t('type')}
+              value={formik.values.taskType}
+              onChange={formik.handleChange}
+              options={TASK_TYPE_ORDER.map((taskType) => ({
+                value: taskType,
+                label: t(getTaskTypeTranslationKey(taskType)),
+              }))}
+              error={
+                formik.errors.taskType ? t(formik.errors.taskType) : undefined
+              }
             />
 
             <SelectWithLabel
@@ -228,22 +240,6 @@ const CreateTask = ({
               }
               required
             />
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="enableRiskAssessment"
-                checked={enableRiskAssessment}
-                onChange={(e) => setEnableRiskAssessment(e.target.checked)}
-                className="border-line text-primary focus:ring-primary h-4 w-4 rounded"
-              />
-              <label
-                htmlFor="enableRiskAssessment"
-                className="text-content-secondary text-sm font-medium"
-              >
-                {t('oscrat.ui.enable-risk-assessment')}
-              </label>
-            </div>
 
             <div className="w-full">
               <label
