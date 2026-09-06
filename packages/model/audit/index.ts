@@ -199,11 +199,36 @@ export const EntityType = {
 export type EntityType = (typeof EntityType)[keyof typeof EntityType];
 
 const TRACKED_FIELDS: Record<EntityType, string[]> = {
-  Vulnerability: ['name', 'severity', 'status', 'cve', 'description', 'advisoryId', 'dateOfDiscovery', 'affectedMemberStates'],
-  Incident: ['name', 'status', 'severity', 'classification', 'description', 'attackType', 'scope', 'dateOfDetection'],
+  Vulnerability: [
+    'name',
+    'severity',
+    'status',
+    'cve',
+    'description',
+    'advisoryId',
+    'dateOfDiscovery',
+    'affectedMemberStates',
+  ],
+  Incident: [
+    'name',
+    'status',
+    'severity',
+    'classification',
+    'description',
+    'attackType',
+    'scope',
+    'dateOfDetection',
+  ],
   Repository: ['name', 'repositoryUrl', 'targetBranch', 'provider'],
-  Task: ['title', 'status', 'duedate', 'assigneeId', 'description'],
-  Product: ['name', 'acronym', 'type', 'productCategory', 'description', 'status'],
+  Task: ['title', 'status', 'taskType', 'duedate', 'assigneeId', 'description'],
+  Product: [
+    'name',
+    'acronym',
+    'type',
+    'productCategory',
+    'description',
+    'status',
+  ],
   ProductVersion: ['version', 'status', 'releaseDate', 'supportEndDate'],
   SbomReport: ['name', 'format', 'status'],
   VulnerabilityScanReport: ['name', 'status', 'sbomReportId'],
@@ -217,13 +242,34 @@ const TRACKED_FIELDS: Record<EntityType, string[]> = {
   Webhook: ['name', 'url', 'events', 'isActive'],
   ApiKey: ['name', 'expiresAt'],
   Assessment: ['type', 'schemaVersion'],
-  Attachment: ['name', 'mimeType', 'description', 'taskId', 'versionId', 'vulnerabilityId', 'incidentId', 'assessmentId'],
-  Documentation: ['title', 'level', 'visibility', 'status', 'version', 'productId', 'versionId'],
+  Attachment: [
+    'name',
+    'mimeType',
+    'description',
+    'taskId',
+    'versionId',
+    'vulnerabilityId',
+    'incidentId',
+    'assessmentId',
+  ],
+  Documentation: [
+    'title',
+    'level',
+    'visibility',
+    'status',
+    'version',
+    'productId',
+    'versionId',
+  ],
 };
 
-function pick<T extends Record<string, unknown>>(obj: T, fields: string[]): Partial<T> {
+function pick<T extends Record<string, unknown>>(
+  obj: T,
+  fields: string[]
+): Partial<T> {
   const result: Partial<T> = {};
-  for (const f of fields) if (f in obj) result[f as keyof T] = obj[f as keyof T];
+  for (const f of fields)
+    if (f in obj) result[f as keyof T] = obj[f as keyof T];
   return result;
 }
 
@@ -231,12 +277,14 @@ function resolveEntityScope(
   ctx: AuditContext,
   entity: Record<string, unknown>
 ): { productId?: string; versionId?: string } {
-  const versionId = 'versionId' in entity
-    ? (entity.versionId as string) || undefined
-    : ctx.versionId;
-  const productId = 'productId' in entity
-    ? (entity.productId as string) || undefined
-    : ctx.productId;
+  const versionId =
+    'versionId' in entity
+      ? (entity.versionId as string) || undefined
+      : ctx.versionId;
+  const productId =
+    'productId' in entity
+      ? (entity.productId as string) || undefined
+      : ctx.productId;
   return { productId, versionId };
 }
 
