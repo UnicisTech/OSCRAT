@@ -27,7 +27,9 @@ import {
   TaskOriginType,
   TaskType,
   sortConfigurationScanRules,
-  TASK_CONFIGURATION_PROPERTY_KEYS,
+  buildConfigurationTaskProperties,
+  CONFIGURATION_TASK_TITLE_LOC_ID,
+  CONFIGURATION_TASK_DESCRIPTION_LOC_ID,
 } from '@oscrat/model';
 import type {
   ConfigurationScanSummary,
@@ -35,18 +37,9 @@ import type {
   ConfigurationResult,
   ConfigurationSeverity,
 } from '@oscrat/model';
-import type { TaskConfigurationProperties } from '@/types';
 import ReportStatusMessage from '@/components/oscrat/ReportStatusMessage';
-import {
-  sanitizeForTitle,
-  sanitizeForDescription,
-  truncateAtWordBoundary,
-} from '@/lib/text-sanitize';
 import { formatDateShort } from '@/utils/dateFormat';
 import { LISTING_PAGE_SIZE } from '@/constants/pagination';
-
-const TASK_TITLE_MAX = 100;
-const TASK_DESCRIPTION_MAX = 500;
 
 const SEVERITY_BADGE: Record<ConfigurationSeverity, string> = {
   [CONFIGURATION_SEVERITY.HIGH]: 'border border-danger text-content',
@@ -450,28 +443,9 @@ export default function ConfigurationScanSummaryPage() {
     setTaskModalVisible(true);
   };
 
-  const taskTitle = selectedRule
-    ? buildTaskTitle(
-        selectedRule,
-        t('oscrat.ui.versions.configuration.task-title-prefix')
-      )
-    : '';
-
-  const taskDescription = selectedRule
-    ? buildTaskDescription(selectedRule, t)
-    : '';
-
-  const linkedProperties: Partial<TaskConfigurationProperties> | undefined =
-    selectedRule
-      ? {
-          [TASK_CONFIGURATION_PROPERTY_KEYS.REPORT_ID]: reportId as string,
-          [TASK_CONFIGURATION_PROPERTY_KEYS.RULE_ID]: selectedRule.ruleId,
-          ...(selectedRule.cceId
-            ? { [TASK_CONFIGURATION_PROPERTY_KEYS.CCE]: selectedRule.cceId }
-            : {}),
-          [TASK_CONFIGURATION_PROPERTY_KEYS.SEVERITY]: selectedRule.severity,
-        }
-      : undefined;
+  const linkedProperties = selectedRule
+    ? buildConfigurationTaskProperties(reportId as string, selectedRule)
+    : undefined;
 
   const handleViewTask = (taskNumber: number) => {
     router.push(`/organization/${teamId}/tasks/${taskNumber}`);
@@ -529,8 +503,8 @@ export default function ConfigurationScanSummaryPage() {
           team={teamContext.team}
           defaultProductId={productId}
           defaultVersionId={versionId}
-          defaultTitle={taskTitle}
-          defaultDescription={taskDescription}
+          titleLocId={CONFIGURATION_TASK_TITLE_LOC_ID}
+          descriptionLocId={CONFIGURATION_TASK_DESCRIPTION_LOC_ID}
           defaultOriginType={TaskOriginType.AUTOMATIC}
           defaultTaskType={TaskType.CONFIGURATION_MANAGEMENT}
           linkedProperties={linkedProperties}
@@ -538,68 +512,6 @@ export default function ConfigurationScanSummaryPage() {
       )}
     </>
   );
-}
-
-function buildTaskTitle(
-  rule: ConfigurationScanRuleResult,
-  prefix: string
-): string {
-  const candidates = [rule.title, rule.cceId, rule.ruleId?.split('_').pop()];
-  const sanitizedPrefix = sanitizeForTitle(prefix);
-  // ' - ' (hyphen) instead of ': ' because ':' is not in the title char regex.
-  const head = sanitizedPrefix ? `${sanitizedPrefix} - ` : '';
-  const budget = TASK_TITLE_MAX - head.length;
-
-  for (const candidate of candidates) {
-    const sanitized = sanitizeForTitle(candidate);
-    if (sanitized) {
-      return `${head}${truncateAtWordBoundary(sanitized, budget)}`;
-    }
-  }
-  return truncateAtWordBoundary(sanitizedPrefix, TASK_TITLE_MAX);
-}
-
-function buildTaskDescription(
-  rule: ConfigurationScanRuleResult,
-  t: (key: string, options?: any) => string
-): string {
-  const headerLines: string[] = [
-    t('oscrat.ui.versions.configuration.task-description-header'),
-  ];
-  if (rule.cceId) {
-    headerLines.push(
-      `${t('oscrat.ui.versions.configuration.task-description-cce')}: ${rule.cceId}`
-    );
-  }
-  headerLines.push(
-    `${t('oscrat.ui.versions.configuration.task-description-rule-id')}: ${rule.ruleId}`
-  );
-  headerLines.push(
-    `${t('oscrat.ui.versions.configuration.task-description-severity')}: ${formatSeverity(rule.severity)}`
-  );
-  const header = sanitizeForDescription(headerLines.join('\n'));
-
-  if (header.length >= TASK_DESCRIPTION_MAX) {
-    return truncateAtWordBoundary(header, TASK_DESCRIPTION_MAX);
-  }
-
-  const bodySource = rule.description?.trim() ? rule.description : rule.title;
-  const sanitizedBody = sanitizeForDescription(bodySource);
-  if (!sanitizedBody) {
-    return header;
-  }
-
-  const separator = '\n\n';
-  const bodyBudget = TASK_DESCRIPTION_MAX - header.length - separator.length;
-  if (bodyBudget <= 0) {
-    return header;
-  }
-  const body = truncateAtWordBoundary(sanitizedBody, bodyBudget);
-  return `${header}${separator}${body}`;
-}
-
-function formatSeverity(severity: ConfigurationSeverity): string {
-  return severity.charAt(0).toUpperCase() + severity.slice(1);
 }
 
 ConfigurationScanSummaryPage.getLayout = withProductDetailLayout;

@@ -7,6 +7,9 @@ import {
   TASK_CONFIGURATION_PROPERTY_KEYS,
   TASK_CSC_PROPERTY_KEYS,
   TASK_RISK_PROPERTY_KEYS,
+  CONFIGURATION_TASK_TITLE_LOC_ID,
+  CONFIGURATION_TASK_DESCRIPTION_LOC_ID,
+  CONFIGURATION_TASK_RULE_DESCRIPTION_MAX,
   type ConfigurationSeverity,
   type TaskCscAuditLogEntry,
   type TaskProperties,
@@ -35,7 +38,18 @@ const taskConfigurationPropertiesSchema = {
     Yup.mixed<ConfigurationSeverity>()
       .oneOf(Object.values(CONFIGURATION_SEVERITY))
       .optional(),
+  [TASK_CONFIGURATION_PROPERTY_KEYS.RULE_TITLE]: Yup.string()
+    .trim()
+    .max(500)
+    .optional(),
+  [TASK_CONFIGURATION_PROPERTY_KEYS.RULE_DESCRIPTION]: Yup.string()
+    .trim()
+    .max(CONFIGURATION_TASK_RULE_DESCRIPTION_MAX)
+    .optional(),
 };
+
+const TITLE_LOC_IDS = [CONFIGURATION_TASK_TITLE_LOC_ID];
+const DESCRIPTION_LOC_IDS = [CONFIGURATION_TASK_DESCRIPTION_LOC_ID];
 
 const taskCscPropertiesSchema = {
   [TASK_CSC_PROPERTY_KEYS.CONTROLS]: Yup.array()
@@ -69,8 +83,14 @@ const taskTitleSchema = Yup.string()
 
 export const createTaskCreateSchema = () =>
   Yup.object({
-    title: taskTitleSchema,
+    titleLocId: Yup.string().oneOf(TITLE_LOC_IDS).optional(),
+    title: Yup.string().when('titleLocId', {
+      is: (locId?: string) => !!locId,
+      then: (schema) => schema.optional(),
+      otherwise: () => taskTitleSchema,
+    }),
     description: descriptionSchema.optional(),
+    descriptionLocId: Yup.string().oneOf(DESCRIPTION_LOC_IDS).optional(),
     status: Yup.mixed<TaskStatus>()
       .oneOf(
         Object.values(TaskStatus),

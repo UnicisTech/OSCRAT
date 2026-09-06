@@ -17,6 +17,8 @@ const env = {
     port: parseInt(process.env.JOBRUNNER_PORT || '3001'),
     pollIntervalMs: parseInt(process.env.JOB_POLL_INTERVAL_MS || '5000'),
     maxConcurrentJobs: parseInt(process.env.MAX_CONCURRENT_JOBS || '3'),
+    autoCreateConfigurationTasks:
+      process.env.CONFIGURATION_SCAN_AUTO_TASKS !== 'false',
   },
 
   // Workspace

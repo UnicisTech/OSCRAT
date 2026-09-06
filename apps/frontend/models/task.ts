@@ -32,9 +32,11 @@ export const createTask = async (
     authorId: string;
     teamId: string;
     title: string;
+    titleLocId?: string;
     status: TaskStatus;
     duedate?: string;
     description: string;
+    descriptionLocId?: string;
     assigneeId?: string;
     productId?: string;
     versionId?: string;

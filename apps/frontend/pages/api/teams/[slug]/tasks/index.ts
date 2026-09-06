@@ -48,9 +48,11 @@ const handlePOST = async (
 
   const {
     title,
+    titleLocId,
     status,
     duedate,
     description,
+    descriptionLocId,
     productId,
     versionId,
     originType,
@@ -62,10 +64,12 @@ const handlePOST = async (
     {
       authorId: user.id,
       teamId,
-      title,
+      title: title || '',
+      titleLocId,
       status: status || DEFAULT_TASK_STATUS,
       duedate: duedate.toISOString(),
       description: description || '',
+      descriptionLocId,
       productId: productId || undefined,
       versionId: versionId || undefined,
       originType: originType || DEFAULT_TASK_ORIGIN_TYPE,

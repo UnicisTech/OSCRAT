@@ -211,7 +211,7 @@ export function useOscratVersionConfigurationScanReports(
   };
 
   const refreshReports = () => {
-    return invalidateConfigurationScanReports(teamId, versionId);
+    return invalidateConfigurationScanReports(teamId, productId, versionId);
   };
 
   const isLoading =

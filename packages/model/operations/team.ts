@@ -643,6 +643,19 @@ export const incrementTaskIndex = async (
   }
 };
 
+export const reserveTaskNumbers = async (
+  prisma: PrismaClient,
+  teamId: string,
+  count: number
+): Promise<number> => {
+  const team = await prisma.team.update({
+    where: { id: teamId },
+    data: { taskIndex: { increment: count } },
+    select: { taskIndex: true },
+  });
+  return team.taskIndex - count;
+};
+
 /** Get team with product summaries (lightweight) */
 export const getTeamWithProductsSummary = async (
   prisma: PrismaClient,

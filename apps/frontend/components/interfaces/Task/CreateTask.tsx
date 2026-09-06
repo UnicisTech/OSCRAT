@@ -28,6 +28,7 @@ import {
 } from '@/lib/validation/task';
 import { extractErrorMessage } from '@/lib/utils';
 import { useSearchProducts } from '@/lib/api/hooks/oscrat/projects';
+import { resolveTaskTitle, resolveTaskDescription } from '@/lib/tasks';
 
 interface CreateTaskProps {
   visible: boolean;
@@ -37,6 +38,8 @@ interface CreateTaskProps {
   defaultVersionId?: string;
   defaultTitle?: string;
   defaultDescription?: string;
+  titleLocId?: string;
+  descriptionLocId?: string;
   defaultOriginType?: TaskOriginType;
   defaultTaskType?: TaskType;
   linkedProperties?: TaskProperties;
@@ -51,6 +54,8 @@ const CreateTask = ({
   defaultVersionId,
   defaultTitle,
   defaultDescription,
+  titleLocId,
+  descriptionLocId,
   defaultOriginType,
   defaultTaskType,
   linkedProperties,
@@ -65,12 +70,24 @@ const CreateTask = ({
 
   const validationSchema = useMemo(() => createTaskCreateSchema(), []);
 
+  const localized = {
+    titleLocId,
+    descriptionLocId,
+    properties: linkedProperties,
+  };
+  const localizedTitle = titleLocId ? resolveTaskTitle(localized, t) : '';
+  const localizedDescription = descriptionLocId
+    ? resolveTaskDescription(localized, t)
+    : '';
+
   const initialValues: TaskCreateData = {
     title: defaultTitle || '',
+    titleLocId,
     status: DEFAULT_TASK_STATUS,
     taskType: defaultTaskType || DEFAULT_TASK_TYPE,
     duedate: new Date(getCurrentStringDate()),
     description: defaultDescription || '',
+    descriptionLocId,
     productId: defaultProductId || '',
     versionId: defaultVersionId || '',
   };
@@ -84,10 +101,12 @@ const CreateTask = ({
     onSubmit: async (values) => {
       try {
         const result = await createTask({
-          title: values.title.trim(),
+          title: values.title?.trim() || '',
+          titleLocId: values.titleLocId,
           status: values.status as TaskStatus,
           duedate: values.duedate,
           description: values.description?.trim() || '',
+          descriptionLocId: values.descriptionLocId,
           productId: values.productId || undefined,
           versionId: values.versionId || undefined,
           originType: defaultOriginType,
@@ -141,20 +160,29 @@ const CreateTask = ({
       <form onSubmit={formik.handleSubmit} method="POST" className="contents">
         <Modal.Body>
           <div className="space-y-4">
-            <InputWithLabel
-              name="title"
-              label={
-                <>
-                  {t('title')}
-                  {requiredAsterisk}
-                </>
-              }
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              error={formik.errors.title ? t(formik.errors.title) : undefined}
-              required
-              placeholder={t('task-title-placeholder')}
-            />
+            {titleLocId ? (
+              <InputWithLabel
+                name="title"
+                label={t('title')}
+                value={localizedTitle}
+                disabled
+              />
+            ) : (
+              <InputWithLabel
+                name="title"
+                label={
+                  <>
+                    {t('title')}
+                    {requiredAsterisk}
+                  </>
+                }
+                value={formik.values.title}
+                onChange={formik.handleChange}
+                error={formik.errors.title ? t(formik.errors.title) : undefined}
+                required
+                placeholder={t('task-title-placeholder')}
+              />
+            )}
 
             <SelectWithLabel
               name="taskType"
@@ -248,15 +276,21 @@ const CreateTask = ({
               >
                 {t('description')}
               </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formik.values.description || ''}
-                onChange={formik.handleChange}
-                rows={4}
-                className="border-line text-content-secondary placeholder-content-placeholder shadow-2 focus:border-primary focus:ring-primary rounded-input w-full border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2"
-                placeholder={t('task-description-placeholder')}
-              />
+              {descriptionLocId ? (
+                <div className="border-line-subtle bg-surface-muted text-content-muted rounded-input w-full cursor-not-allowed whitespace-pre-line border px-3 py-2 text-sm">
+                  {localizedDescription}
+                </div>
+              ) : (
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formik.values.description || ''}
+                  onChange={formik.handleChange}
+                  rows={4}
+                  className="border-line text-content-secondary placeholder-content-placeholder shadow-2 focus:border-primary focus:ring-primary rounded-input w-full border px-3 py-2 transition-colors duration-200 focus:outline-none focus:ring-2"
+                  placeholder={t('task-description-placeholder')}
+                />
+              )}
               {formik.errors.description && (
                 <p className="text-danger mt-1 text-sm">
                   {t(formik.errors.description)}

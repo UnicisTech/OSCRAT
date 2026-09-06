@@ -16,6 +16,7 @@ import {
 import { toJsonInput } from '../utils/json';
 import {
   TASK_CONFIGURATION_PROPERTY_KEYS,
+  buildConfigurationTaskProperties,
   type TaskByRuleSummary,
   type TaskProperties,
 } from '../types/task';
@@ -24,7 +25,16 @@ import {
   AWARENESS_TRAINING_TITLE_LOC_ID,
   AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
 } from '../constants/awarenessTraining';
-import { getTeamDetail, incrementTaskIndex } from './team';
+import {
+  CONFIGURATION_TASK_DUE_DAYS,
+  CONFIGURATION_TASK_TITLE_LOC_ID,
+  CONFIGURATION_TASK_DESCRIPTION_LOC_ID,
+} from '../constants/configurationTask';
+import {
+  CONFIGURATION_RESULT,
+  type ConfigurationScanRuleResult,
+} from '../types/configurationScan';
+import { getTeamDetail, incrementTaskIndex, reserveTaskNumbers } from './team';
 import { assertOwnership } from './ownership';
 
 const { RULE_ID: CONFIGURATION_RULE_ID } = TASK_CONFIGURATION_PROPERTY_KEYS;
@@ -412,4 +422,66 @@ export const ensureAwarenessTrainingTask = async (
 
   await incrementTaskIndex(prisma, teamId);
   return task;
+};
+
+export const ensureConfigurationTasksForReport = async (
+  prisma: PrismaClient,
+  param: {
+    teamId: string;
+    versionId: string;
+    productId?: string;
+    reportId: string;
+    authorId: string;
+    rules: ConfigurationScanRuleResult[];
+  },
+  auditInfo: AuditInfo
+): Promise<{ created: number; skipped: number }> => {
+  const { teamId, versionId, productId, reportId, authorId, rules } = param;
+
+  const existing = await getConfigurationTasksByVersion(
+    prisma,
+    teamId,
+    versionId
+  );
+  const failed = rules.filter(
+    (rule) => rule.result === CONFIGURATION_RESULT.FAIL
+  );
+  const newlyFailed = failed.filter((rule) => !existing.has(rule.ruleId));
+  const skipped = failed.length - newlyFailed.length;
+  if (newlyFailed.length === 0) return { created: 0, skipped };
+
+  const duedate = new Date();
+  duedate.setDate(duedate.getDate() + CONFIGURATION_TASK_DUE_DAYS);
+
+  const firstTaskNumber = await reserveTaskNumbers(
+    prisma,
+    teamId,
+    newlyFailed.length
+  );
+
+  for (let index = 0; index < newlyFailed.length; index++) {
+    const rule = newlyFailed[index];
+    await createTask(
+      prisma,
+      {
+        authorId,
+        teamId,
+        title: '',
+        titleLocId: CONFIGURATION_TASK_TITLE_LOC_ID,
+        status: TaskStatus.TODO,
+        duedate: duedate.toISOString(),
+        description: '',
+        descriptionLocId: CONFIGURATION_TASK_DESCRIPTION_LOC_ID,
+        productId,
+        versionId,
+        originType: TaskOriginType.AUTOMATIC,
+        taskType: TaskType.CONFIGURATION_MANAGEMENT,
+        taskNumber: firstTaskNumber + index,
+        properties: buildConfigurationTaskProperties(reportId, rule),
+      },
+      auditInfo
+    );
+  }
+
+  return { created: newlyFailed.length, skipped };
 };

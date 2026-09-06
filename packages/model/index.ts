@@ -79,6 +79,12 @@ export {
   AWARENESS_TRAINING_TITLE_LOC_ID,
   AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
 } from './constants/awarenessTraining';
+export {
+  CONFIGURATION_TASK_DUE_DAYS,
+  CONFIGURATION_TASK_TITLE_LOC_ID,
+  CONFIGURATION_TASK_DESCRIPTION_LOC_ID,
+  CONFIGURATION_TASK_RULE_DESCRIPTION_MAX,
+} from './constants/configurationTask';
 
 // Export specific operation types needed by frontend
 export type {

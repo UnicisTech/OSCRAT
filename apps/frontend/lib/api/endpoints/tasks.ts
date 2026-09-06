@@ -22,7 +22,9 @@ export interface TaskLinkedDocumentation {
 
 export type CreateTaskData = {
   title: string;
+  titleLocId?: string;
   description?: string;
+  descriptionLocId?: string;
   assigneeId?: string | null;
   duedate: Date;
   priority?: string;
