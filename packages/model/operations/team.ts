@@ -689,22 +689,3 @@ export const updateLastAwarenessTrainingCompletion = async (
     data: { lastAwarenessTrainingCompletion: date },
   });
 };
-
-/** Find team members who have never completed training or whose last completion is overdue */
-export const getAwarenessTrainingOverdueMembers = async (
-  prisma: PrismaClient,
-  thresholdDate: Date
-) => {
-  return prisma.teamMember.findMany({
-    where: {
-      OR: [
-        { lastAwarenessTrainingCompletion: null },
-        { lastAwarenessTrainingCompletion: { lt: thresholdDate } },
-      ],
-    },
-    include: {
-      user: { select: { id: true, name: true } },
-      team: { select: { id: true, name: true, slug: true } },
-    },
-  });
-};

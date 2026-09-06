@@ -6,7 +6,6 @@ import { executeSbomImport } from './jobs/sbomImport';
 import { executeVulnerabilityScan } from './jobs/vulnerabilityScan';
 import { executeSbomReportScan } from './jobs/sbomReportScan';
 import { executeConfigurationScan } from './jobs/configurationScan';
-import { checkAwarenessTrainingRegeneration } from './jobs/awarenessTraining';
 import * as fs from 'fs';
 import * as path from 'path';
 import { $ } from 'zx';
@@ -21,7 +20,6 @@ class JobRunner {
   private maxConcurrentJobs: number;
   private pollTimeout: NodeJS.Timeout | null = null;
   private isProcessingJobs = false;
-  private trainingCheckTimeout: NodeJS.Timeout | null = null;
   private grypeDbRefreshTimeout: NodeJS.Timeout | null = null;
   private grypeDbRefreshDue = false;
   private workspaceRoot: string;
@@ -127,7 +125,6 @@ class JobRunner {
 
       this.isRunning = true;
       this.processJobs();
-      this.startTrainingRegeneration();
       this.scheduleGrypeDbRefresh();
       console.log(
         `[Job Runner] Started successfully (max ${this.maxConcurrentJobs} concurrent jobs)`
@@ -136,27 +133,6 @@ class JobRunner {
       console.error('[Job Runner] Failed to start:', error);
       process.exit(1);
     }
-  }
-
-  private startTrainingRegeneration() {
-    this.runTrainingCheck();
-    console.log('[Job Runner] Awareness training regeneration scheduled (every 24h)');
-  }
-
-  private async runTrainingCheck() {
-    try {
-      await checkAwarenessTrainingRegeneration(this.prisma);
-    } catch (err) {
-      console.error('[Job Runner] Awareness training check failed:', err);
-    } finally {
-      this.scheduleTrainingCheck();
-    }
-  }
-
-  private scheduleTrainingCheck() {
-    if (!this.isRunning) return;
-    const intervalMs = 24 * 60 * 60 * 1000;
-    this.trainingCheckTimeout = setTimeout(() => this.runTrainingCheck(), intervalMs);
   }
 
   private async updateGrypeDb() {
@@ -177,11 +153,6 @@ class JobRunner {
   async stop() {
     console.log('[Job Runner] Stopping...');
     this.isRunning = false;
-
-    if (this.trainingCheckTimeout) {
-      clearTimeout(this.trainingCheckTimeout);
-      this.trainingCheckTimeout = null;
-    }
 
     if (this.grypeDbRefreshTimeout) {
       clearTimeout(this.grypeDbRefreshTimeout);

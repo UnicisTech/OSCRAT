@@ -9,6 +9,8 @@ import {
   type AuditInfo,
   type TaskProperties,
 } from '@oscrat/model';
+import { AWARENESS_TRAINING_REGENERATION_DAYS } from '@oscrat/model/constants/awarenessTraining';
+import { addDays } from 'date-fns';
 
 const normalizeTaskTitle = (title: string) => title.trim();
 type TaskUpdateInput = TaskOps.TaskUpdateInput;
@@ -80,6 +82,7 @@ export const updateTask = async (
   audit: AuditInfo
 ) => {
   let updateData: TaskUpdateInput = data;
+  let completedTraining: { teamId: string; userId: string } | null = null;
 
   if (data?.status === TaskStatus.DONE) {
     const task = await prisma.task.findFirst({
@@ -89,6 +92,7 @@ export const updateTask = async (
         teamId: true,
         taskType: true,
         properties: true,
+        status: true,
       },
     });
 
@@ -98,13 +102,18 @@ export const updateTask = async (
       (data.properties ?? task?.properties) as TaskProperties | null
     );
 
-    if (task?.assigneeId && task.taskType === TaskType.TRAINING) {
+    if (
+      task?.assigneeId &&
+      task.taskType === TaskType.TRAINING &&
+      task.status !== TaskStatus.DONE
+    ) {
       await TeamOps.updateLastAwarenessTrainingCompletion(
         prisma,
         task.teamId,
         task.assigneeId,
         new Date()
       );
+      completedTraining = { teamId: task.teamId, userId: task.assigneeId };
     }
   }
 
@@ -115,7 +124,33 @@ export const updateTask = async (
     };
   }
 
-  return await TaskOps.updateTask(prisma, taskNumber, slug, updateData, audit);
+  const updated = await TaskOps.updateTask(
+    prisma,
+    taskNumber,
+    slug,
+    updateData,
+    audit
+  );
+
+  if (completedTraining) {
+    try {
+      await TaskOps.ensureAwarenessTrainingTask(
+        prisma,
+        completedTraining.teamId,
+        completedTraining.userId,
+        audit.user.name ?? '',
+        audit,
+        addDays(new Date(), AWARENESS_TRAINING_REGENERATION_DAYS)
+      );
+    } catch (err) {
+      console.error(
+        '[Awareness] Failed to create next training task on completion:',
+        err
+      );
+    }
+  }
+
+  return updated;
 };
 
 export const deleteTask = async (

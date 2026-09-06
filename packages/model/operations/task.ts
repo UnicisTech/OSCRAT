@@ -25,6 +25,7 @@ import {
   AWARENESS_TRAINING_TITLE_LOC_ID,
   AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
 } from '../constants/awarenessTraining';
+import { addDays } from 'date-fns';
 import {
   CONFIGURATION_TASK_DUE_DAYS,
   CONFIGURATION_TASK_TITLE_LOC_ID,
@@ -379,26 +380,20 @@ export const findActiveTrainingTaskForUser = async (
   });
 };
 
-/**
- * Creates an awareness training task for a user in a team if one doesn't
- * already exist (idempotent). Used by both the frontend (on team member
- * creation) and the jobrunner (daily regeneration).
- */
+/** Creates an awareness training task for a user in a team if one doesn't already exist (idempotent). */
 export const ensureAwarenessTrainingTask = async (
   prisma: PrismaClient,
   teamId: string,
   userId: string,
   userName: string,
-  auditInfo: AuditInfo
+  auditInfo: AuditInfo,
+  duedate: Date = addDays(new Date(), AWARENESS_TRAINING_DUE_DAYS)
 ) => {
   const existing = await findActiveTrainingTaskForUser(prisma, teamId, userId);
   if (existing) return existing;
 
   const team = await getTeamDetail(prisma, { id: teamId });
   if (!team) throw new Error(`Team ${teamId} not found`);
-
-  const duedate = new Date();
-  duedate.setDate(duedate.getDate() + AWARENESS_TRAINING_DUE_DAYS);
 
   const task = await createTask(
     prisma,
