@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { ApiError } from '@/lib/errors';
 import * as TaskOps from '@oscrat/model/operations';
 import * as TeamOps from '@oscrat/model/operations';
 import {
@@ -11,6 +12,20 @@ import {
 
 const normalizeTaskTitle = (title: string) => title.trim();
 type TaskUpdateInput = TaskOps.TaskUpdateInput;
+
+const assertRiskTaskCanBeDone = (
+  taskType: TaskType | null | undefined,
+  status: TaskStatus | undefined,
+  properties: TaskProperties | null | undefined
+) => {
+  if (
+    status === TaskStatus.DONE &&
+    taskType === TaskType.RISK &&
+    !(properties?.riskDetails && properties?.riskTreatment)
+  ) {
+    throw new ApiError(400, 'oscrat.ui.validation.risk-sections-required');
+  }
+};
 
 export const createTask = async (
   param: {
@@ -30,6 +45,9 @@ export const createTask = async (
   audit: AuditInfo
 ) => {
   const { teamId } = param;
+
+  assertRiskTaskCanBeDone(param.taskType, param.status, param.properties);
+
   const normalizedTitle = normalizeTaskTitle(param.title);
   const team = await TeamOps.getTeamDetail(prisma, { id: teamId });
   if (!team) {
@@ -68,8 +86,15 @@ export const updateTask = async (
         assigneeId: true,
         teamId: true,
         taskType: true,
+        properties: true,
       },
     });
+
+    assertRiskTaskCanBeDone(
+      data.taskType ?? task?.taskType,
+      data.status,
+      (data.properties ?? task?.properties) as TaskProperties | null
+    );
 
     if (task?.assigneeId && task.taskType === TaskType.TRAINING) {
       await TeamOps.updateLastAwarenessTrainingCompletion(

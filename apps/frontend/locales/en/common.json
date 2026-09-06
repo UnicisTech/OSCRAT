@@ -1124,6 +1124,7 @@
         "task-status-required": "Task status is required",
         "task-status-invalid": "Please select a valid task status",
         "task-type-invalid": "Please select a valid task type",
+        "risk-sections-required": "Complete the risk details and risk treatment sections before marking this risk task as done",
         "task-due-date-required": "Due date is required",
         "task-due-date-past": "Due date cannot be in the past",
         "task-title-already-exists": "A task with this title already exists",

@@ -17,7 +17,7 @@ import { resolveTaskTitle, resolveTaskDescription } from '@/lib/tasks';
 import { useFormik } from 'formik';
 import { createTaskUpdateSchema } from '@/lib/validation/task';
 import type { UpdateTaskData } from '@/lib/api/endpoints/tasks';
-import type { ApiError } from '@/types';
+import { extractErrorMessage } from '@/lib/utils';
 import Button from '@/components/button';
 
 interface TaskDetailsFormProps {
@@ -89,8 +89,8 @@ const TaskDetailsForm: React.FC<TaskDetailsFormProps> = ({ task, team }) => {
         await updateTask(payload);
         toast.success(t('task-updated-successfully'));
       } catch (error: unknown) {
-        const apiError = error as ApiError;
-        toast.error(apiError.message);
+        toast.error(extractErrorMessage(error, t('error-updating-task'), t));
+        formik.resetForm();
       }
     },
   });

@@ -23,7 +23,7 @@ import {
   calculateExposure,
   RISK_LEVEL_BADGE_CLASSES,
 } from '@/utils/riskCalculation';
-import type { ApiError } from '@/types';
+import { extractErrorMessage } from '@/lib/utils';
 
 interface RiskAssessmentSectionProps {
   task: Task;
@@ -86,8 +86,7 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({
         await updateTask({ properties: mergedProps });
         toast.success(t('oscrat.ui.risk.risk-details-saved'));
       } catch (error: unknown) {
-        const apiError = error as ApiError;
-        toast.error(apiError.message);
+        toast.error(extractErrorMessage(error, t('error-updating-task'), t));
       }
     },
   });
@@ -107,8 +106,7 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({
         await updateTask({ properties: mergedProps });
         toast.success(t('oscrat.ui.risk.risk-treatment-saved'));
       } catch (error: unknown) {
-        const apiError = error as ApiError;
-        toast.error(apiError.message);
+        toast.error(extractErrorMessage(error, t('error-updating-task'), t));
       }
     },
   });
