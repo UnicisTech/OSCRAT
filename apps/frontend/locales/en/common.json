@@ -683,7 +683,7 @@
       "task-status-in-progress": "In Progress",
       "task-status-done": "Done",
       "awareness-training-title": "Awareness Training",
-      "awareness-training-description": "Please complete the following security awareness training materials:\n\n1. OWASP Security Awareness: https://owasp.org/www-project-security-awareness/\n2. ENISA Cybersecurity Training: https://www.enisa.europa.eu/topics/training-and-exercises\n3. NIST Cybersecurity Awareness: https://www.nist.gov/cybersecurity\n\nAfter completing all materials, update the task status to Done.",
+      "awareness-training-description": "Please complete the following security awareness training materials:\n\n1. OWASP Security Awareness: https://owasp.org/www-project-application-security-awareness-campaigns/\n2. ENISA Cybersecurity Training: https://www.enisa.europa.eu/topics/cyber-hygiene\n3. NIST Cybersecurity Awareness: https://www.nist.gov/cybersecurity\n4. OSCRAT Resources: https://oscrat.eu/resources/\n\nAfter completing all materials, update the task status to Done.",
       "configuration-task-title": "Remediate Config - {{configuration_rule_title}}",
       "configuration-task-description": "Remediate configuration violation:\nRule ID: {{configuration_rule_id}}\nSeverity: {{configuration_severity}}\n\n{{configuration_rule_description}}",
       "task-type-generic": "Other",
