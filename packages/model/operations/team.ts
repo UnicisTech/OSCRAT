@@ -643,6 +643,19 @@ export const incrementTaskIndex = async (
   }
 };
 
+export const reserveTaskNumbers = async (
+  prisma: PrismaClient,
+  teamId: string,
+  count: number
+): Promise<number> => {
+  const team = await prisma.team.update({
+    where: { id: teamId },
+    data: { taskIndex: { increment: count } },
+    select: { taskIndex: true },
+  });
+  return team.taskIndex - count;
+};
+
 /** Get team with product summaries (lightweight) */
 export const getTeamWithProductsSummary = async (
   prisma: PrismaClient,
@@ -674,24 +687,5 @@ export const updateLastAwarenessTrainingCompletion = async (
   return prisma.teamMember.update({
     where: { teamId_userId: { teamId, userId } },
     data: { lastAwarenessTrainingCompletion: date },
-  });
-};
-
-/** Find team members who have never completed training or whose last completion is overdue */
-export const getAwarenessTrainingOverdueMembers = async (
-  prisma: PrismaClient,
-  thresholdDate: Date
-) => {
-  return prisma.teamMember.findMany({
-    where: {
-      OR: [
-        { lastAwarenessTrainingCompletion: null },
-        { lastAwarenessTrainingCompletion: { lt: thresholdDate } },
-      ],
-    },
-    include: {
-      user: { select: { id: true, name: true } },
-      team: { select: { id: true, name: true, slug: true } },
-    },
   });
 };

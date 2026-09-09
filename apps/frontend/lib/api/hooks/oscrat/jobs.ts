@@ -7,6 +7,7 @@ import {
 } from '@/lib/api/endpoints/oscrat/jobs';
 import { queryKeys } from '@/lib/api/queryKeys';
 import { queryClient } from '@/lib/api/hooks';
+import { invalidateProductCountCaches } from './invalidations';
 import { WorkerJobType } from '@oscrat/model';
 
 // List SBOM reports
@@ -434,11 +435,17 @@ export function useDeleteConfigurationScanReport(
   });
 }
 
-// Invalidate configuration scan reports query
 export function useInvalidateConfigurationScanReports() {
   const queryClient = useQueryClient();
 
-  return (teamId: string, versionId: string) => {
+  return (teamId: string, productId: string, versionId: string) => {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.teams.tasks.all(teamId),
+    });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.oscrat.projects.versions.detail(teamId, versionId),
+    });
+    invalidateProductCountCaches(teamId, productId);
     return queryClient.invalidateQueries({
       queryKey: queryKeys.oscrat.projects.versions.jobs.configurationScan.all(
         teamId,

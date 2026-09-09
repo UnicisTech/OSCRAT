@@ -4,6 +4,7 @@ import {
   Task,
   TaskStatus,
   TaskOriginType,
+  TaskType,
   DocumentationStatus,
   type TaskProperties,
 } from '@oscrat/model';
@@ -21,7 +22,9 @@ export interface TaskLinkedDocumentation {
 
 export type CreateTaskData = {
   title: string;
+  titleLocId?: string;
   description?: string;
+  descriptionLocId?: string;
   assigneeId?: string | null;
   duedate: Date;
   priority?: string;
@@ -29,6 +32,7 @@ export type CreateTaskData = {
   productId?: string;
   versionId?: string;
   originType?: TaskOriginType;
+  taskType?: TaskType;
   properties?: TaskProperties;
 };
 

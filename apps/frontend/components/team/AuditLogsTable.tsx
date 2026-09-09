@@ -8,7 +8,7 @@ import {
   getAuditActionTranslationKey,
   oscratEntityTypeTranslationMap,
 } from '@/utils/translation';
-import { getCrudConfig, formatTimestamp } from '@/lib/auditUtils';
+import { formatTimestamp } from '@/lib/auditUtils';
 import { formatNameWithUuidFallback } from '@/lib/utils';
 
 interface AuditLogsTableProps {
@@ -84,25 +84,11 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({
               </div>
             </Table.td>
             <Table.td>
-              <div className="flex items-center gap-2">
-                {(() => {
-                  const crud = getCrudConfig(log.crud);
-                  return (
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${crud.bg} ${crud.text}`}
-                    >
-                      {t(crud.labelKey, {
-                        defaultValue: log.crud.toUpperCase(),
-                      })}
-                    </span>
-                  );
-                })()}
-                <span className="text-sm">
-                  {t(getAuditActionTranslationKey(log.action), {
-                    defaultValue: log.action,
-                  })}
-                </span>
-              </div>
+              <span className="text-sm">
+                {t(getAuditActionTranslationKey(log.action), {
+                  defaultValue: log.action,
+                })}
+              </span>
             </Table.td>
             <Table.td>
               <div className="flex flex-col">

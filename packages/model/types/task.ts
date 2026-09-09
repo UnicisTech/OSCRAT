@@ -1,11 +1,17 @@
 import type { TaskStatus } from '@prisma/client';
-import type { ConfigurationSeverity } from './configurationScan';
+import type {
+  ConfigurationSeverity,
+  ConfigurationScanRuleResult,
+} from './configurationScan';
+import { CONFIGURATION_TASK_RULE_DESCRIPTION_MAX } from '../constants/configurationTask';
 
 export const TASK_CONFIGURATION_PROPERTY_KEYS = {
   REPORT_ID: 'configuration_report_id',
   RULE_ID: 'configuration_rule_id',
   CCE: 'configuration_cce',
   SEVERITY: 'configuration_severity',
+  RULE_TITLE: 'configuration_rule_title',
+  RULE_DESCRIPTION: 'configuration_rule_description',
 } as const;
 
 export const TASK_CSC_PROPERTY_KEYS = {
@@ -13,12 +19,7 @@ export const TASK_CSC_PROPERTY_KEYS = {
   AUDIT_LOGS: 'csc_audit_logs',
 } as const;
 
-export const TASK_TRAINING_PROPERTY_KEYS = {
-  TASK_TYPE: 'task_type',
-} as const;
-
 export const TASK_RISK_PROPERTY_KEYS = {
-  ENABLE_RISK_ASSESSMENT: 'enableRiskAssessment',
   DETAILS: 'riskDetails',
   TREATMENT: 'riskTreatment',
 } as const;
@@ -55,6 +56,8 @@ interface TaskConfigurationProperties {
   [TASK_CONFIGURATION_PROPERTY_KEYS.RULE_ID]?: string;
   [TASK_CONFIGURATION_PROPERTY_KEYS.CCE]?: string;
   [TASK_CONFIGURATION_PROPERTY_KEYS.SEVERITY]?: ConfigurationSeverity;
+  [TASK_CONFIGURATION_PROPERTY_KEYS.RULE_TITLE]?: string;
+  [TASK_CONFIGURATION_PROPERTY_KEYS.RULE_DESCRIPTION]?: string;
 }
 
 interface TaskCscAuditLogActor {
@@ -75,20 +78,33 @@ interface TaskCscProperties {
   [TASK_CSC_PROPERTY_KEYS.AUDIT_LOGS]?: TaskCscAuditLogEntry[];
 }
 
-interface TaskTrainingProperties {
-  [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]?: string;
-}
-
 interface TaskRiskFlagProperties {
-  [TASK_RISK_PROPERTY_KEYS.ENABLE_RISK_ASSESSMENT]?: boolean;
   [TASK_RISK_PROPERTY_KEYS.DETAILS]?: RiskDetailsProperties;
   [TASK_RISK_PROPERTY_KEYS.TREATMENT]?: RiskTreatmentProperties;
 }
 
 type TaskProperties = TaskConfigurationProperties &
   TaskCscProperties &
-  TaskTrainingProperties &
   TaskRiskFlagProperties;
+
+export const buildConfigurationTaskProperties = (
+  reportId: string,
+  rule: ConfigurationScanRuleResult
+): TaskConfigurationProperties => {
+  const keys = TASK_CONFIGURATION_PROPERTY_KEYS;
+  const description = rule.description?.trim() || rule.title;
+  return {
+    [keys.REPORT_ID]: reportId,
+    [keys.RULE_ID]: rule.ruleId,
+    ...(rule.cceId ? { [keys.CCE]: rule.cceId } : {}),
+    [keys.SEVERITY]: rule.severity,
+    [keys.RULE_TITLE]: rule.title,
+    [keys.RULE_DESCRIPTION]: description.slice(
+      0,
+      CONFIGURATION_TASK_RULE_DESCRIPTION_MAX
+    ),
+  };
+};
 
 export type {
   TaskByRuleSummary,
@@ -96,7 +112,6 @@ export type {
   TaskCscAuditLogActor,
   TaskCscAuditLogEntry,
   TaskCscProperties,
-  TaskTrainingProperties,
   RiskLevel,
   RiskCategory,
   RiskTreatmentOption,

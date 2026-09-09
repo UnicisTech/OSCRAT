@@ -3,11 +3,13 @@ import { PrismaClient } from '@oscrat/model/server';
 import type { ProcessConfigurationScanResult } from '@oscrat/model/types/jobPayloads';
 import {
   updateConfigurationScanReport,
+  ensureConfigurationTasksForReport,
   getProductVersionNames,
   generateConfigurationScanFilename,
   getFileById,
   deleteFile,
 } from '@oscrat/model/operations';
+import env from '../lib/env';
 import type { AuditInfo } from '@oscrat/model/audit';
 import { processConfigurationScanPayloadSchema } from '@oscrat/model/schemas/jobPayloads';
 import { withTempDirectory, resolveInTempDir } from '../utils/filesystem';
@@ -107,12 +109,21 @@ export async function executeConfigurationScan(
 
         console.log(`[Configuration Scan] Completed successfully. Report ID: ${reportId}`);
 
+        const tasksCreated = await createTasksForFailedRules(
+          job,
+          prisma,
+          reportId,
+          scanSummary,
+          auditInfo
+        );
+
         return {
           generatedAt: new Date().toISOString(),
           totalRules: scanSummary.totalRules,
           passCount: scanSummary.passCount,
           failCount: scanSummary.failCount,
           otherCount: scanSummary.errorCount + scanSummary.notApplicableCount + scanSummary.notCheckedCount + scanSummary.otherCount,
+          tasksCreated,
         };
       } catch (error) {
         console.error(`[Configuration Scan] Job ${job.id} failed:`, error);
@@ -128,5 +139,50 @@ export async function executeConfigurationScan(
         err
       );
     });
+  }
+}
+
+async function createTasksForFailedRules(
+  job: WorkerJob,
+  prisma: PrismaClient,
+  reportId: string,
+  scanSummary: ConfigurationScanSummary,
+  auditInfo: AuditInfo | undefined
+): Promise<number> {
+  const prefix = `[Configuration Scan] Task generation for report ${reportId}:`;
+
+  if (!env.jobRunner.autoCreateConfigurationTasks) {
+    console.log(`${prefix} skipped (CONFIGURATION_SCAN_AUTO_TASKS=false)`);
+    return 0;
+  }
+  if (!auditInfo || !job.contextVersionId) {
+    console.warn(`${prefix} skipped (job ${job.id} has no team/version context)`);
+    return 0;
+  }
+  if (scanSummary.failCount === 0) {
+    console.log(`${prefix} skipped (no failed rules)`);
+    return 0;
+  }
+
+  try {
+    const { created, skipped } = await ensureConfigurationTasksForReport(
+      prisma,
+      {
+        teamId: job.contextTeamId,
+        versionId: job.contextVersionId,
+        productId: job.contextProductId ?? undefined,
+        reportId,
+        authorId: job.triggeredByUserId,
+        rules: scanSummary.rules,
+      },
+      auditInfo
+    );
+    console.log(
+      `${prefix} ${scanSummary.failCount} failed rule(s), created ${created} task(s), skipped ${skipped} with an open task`
+    );
+    return created;
+  } catch (error) {
+    console.error(`${prefix} failed, scan report is kept:`, error);
+    return 0;
   }
 }

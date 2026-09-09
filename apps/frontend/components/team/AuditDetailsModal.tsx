@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'next-i18next';
 import Button from '@/components/button';
 import Modal from '@/components/shared/Modal';
+import Badge from '@/components/shared/Badge';
 import {
   ClipboardIcon,
   CheckIcon,
@@ -14,11 +15,13 @@ import {
   oscratEntityTypeTranslationMap,
 } from '@/utils/translation';
 import { getCrudConfig, formatTimestamp } from '@/lib/auditUtils';
+import { auditFieldLabel, auditEnumLabel } from '@/lib/auditFieldFormat';
 import { isUuid } from '@/lib/utils';
 import { formatDateTime } from '@/utils/dateFormat';
 import { useQuery } from '@tanstack/react-query';
 import { teamsEndpoints } from '@/lib/api/endpoints/teams';
 import { queryKeys } from '@/lib/api/queryKeys';
+import type { TFunction } from 'next-i18next';
 
 interface AuditDetailsModalProps {
   log: OscratAuditLog | null;
@@ -32,25 +35,14 @@ interface AuditDetailsModalProps {
   teamSlug?: string;
 }
 
-const formatKey = (key: string) =>
-  key
-    .replace(/_/g, ' ')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-
 const isDateString = (value: string) =>
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value) ||
   /^\d{4}-\d{2}-\d{2}$/.test(value);
 
 const USER_REFERENCE_FIELDS = new Set(['assigneeId', 'userId']);
 
-const isUserReferenceField = (path: string): boolean => {
-  const parts = path.split('/').filter(Boolean);
-  return parts.length > 0 && USER_REFERENCE_FIELDS.has(parts[parts.length - 1]);
-};
-
 const formatValue = (value: unknown): string => {
-  if (value === null || value === undefined) return '—';
+  if (value === null || value === undefined || value === '') return '—';
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
   if (typeof value === 'string' && isDateString(value)) {
     return formatDateTime(value);
@@ -107,10 +99,19 @@ const parseMetadata = (
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-const pathToFieldName = (path: string): string => {
+const pathToField = (path: string): string => {
   const parts = path.split('/').filter(Boolean);
-  return parts.length > 0 ? formatKey(parts[parts.length - 1]) : path;
+  return parts.length > 0 ? parts[parts.length - 1] : path;
 };
+
+interface DisplayContext {
+  targetType: string;
+  t: TFunction;
+  resolveUserId?: (id: string) => string | undefined;
+}
+
+const labelClass = 'text-content-muted pt-0.5 text-xs';
+const valueClass = 'text-content min-w-0 break-words text-sm';
 
 const opIndicator: Record<PatchOpValue, { symbol: string; className: string }> =
   {
@@ -121,38 +122,39 @@ const opIndicator: Record<PatchOpValue, { symbol: string; className: string }> =
 
 const resolveDisplayValue = (
   rawValue: unknown,
-  path: string,
-  resolveUserId?: (id: string) => string | undefined
+  field: string,
+  { targetType, t, resolveUserId }: DisplayContext
 ): string => {
   if (
     resolveUserId &&
-    isUserReferenceField(path) &&
+    USER_REFERENCE_FIELDS.has(field) &&
     typeof rawValue === 'string' &&
     isUuid(rawValue)
   ) {
     return resolveUserId(rawValue) ?? formatValue(rawValue);
   }
-  return formatValue(rawValue);
+  return (
+    auditEnumLabel(targetType, field, rawValue, t) ?? formatValue(rawValue)
+  );
 };
 
 const PatchDisplay: React.FC<{
   patch: PatchOperation[];
-  resolveUserId?: (id: string) => string | undefined;
-}> = ({ patch, resolveUserId }) => (
-  <dl className="grid grid-cols-[max-content_1fr_max-content_1fr] items-baseline gap-x-3 gap-y-1.5">
+  context: DisplayContext;
+}> = ({ patch, context }) => (
+  <dl className="grid grid-cols-[max-content_1fr_max-content_1fr] items-baseline gap-x-5 gap-y-2">
     {patch.map((op, index) => {
+      const field = pathToField(op.path);
       const ind = opIndicator[op.op];
       const hasPrevious =
         op.op !== PatchOp.Add && op.previousValue !== undefined;
       return (
         <React.Fragment key={index}>
-          <dt className="text-content-muted text-xs">
-            {pathToFieldName(op.path)}
-          </dt>
-          <dd className="text-content-muted break-words text-sm">
+          <dt className={labelClass}>{auditFieldLabel(field, context.t)}</dt>
+          <dd className="text-content-muted min-w-0 break-words text-sm">
             {hasPrevious ? (
-              <span className="line-through decoration-content-muted/40">
-                {resolveDisplayValue(op.previousValue, op.path, resolveUserId)}
+              <span className="decoration-content-muted/40 line-through">
+                {resolveDisplayValue(op.previousValue, field, context)}
               </span>
             ) : (
               <span className="italic">—</span>
@@ -164,11 +166,11 @@ const PatchDisplay: React.FC<{
           >
             {ind.symbol}
           </span>
-          <dd className="text-content break-words text-sm">
+          <dd className={valueClass}>
             {op.op === PatchOp.Remove ? (
               <span className="text-danger italic">removed</span>
             ) : (
-              resolveDisplayValue(op.value, op.path, resolveUserId)
+              resolveDisplayValue(op.value, field, context)
             )}
           </dd>
         </React.Fragment>
@@ -179,17 +181,22 @@ const PatchDisplay: React.FC<{
 
 const SimplePropertyList: React.FC<{
   data: Record<string, unknown>;
+  context: DisplayContext;
   depth?: number;
-}> = ({ data, depth = 0 }) => (
+}> = ({ data, context, depth = 0 }) => (
   <dl
-    className={`grid grid-cols-[max-content_1fr] items-baseline gap-x-3 gap-y-1 ${depth > 0 ? 'col-span-2 ml-4 mt-1' : ''}`}
+    className={`grid grid-cols-[max-content_1fr] items-baseline gap-x-5 gap-y-2 ${depth > 0 ? 'col-span-2 ml-4 mt-1' : ''}`}
   >
-    {Object.entries(data).map(([key, value]) => (
-      <React.Fragment key={key}>
-        <dt className="text-content-muted text-xs">{formatKey(key)}</dt>
-        <dd className="text-content min-w-0 break-words text-sm">
+    {Object.entries(data).map(([field, value]) => (
+      <React.Fragment key={field}>
+        <dt className={labelClass}>{auditFieldLabel(field, context.t)}</dt>
+        <dd className={valueClass}>
           {isObject(value) ? (
-            <SimplePropertyList data={value} depth={depth + 1} />
+            <SimplePropertyList
+              data={value}
+              context={context}
+              depth={depth + 1}
+            />
           ) : Array.isArray(value) ? (
             value.length === 0 ? (
               '—'
@@ -197,7 +204,7 @@ const SimplePropertyList: React.FC<{
               value.map(formatValue).join(', ')
             )
           ) : (
-            formatValue(value)
+            resolveDisplayValue(value, field, context)
           )}
         </dd>
       </React.Fragment>
@@ -263,9 +270,19 @@ const Field: React.FC<{ label: string; children: React.ReactNode }> = ({
   children,
 }) => (
   <>
-    <dt className="text-content-muted pt-0.5 text-xs">{label}</dt>
-    <dd className="text-content min-w-0 text-sm">{children}</dd>
+    <dt className={labelClass}>{label}</dt>
+    <dd className={valueClass}>{children}</dd>
   </>
+);
+
+const Section: React.FC<{ title: string; children: React.ReactNode }> = ({
+  title,
+  children,
+}) => (
+  <div className="border-line-subtle border-t pt-4">
+    <h3 className="text-content-secondary mb-3 text-sm font-medium">{title}</h3>
+    {children}
+  </div>
 );
 
 const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
@@ -336,22 +353,25 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
   });
 
   const showSeparateTargetId = log.targetId && log.targetName !== log.targetId;
+  const displayContext: DisplayContext = {
+    targetType: log.targetType,
+    t,
+    resolveUserId,
+  };
 
   return (
     <Modal open={isOpen} close={onClose} size="lg">
       <Modal.Header>
-        <div className="flex flex-col">
-          <div
+        <div className="flex items-center gap-3">
+          <span
             className="text-content text-base font-semibold leading-tight"
             title={log.action}
           >
             {actionLabel}
-          </div>
-          <div className="mt-1 text-xs">
-            <span className={`rounded px-1.5 py-0.5 ${crud.bg} ${crud.text}`}>
-              {t(crud.labelKey, { defaultValue: log.crud.toUpperCase() })}
-            </span>
-          </div>
+          </span>
+          <Badge>
+            {t(crud.labelKey, { defaultValue: log.crud.toUpperCase() })}
+          </Badge>
         </div>
       </Modal.Header>
 
@@ -416,11 +436,8 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
           </dl>
 
           {hasFiles && (
-            <div>
-              <h3 className="text-content-secondary mb-2 text-sm font-medium">
-                {t('files')}
-              </h3>
-              <div className="space-y-1 pl-1">
+            <Section title={t('files')}>
+              <div className="space-y-1">
                 {inputFilename && (
                   <FileRow
                     icon={<ArrowUpTrayIcon className="h-4 w-4" />}
@@ -436,27 +453,28 @@ const AuditDetailsModal: React.FC<AuditDetailsModalProps> = ({
                   />
                 )}
               </div>
-            </div>
+            </Section>
           )}
 
           {hasChanges && (
-            <div>
-              <h3 className="text-content-secondary mb-2 text-sm font-medium">
-                {t('changes')}
-              </h3>
-              <div className="pl-1">
-                {metadataType === 'patch' ? (
-                  <PatchDisplay
-                    patch={metadataData as PatchOperation[]}
-                    resolveUserId={resolveUserId}
-                  />
-                ) : metadataType === 'snapshot' && isObject(metadataData) ? (
-                  <SimplePropertyList data={metadataData} />
-                ) : extraMetadata ? (
-                  <SimplePropertyList data={extraMetadata} />
-                ) : null}
-              </div>
-            </div>
+            <Section title={t('changes')}>
+              {metadataType === 'patch' ? (
+                <PatchDisplay
+                  patch={metadataData as PatchOperation[]}
+                  context={displayContext}
+                />
+              ) : metadataType === 'snapshot' && isObject(metadataData) ? (
+                <SimplePropertyList
+                  data={metadataData}
+                  context={displayContext}
+                />
+              ) : extraMetadata ? (
+                <SimplePropertyList
+                  data={extraMetadata}
+                  context={displayContext}
+                />
+              ) : null}
+            </Section>
           )}
         </div>
       </Modal.Body>

@@ -4,3 +4,15 @@ packages:
   - 'packages/**'
   # if required, exclude directories
   - '!**/test/**'
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@swc/core': true
+  core-js: true
+  es5-ext: true
+  esbuild: true
+  prisma: true
+  protobufjs: true
+  sharp: true
+  sqlite3: true
+  unrs-resolver: true

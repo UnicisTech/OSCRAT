@@ -41,6 +41,7 @@ export {
   WorkerJobStatus,
   TaskStatus,
   TaskOriginType,
+  TaskType,
   AuditUserType,
   DocumentationVisibility,
   DocumentationStatus,
@@ -73,12 +74,17 @@ export * from './audit';
 export { OPEN_VULNERABILITY_STATUSES } from './constants/vulnerability';
 
 export {
-  TRAINING_TASK_TYPE_VALUE,
   AWARENESS_TRAINING_DUE_DAYS,
   AWARENESS_TRAINING_REGENERATION_DAYS,
   AWARENESS_TRAINING_TITLE_LOC_ID,
   AWARENESS_TRAINING_DESCRIPTION_LOC_ID,
 } from './constants/awarenessTraining';
+export {
+  CONFIGURATION_TASK_DUE_DAYS,
+  CONFIGURATION_TASK_TITLE_LOC_ID,
+  CONFIGURATION_TASK_DESCRIPTION_LOC_ID,
+  CONFIGURATION_TASK_RULE_DESCRIPTION_MAX,
+} from './constants/configurationTask';
 
 // Export specific operation types needed by frontend
 export type {

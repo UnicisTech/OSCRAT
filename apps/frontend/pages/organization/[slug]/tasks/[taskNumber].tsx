@@ -11,6 +11,7 @@ import {
   RiskAssessmentSection,
 } from '@/components/oscrat/tasks';
 import { formatTaskLabel, resolveTaskTitle } from '@/lib/tasks';
+import { TaskType } from '@oscrat/model';
 
 const TaskDetails = () => {
   const router = useRouter();
@@ -52,7 +53,9 @@ const TaskDetails = () => {
       href: `/organization/${team.slug}/tasks`,
     },
     {
-      label: resolveTaskTitle(task, t) ? formatTaskLabel(task, t) : t('task-details'),
+      label: resolveTaskTitle(task, t)
+        ? formatTaskLabel(task, t)
+        : t('task-details'),
       current: true,
     },
   ];
@@ -65,9 +68,10 @@ const TaskDetails = () => {
       {/* Task Details Form */}
       <TaskDetailsForm task={task} team={team} />
 
-      {/* Risk Assessment (enabled via checkbox) */}
-      {(task.properties as Record<string, unknown>)?.enableRiskAssessment ===
-        true && <RiskAssessmentSection task={task} team={team} />}
+      {/* Risk Assessment (shown for tasks of type Risk) */}
+      {task.taskType === TaskType.RISK && (
+        <RiskAssessmentSection task={task} team={team} />
+      )}
 
       {/* Tab Manager */}
       <TaskDetailsTabs task={task} team={team} />

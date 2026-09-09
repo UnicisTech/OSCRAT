@@ -1,13 +1,29 @@
 import type { TFunction } from 'next-i18next';
+import { truncateAtWordBoundary } from '@/lib/text-sanitize';
 
-type TaskTitleFields = { title?: string | null; titleLocId?: string | null };
-type TaskDescriptionFields = {
+const TASK_TITLE_MAX = 100;
+
+type LocalizedFields = { properties?: unknown };
+type TaskTitleFields = LocalizedFields & {
+  title?: string | null;
+  titleLocId?: string | null;
+};
+type TaskDescriptionFields = LocalizedFields & {
   description?: string | null;
   descriptionLocId?: string | null;
 };
 
+const interpolationValues = (task: LocalizedFields) =>
+  (task.properties ?? {}) as Record<string, unknown>;
+
 export const resolveTaskTitle = (task: TaskTitleFields, t: TFunction): string =>
-  task.title || (task.titleLocId ? t(task.titleLocId) : '');
+  task.title ||
+  (task.titleLocId
+    ? truncateAtWordBoundary(
+        t(task.titleLocId, interpolationValues(task)),
+        TASK_TITLE_MAX
+      )
+    : '');
 
 // Prefixes the team-scoped task number so tasks sharing a title can be told
 // apart, e.g. "#42: Patch dependency".
@@ -20,7 +36,10 @@ export const resolveTaskDescription = (
   task: TaskDescriptionFields,
   t: TFunction
 ): string =>
-  task.description || (task.descriptionLocId ? t(task.descriptionLocId) : '');
+  task.description ||
+  (task.descriptionLocId
+    ? t(task.descriptionLocId, interpolationValues(task))
+    : '');
 
 const dateOptions: Intl.DateTimeFormatOptions = {
   year: 'numeric',

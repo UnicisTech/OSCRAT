@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'next-i18next';
 import type { Task, Team } from '@oscrat/model';
 import { TaskStatus } from '@oscrat/model';
-import type { ApiError } from '@/types';
+import { extractErrorMessage } from '@/lib/utils';
 import { useTask } from '@/hooks/useTask';
 import { getTaskStatusTranslationKey } from '@/constants/taskStatuses';
 
@@ -31,8 +31,7 @@ const TaskStatusDropdown: React.FC<TaskStatusDropdownProps> = ({
       await updateTask({ status: newStatus });
       toast.success(t('task-status-updated'));
     } catch (error: unknown) {
-      const apiError = error as ApiError;
-      toast.error(apiError.message);
+      toast.error(extractErrorMessage(error, t('error-updating-task'), t));
       e.target.value = task.status;
     }
   };

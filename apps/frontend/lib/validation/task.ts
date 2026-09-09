@@ -2,11 +2,14 @@ import * as Yup from 'yup';
 import {
   TaskStatus,
   TaskOriginType,
+  TaskType,
   CONFIGURATION_SEVERITY,
   TASK_CONFIGURATION_PROPERTY_KEYS,
   TASK_CSC_PROPERTY_KEYS,
-  TASK_TRAINING_PROPERTY_KEYS,
   TASK_RISK_PROPERTY_KEYS,
+  CONFIGURATION_TASK_TITLE_LOC_ID,
+  CONFIGURATION_TASK_DESCRIPTION_LOC_ID,
+  CONFIGURATION_TASK_RULE_DESCRIPTION_MAX,
   type ConfigurationSeverity,
   type TaskCscAuditLogEntry,
   type TaskProperties,
@@ -35,7 +38,18 @@ const taskConfigurationPropertiesSchema = {
     Yup.mixed<ConfigurationSeverity>()
       .oneOf(Object.values(CONFIGURATION_SEVERITY))
       .optional(),
+  [TASK_CONFIGURATION_PROPERTY_KEYS.RULE_TITLE]: Yup.string()
+    .trim()
+    .max(500)
+    .optional(),
+  [TASK_CONFIGURATION_PROPERTY_KEYS.RULE_DESCRIPTION]: Yup.string()
+    .trim()
+    .max(CONFIGURATION_TASK_RULE_DESCRIPTION_MAX)
+    .optional(),
 };
+
+const TITLE_LOC_IDS = [CONFIGURATION_TASK_TITLE_LOC_ID];
+const DESCRIPTION_LOC_IDS = [CONFIGURATION_TASK_DESCRIPTION_LOC_ID];
 
 const taskCscPropertiesSchema = {
   [TASK_CSC_PROPERTY_KEYS.CONTROLS]: Yup.array()
@@ -46,12 +60,7 @@ const taskCscPropertiesSchema = {
     .optional(),
 };
 
-const taskTrainingPropertiesSchema = {
-  [TASK_TRAINING_PROPERTY_KEYS.TASK_TYPE]: Yup.string().trim().optional(),
-};
-
 const taskRiskFlagPropertiesSchema = {
-  [TASK_RISK_PROPERTY_KEYS.ENABLE_RISK_ASSESSMENT]: Yup.boolean().optional(),
   [TASK_RISK_PROPERTY_KEYS.DETAILS]: riskDetailsPropertiesSchema.optional(),
   [TASK_RISK_PROPERTY_KEYS.TREATMENT]: riskTreatmentPropertiesSchema.optional(),
 };
@@ -60,7 +69,6 @@ export const taskPropertiesSchema: Yup.ObjectSchema<TaskProperties> =
   Yup.object({
     ...taskConfigurationPropertiesSchema,
     ...taskCscPropertiesSchema,
-    ...taskTrainingPropertiesSchema,
     ...taskRiskFlagPropertiesSchema,
   })
     .noUnknown()
@@ -75,8 +83,14 @@ const taskTitleSchema = Yup.string()
 
 export const createTaskCreateSchema = () =>
   Yup.object({
-    title: taskTitleSchema,
+    titleLocId: Yup.string().oneOf(TITLE_LOC_IDS).optional(),
+    title: Yup.string().when('titleLocId', {
+      is: (locId?: string) => !!locId,
+      then: (schema) => schema.optional(),
+      otherwise: () => taskTitleSchema,
+    }),
     description: descriptionSchema.optional(),
+    descriptionLocId: Yup.string().oneOf(DESCRIPTION_LOC_IDS).optional(),
     status: Yup.mixed<TaskStatus>()
       .oneOf(
         Object.values(TaskStatus),
@@ -88,6 +102,9 @@ export const createTaskCreateSchema = () =>
     versionId: Yup.string().optional(),
     originType: Yup.mixed<TaskOriginType>()
       .oneOf(Object.values(TaskOriginType))
+      .optional(),
+    taskType: Yup.mixed<TaskType>()
+      .oneOf(Object.values(TaskType), 'oscrat.ui.validation.task-type-invalid')
       .optional(),
     properties: taskPropertiesSchema.optional(),
   });
@@ -112,6 +129,9 @@ export const createTaskUpdateSchema = (options?: {
       .optional(),
     duedate: Yup.date().optional(),
     assigneeId: Yup.string().nullable().optional(),
+    taskType: Yup.mixed<TaskType>()
+      .oneOf(Object.values(TaskType), 'oscrat.ui.validation.task-type-invalid')
+      .optional(),
     properties: taskPropertiesSchema.optional(),
   });
 

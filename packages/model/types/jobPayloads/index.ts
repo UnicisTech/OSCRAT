@@ -58,6 +58,7 @@ export interface ProcessConfigurationScanResult {
   passCount?: number;
   failCount?: number;
   otherCount?: number;
+  tasksCreated?: number;
 }
 
 export type WorkerJobPayload =

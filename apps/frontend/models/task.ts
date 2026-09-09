@@ -1,34 +1,57 @@
 import { prisma } from '@/lib/prisma';
+import { ApiError } from '@/lib/errors';
 import * as TaskOps from '@oscrat/model/operations';
 import * as TeamOps from '@oscrat/model/operations';
 import {
   TaskStatus,
   TaskOriginType,
-  TRAINING_TASK_TYPE_VALUE,
+  TaskType,
   type AuditInfo,
   type TaskProperties,
 } from '@oscrat/model';
+import { AWARENESS_TRAINING_REGENERATION_DAYS } from '@oscrat/model/constants/awarenessTraining';
+import { addDays } from 'date-fns';
 
 const normalizeTaskTitle = (title: string) => title.trim();
 type TaskUpdateInput = TaskOps.TaskUpdateInput;
+
+const assertRiskTaskCanBeDone = (
+  taskType: TaskType | null | undefined,
+  status: TaskStatus | undefined,
+  properties: TaskProperties | null | undefined
+) => {
+  if (
+    status === TaskStatus.DONE &&
+    taskType === TaskType.RISK &&
+    !(properties?.riskDetails && properties?.riskTreatment)
+  ) {
+    throw new ApiError(400, 'oscrat.ui.validation.risk-sections-required');
+  }
+};
 
 export const createTask = async (
   param: {
     authorId: string;
     teamId: string;
     title: string;
+    titleLocId?: string;
     status: TaskStatus;
     duedate?: string;
     description: string;
+    descriptionLocId?: string;
     assigneeId?: string;
     productId?: string;
     versionId?: string;
     originType?: TaskOriginType;
+    taskType?: TaskType;
     properties?: TaskProperties;
   },
   audit: AuditInfo
 ) => {
   const { teamId } = param;
+
+  assertRiskTaskCanBeDone(param.taskType, param.status, param.properties);
+
   const normalizedTitle = normalizeTaskTitle(param.title);
   const team = await TeamOps.getTeamDetail(prisma, { id: teamId });
   if (!team) {
@@ -59,22 +82,38 @@ export const updateTask = async (
   audit: AuditInfo
 ) => {
   let updateData: TaskUpdateInput = data;
+  let completedTraining: { teamId: string; userId: string } | null = null;
 
   if (data?.status === TaskStatus.DONE) {
     const task = await prisma.task.findFirst({
       where: { taskNumber, team: { slug } },
-      select: { assigneeId: true, teamId: true, properties: true },
+      select: {
+        assigneeId: true,
+        teamId: true,
+        taskType: true,
+        properties: true,
+        status: true,
+      },
     });
-    if (task?.assigneeId) {
-      const props = task.properties as Record<string, unknown>;
-      if (props?.task_type === TRAINING_TASK_TYPE_VALUE) {
-        await TeamOps.updateLastAwarenessTrainingCompletion(
-          prisma,
-          task.teamId,
-          task.assigneeId,
-          new Date()
-        );
-      }
+
+    assertRiskTaskCanBeDone(
+      data.taskType ?? task?.taskType,
+      data.status,
+      (data.properties ?? task?.properties) as TaskProperties | null
+    );
+
+    if (
+      task?.assigneeId &&
+      task.taskType === TaskType.TRAINING &&
+      task.status !== TaskStatus.DONE
+    ) {
+      await TeamOps.updateLastAwarenessTrainingCompletion(
+        prisma,
+        task.teamId,
+        task.assigneeId,
+        new Date()
+      );
+      completedTraining = { teamId: task.teamId, userId: task.assigneeId };
     }
   }
 
@@ -85,7 +124,33 @@ export const updateTask = async (
     };
   }
 
-  return await TaskOps.updateTask(prisma, taskNumber, slug, updateData, audit);
+  const updated = await TaskOps.updateTask(
+    prisma,
+    taskNumber,
+    slug,
+    updateData,
+    audit
+  );
+
+  if (completedTraining) {
+    try {
+      await TaskOps.ensureAwarenessTrainingTask(
+        prisma,
+        completedTraining.teamId,
+        completedTraining.userId,
+        audit.user.name ?? '',
+        audit,
+        addDays(new Date(), AWARENESS_TRAINING_REGENERATION_DAYS)
+      );
+    } catch (err) {
+      console.error(
+        '[Awareness] Failed to create next training task on completion:',
+        err
+      );
+    }
+  }
+
+  return updated;
 };
 
 export const deleteTask = async (
