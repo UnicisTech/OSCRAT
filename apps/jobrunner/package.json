@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
     "build": "tsc",
-    "start": "tsx src/index.ts",
+    "start": "tsx dist/apps/jobrunner/src/index.js",
     "check-types": "tsc --pretty --noEmit",
     "check-format": "prettier --check .",
     "check-lint": "npx eslint .",
@@ -22,6 +22,7 @@
     "fast-xml-parser": "^5.7.2",
     "p-queue": "^8.1.0",
     "tempy": "^3.1.0",
+    "tsx": "^4.20.3",
     "yup": "^1.6.1",
     "zx": "^8.5.5"
   },

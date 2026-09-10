@@ -1,0 +1,69 @@
+# syntax=docker/dockerfile:1.7
+
+FROM node:22-bookworm-slim AS base
+
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    python3 \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN corepack enable \
+  && corepack prepare pnpm@9.15.4 --activate
+
+WORKDIR /app
+
+FROM base AS deps
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
+COPY apps/frontend/package.json apps/frontend/package.json
+COPY apps/jobrunner/package.json apps/jobrunner/package.json
+COPY packages/model/package.json packages/model/package.json
+
+RUN pnpm install --frozen-lockfile
+
+FROM deps AS build
+
+COPY . .
+
+ENV DATABASE_URL=postgresql://postgres:counter@db:5432/unicis_platform
+ENV APP_URL=http://localhost:4002
+ENV NEXTAUTH_URL=http://localhost:4002
+ENV NEXTAUTH_SECRET=docker-development-secret
+ENV TOKEN_ENCRYPTION_KEY=docker-development-token-key
+ENV CONFIRM_EMAIL=false
+ENV NODE_ENV=production
+
+RUN pnpm --filter @oscrat/model exec prisma generate
+RUN pnpm --filter @oscrat/frontend build
+RUN generated_client_dir="$(find /app/node_modules -path '*/node_modules/.prisma/client' -type d -print -quit)" \
+  && test -n "$generated_client_dir" \
+  && mkdir -p /tmp/prisma-engines \
+  && cp "$generated_client_dir"/libquery_engine-*.so.node /tmp/prisma-engines/
+
+FROM node:22-bookworm-slim AS runtime
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY --from=build /app/apps/frontend/public ./public
+COPY --from=build /app/apps/frontend/.next/standalone ./
+COPY --from=build /app/apps/frontend/.next/static ./apps/frontend/.next/static
+COPY --from=build /tmp/prisma-engines ./apps/frontend/.next/server
+
+ENV NODE_ENV=production
+ENV PORT=4002
+ENV HOSTNAME=0.0.0.0
+
+EXPOSE 4002
+
+CMD ["node", "apps/frontend/server.js"]

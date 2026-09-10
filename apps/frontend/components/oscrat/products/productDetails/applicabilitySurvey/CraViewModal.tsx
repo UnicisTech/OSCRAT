@@ -36,8 +36,7 @@ const CraViewModal: React.FC<CraViewModalProps> = ({
   const skippedQuestions =
     rawData?.questionnaire_results?.skippedQuestions || [];
 
-  // Combine all questions in order
-  const allQuestions = [...data.applicabilityQuestions, ...data.riskQuestions];
+  const allQuestions = data.applicabilityQuestions;
 
   // Build content for display - include both answered and skipped questions
   const content = allQuestions.flatMap((q, index) => {

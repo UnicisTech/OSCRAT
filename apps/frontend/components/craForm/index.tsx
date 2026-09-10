@@ -14,10 +14,7 @@ const CraForm: React.FC<CraFormProps> = ({
   onFormCompleted,
   initialFormState,
 }) => {
-  const allQuestions: CraQuestion[] = [
-    ...data.applicabilityQuestions,
-    ...data.riskQuestions,
-  ];
+  const allQuestions: CraQuestion[] = data.applicabilityQuestions;
   const TOTAL_QUESTIONS = allQuestions.length;
 
   const {
