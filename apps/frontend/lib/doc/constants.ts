@@ -1,6 +1,6 @@
 import { AssessmentType, DeclarationType } from './types';
 
-export const DOC_GUIDE_URL = 'https://cloud.unicis.tech/f/262437';
+export const DOC_GUIDE_URL = 'https://oscrat.eu/wp-content/uploads/2026/09/D2.1-Annex_12.pdf';
 
 export const ASSESSMENT_OPTIONS = [
   { value: AssessmentType.SELF, labelKey: 'oscrat.ui.doc.self-assessment' },
