@@ -75,11 +75,11 @@ const CreateTeam = ({ onClose }: CreateTeamProps) => {
       try {
         const teamData = {
           name: values.name,
-          type: values.type as OscratOrganizationType,
-          orgRole: values.orgRole as OscratOrganizationRole,
-          ...((values.type as OscratOrganizationType) ===
+          type: values.type as typeof OscratOrganizationType[keyof typeof OscratOrganizationType],
+          orgRole: values.orgRole as typeof OscratOrganizationRole[keyof typeof OscratOrganizationRole],
+          ...((values.type as typeof OscratOrganizationType[keyof typeof OscratOrganizationType]) ===
             OscratOrganizationType.LIMITED_LIABILITY_COMPANY && {
-            size: values.size as OscratOrganizationSize,
+            size: values.size as typeof OscratOrganizationSize[keyof typeof OscratOrganizationSize],
             taxId: values.taxId,
           }),
           postalAddress: values.postalAddress,
