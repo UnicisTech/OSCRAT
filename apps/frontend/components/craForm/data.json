@@ -7,12 +7,12 @@
       "hint": "This Regulation applies to economic operators only in relation to products with digital elements made available on the market, hence supplied for distribution or use on the Union market in the course of a commercial activity. Including through sales, monetization, paid support, or data processing beyond security purposes, and excluding cases where the product is solely cost-recovery based or developed/used exclusively by public administration without market availability.",
       "references": [
         {
-          "text": "Section 1.1 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(1); Recital 16",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         },
         {
-          "text": "Section 1.2 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(1); Recital 16",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -33,9 +33,10 @@
       "hint": "The unfinished software which does not comply with CRA can be made available on the market, provided that the software is made available only for a limited period required for testing purposes with a visible sign clearly indicating that it does not comply with this Regulation and that it will not be available on the market for purposes other than testing.",
       "references": [
         {
-          "text": "Section 1.2 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(1)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
+      ],
       ],
       "answerOptions": [
         {
@@ -53,9 +54,9 @@
       "question": "Was the product with digital elements developed as a spare part to replace identical components on the market?",
       "hint": "This Regulation does not apply to spare parts that are made available on the market to replace identical components in products with digital elements and that are manufactured according to the same specifications as the components that they are intended to replace. In order to ensure that products with digital elements made available on the market can be repaired effectively and their durability extended, an exemption cover both spare parts that have the purpose of repairing legacy products made available before the date of application of CRA and spare parts that have already undergone a conformity assessment procedure pursuant to CRA.",
       "references": [
-        {
-          "text": "Section 1.3 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+       {
+          "text": "CRA Article 2(6)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -75,8 +76,8 @@
       "hint": "Determining whether it is a 'significant modification' and requires reassessment – a significant modification, if the product is being assessed by a third party, must also be reported to that party.",
       "references": [
         {
-          "text": "Section 1.4 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 3(30); Recital 41",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -97,8 +98,8 @@
       "hint": "Substantial modification means a change to the product with digital elements following its placing on the market, which affects the compliance of the product with digital elements with the essential cybersecurity requirements set out in Part I of Annex I or which results in a modification to the intended purpose for which the product with digital elements has been assessed.",
       "references": [
         {
-          "text": "Section 1.5 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 3(30); Recitals 38–41",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -118,8 +119,8 @@
       "hint": "\"Product with digital elements\" means a software or hardware product, where:\n- \"software\" means the part of an electronic information system which consists of computer code;\n- \"hardware\" means a physical electronic information system, or parts capable of processing, storing or transmitting digital data;\n- \"electronic information system\" means a system, including electrical or electronic equipment, capable of processing, storing or transmitting digital data;\nand its remote data processing solutions, including software or hardware components being placed on the market separately, where:\n- \"component\" means software or hardware intended for integration into an electronic information system;\n- \"remote data processing\" means data processing at a distance for which the software is designed and developed by the manufacturer, or under the responsibility of the manufacturer, and the absence of which would prevent the product with digital elements from performing one of its functions;",
       "references": [
         {
-          "text": "Section 1.6 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 3(1)–(2)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -144,8 +145,8 @@
       "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2017/745, it is a medical device.\n\"Medical device\" means any instrument, apparatus, appliance, software, implant, reagent, material or other article intended by the manufacturer to be used, alone or in combination, for human beings for one or more of the following specific medical purposes:\n- diagnosis, prevention, monitoring, prediction, prognosis, treatment or alleviation of disease,\n- diagnosis, monitoring, treatment, alleviation of, or compensation for, an injury or disability,\n- investigation, replacement or modification of the anatomy or of a physiological or pathological process or state,\n- providing information by means of in vitro examination of specimens derived from the human body, including organ, blood and tissue donations,\nand which does not achieve its principal intended action by pharmacological, immunological or metabolic means, in or on the human body, but which may be assisted in its function by such means.\nThe following products shall also be deemed to be medical devices:\n- devices for the control or support of conception;\n- products specifically intended for the cleaning, disinfection or sterilisation of devices as referred to in Article 1(4) and of those referred to in the first paragraph of this point.",
       "references": [
         {
-          "text": "Section 1.7 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(2)(a)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -166,8 +167,8 @@
       "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2017/746, it is a vitro diagnostic medical device.\n\"In vitro diagnostic medical device\" means any medical device which is a reagent, reagent product, calibrator, control material, kit, instrument, apparatus, piece of equipment, software or system, whether used alone or in combination, intended by the manufacturer to be used in vitro for the examination of specimens, including blood and tissue donations, derived from the human body, solely or principally for the purpose of providing information on one or more of the following:\n- concerning a physiological or pathological process or state;\n- concerning congenital physical or mental impairments;\n- concerning the predisposition to a medical condition or a disease;\n- to determine the safety and compatibility with potential recipients;\n- to predict treatment response or reactions;\n- to define or monitoring therapeutic measures.\nSpecimen receptacles shall also be deemed to be in vitro diagnostic medical devices;",
       "references": [
         {
-          "text": "Section 1.7 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(2)(b)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -188,8 +189,8 @@
       "hint": "If the product is subject to the requirements set out in the Regulation (EU) 2019/2144, it is a product for protection and safety of vehicle occupants and vulnerable road users, pressure monitoring systems, fuel efficiency and CO2 emissions, tyres.",
       "references": [
         {
-          "text": "Section 1.7 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(2)(c)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -210,8 +211,8 @@
       "hint": "A product certified and in the scope of Regulation (EU) 2018/1139 does not apply to CRA.",
       "references": [
         {
-          "text": "Section 1.7 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(3)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -232,8 +233,8 @@
       "hint": "A product in the scope of Regulation 2014/90/UE does not apply to CRA.",
       "references": [
         {
-          "text": "Section 1.7 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(4)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -253,8 +254,8 @@
       "hint": "Products with digital elements that are developed or modified exclusively for national security or defence purposes or products that are specifically designed to process classified information fall outside the scope of this Regulation.",
       "references": [
         {
-          "text": "Section 1.7 of the CRA Form",
-          "url": "https://www.cra.gov.uk/form"
+          "text": "CRA Article 2(7)",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -277,7 +278,7 @@
       "references": [
         {
           "text": "Annex III, Annex IV",
-          "url": "https://www.cra.gov.uk/form"
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
         }
       ],
       "answerOptions": [
@@ -288,7 +289,7 @@
           "references": [
             {
               "text": "Annex IV point (1)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -299,7 +300,7 @@
           "references": [
             {
               "text": "Annex IV point (2)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -310,7 +311,7 @@
           "references": [
             {
               "text": "Annex IV point (3)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -321,7 +322,7 @@
           "references": [
             {
               "text": "Annex III part II point (1)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -332,7 +333,7 @@
           "references": [
             {
               "text": "Annex III part II point (2)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -343,7 +344,7 @@
           "references": [
             {
               "text": "Annex III part II point (3)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -354,7 +355,7 @@
           "references": [
             {
               "text": "Annex III part II point (4)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -365,7 +366,7 @@
           "references": [
             {
               "text": "Annex III part I point (1)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -376,7 +377,7 @@
           "references": [
             {
               "text": "Annex III part I point (2)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -387,7 +388,7 @@
           "references": [
             {
               "text": "Annex III part I point (3)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -398,7 +399,7 @@
           "references": [
             {
               "text": "Annex III part I point (4)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -409,7 +410,7 @@
           "references": [
             {
               "text": "Annex III part I point (5)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -420,7 +421,7 @@
           "references": [
             {
               "text": "Annex III part I point (6)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -431,7 +432,7 @@
           "references": [
             {
               "text": "Annex III part I point (7)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -442,7 +443,7 @@
           "references": [
             {
               "text": "Annex III part I point (8)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -453,7 +454,7 @@
           "references": [
             {
               "text": "Annex III part I point (9)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -464,7 +465,7 @@
           "references": [
             {
               "text": "Annex III part I point (10)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -475,7 +476,7 @@
           "references": [
             {
               "text": "Annex III part I point (11)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -486,7 +487,7 @@
           "references": [
             {
               "text": "Annex III part I point (12)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -497,7 +498,7 @@
           "references": [
             {
               "text": "Annex III part I point (13)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -508,7 +509,7 @@
           "references": [
             {
               "text": "Annex III part I point (14)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -519,7 +520,7 @@
           "references": [
             {
               "text": "Annex III part I point (15)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -530,7 +531,7 @@
           "references": [
             {
               "text": "Annex III part I point (16)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -541,7 +542,7 @@
           "references": [
             {
               "text": "Annex III part I point (17)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -552,7 +553,7 @@
           "references": [
             {
               "text": "Annex III part I point (18)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -563,7 +564,7 @@
           "references": [
             {
               "text": "Annex III part I point (19)",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         },
@@ -574,7 +575,7 @@
           "references": [
             {
               "text": "Annex III, Annex IV",
-              "url": "https://www.cra.gov.uk/form"
+              "url": "https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng"
             }
           ]
         }
