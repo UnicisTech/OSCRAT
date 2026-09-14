@@ -86,6 +86,7 @@ const redirects = [
 
 /** @type {import('next').NextConfig} */
 module.exports = withConfig({
+  output: 'standalone',
   reactStrictMode: false,
   transpilePackages: ['@oscrat/model', '@mdxeditor/editor'],
   serverExternalPackages: ['@prisma/client'],
