@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.7
 
-FROM node:22-bookworm-slim AS tooling
+ARG NODE_VERSION=22.23.4
+
+FROM node:${NODE_VERSION}-bookworm-slim AS tooling
 
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
@@ -27,7 +29,7 @@ RUN python3 -m venv /opt/openscap-venv \
   && /opt/openscap-venv/bin/pip install --no-cache-dir openscap-report==1.0.0 \
   && ln -sf /opt/openscap-venv/bin/oscap-report /usr/local/bin/oscap-report
 
-FROM node:22-bookworm-slim AS base
+FROM node:${NODE_VERSION}-bookworm-slim AS base
 
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
@@ -74,7 +76,7 @@ RUN pnpm --filter @oscrat/jobrunner --prod deploy /opt/jobrunner \
   && find /opt/jobrunner/node_modules -path '*/node_modules/@prisma/client' -type d -exec sh -c 'prisma_package_dir="$1"; target_client_dir="$(dirname "$prisma_package_dir")/.prisma/client"; if [ ! -f "$target_client_dir/default.js" ]; then rm -rf "$target_client_dir"; mkdir -p "$target_client_dir"; cp -a "$2"/. "$target_client_dir"/; fi' sh {} "$generated_client_dir" \;
 RUN cd /opt/jobrunner/node_modules/@oscrat/model && node --input-type=module -e "import PrismaClient from '@prisma/client'; if (!PrismaClient.IncidentStatus) throw new Error('Deployed Prisma Client is missing IncidentStatus')"
 
-FROM node:22-bookworm-slim AS runtime
+FROM node:${NODE_VERSION}-bookworm-slim AS runtime
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \

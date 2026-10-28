@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.7
 
-FROM node:22-bookworm-slim AS base
+ARG NODE_VERSION=22.23.4
+
+FROM node:${NODE_VERSION}-bookworm-slim AS base
 
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
@@ -48,7 +50,7 @@ RUN generated_client_dir="$(find /app/node_modules -path '*/node_modules/.prisma
   && mkdir -p /tmp/prisma-engines \
   && cp "$generated_client_dir"/libquery_engine-*.so.node /tmp/prisma-engines/
 
-FROM node:22-bookworm-slim AS runtime
+FROM node:${NODE_VERSION}-bookworm-slim AS runtime
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl \
