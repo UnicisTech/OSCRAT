@@ -35,6 +35,11 @@ FROM deps AS build
 
 COPY . .
 
+ARG NEXT_PUBLIC_MATOMO_URL=https://stats.unicis.tech/matomo
+ARG NEXT_PUBLIC_MATOMO_SITE_ID=11
+ENV NEXT_PUBLIC_MATOMO_URL=$NEXT_PUBLIC_MATOMO_URL
+ENV NEXT_PUBLIC_MATOMO_SITE_ID=$NEXT_PUBLIC_MATOMO_SITE_ID
+
 ENV DATABASE_URL=postgresql://postgres:counter@db:5432/unicis_platform
 ENV APP_URL=http://localhost:4002
 ENV NEXTAUTH_URL=http://localhost:4002

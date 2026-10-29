@@ -6,6 +6,8 @@ const { withGlobalCss } = require('next-global-css');
 const withConfig = withGlobalCss();
 
 const isDev = process.env.NODE_ENV !== 'production';
+const matomoUrl = process.env.NEXT_PUBLIC_MATOMO_URL?.trim();
+const matomoSource = matomoUrl ? ` ${new URL(matomoUrl).origin}` : '';
 
 const cspDirectives = [
   "default-src 'self'",
@@ -17,12 +19,12 @@ const cspDirectives = [
   // (yoga-layout) instantiates a WebAssembly module in the browser. Without it
   // every client-side PDF export fails outside dev, where 'unsafe-eval' happens
   // to cover it.
-  `script-src 'self' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
+  `script-src 'self' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ''} https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/${matomoSource}`,
   "script-src-attr 'none'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https://api.dicebear.com",
-  `connect-src 'self'${isDev ? ' ws:' : ''} https://www.google.com/recaptcha/`,
+  `img-src 'self' data: blob: https://api.dicebear.com${matomoSource}`,
+  `connect-src 'self'${isDev ? ' ws:' : ''} https://www.google.com/recaptcha/${matomoSource}`,
   'frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/',
   ...(isDev ? [] : ['upgrade-insecure-requests']),
 ];

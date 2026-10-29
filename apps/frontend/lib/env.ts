@@ -56,8 +56,9 @@ const env = {
 
   // Matomo configuration
   matomo: {
-    url: `${process.env.NEXT_PUBLIC_MATOMO_URL}`,
-    siteId: `${process.env.NEXT_PUBLIC_MATOMO_SITE_ID}`,
+    enabled: process.env.NODE_ENV === 'production',
+    url: process.env.NEXT_PUBLIC_MATOMO_URL?.trim() || '',
+    siteId: process.env.NEXT_PUBLIC_MATOMO_SITE_ID?.trim() || '',
   },
 
   // NextAuth configuration
