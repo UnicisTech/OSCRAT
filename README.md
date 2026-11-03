@@ -32,7 +32,47 @@ oscrat-oves/
 
 ## Deployment
 
-To Be Done
+Node.js is pinned to **22.23.4**, the fixed 22.x release in the
+[October 2026 security bulletin](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases).
+Deployment uses Docker. `.nvmrc` is the version source for local development and
+GitHub Actions. Keep the `NODE_VERSION` default in all three Dockerfiles
+synchronized with it. `@types/node` supplies TypeScript declarations and does not
+select or update the runtime.
+
+- `Dockerfile.frontend` builds the Next.js frontend and backend API as a standalone
+  server on port 4002. `Dockerfile.jobrunner` builds the separate database-polling
+  worker with Syft, Grype, and openscap-report. `Dockerfile.txt` offers both as
+  separate `frontend` and `jobrunner` targets. Every Node stage keeps the existing
+  Debian Bookworm slim base and pins the full Node.js version.
+- GitHub Actions runs generation, lint, typecheck, and build on pushes/PRs to
+  `main`; it does not deploy. Docker Compose only starts local PostgreSQL.
+
+To roll out the runtime update, rebuild both Docker images with `--pull`, then
+replace the running instances. For example, from the repository root:
+
+```bash
+docker build --pull -f Dockerfile.frontend -t oscrat-frontend:node-22.23.4 .
+docker build --pull -f Dockerfile.jobrunner -t oscrat-jobrunner:node-22.23.4 .
+```
+
+Verify `node --version` inside each new running container, check frontend
+`/api/health` against its database, and confirm the worker connects and polls its
+queue. Repository pins alone do not establish the Node.js version of an already
+running service.
+
+### Matomo analytics
+
+Production frontend builds track page views, Next.js route changes, and outlinks
+using the existing `@socialgouv/matomo-next` integration. Both frontend Docker build
+paths default to `https://stats.unicis.tech/matomo` with Site ID `11`. Tracking is
+disabled in development and when either Matomo setting is empty.
+
+Override `NEXT_PUBLIC_MATOMO_URL` and `NEXT_PUBLIC_MATOMO_SITE_ID` with Docker
+`--build-arg` options when building a different environment. Set both build
+arguments to empty values to disable tracking. These public values and the
+matching CSP allowlist are embedded at build time. Set new build arguments and
+rebuild the frontend image to change them; runtime environment variables alone
+have no effect.
 
 ## Getting Started
 
@@ -40,7 +80,7 @@ Please follow these simple steps to get a local copy up and running.
 
 ### Prerequisites
 
-- Node.js (Version: >=22.x, see `.nvmrc`)
+- Node.js 22.23.4 (see `.nvmrc`; run `nvm install && nvm use`)
 - PostgreSQL
 - PNPM
 - Docker compose

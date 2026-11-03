@@ -14,6 +14,7 @@ import '../styles/globals.css';
 import '@mdxeditor/editor/style.css';
 import { Themer } from '@boxyhq/react-ui/shared';
 import AccountLayout from '@/components/layouts/AccountLayout';
+import MatomoAnalytics from '@/components/analytics/MatomoAnalytics';
 
 /**
  * Mounts the @atlaskit/tokens CSS variables in light mode. Atlaskit components
@@ -42,6 +43,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <ReactQueryProvider>
+      <MatomoAnalytics />
       <Head>
         <title>{app.name}</title>
         <link
